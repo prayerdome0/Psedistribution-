@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopping Cart - PSE Wholesale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        .cart-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .cart-items {
+            background: #fff;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid #e9edf2;
+        }
+        .cart-items h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #0b2a3b;
+        }
+        .cart-item {
+            display: grid;
+            grid-template-columns: 80px 1fr auto;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eef2f6;
+            align-items: center;
+        }
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        .cart-item .item-image {
+            background: #f4f8fa;
+            border-radius: 0.8rem;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #3a6b7a;
+            overflow: hidden;
+        }
+        .cart-item .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .cart-item .item-details .item-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #0b2a3b;
+        }
+        .cart-item .item-details .item-brand {
+            font-size: 0.8rem;
+            color: #6a889a;
+        }
+        .cart-item .item-details .item-price {
+            font-weight: 700;
+            color: #1e7b6b;
+            font-size: 1.1rem;
+            margin-top: 0.2rem;
+        }
+        .cart-item .item-details .item-price .old {
+            font-weight: 400;
+            color: #9aafbb;
+            text-decoration: line-through;
+            font-size: 0.85rem;
+            margin-left: 0.4rem;
+        }
+        .cart-item .item-qty {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .cart-item .item-qty input {
+            width: 50px;
+            padding: 0.3rem;
+            border: 1px solid #dce3e9;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .cart-item .item-qty button {
+            background: #f1f5f9;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+        .cart-item .item-qty button:hover {
+            background: #dce3e9;
+        }
+        .cart-item .item-remove {
+            color: #c0392b;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            background: none;
+            border: none;
+        }
+        .cart-item .item-remove:hover {
+            color: #a93226;
+        }
+        .cart-item .item-subtotal {
+            font-weight: 700;
+            color: #0b2a3b;
+            font-size: 1.1rem;
+            text-align: right;
+        }
+
+        .cart-summary {
+            background: #fff;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid #e9edf2;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+        .cart-summary h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            color: #0b2a3b;
+        }
+        .cart-summary .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            font-size: 0.9rem;
+            color: #2c5a6b;
+            border-bottom: 1px solid #eef2f6;
+        }
+        .cart-summary .summary-row.total {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0b2a3b;
+            border-bottom: none;
+            padding-top: 0.8rem;
+        }
+        .cart-summary .summary-row .amount {
+            font-weight: 600;
+        }
+        .cart-summary .summary-row.total .amount {
+            color: #1e7b6b;
+        }
+        .cart-summary .coupon {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        .cart-summary .coupon input {
+            flex: 1;
+            padding: 0.5rem 0.8rem;
+            border: 1px solid #dce3e9;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+        .cart-summary .coupon button {
+            background: #0b2a3b;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .cart-summary .coupon button:hover {
+            background: #1a4b5e;
+        }
+        .btn-checkout {
+            background: #1e7b6b;
+            color: #fff;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1rem;
+            width: 100%;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 0.5rem;
+        }
+        .btn-checkout:hover {
+            background: #146354;
+        }
+        .btn-checkout i {
+            margin-right: 0.5rem;
+        }
+
+        .trust-badges {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .trust-badges span {
+            font-size: 0.7rem;
+            color: #6a889a;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .trust-badges span i {
+            color: #1e7b6b;
+            font-size: 0.9rem;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        .empty-cart i {
+            font-size: 4rem;
+            color: #dce3e9;
+            margin-bottom: 1rem;
+        }
+        .empty-cart h3 {
+            font-size: 1.2rem;
+            color: #0b2a3b;
+        }
+        .empty-cart p {
+            color: #6a889a;
+            margin: 0.5rem 0 1.5rem;
+        }
+        .btn-continue {
+            background: #1e7b6b;
+            color: #fff;
+            border: none;
+            padding: 0.6rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-continue:hover {
+            background: #146354;
+        }
+
+        @media (max-width: 992px) {
+            .cart-layout {
+                grid-template-columns: 1fr;
+            }
+            .cart-summary {
+                position: static;
+            }
+        }
+        @media (max-width: 768px) {
+            .cart-item {
+                grid-template-columns: 60px 1fr;
+                gap: 0.8rem;
+            }
+            .cart-item .item-image {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+            .cart-item .item-subtotal {
+                grid-column: 1 / -1;
+                text-align: right;
+                padding-top: 0.3rem;
+                border-top: 1px solid #eef2f6;
+            }
+            .cart-item .item-qty {
+                justify-content: flex-end;
+            }
+            .cart-items {
+                padding: 1rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .cart-item {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .cart-item .item-image {
+                margin: 0 auto;
+            }
+            .cart-item .item-subtotal {
+                text-align: center;
+            }
+            .cart-item .item-qty {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── TOP BAR ─── -->
+<div class="top-bar">
+    <div class="container">
+        <div>
+            <span>Welcome to PSE Wholesale</span>
+            <a href="#" onclick="showToast('✅ Verified Supplier - Trusted partners!', 'success')">
+                <i class="fa-regular fa-circle-check"></i> Verified Supplier
+            </a>
+            <a href="#" onclick="showToast('🚚 Bulk Shipping - Free on orders over $250!', 'info')">
+                <i class="fa-regular fa-truck"></i> Bulk Shipping
+            </a>
+        </div>
+        <div id="authLinks">
+            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
+            <a href="#" onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</a>
+            <a href="seller-dashboard.html">Become a Seller</a>
+            <a href="login.html" id="loginLink">Login</a>
+            <a href="register.html" id="registerLink">Register</a>
+            <select class="lang-select" onchange="showToast('🌐 Language changed to ' + this.value, 'info')">
+                <option value="EN">EN</option>
+                <option value="ES">ES</option>
+                <option value="FR">FR</option>
+                <option value="DE">DE</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+    <div class="container">
+        <a href="index.html" class="logo">
+    <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+</a>
+        <div class="search-bar">
+            <select id="categoryFilter"><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
+            <input type="text" id="searchInput" placeholder="Search wholesale products..." onkeyup="searchProducts(event)" />
+            <button onclick="searchProducts()"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <div class="header-actions">
+            <div class="location-selector"><i class="fa-solid fa-location-dot"></i> Sacramento, 95829</div>
+            <a href="#" class="icon-btn" onclick="if(!JSON.parse(localStorage.getItem('pse_user')||'null')){showToast('Please login first','error')}else{window.location.href='wishlist.html'}">
+                <i class="fa-regular fa-heart"></i><span>Wishlist</span>
+                <span class="badge-count wishlist-count">0</span>
+            </a>
+            <a href="#" class="icon-btn">
+                <i class="fa-regular fa-bell"></i><span>Alerts</span>
+                <span class="badge-count">3</span>
+            </a>
+            <a href="#" class="icon-btn" id="accountBtn" onclick="if(!JSON.parse(localStorage.getItem('pse_user')||'null')){window.location.href='login.html'}else{window.location.href='account.html'}">
+                <i class="fa-regular fa-user"></i><span id="accountLabel">Account</span>
+            </a>
+            <a href="#" class="icon-btn" onclick="window.location.href='cart.html'">
+                <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ─── NAVIGATION ─── -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="index.html"><i class="fa-solid fa-bars"></i> All Departments</a>
+        <a href="#" onclick="filterByCategory('deals')">Today's Deals</a>
+        <a href="#" onclick="filterByCategory('new')">New Arrivals</a>
+        <a href="#" class="wholesale-nav" onclick="filterByCategory('wholesale')"><i class="fa-solid fa-cubes"></i> Wholesale</a>
+        <a href="#" onclick="filterByCategory('all')">Brands</a>
+        <a href="#" onclick="filterByCategory('clearance')">Clearance</a>
+        <a href="#" onclick="document.getElementById('flashDeals').scrollIntoView({behavior:'smooth'})">Flash Deals</a>
+        <a href="#">Gift Cards</a>
+        <a href="#">Business Solutions</a>
+        <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Customer Service</a>
+    </div>
+</nav>
+
+<!-- ─── MAIN CONTENT ─── -->
+<div class="container">
+
+    <!-- PAGE LINKS -->
+    <div class="page-links">
+        <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products.html"><i class="fa-solid fa-grid-2"></i> Products</a>
+        <a href="product-detail.html"><i class="fa-solid fa-eye"></i> Detail</a>
+        <a href="cart.html" class="active"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+        <a href="checkout.html"><i class="fa-solid fa-credit-card"></i> Checkout</a>
+        <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+        <a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a>
+        <a href="account.html"><i class="fa-solid fa-user"></i> Account</a>
+        <a href="seller-dashboard.html"><i class="fa-solid fa-store"></i> Seller</a>
+        <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Admin</a>
+        <a href="about.html"><i class="fa-solid fa-info-circle"></i> About</a>
+    </div>
+
+    <!-- Cart Layout -->
+    <div class="cart-layout" id="cartLayout">
+
+        <!-- Cart Items -->
+        <div class="cart-items" id="cartItems">
+            <h2><i class="fa-solid fa-cart-shopping"></i> Your Cart (<span id="cartItemCount">0</span> items)</h2>
+            <div id="cartItemsList">
+                <div class="loading-spinner">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;"></i>
+                    <p style="margin-top:0.5rem;">Loading cart...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="cart-summary" id="cartSummary">
+            <h3>Order Summary</h3>
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span class="amount" id="summarySubtotal">$0.00</span>
+            </div>
+            <div class="summary-row">
+                <span>Bulk Discount</span>
+                <span class="amount" style="color:#1e7b6b;" id="summaryDiscount">−$0.00</span>
+            </div>
+            <div class="summary-row">
+                <span>Shipping</span>
+                <span class="amount" style="color:#1e7b6b;" id="summaryShipping">FREE</span>
+            </div>
+            <div class="summary-row">
+                <span>Tax (est.)</span>
+                <span class="amount" id="summaryTax">$0.00</span>
+            </div>
+            <div class="summary-row total">
+                <span>Total</span>
+                <span class="amount" id="summaryTotal">$0.00</span>
+            </div>
+
+            <div class="coupon">
+                <input type="text" id="couponInput" placeholder="Enter coupon code" />
+                <button onclick="applyCoupon()">Apply</button>
+            </div>
+
+            <a href="checkout.html">
+                <button class="btn-checkout"><i class="fa-solid fa-lock"></i> Proceed to Checkout</button>
+            </a>
+
+            <div class="trust-badges">
+                <span><i class="fa-solid fa-lock"></i> Secure</span>
+                <span><i class="fa-solid fa-truck"></i> Fast Delivery</span>
+                <span><i class="fa-solid fa-rotate-left"></i> Easy Returns</span>
+                <span><i class="fa-solid fa-shield"></i> Buyer Protection</span>
+            </div>
+
+            <div style="text-align:center; margin-top:0.8rem; font-size:0.75rem; color:#6a889a;">
+                <a href="products.html" style="color:#1e7b6b;"><i class="fa-solid fa-arrow-left"></i> Continue Shopping</a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ─── HELP MODAL ─── -->
+<div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
+    <div class="modal-content">
+        <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
+        <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
+        <p>Choose from our support options below:</p>
+        <ul>
+            <li><i class="fa-regular fa-message" style="color:#1e7b6b; width:20px;"></i> Live Chat (24/7)</li>
+            <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
+            <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
+            <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
+        </ul>
+        <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
+    </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+    <div class="container">
+        <div>
+            <h4>PSE Wholesale</h4>
+            <ul>
+                <li onclick="window.location.href='about.html'">About Us</li>
+                <li>Careers</li>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
+                <li>Blog</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Customer Service</h4>
+            <ul>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
+                <li>Returns & Refunds</li>
+                <li>Shipping Policy</li>
+                <li onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</li>
+            </ul>
+        </div>
+        <div>
+            <h4>B2B</h4>
+            <ul>
+                <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
+                <li>Wholesale Pricing</li>
+                <li>Bulk Orders</li>
+                <li>Supplier Program</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Legal</h4>
+            <ul>
+                <li>Privacy Policy</li>
+                <li>Terms & Conditions</li>
+                <li>Cookie Policy</li>
+            </ul>
+        </div>
+        <div class="bottom">
+            &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- ADMIN QUICK ACCESS -->
+<a href="admin-dashboard.html" class="admin-quick">
+    <i class="fa-solid fa-gauge-high"></i> Admin
+</a>
+
+<!-- ─── SCRIPTS ─── -->
+<script src="main.js"></script>
+<script>
+    let couponApplied = false;
+
+    function loadCart() {
+        const cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
+        const list = document.getElementById('cartItemsList');
+        const count = document.getElementById('cartItemCount');
+
+        if (cart.length === 0) {
+            list.innerHTML = `
+                <div class="empty-cart">
+                    <i class="fa-regular fa-cart-shopping"></i>
+                    <h3>Your cart is empty</h3>
+                    <p>Browse our wholesale products and find great deals!</p>
+                    <a href="products.html"><button class="btn-continue"><i class="fa-solid fa-arrow-left"></i> Start Shopping</button></a>
+                </div>
+            `;
+            count.textContent = '0';
+            updateCartSummary(cart);
+            return;
+        }
+
+        count.textContent = cart.length;
+
+        list.innerHTML = cart.map(item => `
+            <div class="cart-item">
+                <div class="item-image">
+                    ${item.image ? `<img src="${item.image}" alt="${item.title}" />` : `<i class="fa-solid fa-${item.icon || 'box'}"></i>`}
+                </div>
+                <div class="item-details">
+                    <div class="item-title">${item.title}</div>
+                    <div class="item-brand">${item.brand || 'PSE Wholesale'}</div>
+                    <div class="item-price">
+                        $${item.price.toFixed(2)}
+                        ${item.old_price ? `<span class="old">$${item.old_price.toFixed(2)}</span>` : ''}
+                        ${item.moq ? `<span style="font-size:0.6rem; background:#e3f0eb; padding:0.1rem 0.5rem; border-radius:30px; color:#1e7b6b; margin-left:0.3rem;">MOQ ${item.moq}</span>` : ''}
+                    </div>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
+                    <div class="item-qty">
+                        <button onclick="updateCartItem(${item.id}, -1)">−</button>
+                        <input type="number" id="qty_${item.id}" value="${item.quantity || 1}" min="${item.moq || 1}" onchange="updateCartItemQty(${item.id}, this.value)" />
+                        <button onclick="updateCartItem(${item.id}, 1)">+</button>
+                    </div>
+                    <button class="item-remove" onclick="removeCartItem(${item.id})"><i class="fa-regular fa-trash-can"></i> Remove</button>
+                </div>
+                <div class="item-subtotal">$${(item.price * (item.quantity || 1)).toFixed(2)}</div>
+            </div>
+        `).join('');
+
+        updateCartSummary(cart);
+    }
+
+    function updateCartItem(productId, change) {
+        let cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
+        const item = cart.find(i => i.id === productId);
+        if (item) {
+            const newQty = (item.quantity || 1) + change;
+            if (newQty >= (item.moq || 1)) {
+                item.quantity = newQty;
+                localStorage.setItem('pse_cart', JSON.stringify(cart));
+                loadCart();
+                updateCartCount();
+            } else {
+                showToast(`Minimum quantity is ${item.moq || 1}`, 'error');
+            }
+        }
+    }
+
+    function updateCartItemQty(productId, value) {
+        let cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
+        const item = cart.find(i => i.id === productId);
+        if (item) {
+            const newQty = parseInt(value) || 1;
+            if (newQty >= (item.moq || 1)) {
+                item.quantity = newQty;
+                localStorage.setItem('pse_cart', JSON.stringify(cart));
+                loadCart();
+                updateCartCount();
+            } else {
+                showToast(`Minimum quantity is ${item.moq || 1}`, 'error');
+                document.getElementById(`qty_${productId}`).value = item.quantity || 1;
+            }
+        }
+    }
+
+    function removeCartItem(productId) {
+        let cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
+        cart = cart.filter(i => i.id !== productId);
+        localStorage.setItem('pse_cart', JSON.stringify(cart));
+        loadCart();
+        updateCartCount();
+        showToast('🗑️ Item removed from cart', 'info');
+    }
+
+    function updateCartSummary(cart) {
+        let subtotal = 0;
+        let discount = 0;
+        let shipping = 0;
+
+        cart.forEach(item => {
+            const qty = item.quantity || 1;
+            subtotal += item.price * qty;
+            if (item.old_price) {
+                discount += (item.old_price - item.price) * qty;
+            }
+        });
+
+        // Free shipping over $250
+        if (subtotal >= 250) {
+            shipping = 0;
+        } else {
+            shipping = 15.00;
+        }
+
+        const tax = subtotal * 0.08; // 8% tax
+        const total = subtotal - discount + shipping + tax;
+
+        document.getElementById('summarySubtotal').textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById('summaryDiscount').textContent = `−$${discount.toFixed(2)}`;
+        document.getElementById('summaryShipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
+        document.getElementById('summaryTax').textContent = `$${tax.toFixed(2)}`;
+        document.getElementById('summaryTotal').textContent = `$${total.toFixed(2)}`;
+    }
+
+    function applyCoupon() {
+        const input = document.getElementById('couponInput');
+        const code = input.value.trim().toUpperCase();
+        
+        if (couponApplied) {
+            showToast('Coupon already applied', 'info');
+            return;
+        }
+
+        if (code === 'SAVE10' || code === 'WHOLESALE10') {
+            couponApplied = true;
+            showToast('🎉 Coupon SAVE10 applied! 10% off', 'success');
+            // Recalculate with discount
+            const cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
+            let subtotal = cart.reduce((sum, i) => sum + (i.price * (i.quantity || 1)), 0);
+            const discount = subtotal * 0.10;
+            const tax = (subtotal - discount) * 0.08;
+            const total = subtotal - discount + tax;
+            
+            document.getElementById('summaryDiscount').textContent = `−$${discount.toFixed(2)}`;
+            document.getElementById('summaryTax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('summaryTotal').textContent = `$${total.toFixed(2)}`;
+            input.value = '';
+            input.disabled = true;
+        } else if (code === '') {
+            showToast('Please enter a coupon code', 'error');
+        } else {
+            showToast('❌ Invalid coupon code', 'error');
+        }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        loadCart();
+    });
+</script>
+
+</body>
+</html>

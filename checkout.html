@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout - PSE Wholesale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        .checkout-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .checkout-form {
+            background: #fff;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid #e9edf2;
+        }
+        .checkout-form h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: #0b2a3b;
+        }
+        .checkout-form .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .checkout-form .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0b2a3b;
+            margin-bottom: 0.3rem;
+        }
+        .checkout-form .form-group input,
+        .checkout-form .form-group select,
+        .checkout-form .form-group textarea {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #dce3e9;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .checkout-form .form-group input:focus,
+        .checkout-form .form-group select:focus,
+        .checkout-form .form-group textarea:focus {
+            border-color: #1e7b6b;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(30, 123, 107, 0.1);
+        }
+        .checkout-form .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .checkout-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+        .payment-methods .method {
+            flex: 1;
+            min-width: 100px;
+            padding: 0.8rem;
+            border: 2px solid #dce3e9;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .payment-methods .method:hover {
+            border-color: #bcd9d0;
+        }
+        .payment-methods .method.active {
+            border-color: #1e7b6b;
+            background: #f0f8f5;
+        }
+        .payment-methods .method i {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .payment-methods .method span {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #0b2a3b;
+        }
+
+        .order-summary-side {
+            background: #fff;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid #e9edf2;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+        .order-summary-side h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #0b2a3b;
+        }
+        .order-summary-side .order-item {
+            display: flex;
+            gap: 0.8rem;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #eef2f6;
+            align-items: center;
+        }
+        .order-summary-side .order-item .item-image {
+            width: 50px;
+            height: 50px;
+            background: #f4f8fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #3a6b7a;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .order-summary-side .order-item .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .order-summary-side .order-item .item-info {
+            flex: 1;
+        }
+        .order-summary-side .order-item .item-info .title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0b2a3b;
+        }
+        .order-summary-side .order-item .item-info .qty {
+            font-size: 0.75rem;
+            color: #6a889a;
+        }
+        .order-summary-side .order-item .item-price {
+            font-weight: 700;
+            color: #1e7b6b;
+            font-size: 0.9rem;
+        }
+
+        .summary-totals {
+            margin-top: 1rem;
+        }
+        .summary-totals .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            font-size: 0.9rem;
+            color: #2c5a6b;
+        }
+        .summary-totals .row.total {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0b2a3b;
+            border-top: 2px solid #e9edf2;
+            padding-top: 0.8rem;
+            margin-top: 0.3rem;
+        }
+        .summary-totals .row.total .amount {
+            color: #1e7b6b;
+        }
+
+        .btn-place-order {
+            background: #1e7b6b;
+            color: #fff;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1rem;
+            width: 100%;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 1rem;
+        }
+        .btn-place-order:hover {
+            background: #146354;
+        }
+        .btn-place-order i {
+            margin-right: 0.5rem;
+        }
+
+        .guest-checkout {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e9edf2;
+        }
+        .guest-checkout label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #0b2a3b;
+            cursor: pointer;
+        }
+
+        @media (max-width: 992px) {
+            .checkout-layout {
+                grid-template-columns: 1fr;
+            }
+            .order-summary-side {
+                position: static;
+            }
+            .checkout-form .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .checkout-form {
+                padding: 1rem;
+            }
+            .payment-methods .method {
+                min-width: 80px;
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── TOP BAR ─── -->
+<div class="top-bar">
+    <div class="container">
+        <div>
+            <span>Welcome to PSE Wholesale</span>
+            <a href="#" onclick="showToast('✅ Verified Supplier - Trusted partners!', 'success')">
+                <i class="fa-regular fa-circle-check"></i> Verified Supplier
+            </a>
+            <a href="#" onclick="showToast('🚚 Bulk Shipping - Free on orders over $250!', 'info')">
+                <i class="fa-regular fa-truck"></i> Bulk Shipping
+            </a>
+        </div>
+        <div id="authLinks">
+            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
+            <a href="#" onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</a>
+            <a href="seller-dashboard.html">Become a Seller</a>
+            <a href="login.html" id="loginLink">Login</a>
+            <a href="register.html" id="registerLink">Register</a>
+            <select class="lang-select" onchange="showToast('🌐 Language changed to ' + this.value, 'info')">
+                <option value="EN">EN</option>
+                <option value="ES">ES</option>
+                <option value="FR">FR</option>
+                <option value="DE">DE</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+    <div class="container">
+        <a href="index.html" class="logo">
+    <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+</a>
+        <div class="search-bar">
+            <select><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
+            <input type="text" placeholder="Search wholesale products..." />
+            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <div class="header-actions">
+            <div class="location-selector"><i class="fa-solid fa-location-dot"></i> Sacramento, 95829</div>
+            <a href="#" class="icon-btn"><i class="fa-regular fa-heart"></i><span>Wishlist</span><span class="badge-count wishlist-count">0</span></a>
+            <a href="#" class="icon-btn"><i class="fa-regular fa-bell"></i><span>Alerts</span><span class="badge-count">3</span></a>
+            <a href="#" class="icon-btn" id="accountBtn"><i class="fa-regular fa-user"></i><span id="accountLabel">Account</span></a>
+            <a href="#" class="icon-btn" onclick="window.location.href='cart.html'">
+                <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ─── NAVIGATION ─── -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="index.html"><i class="fa-solid fa-bars"></i> All Departments</a>
+        <a href="#">Today's Deals</a>
+        <a href="#">New Arrivals</a>
+        <a href="#" class="wholesale-nav"><i class="fa-solid fa-cubes"></i> Wholesale</a>
+        <a href="#">Brands</a>
+        <a href="#">Clearance</a>
+        <a href="#">Flash Deals</a>
+        <a href="#">Gift Cards</a>
+        <a href="#">Business Solutions</a>
+        <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Customer Service</a>
+    </div>
+</nav>
+
+<!-- ─── MAIN CONTENT ─── -->
+<div class="container">
+
+    <!-- PAGE LINKS -->
+    <div class="page-links">
+        <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products.html"><i class="fa-solid fa-grid-2"></i> Products</a>
+        <a href="product-detail.html"><i class="fa-solid fa-eye"></i> Detail</a>
+        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+        <a href="checkout.html" class="active"><i class="fa-solid fa-credit-card"></i> Checkout</a>
+        <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+        <a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a>
+        <a href="account.html"><i class="fa-solid fa-user"></i> Account</a>
+        <a href="seller-dashboard.html"><i class="fa-solid fa-store"></i> Seller</a>
+        <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Admin</a>
+        <a href="about.html"><i class="fa-solid fa-info-circle"></i> About</a>
+    </div>
+
+    <!-- Checkout Layout -->
+    <div class="checkout-layout">
+
+        <!-- Checkout Form -->
+        <div class="checkout-form">
+            <h2><i class="fa-regular fa-address-card"></i> Shipping Information</h2>
+
+            <div class="guest-checkout">
+                <label>
+                    <input type="checkbox" id="guestCheckout" checked />
+                    Checkout as Guest
+                </label>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name *</label>
+                    <input type="text" id="firstName" placeholder="John" required />
+                </div>
+                <div class="form-group">
+                    <label>Last Name *</label>
+                    <input type="text" id="lastName" placeholder="Doe" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email Address *</label>
+                <input type="email" id="email" placeholder="john@example.com" required />
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="phone" placeholder="(555) 123-4567" />
+            </div>
+
+            <div class="form-group">
+                <label>Street Address *</label>
+                <input type="text" id="address" placeholder="123 Main Street" required />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>City *</label>
+                    <input type="text" id="city" placeholder="Los Angeles" required />
+                </div>
+                <div class="form-group">
+                    <label>State *</label>
+                    <select id="state" required>
+                        <option value="">Select State</option>
+                        <option value="CA">California</option>
+                        <option value="NY">New York</option>
+                        <option value="TX">Texas</option>
+                        <option value="FL">Florida</option>
+                        <option value="IL">Illinois</option>
+                        <option value="WA">Washington</option>
+                        <option value="OR">Oregon</option>
+                        <option value="NV">Nevada</option>
+                        <option value="AZ">Arizona</option>
+                        <option value="CO">Colorado</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ZIP Code *</label>
+                    <input type="text" id="zip" placeholder="90210" required />
+                </div>
+                <div class="form-group">
+                    <label>Country</label>
+                    <select id="country">
+                        <option value="US">United States</option>
+                        <option value="CA">Canada</option>
+                        <option value="UK">United Kingdom</option>
+                        <option value="DE">Germany</option>
+                        <option value="FR">France</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Order Notes (Optional)</label>
+                <textarea id="notes" placeholder="Special delivery instructions or notes..."></textarea>
+            </div>
+
+            <h2 style="margin-top:1.5rem;"><i class="fa-regular fa-credit-card"></i> Payment Method</h2>
+
+            <div class="payment-methods" id="paymentMethods">
+                <div class="method active" onclick="selectPayment(this)" data-method="card">
+                    <i class="fa-regular fa-credit-card"></i>
+                    <span>Credit Card</span>
+                </div>
+                <div class="method" onclick="selectPayment(this)" data-method="paypal">
+                    <i class="fa-brands fa-paypal"></i>
+                    <span>PayPal</span>
+                </div>
+                <div class="method" onclick="selectPayment(this)" data-method="bank">
+                    <i class="fa-regular fa-building-columns"></i>
+                    <span>Bank Transfer</span>
+                </div>
+            </div>
+
+            <div id="cardDetails" style="margin-top:1rem;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Card Number</label>
+                        <input type="text" placeholder="4242 4242 4242 4242" />
+                    </div>
+                    <div class="form-group">
+                        <label>Expiry Date</label>
+                        <input type="text" placeholder="MM/YY" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>CVV</label>
+                    <input type="text" placeholder="123" style="max-width:120px;" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary Sidebar -->
+        <div class="order-summary-side">
+            <h3><i class="fa-regular fa-receipt"></i> Order Summary</h3>
+
+            <div id="orderItems">
+                <div class="loading-spinner">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;"></i>
+                    <p style="margin-top:0.3rem; font-size:0.8rem;">Loading cart...</p>
+                </div>
+            </div>
+
+            <div class="summary-totals">
+                <div class="row">
+                    <span>Subtotal</span>
+                    <span id="checkoutSubtotal">$0.00</span>
+                </div>
+                <div class="row">
+                    <span>Discount</span>
+                    <span id="checkoutDiscount" style="color:#1e7b6b;">−$0.00</span>
+                </div>
+                <div class="row">
+                    <span>Shipping</span>
+                    <span id="checkoutShipping" style="color:#1e7b6b;">FREE</span>
+                </div>
+                <div class="row">
+                    <span>Tax (8%)</span>
+                    <span id="checkoutTax">$0.00</span>
+                </div>
+                <div class="row total">
+                    <span>Total</span>
+                    <span class="amount" id="checkoutTotal">$0.00</span>
+                </div>
+            </div>
+
+            <button class="btn-place-order" onclick="placeOrder()">
+                <i class="fa-solid fa-lock"></i> Place Order
+            </button>
+
+            <div style="text-align:center; margin-top:0.8rem; font-size:0.7rem; color:#6a889a;">
+                <i class="fa-solid fa-lock"></i> Your information is secure
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ─── HELP MODAL ─── -->
+<div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
+    <div class="modal-content">
+        <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
+        <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
+        <p>Choose from our support options below:</p>
+        <ul>
+            <li><i class="fa-regular fa-message" style="color:#1e7b6b; width:20px;"></i> Live Chat (24/7)</li>
+            <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
+            <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
+            <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
+        </ul>
+        <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
+    </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+    <div class="container">
+        <div>
+            <h4>PSE Wholesale</h4>
+            <ul>
+                <li onclick="window.location.href='about.html'">About Us</li>
+                <li>Careers</li>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
+                <li>Blog</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Customer Service</h4>
+            <ul>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
+                <li>Returns & Refunds</li>
+                <li>Shipping Policy</li>
+                <li onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</li>
+            </ul>
+        </div>
+        <div>
+            <h4>B2B</h4>
+            <ul>
+                <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
+                <li>Wholesale Pricing</li>
+                <li>Bulk Orders</li>
+                <li>Supplier Program</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Legal</h4>
+            <ul>
+                <li>Privacy Policy</li>
+                <li>Terms & Conditions</li>
+                <li>Cookie Policy</li>
+            </ul>
+        </div>
+        <div class="bottom">
+            &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- ADMIN QUICK ACCESS -->
+<a href="admin-dashboard.html" class="admin-quick">
+    <i class="fa-solid fa-gauge-high"></i> Admin
+</a>
+
+<!-- ─── SCRIPTS ─── -->
+<script src="main.js"></script>
+<script>
+    let selectedPayment = 'card';
+
+    function selectPayment(el) {
+        document.querySelectorAll('.payment-methods .method').forEach(m => m.classList.remove('active'));
+        el.classList.add('active');
+        selectedPayment = el.dataset.method;
+        
+        const cardDetails = document.getElementById('cardDetails');
+        if (selectedPayment === 'card') {
+            cardDetails.style.display = 'block';
+        } else {
+            cardDetails.style.display = 'none';
+        }
+    }
+
+    function loadCheckoutSummary() {
+        const cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
+        const container = document.getElementById('orderItems');
+
+        if (cart.length === 0) {
+            container.innerHTML = `
+                <div style="text-align:center; padding:1rem 0; color:#6a889a;">
+                    <i class="fa-regular fa-cart-shopping" style="font-size:2rem;"></i>
+                    <p style="margin-top:0.5rem;">Your cart is empty</p>
+                    <a href="products.html" style="color:#1e7b6b; font-size:0.8rem;">Browse products</a>
+                </div>
+            `;
+            updateTotals(cart);
+            return;
+        }
+
+        container.innerHTML = cart.map(item => `
+            <div class="order-item">
+                <div class="item-image">
+                    ${item.image ? `<img src="${item.image}" alt="${item.title}" />` : `<i class="fa-solid fa-${item.icon || 'box'}"></i>`}
+                </div>
+                <div class="item-info">
+                    <div class="title">${item.title}</div>
+                    <div class="qty">Qty: ${item.quantity || 1}</div>
+                </div>
+                <div class="item-price">$${(item.price * (item.quantity || 1)).toFixed(2)}</div>
+            </div>
+        `).join('');
+
+        updateTotals(cart);
+    }
+
+    function updateTotals(cart) {
+        let subtotal = cart.reduce((sum, i) => sum + (i.price * (i.quantity || 1)), 0);
+        let discount = 0;
+        
+        // Calculate discount from old prices
+        cart.forEach(item => {
+            if (item.old_price) {
+                discount += (item.old_price - item.price) * (item.quantity || 1);
+            }
+        });
+
+        const shipping = subtotal >= 250 ? 0 : 15;
+        const tax = (subtotal - discount) * 0.08;
+        const total = subtotal - discount + shipping + tax;
+
+        document.getElementById('checkoutSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById('checkoutDiscount').textContent = `−$${discount.toFixed(2)}`;
+        document.getElementById('checkoutShipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
+        document.getElementById('checkoutTax').textContent = `$${tax.toFixed(2)}`;
+        document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
+    }
+
+    function placeOrder() {
+        // Validate required fields
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const address = document.getElementById('address').value.trim();
+        const city = document.getElementById('city').value.trim();
+        const state = document.getElementById('state').value;
+        const zip = document.getElementById('zip').value.trim();
+
+        if (!firstName || !lastName || !email || !address || !city || !state || !zip) {
+            showToast('❌ Please fill in all required fields', 'error');
+            return;
+        }
+
+        const cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
+        if (cart.length === 0) {
+            showToast('❌ Your cart is empty', 'error');
+            return;
+        }
+
+        // Generate order number
+        const orderNumber = 'PSE-' + Date.now().toString().slice(-8) + Math.random().toString(36).substring(2, 6).toUpperCase();
+        
+        // Save order to localStorage
+        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+        const subtotal = cart.reduce((sum, i) => sum + (i.price * (i.quantity || 1)), 0);
+        const discount = cart.reduce((sum, i) => sum + ((i.old_price || i.price) - i.price) * (i.quantity || 1), 0);
+        const shipping = subtotal >= 250 ? 0 : 15;
+        const tax = (subtotal - discount) * 0.08;
+        const total = subtotal - discount + shipping + tax;
+
+        const order = {
+            id: 'ORD-' + Date.now().toString().slice(-6),
+            orderNumber: orderNumber,
+            date: new Date().toISOString(),
+            items: cart.map(item => ({ ...item })),
+            customer: { firstName, lastName, email, phone: document.getElementById('phone').value },
+            shipping: { address, city, state, zip, country: document.getElementById('country').value },
+            payment: { method: selectedPayment },
+            totals: { subtotal, discount, shipping, tax, total },
+            status: 'pending',
+            notes: document.getElementById('notes').value
+        };
+
+        orders.push(order);
+        localStorage.setItem('pse_orders', JSON.stringify(orders));
+        
+        // Clear cart
+        localStorage.setItem('pse_cart', '[]');
+        updateCartCount();
+
+        showToast('🎉 Order placed successfully! Order #' + orderNumber, 'success');
+        
+        // Redirect to order confirmation
+        setTimeout(() => {
+            window.location.href = `order-success.html?order=${orderNumber}`;
+        }, 1500);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadCheckoutSummary();
+    });
+</script>
+
+</body>
+</html>
