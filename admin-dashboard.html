@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - PSE Wholesale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .admin-sidebar {
+            background: #0b2a3b;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+        .admin-sidebar .admin-brand {
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #1a4055;
+            margin-bottom: 1rem;
+        }
+        .admin-sidebar .admin-brand i {
+            color: #f1c40f;
+            margin-right: 0.5rem;
+        }
+        .admin-sidebar .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            color: #b4d0e0;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 0.2rem;
+        }
+        .admin-sidebar .nav-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+        .admin-sidebar .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-weight: 600;
+        }
+        .admin-sidebar .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        .admin-sidebar .nav-item .badge {
+            margin-left: auto;
+            background: #c0392b;
+            color: #fff;
+            font-size: 0.6rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 30px;
+        }
+
+        .admin-content {
+            background: #fff;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid #e9edf2;
+        }
+        .admin-content .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0b2a3b;
+            margin-bottom: 1.2rem;
+        }
+        .admin-content .section-title i {
+            color: #1e7b6b;
+            margin-right: 0.5rem;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .admin-stat-card {
+            background: #f8fafc;
+            border-radius: 1.2rem;
+            padding: 1.5rem;
+            border: 1px solid #e9edf2;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .admin-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        }
+        .admin-stat-card .number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #0b2a3b;
+        }
+        .admin-stat-card .label {
+            font-size: 0.8rem;
+            color: #6a889a;
+            margin-top: 0.2rem;
+        }
+        .admin-stat-card .icon {
+            font-size: 1.5rem;
+            color: #1e7b6b;
+            margin-bottom: 0.3rem;
+        }
+        .admin-stat-card.green .number { color: #1e7b6b; }
+        .admin-stat-card.blue .number { color: #2980b9; }
+        .admin-stat-card.orange .number { color: #e67e22; }
+        .admin-stat-card.red .number { color: #c0392b; }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+        .table-container table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .table-container th {
+            background: #f1f5f9;
+            padding: 0.6rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #0b2a3b;
+            white-space: nowrap;
+        }
+        .table-container td {
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid #eef2f6;
+        }
+        .table-container .status-badge {
+            display: inline-block;
+            padding: 0.1rem 0.6rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .table-container .status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+        .table-container .status-badge.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .table-container .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .table-container .status-badge.shipped {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .table-container .status-badge.delivered {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .table-container .btn-action {
+            padding: 0.2rem 0.6rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: 0.2s;
+        }
+        .table-container .btn-action.edit {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .table-container .btn-action.edit:hover {
+            background: #b8d4f0;
+        }
+        .table-container .btn-action.delete {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .table-container .btn-action.delete:hover {
+            background: #f5c6cb;
+        }
+        .table-container .btn-action.approve {
+            background: #d4edda;
+            color: #155724;
+        }
+        .table-container .btn-action.approve:hover {
+            background: #c3e6cb;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .admin-actions button {
+            padding: 0.4rem 1.2rem;
+            border: 1px solid #dce3e9;
+            border-radius: 30px;
+            background: #fff;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+            font-size: 0.8rem;
+        }
+        .admin-actions button:hover {
+            background: #f1f5f9;
+        }
+        .admin-actions button.active {
+            background: #1e7b6b;
+            color: #fff;
+            border-color: #1e7b6b;
+        }
+        .admin-actions button i {
+            margin-right: 0.3rem;
+        }
+
+        @media (max-width: 992px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+            }
+            .admin-sidebar {
+                position: static;
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 0.3rem;
+                padding: 1rem;
+            }
+            .admin-sidebar .admin-brand {
+                grid-column: 1 / -1;
+                border-bottom: 1px solid #1a4055;
+            }
+        }
+        @media (max-width: 768px) {
+            .admin-content {
+                padding: 1rem;
+            }
+            .admin-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .admin-sidebar {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 480px) {
+            .admin-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            .admin-sidebar {
+                grid-template-columns: 1fr;
+            }
+            .table-container table {
+                font-size: 0.7rem;
+            }
+            .table-container th,
+            .table-container td {
+                padding: 0.3rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── TOP BAR ─── -->
+<div class="top-bar">
+    <div class="container">
+        <div>
+            <span>Welcome to PSE Wholesale</span>
+            <a href="#" onclick="showToast('✅ Verified Supplier - Trusted partners!', 'success')">
+                <i class="fa-regular fa-circle-check"></i> Verified Supplier
+            </a>
+            <a href="#" onclick="showToast('🚚 Bulk Shipping - Free on orders over $250!', 'info')">
+                <i class="fa-regular fa-truck"></i> Bulk Shipping
+            </a>
+        </div>
+        <div id="authLinks">
+            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
+            <a href="#" onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</a>
+            <a href="seller-dashboard.html">Become a Seller</a>
+            <a href="login.html" id="loginLink" style="display:none;">Login</a>
+            <a href="register.html" id="registerLink" style="display:none;">Register</a>
+            <select class="lang-select" onchange="showToast('🌐 Language changed to ' + this.value, 'info')">
+                <option value="EN">EN</option>
+                <option value="ES">ES</option>
+                <option value="FR">FR</option>
+                <option value="DE">DE</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+    <div class="container">
+        <a href="index.html" class="logo">
+    <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+</a>
+        <div class="search-bar">
+            <select><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
+            <input type="text" placeholder="Search wholesale products..." />
+            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <div class="header-actions">
+            <div class="location-selector"><i class="fa-solid fa-location-dot"></i> Sacramento, 95829</div>
+            <a href="#" class="icon-btn"><i class="fa-regular fa-heart"></i><span>Wishlist</span><span class="badge-count wishlist-count">0</span></a>
+            <a href="#" class="icon-btn"><i class="fa-regular fa-bell"></i><span>Alerts</span><span class="badge-count">3</span></a>
+            <a href="#" class="icon-btn" id="accountBtn"><i class="fa-regular fa-user"></i><span id="accountLabel">Account</span></a>
+            <a href="#" class="icon-btn" onclick="window.location.href='cart.html'">
+                <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ─── NAVIGATION ─── -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="index.html"><i class="fa-solid fa-bars"></i> All Departments</a>
+        <a href="#">Today's Deals</a>
+        <a href="#">New Arrivals</a>
+        <a href="#" class="wholesale-nav"><i class="fa-solid fa-cubes"></i> Wholesale</a>
+        <a href="#">Brands</a>
+        <a href="#">Clearance</a>
+        <a href="#">Flash Deals</a>
+        <a href="#">Gift Cards</a>
+        <a href="#">Business Solutions</a>
+        <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Customer Service</a>
+    </div>
+</nav>
+
+<!-- ─── MAIN CONTENT ─── -->
+<div class="container">
+
+    <!-- PAGE LINKS -->
+    <div class="page-links">
+        <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products.html"><i class="fa-solid fa-grid-2"></i> Products</a>
+        <a href="product-detail.html"><i class="fa-solid fa-eye"></i> Detail</a>
+        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+        <a href="checkout.html"><i class="fa-solid fa-credit-card"></i> Checkout</a>
+        <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+        <a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a>
+        <a href="account.html"><i class="fa-solid fa-user"></i> Account</a>
+        <a href="seller-dashboard.html"><i class="fa-solid fa-store"></i> Seller</a>
+        <a href="admin-dashboard.html" class="active"><i class="fa-solid fa-gauge-high"></i> Admin</a>
+        <a href="about.html"><i class="fa-solid fa-info-circle"></i> About</a>
+    </div>
+
+    <!-- Admin Layout -->
+    <div class="admin-layout">
+
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-brand">
+                <i class="fa-solid fa-gauge-high"></i> Admin
+            </div>
+            <div class="nav-item active" onclick="showAdminTab('dashboard')">
+                <i class="fa-regular fa-chart-simple"></i> Dashboard
+            </div>
+            <div class="nav-item" onclick="showAdminTab('products')">
+                <i class="fa-regular fa-box"></i> Products
+            </div>
+            <div class="nav-item" onclick="showAdminTab('orders')">
+                <i class="fa-regular fa-receipt"></i> Orders
+                <span class="badge" id="adminOrderBadge">0</span>
+            </div>
+            <div class="nav-item" onclick="showAdminTab('users')">
+                <i class="fa-regular fa-users"></i> Users
+            </div>
+            <div class="nav-item" onclick="showAdminTab('sellers')">
+                <i class="fa-regular fa-store"></i> Sellers
+            </div>
+            <div class="nav-item" onclick="showAdminTab('settings')">
+                <i class="fa-regular fa-gear"></i> Settings
+            </div>
+            <div class="nav-item" onclick="logoutUser()" style="margin-top:0.5rem; border-top:1px solid #1a4055; padding-top:0.8rem;">
+                <i class="fa-regular fa-right-from-bracket"></i> Logout
+            </div>
+        </aside>
+
+        <!-- Content -->
+        <div class="admin-content">
+
+            <!-- Dashboard Tab -->
+            <div class="tab-content active" id="admin-dashboard">
+                <div class="section-title"><i class="fa-regular fa-chart-simple"></i> Dashboard Overview</div>
+
+                <div class="admin-stats">
+                    <div class="admin-stat-card green">
+                        <div class="icon"><i class="fa-regular fa-box"></i></div>
+                        <div class="number" id="adminTotalProducts">0</div>
+                        <div class="label">Total Products</div>
+                    </div>
+                    <div class="admin-stat-card blue">
+                        <div class="icon"><i class="fa-regular fa-receipt"></i></div>
+                        <div class="number" id="adminTotalOrders">0</div>
+                        <div class="label">Total Orders</div>
+                    </div>
+                    <div class="admin-stat-card orange">
+                        <div class="icon"><i class="fa-regular fa-users"></i></div>
+                        <div class="number" id="adminTotalUsers">0</div>
+                        <div class="label">Total Users</div>
+                    </div>
+                    <div class="admin-stat-card red">
+                        <div class="icon"><i class="fa-regular fa-dollar-sign"></i></div>
+                        <div class="number" id="adminTotalRevenue">$0</div>
+                        <div class="label">Total Revenue</div>
+                    </div>
+                </div>
+
+                <div style="background:#f8fafc; border-radius:1rem; padding:2rem; text-align:center; color:#6a889a; border:1px solid #e9edf2;">
+                    <i class="fa-regular fa-chart-bar" style="font-size:2.5rem; color:#1e7b6b;"></i>
+                    <p style="margin-top:0.5rem;">Advanced analytics dashboard coming soon</p>
+                    <p style="font-size:0.8rem;">Manage products, orders, and users from the sidebar</p>
+                </div>
+            </div>
+
+            <!-- Products Tab -->
+            <div class="tab-content" id="admin-products">
+                <div class="section-title"><i class="fa-regular fa-box"></i> Manage Products</div>
+                <div class="admin-actions">
+                    <button class="active" onclick="filterAdminProducts('all')"><i class="fa-regular fa-list"></i> All</button>
+                    <button onclick="filterAdminProducts('active')"><i class="fa-regular fa-circle-check"></i> Active</button>
+                    <button onclick="filterAdminProducts('pending')"><i class="fa-regular fa-clock"></i> Pending</button>
+                    <button onclick="filterAdminProducts('inactive')"><i class="fa-regular fa-circle-xmark"></i> Inactive</button>
+                    <button onclick="openAddProductAdmin()" style="background:#1e7b6b; color:#fff; border-color:#1e7b6b;">
+                        <i class="fa-regular fa-plus"></i> Add Product
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Seller</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminProductBody">
+                            <tr>
+                                <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                                    Loading products...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Orders Tab -->
+            <div class="tab-content" id="admin-orders">
+                <div class="section-title"><i class="fa-regular fa-receipt"></i> Manage Orders</div>
+                <div class="admin-actions">
+                    <button class="active" onclick="filterAdminOrders('all')">All</button>
+                    <button onclick="filterAdminOrders('pending')">Pending</button>
+                    <button onclick="filterAdminOrders('processing')">Processing</button>
+                    <button onclick="filterAdminOrders('shipped')">Shipped</button>
+                    <button onclick="filterAdminOrders('delivered')">Delivered</button>
+                    <button onclick="filterAdminOrders('cancelled')">Cancelled</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminOrderBody">
+                            <tr>
+                                <td colspan="7" style="text-align:center; color:#6a889a; padding:2rem;">
+                                    No orders found.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div class="tab-content" id="admin-users">
+                <div class="section-title"><i class="fa-regular fa-users"></i> Manage Users</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Joined</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUserBody">
+                            <tr>
+                                <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                                    Loading users...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sellers Tab -->
+            <div class="tab-content" id="admin-sellers">
+                <div class="section-title"><i class="fa-regular fa-store"></i> Manage Sellers</div>
+                <div class="admin-actions">
+                    <button class="active" onclick="filterAdminSellers('all')">All</button>
+                    <button onclick="filterAdminSellers('approved')">Approved</button>
+                    <button onclick="filterAdminSellers('pending')">Pending</button>
+                    <button onclick="filterAdminSellers('suspended')">Suspended</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Store Name</th>
+                                <th>Owner</th>
+                                <th>Email</th>
+                                <th>Products</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminSellerBody">
+                            <tr>
+                                <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                                    Loading sellers...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-content" id="admin-settings">
+                <div class="section-title"><i class="fa-regular fa-gear"></i> System Settings</div>
+                <form class="profile-form" style="max-width:600px;">
+                    <div class="form-group">
+                        <label>Store Name</label>
+                        <input type="text" value="PSE Wholesale Marketplace" />
+                    </div>
+                    <div class="form-group">
+                        <label>Store Email</label>
+                        <input type="email" value="info@psewholesale.com" />
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" value="+1 (800) 555-PSEW" />
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" value="123 Commerce St, Sacramento, CA 95829" />
+                    </div>
+                    <div class="form-group">
+                        <label>Currency</label>
+                        <select>
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="GBP">GBP (£)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tax Rate (%)</label>
+                        <input type="number" value="8.0" step="0.1" />
+                    </div>
+                    <button class="btn-save" onclick="showToast('✅ Settings saved!', 'success')">
+                        <i class="fa-regular fa-floppy-disk"></i> Save Settings
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ─── ADD PRODUCT MODAL (Admin) ─── -->
+<div class="modal-overlay" id="addProductAdminModal">
+    <div class="modal-box">
+        <h3><i class="fa-regular fa-plus"></i> Add New Product</h3>
+        <form id="addProductAdminForm">
+            <div class="form-group">
+                <label>Product Title *</label>
+                <input type="text" id="adminNewProductTitle" placeholder="Enter product title" required />
+            </div>
+            <div class="form-group">
+                <label>Brand</label>
+                <input type="text" id="adminNewProductBrand" placeholder="Brand name" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Price *</label>
+                    <input type="number" id="adminNewProductPrice" placeholder="0.00" step="0.01" required />
+                </div>
+                <div class="form-group">
+                    <label>Old Price</label>
+                    <input type="number" id="adminNewProductOldPrice" placeholder="0.00" step="0.01" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>MOQ</label>
+                    <input type="number" id="adminNewProductMoq" placeholder="Minimum order quantity" />
+                </div>
+                <div class="form-group">
+                    <label>Stock</label>
+                    <input type="number" id="adminNewProductStock" placeholder="100" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="adminNewProductCategory">
+                    <option value="electronics">Electronics</option>
+                    <option value="fashion">Fashion</option>
+                    <option value="home">Home</option>
+                    <option value="kitchen">Kitchen</option>
+                    <option value="grocery">Grocery</option>
+                    <option value="beauty">Beauty</option>
+                    <option value="sports">Sports</option>
+                    <option value="office">Office</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Image URL</label>
+                <input type="text" id="adminNewProductImage" placeholder="https://example.com/image.jpg" />
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="adminNewProductDescription" placeholder="Describe your product..." rows="3"></textarea>
+            </div>
+            <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+                <button type="button" class="btn-close" onclick="closeAddProductAdmin()">Cancel</button>
+                <button type="submit" class="btn-submit"><i class="fa-regular fa-plus"></i> Add Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ─── HELP MODAL ─── -->
+<div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
+    <div class="modal-content">
+        <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
+        <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
+        <p>Choose from our support options below:</p>
+        <ul>
+            <li><i class="fa-regular fa-message" style="color:#1e7b6b; width:20px;"></i> Live Chat (24/7)</li>
+            <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
+            <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
+            <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
+        </ul>
+        <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
+    </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+    <div class="container">
+        <div>
+            <h4>PSE Wholesale</h4>
+            <ul>
+                <li onclick="window.location.href='about.html'">About Us</li>
+                <li>Careers</li>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
+                <li>Blog</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Customer Service</h4>
+            <ul>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
+                <li>Returns & Refunds</li>
+                <li>Shipping Policy</li>
+                <li onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</li>
+            </ul>
+        </div>
+        <div>
+            <h4>B2B</h4>
+            <ul>
+                <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
+                <li>Wholesale Pricing</li>
+                <li>Bulk Orders</li>
+                <li>Supplier Program</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Legal</h4>
+            <ul>
+                <li>Privacy Policy</li>
+                <li>Terms & Conditions</li>
+                <li>Cookie Policy</li>
+            </ul>
+        </div>
+        <div class="bottom">
+            &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- ─── SCRIPTS ─── -->
+<script src="js/main.js"></script>
+<script>
+    let adminProducts = [];
+    let adminFilter = 'all';
+    let adminOrderFilter = 'all';
+    let adminSellerFilter = 'all';
+
+    function loadAdminData() {
+        const user = JSON.parse(localStorage.getItem('pse_user') || 'null');
+        if (!user || user.role !== 'admin') {
+            showToast('⚠️ Admin access required', 'error');
+            setTimeout(() => window.location.href = 'login.html', 1500);
+            return;
+        }
+
+        loadAdminProducts();
+        loadAdminOrders();
+        loadAdminUsers();
+        loadAdminSellers();
+        updateAdminStats();
+    }
+
+    function loadAdminProducts() {
+        const products = JSON.parse(localStorage.getItem('seller_products') || '[]');
+        // Add sample products if empty
+        if (products.length === 0) {
+            const sample = [
+                { id: 1, title: 'Premium Cotton Tee', brand: 'TextilePro', price: 6.80, old_price: 11.50, moq: 12, stock: 500, category: 'fashion', status: 'active', seller: 'TextilePro' },
+                { id: 2, title: 'Ceramic Mug Set', brand: 'HomeCraft', price: 4.20, old_price: 6.00, moq: 24, stock: 300, category: 'kitchen', status: 'active', seller: 'HomeCraft' },
+                { id: 3, title: 'Wireless Buds Pro', brand: 'AudioMax', price: 14.50, old_price: 24.99, moq: 10, stock: 150, category: 'electronics', status: 'pending', seller: 'AudioMax' }
+            ];
+            localStorage.setItem('seller_products', JSON.stringify(sample));
+            adminProducts = sample;
+        } else {
+            adminProducts = products;
+        }
+        renderAdminProducts();
+    }
+
+    function renderAdminProducts() {
+        let filtered = adminProducts;
+        if (adminFilter === 'active') filtered = filtered.filter(p => p.status === 'active');
+        else if (adminFilter === 'pending') filtered = filtered.filter(p => p.status === 'pending');
+        else if (adminFilter === 'inactive') filtered = filtered.filter(p => p.status === 'inactive');
+
+        const tbody = document.getElementById('adminProductBody');
+        if (filtered.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                        No products found.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(p => `
+            <tr>
+                <td><strong>${p.title}</strong><br><span style="font-size:0.7rem; color:#6a889a;">${p.brand || ''}</span></td>
+                <td>$${p.price.toFixed(2)}</td>
+                <td>${p.stock || 0}</td>
+                <td>${p.seller || 'PSE'}</td>
+                <td><span class="status-badge ${p.status || 'active'}">${p.status || 'Active'}</span></td>
+                <td>
+                    <button class="btn-action edit" onclick="editAdminProduct(${p.id})"><i class="fa-regular fa-pen"></i></button>
+                    <button class="btn-action delete" onclick="deleteAdminProduct(${p.id})"><i class="fa-regular fa-trash-can"></i></button>
+                    ${p.status === 'pending' ? `<button class="btn-action approve" onclick="approveAdminProduct(${p.id})"><i class="fa-regular fa-circle-check"></i></button>` : ''}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function loadAdminOrders() {
+        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+        renderAdminOrders(orders);
+        document.getElementById('adminOrderBadge').textContent = orders.filter(o => o.status === 'pending').length;
+    }
+
+    function renderAdminOrders(orders) {
+        let filtered = orders;
+        if (adminOrderFilter !== 'all') {
+            filtered = filtered.filter(o => o.status === adminOrderFilter);
+        }
+
+        const tbody = document.getElementById('adminOrderBody');
+        if (filtered.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align:center; color:#6a889a; padding:2rem;">
+                        No orders found.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(o => `
+            <tr>
+                <td><strong>${o.orderNumber}</strong></td>
+                <td>${o.customer?.firstName || 'Guest'} ${o.customer?.lastName || ''}</td>
+                <td>${o.items?.length || 0}</td>
+                <td>$${(o.totals?.total || 0).toFixed(2)}</td>
+                <td><span class="status-badge ${o.status || 'pending'}">${o.status || 'Pending'}</span></td>
+                <td>${new Date(o.date).toLocaleDateString()}</td>
+                <td>
+                    <button class="btn-action edit" onclick="updateOrderStatus('${o.id}', 'processing')">Process</button>
+                    <button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'shipped')">Ship</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function updateOrderStatus(orderId, status) {
+        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+        const order = orders.find(o => o.id === orderId);
+        if (order) {
+            order.status = status;
+            localStorage.setItem('pse_orders', JSON.stringify(orders));
+            showToast(`✅ Order status updated to ${status}`, 'success');
+            loadAdminOrders();
+            updateAdminStats();
+        }
+    }
+
+    function loadAdminUsers() {
+        const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
+        // Add sample users if empty
+        if (users.length === 0) {
+            const sample = [
+                { id: 1, firstName: 'Admin', lastName: 'User', email: 'admin@pse.com', role: 'admin', created: new Date().toISOString() },
+                { id: 2, firstName: 'John', lastName: 'Doe', email: 'john@example.com', role: 'customer', created: new Date().toISOString() },
+                { id: 3, firstName: 'Jane', lastName: 'Smith', email: 'jane@example.com', role: 'seller', created: new Date().toISOString() }
+            ];
+            localStorage.setItem('pse_users', JSON.stringify(sample));
+        }
+        renderAdminUsers();
+    }
+
+    function renderAdminUsers() {
+        const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
+        const tbody = document.getElementById('adminUserBody');
+
+        if (users.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                        No users found.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = users.map(u => `
+            <tr>
+                <td>${u.firstName || ''} ${u.lastName || ''}</td>
+                <td>${u.email}</td>
+                <td><span class="status-badge ${u.role === 'admin' ? 'active' : u.role === 'seller' ? 'pending' : ''}">${u.role || 'customer'}</span></td>
+                <td>${new Date(u.created).toLocaleDateString()}</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td>
+                    <button class="btn-action edit" onclick="showToast('✏️ Edit user coming soon', 'info')"><i class="fa-regular fa-pen"></i></button>
+                    ${u.role !== 'admin' ? `<button class="btn-action delete" onclick="deleteUser('${u.id}')"><i class="fa-regular fa-trash-can"></i></button>` : ''}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function deleteUser(id) {
+        if (confirm('Delete this user?')) {
+            let users = JSON.parse(localStorage.getItem('pse_users') || '[]');
+            users = users.filter(u => u.id !== id);
+            localStorage.setItem('pse_users', JSON.stringify(users));
+            renderAdminUsers();
+            updateAdminStats();
+            showToast('🗑️ User deleted', 'info');
+        }
+    }
+
+    function loadAdminSellers() {
+        const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
+        const sellers = users.filter(u => u.role === 'seller');
+        renderAdminSellers(sellers);
+    }
+
+    function renderAdminSellers(sellers) {
+        let filtered = sellers;
+        if (adminSellerFilter === 'approved') filtered = filtered.filter(s => s.status === 'approved');
+        else if (adminSellerFilter === 'pending') filtered = filtered.filter(s => s.status === 'pending' || !s.status);
+        else if (adminSellerFilter === 'suspended') filtered = filtered.filter(s => s.status === 'suspended');
+
+        const tbody = document.getElementById('adminSellerBody');
+        if (filtered.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                        No sellers found.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(s => `
+            <tr>
+                <td>${s.company || 'N/A'}</td>
+                <td>${s.firstName || ''} ${s.lastName || ''}</td>
+                <td>${s.email}</td>
+                <td>0</td>
+                <td><span class="status-badge ${s.status === 'approved' ? 'active' : s.status === 'suspended' ? 'inactive' : 'pending'}">${s.status || 'Pending'}</span></td>
+                <td>
+                    ${s.status !== 'approved' ? `<button class="btn-action approve" onclick="approveSeller('${s.id}')"><i class="fa-regular fa-circle-check"></i> Approve</button>` : ''}
+                    ${s.status === 'approved' ? `<button class="btn-action delete" onclick="suspendSeller('${s.id}')"><i class="fa-regular fa-ban"></i> Suspend</button>` : ''}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function approveSeller(id) {
+        const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
+        const user = users.find(u => u.id === id);
+        if (user) {
+            user.status = 'approved';
+            localStorage.setItem('pse_users', JSON.stringify(users));
+            showToast('✅ Seller approved!', 'success');
+            loadAdminSellers();
+        }
+    }
+
+    function suspendSeller(id) {
+        const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
+        const user = users.find(u => u.id === id);
+        if (user) {
+            user.status = 'suspended';
+            localStorage.setItem('pse_users', JSON.stringify(users));
+            showToast('⛔ Seller suspended', 'info');
+            loadAdminSellers();
+        }
+    }
+
+    function updateAdminStats() {
+        const products = JSON.parse(localStorage.getItem('seller_products') || '[]');
+        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+        const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
+        const revenue = orders.reduce((sum, o) => sum + (o.totals?.total || 0), 0);
+
+        document.getElementById('adminTotalProducts').textContent = products.length;
+        document.getElementById('adminTotalOrders').textContent = orders.length;
+        document.getElementById('adminTotalUsers').textContent = users.length;
+        document.getElementById('adminTotalRevenue').textContent = '$' + revenue.toFixed(0);
+    }
+
+    function showAdminTab(tab) {
+        document.querySelectorAll('.admin-sidebar .nav-item').forEach(n => n.classList.remove('active'));
+        document.querySelector(`.admin-sidebar .nav-item[onclick="showAdminTab('${tab}')"]`).classList.add('active');
+        
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('admin-' + tab).classList.add('active');
+    }
+
+    function filterAdminProducts(filter) {
+        adminFilter = filter;
+        document.querySelectorAll('#admin-products .admin-actions button').forEach(b => b.classList.remove('active'));
+        const btns = document.querySelectorAll('#admin-products .admin-actions button');
+        btns.forEach(b => {
+            if (b.textContent.trim().toLowerCase() === filter || 
+                (filter === 'all' && b.textContent.trim() === 'All') ||
+                (filter === 'active' && b.textContent.trim() === 'Active') ||
+                (filter === 'pending' && b.textContent.trim() === 'Pending') ||
+                (filter === 'inactive' && b.textContent.trim() === 'Inactive')) {
+                b.classList.add('active');
+            }
+        });
+        renderAdminProducts();
+    }
+
+    function filterAdminOrders(filter) {
+        adminOrderFilter = filter;
+        document.querySelectorAll('#admin-orders .admin-actions button').forEach(b => b.classList.remove('active'));
+        const btns = document.querySelectorAll('#admin-orders .admin-actions button');
+        btns.forEach(b => {
+            if (b.textContent.trim().toLowerCase() === filter || 
+                (filter === 'all' && b.textContent.trim() === 'All')) {
+                b.classList.add('active');
+            }
+        });
+        loadAdminOrders();
+    }
+
+    function filterAdminSellers(filter) {
+        adminSellerFilter = filter;
+        document.querySelectorAll('#admin-sellers .admin-actions button').forEach(b => b.classList.remove('active'));
+        const btns = document.querySelectorAll('#admin-sellers .admin-actions button');
+        btns.forEach(b => {
+            if (b.textContent.trim().toLowerCase() === filter || 
+                (filter === 'all' && b.textContent.trim() === 'All')) {
+                b.classList.add('active');
+            }
+        });
+        loadAdminSellers();
+    }
+
+    function openAddProductAdmin() {
+        document.getElementById('addProductAdminModal').style.display = 'flex';
+        document.getElementById('addProductAdminForm').reset();
+    }
+
+    function closeAddProductAdmin() {
+        document.getElementById('addProductAdminModal').style.display = 'none';
+    }
+
+    document.getElementById('addProductAdminForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const newProduct = {
+            id: Date.now(),
+            title: document.getElementById('adminNewProductTitle').value,
+            brand: document.getElementById('adminNewProductBrand').value,
+            price: parseFloat(document.getElementById('adminNewProductPrice').value) || 0,
+            old_price: parseFloat(document.getElementById('adminNewProductOldPrice').value) || null,
+            moq: parseInt(document.getElementById('adminNewProductMoq').value) || 1,
+            stock: parseInt(document.getElementById('adminNewProductStock').value) || 100,
+            category: document.getElementById('adminNewProductCategory').value,
+            image_url: document.getElementById('adminNewProductImage').value,
+            description: document.getElementById('adminNewProductDescription').value,
+            status: 'active',
+            seller: 'PSE Admin'
+        };
+
+        const products = JSON.parse(localStorage.getItem('seller_products') || '[]');
+        products.push(newProduct);
+        localStorage.setItem('seller_products', JSON.stringify(products));
+        adminProducts = products;
+        
+        closeAddProductAdmin();
+        renderAdminProducts();
+        updateAdminStats();
+        showToast('✅ Product added successfully!', 'success');
+    });
+
+    function editAdminProduct(id) {
+        showToast('✏️ Edit product feature coming soon', 'info');
+    }
+
+    function deleteAdminProduct(id) {
+        if (confirm('Delete this product?')) {
+            let products = JSON.parse(localStorage.getItem('seller_products') || '[]');
+            products = products.filter(p => p.id !== id);
+            localStorage.setItem('seller_products', JSON.stringify(products));
+            adminProducts = products;
+            renderAdminProducts();
+            updateAdminStats();
+            showToast('🗑️ Product deleted', 'info');
+        }
+    }
+
+    function approveAdminProduct(id) {
+        const products = JSON.parse(localStorage.getItem('seller_products') || '[]');
+        const product = products.find(p => p.id === id);
+        if (product) {
+            product.status = 'active';
+            localStorage.setItem('seller_products', JSON.stringify(products));
+            adminProducts = products;
+            renderAdminProducts();
+            showToast('✅ Product approved!', 'success');
+        }
+    }
+
+    function logoutUser() {
+        if (confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('pse_user');
+            showToast('👋 Logged out successfully', 'info');
+            setTimeout(() => window.location.href = 'index.html', 1000);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAdminData);
+</script>
+
+</body>
+</html>

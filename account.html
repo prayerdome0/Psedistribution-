@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Account - PSE Wholesale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        .account-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .account-sidebar {
+            background: #fff;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid #e9edf2;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+        .account-sidebar .user-info {
+            text-align: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eef2f6;
+            margin-bottom: 1rem;
+        }
+        .account-sidebar .user-info .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #1e7b6b;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 0.5rem;
+        }
+        .account-sidebar .user-info .name {
+            font-weight: 700;
+            color: #0b2a3b;
+        }
+        .account-sidebar .user-info .email {
+            font-size: 0.8rem;
+            color: #6a889a;
+        }
+        .account-sidebar .user-info .role-badge {
+            display: inline-block;
+            font-size: 0.6rem;
+            background: #e3f0eb;
+            color: #1e7b6b;
+            padding: 0.1rem 0.8rem;
+            border-radius: 30px;
+            margin-top: 0.3rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .account-sidebar .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            color: #2c5a6b;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 0.2rem;
+        }
+        .account-sidebar .nav-item:hover {
+            background: #f1f5f9;
+            color: #0b2a3b;
+        }
+        .account-sidebar .nav-item.active {
+            background: #e3f0eb;
+            color: #1e7b6b;
+            font-weight: 600;
+        }
+        .account-sidebar .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        .account-sidebar .nav-item .badge {
+            margin-left: auto;
+            background: #c0392b;
+            color: #fff;
+            font-size: 0.6rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 30px;
+        }
+        .account-sidebar .logout-btn {
+            width: 100%;
+            padding: 0.6rem;
+            background: transparent;
+            border: 1px solid #c0392b;
+            color: #c0392b;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            margin-top: 0.5rem;
+        }
+        .account-sidebar .logout-btn:hover {
+            background: #c0392b;
+            color: #fff;
+        }
+
+        .account-content {
+            background: #fff;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid #e9edf2;
+        }
+        .account-content .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0b2a3b;
+            margin-bottom: 1.2rem;
+        }
+        .account-content .section-title i {
+            color: #1e7b6b;
+            margin-right: 0.5rem;
+        }
+
+        .profile-form .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .profile-form .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0b2a3b;
+            margin-bottom: 0.3rem;
+        }
+        .profile-form .form-group input,
+        .profile-form .form-group select {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #dce3e9;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .profile-form .form-group input:focus,
+        .profile-form .form-group select:focus {
+            border-color: #1e7b6b;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(30, 123, 107, 0.1);
+        }
+        .profile-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .profile-form .btn-save {
+            background: #1e7b6b;
+            color: #fff;
+            border: none;
+            padding: 0.6rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .profile-form .btn-save:hover {
+            background: #146354;
+        }
+
+        .order-history {
+            margin-top: 1rem;
+        }
+        .order-card {
+            border: 1px solid #e9edf2;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .order-card .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+        .order-card .order-header .order-number {
+            font-weight: 700;
+            color: #0b2a3b;
+        }
+        .order-card .order-header .order-date {
+            font-size: 0.8rem;
+            color: #6a889a;
+        }
+        .order-card .order-status {
+            display: inline-block;
+            padding: 0.1rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .order-card .order-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .order-card .order-status.processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .order-card .order-status.shipped {
+            background: #d4edda;
+            color: #155724;
+        }
+        .order-card .order-status.delivered {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .order-card .order-status.cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .order-card .order-items {
+            font-size: 0.85rem;
+            color: #2c5a6b;
+        }
+        .order-card .order-total {
+            font-weight: 700;
+            color: #1e7b6b;
+            text-align: right;
+            margin-top: 0.3rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 992px) {
+            .account-layout {
+                grid-template-columns: 1fr;
+            }
+            .account-sidebar {
+                position: static;
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 0.5rem;
+                padding: 1rem;
+            }
+            .account-sidebar .user-info {
+                grid-column: 1 / -1;
+                border-bottom: 1px solid #eef2f6;
+            }
+            .account-sidebar .logout-btn {
+                grid-column: 1 / -1;
+            }
+        }
+        @media (max-width: 768px) {
+            .account-content {
+                padding: 1rem;
+            }
+            .profile-form .form-row {
+                grid-template-columns: 1fr;
+            }
+            .account-sidebar {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 480px) {
+            .account-sidebar {
+                grid-template-columns: 1fr;
+            }
+            .order-card .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── TOP BAR ─── -->
+<div class="top-bar">
+    <div class="container">
+        <div>
+            <span>Welcome to PSE Wholesale</span>
+            <a href="#" onclick="showToast('✅ Verified Supplier - Trusted partners!', 'success')">
+                <i class="fa-regular fa-circle-check"></i> Verified Supplier
+            </a>
+            <a href="#" onclick="showToast('🚚 Bulk Shipping - Free on orders over $250!', 'info')">
+                <i class="fa-regular fa-truck"></i> Bulk Shipping
+            </a>
+        </div>
+        <div id="authLinks">
+            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
+            <a href="#" onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</a>
+            <a href="seller-dashboard.html">Become a Seller</a>
+            <a href="login.html" id="loginLink" style="display:none;">Login</a>
+            <a href="register.html" id="registerLink" style="display:none;">Register</a>
+            <select class="lang-select" onchange="showToast('🌐 Language changed to ' + this.value, 'info')">
+                <option value="EN">EN</option>
+                <option value="ES">ES</option>
+                <option value="FR">FR</option>
+                <option value="DE">DE</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+    <div class="container">
+        <a href="index.html" class="logo">
+    <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+</a>
+        <div class="search-bar">
+            <select><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
+            <input type="text" placeholder="Search wholesale products..." />
+            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <div class="header-actions">
+            <div class="location-selector"><i class="fa-solid fa-location-dot"></i> Sacramento, 95829</div>
+            <a href="#" class="icon-btn"><i class="fa-regular fa-heart"></i><span>Wishlist</span><span class="badge-count wishlist-count">0</span></a>
+            <a href="#" class="icon-btn"><i class="fa-regular fa-bell"></i><span>Alerts</span><span class="badge-count">3</span></a>
+            <a href="#" class="icon-btn" id="accountBtn"><i class="fa-regular fa-user"></i><span id="accountLabel">Account</span></a>
+            <a href="#" class="icon-btn" onclick="window.location.href='cart.html'">
+                <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ─── NAVIGATION ─── -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="index.html"><i class="fa-solid fa-bars"></i> All Departments</a>
+        <a href="#">Today's Deals</a>
+        <a href="#">New Arrivals</a>
+        <a href="#" class="wholesale-nav"><i class="fa-solid fa-cubes"></i> Wholesale</a>
+        <a href="#">Brands</a>
+        <a href="#">Clearance</a>
+        <a href="#">Flash Deals</a>
+        <a href="#">Gift Cards</a>
+        <a href="#">Business Solutions</a>
+        <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Customer Service</a>
+    </div>
+</nav>
+
+<!-- ─── MAIN CONTENT ─── -->
+<div class="container">
+
+    <!-- PAGE LINKS -->
+    <div class="page-links">
+        <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products.html"><i class="fa-solid fa-grid-2"></i> Products</a>
+        <a href="product-detail.html"><i class="fa-solid fa-eye"></i> Detail</a>
+        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+        <a href="checkout.html"><i class="fa-solid fa-credit-card"></i> Checkout</a>
+        <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+        <a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a>
+        <a href="account.html" class="active"><i class="fa-solid fa-user"></i> Account</a>
+        <a href="seller-dashboard.html"><i class="fa-solid fa-store"></i> Seller</a>
+        <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Admin</a>
+        <a href="about.html"><i class="fa-solid fa-info-circle"></i> About</a>
+    </div>
+
+    <!-- Account Layout -->
+    <div class="account-layout">
+
+        <!-- Sidebar -->
+        <aside class="account-sidebar" id="accountSidebar">
+            <div class="user-info">
+                <div class="avatar"><i class="fa-regular fa-user"></i></div>
+                <div class="name" id="userName">Guest User</div>
+                <div class="email" id="userEmail">guest@example.com</div>
+                <span class="role-badge" id="userRole">Customer</span>
+            </div>
+
+            <div class="nav-item active" onclick="showTab('profile')">
+                <i class="fa-regular fa-user"></i> Profile
+            </div>
+            <div class="nav-item" onclick="showTab('orders')">
+                <i class="fa-regular fa-receipt"></i> Orders
+                <span class="badge" id="orderBadge">0</span>
+            </div>
+            <div class="nav-item" onclick="showTab('wishlist')">
+                <i class="fa-regular fa-heart"></i> Wishlist
+                <span class="badge" id="wishlistBadge">0</span>
+            </div>
+            <div class="nav-item" onclick="showTab('addresses')">
+                <i class="fa-regular fa-location-dot"></i> Addresses
+            </div>
+            <div class="nav-item" onclick="showTab('payment')">
+                <i class="fa-regular fa-credit-card"></i> Payment Methods
+            </div>
+            <div class="nav-item" onclick="showTab('security')">
+                <i class="fa-regular fa-shield"></i> Security
+            </div>
+
+            <button class="logout-btn" onclick="logoutUser()">
+                <i class="fa-regular fa-right-from-bracket"></i> Logout
+            </button>
+        </aside>
+
+        <!-- Content -->
+        <div class="account-content">
+
+            <!-- Profile Tab -->
+            <div class="tab-content active" id="tab-profile">
+                <div class="section-title"><i class="fa-regular fa-user"></i> Profile Information</div>
+
+                <form class="profile-form" id="profileForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name *</label>
+                            <input type="text" id="profFirstName" placeholder="John" />
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name *</label>
+                            <input type="text" id="profLastName" placeholder="Doe" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="profEmail" placeholder="you@example.com" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="profPhone" placeholder="(555) 123-4567" />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Company Name</label>
+                            <input type="text" id="profCompany" placeholder="Your company" />
+                        </div>
+                        <div class="form-group">
+                            <label>Business Type</label>
+                            <select id="profBusinessType">
+                                <option value="">Select</option>
+                                <option value="retail">Retail</option>
+                                <option value="wholesale">Wholesale</option>
+                                <option value="manufacturer">Manufacturer</option>
+                                <option value="distributor">Distributor</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-save"><i class="fa-regular fa-floppy-disk"></i> Save Changes</button>
+                </form>
+            </div>
+
+            <!-- Orders Tab -->
+            <div class="tab-content" id="tab-orders">
+                <div class="section-title"><i class="fa-regular fa-receipt"></i> Order History</div>
+                <div class="order-history" id="orderHistory">
+                    <div style="text-align:center; padding:2rem; color:#6a889a;">
+                        <i class="fa-regular fa-receipt" style="font-size:2rem;"></i>
+                        <p style="margin-top:0.5rem;">No orders yet</p>
+                        <a href="products.html" style="color:#1e7b6b;">Start shopping</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wishlist Tab -->
+            <div class="tab-content" id="tab-wishlist">
+                <div class="section-title"><i class="fa-regular fa-heart"></i> My Wishlist</div>
+                <div class="product-grid" id="wishlistGrid">
+                    <div style="grid-column:1/-1; text-align:center; padding:2rem; color:#6a889a;">
+                        <i class="fa-regular fa-heart" style="font-size:2rem;"></i>
+                        <p style="margin-top:0.5rem;">Your wishlist is empty</p>
+                        <a href="products.html" style="color:#1e7b6b;">Browse products</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Addresses Tab -->
+            <div class="tab-content" id="tab-addresses">
+                <div class="section-title"><i class="fa-regular fa-location-dot"></i> Saved Addresses</div>
+                <div style="text-align:center; padding:2rem; color:#6a889a;">
+                    <i class="fa-regular fa-location-dot" style="font-size:2rem;"></i>
+                    <p style="margin-top:0.5rem;">No saved addresses</p>
+                    <button onclick="showToast('Add address form coming soon', 'info')" style="background:#1e7b6b; color:#fff; border:none; padding:0.5rem 1.5rem; border-radius:30px; cursor:pointer;">
+                        <i class="fa-regular fa-plus"></i> Add Address
+                    </button>
+                </div>
+            </div>
+
+            <!-- Payment Tab -->
+            <div class="tab-content" id="tab-payment">
+                <div class="section-title"><i class="fa-regular fa-credit-card"></i> Payment Methods</div>
+                <div style="text-align:center; padding:2rem; color:#6a889a;">
+                    <i class="fa-regular fa-credit-card" style="font-size:2rem;"></i>
+                    <p style="margin-top:0.5rem;">No saved payment methods</p>
+                    <button onclick="showToast('Add payment method coming soon', 'info')" style="background:#1e7b6b; color:#fff; border:none; padding:0.5rem 1.5rem; border-radius:30px; cursor:pointer;">
+                        <i class="fa-regular fa-plus"></i> Add Payment Method
+                    </button>
+                </div>
+            </div>
+
+            <!-- Security Tab -->
+            <div class="tab-content" id="tab-security">
+                <div class="section-title"><i class="fa-regular fa-shield"></i> Security</div>
+                <form class="profile-form" id="securityForm">
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" placeholder="Enter current password" />
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" placeholder="Enter new password" />
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" placeholder="Confirm new password" />
+                    </div>
+                    <button type="submit" class="btn-save"><i class="fa-regular fa-floppy-disk"></i> Update Password</button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ─── HELP MODAL ─── -->
+<div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
+    <div class="modal-content">
+        <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
+        <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
+        <p>Choose from our support options below:</p>
+        <ul>
+            <li><i class="fa-regular fa-message" style="color:#1e7b6b; width:20px;"></i> Live Chat (24/7)</li>
+            <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
+            <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
+            <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
+        </ul>
+        <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
+    </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+    <div class="container">
+        <div>
+            <h4>PSE Wholesale</h4>
+            <ul>
+                <li onclick="window.location.href='about.html'">About Us</li>
+                <li>Careers</li>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
+                <li>Blog</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Customer Service</h4>
+            <ul>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
+                <li>Returns & Refunds</li>
+                <li>Shipping Policy</li>
+                <li onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</li>
+            </ul>
+        </div>
+        <div>
+            <h4>B2B</h4>
+            <ul>
+                <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
+                <li>Wholesale Pricing</li>
+                <li>Bulk Orders</li>
+                <li>Supplier Program</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Legal</h4>
+            <ul>
+                <li>Privacy Policy</li>
+                <li>Terms & Conditions</li>
+                <li>Cookie Policy</li>
+            </ul>
+        </div>
+        <div class="bottom">
+            &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- ADMIN QUICK ACCESS -->
+<a href="admin-dashboard.html" class="admin-quick">
+    <i class="fa-solid fa-gauge-high"></i> Admin
+</a>
+
+<!-- ─── SCRIPTS ─── -->
+<script src="js/main.js"></script>
+<script>
+    // Load user data
+    function loadUser() {
+        const user = JSON.parse(localStorage.getItem('pse_user') || 'null');
+        if (user) {
+            document.getElementById('userName').textContent = user.firstName + ' ' + user.lastName;
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userRole').textContent = user.role || 'Customer';
+            
+            document.getElementById('profFirstName').value = user.firstName || '';
+            document.getElementById('profLastName').value = user.lastName || '';
+            document.getElementById('profEmail').value = user.email || '';
+            document.getElementById('profCompany').value = user.company || '';
+            document.getElementById('profBusinessType').value = user.businessType || '';
+        } else {
+            // Redirect to login if not logged in
+            window.location.href = 'login.html';
+        }
+    }
+
+    // Show tab
+    function showTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.account-sidebar .nav-item').forEach(n => n.classList.remove('active'));
+        
+        document.getElementById('tab-' + tab).classList.add('active');
+        document.querySelector(`.account-sidebar .nav-item[onclick="showTab('${tab}')"]`)?.classList.add('active');
+        
+        if (tab === 'orders') loadOrders();
+        if (tab === 'wishlist') loadWishlist();
+    }
+
+    // Load orders
+    function loadOrders() {
+        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+        const container = document.getElementById('orderHistory');
+        const badge = document.getElementById('orderBadge');
+        
+        badge.textContent = orders.length;
+
+        if (orders.length === 0) {
+            container.innerHTML = `
+                <div style="text-align:center; padding:2rem; color:#6a889a;">
+                    <i class="fa-regular fa-receipt" style="font-size:2rem;"></i>
+                    <p style="margin-top:0.5rem;">No orders yet</p>
+                    <a href="products.html" style="color:#1e7b6b;">Start shopping</a>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = orders.map(order => `
+            <div class="order-card">
+                <div class="order-header">
+                    <div>
+                        <span class="order-number">${order.orderNumber}</span>
+                        <span class="order-status ${order.status || 'pending'}">${order.status || 'Pending'}</span>
+                    </div>
+                    <span class="order-date">${new Date(order.date).toLocaleDateString()}</span>
+                </div>
+                <div class="order-items">
+                    ${order.items.map(item => `${item.quantity || 1}x ${item.title}`).join(', ')}
+                </div>
+                <div class="order-total">Total: $${(order.totals?.total || 0).toFixed(2)}</div>
+            </div>
+        `).join('');
+    }
+
+    // Load wishlist
+    function loadWishlist() {
+        const wishlist = JSON.parse(localStorage.getItem('pse_wishlist') || '[]');
+        const grid = document.getElementById('wishlistGrid');
+        const badge = document.getElementById('wishlistBadge');
+        
+        badge.textContent = wishlist.length;
+
+        if (wishlist.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; padding:2rem; color:#6a889a;">
+                    <i class="fa-regular fa-heart" style="font-size:2rem;"></i>
+                    <p style="margin-top:0.5rem;">Your wishlist is empty</p>
+                    <a href="products.html" style="color:#1e7b6b;">Browse products</a>
+                </div>
+            `;
+            return;
+        }
+
+        const products = sampleProducts.filter(p => wishlist.includes(p.id));
+        renderProducts(products, 'wishlistGrid');
+    }
+
+    // Profile form
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const user = JSON.parse(localStorage.getItem('pse_user') || '{}');
+        user.firstName = document.getElementById('profFirstName').value;
+        user.lastName = document.getElementById('profLastName').value;
+        user.email = document.getElementById('profEmail').value;
+        user.company = document.getElementById('profCompany').value;
+        user.businessType = document.getElementById('profBusinessType').value;
+        
+        localStorage.setItem('pse_user', JSON.stringify(user));
+        showToast('✅ Profile updated successfully!', 'success');
+        loadUser();
+    });
+
+    // Security form
+    document.getElementById('securityForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        showToast('🔒 Password updated successfully!', 'success');
+        this.reset();
+    });
+
+    // Logout
+    function logoutUser() {
+        if (confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('pse_user');
+            showToast('👋 Logged out successfully', 'info');
+            setTimeout(() => window.location.href = 'index.html', 1000);
+        }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        loadUser();
+        loadOrders();
+        loadWishlist();
+    });
+</script>
+
+</body>
+</html>

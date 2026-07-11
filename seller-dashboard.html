@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seller Dashboard - PSE Wholesale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .stat-card {
+            background: #fff;
+            border-radius: 1.2rem;
+            padding: 1.5rem;
+            border: 1px solid #e9edf2;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #1e7b6b;
+        }
+        .stat-card .label {
+            font-size: 0.8rem;
+            color: #6a889a;
+            margin-top: 0.2rem;
+        }
+        .stat-card .icon {
+            font-size: 1.5rem;
+            color: #bcd9d0;
+            margin-bottom: 0.3rem;
+        }
+
+        .seller-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+        .seller-tabs button {
+            padding: 0.5rem 1.5rem;
+            border: 1px solid #dce3e9;
+            border-radius: 30px;
+            background: #fff;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+            font-size: 0.85rem;
+        }
+        .seller-tabs button:hover {
+            background: #f1f5f9;
+        }
+        .seller-tabs button.active {
+            background: #1e7b6b;
+            color: #fff;
+            border-color: #1e7b6b;
+        }
+
+        .seller-content {
+            background: #fff;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid #e9edf2;
+            min-height: 300px;
+        }
+        .seller-content .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0b2a3b;
+            margin-bottom: 1rem;
+        }
+
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .product-table th {
+            background: #f1f5f9;
+            padding: 0.6rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #0b2a3b;
+        }
+        .product-table td {
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid #eef2f6;
+        }
+        .product-table .status-badge {
+            display: inline-block;
+            padding: 0.1rem 0.6rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .product-table .status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+        .product-table .status-badge.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .product-table .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .product-table .btn-action {
+            padding: 0.2rem 0.6rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: 0.2s;
+        }
+        .product-table .btn-action.edit {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .product-table .btn-action.edit:hover {
+            background: #b8d4f0;
+        }
+        .product-table .btn-action.delete {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .product-table .btn-action.delete:hover {
+            background: #f5c6cb;
+        }
+
+        .btn-add-product {
+            background: #1e7b6b;
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 1rem;
+        }
+        .btn-add-product:hover {
+            background: #146354;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay .modal-box {
+            background: #fff;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+        .modal-overlay .modal-box h3 {
+            font-size: 1.3rem;
+            color: #0b2a3b;
+            margin-bottom: 1rem;
+        }
+        .modal-overlay .modal-box .form-group {
+            margin-bottom: 1rem;
+        }
+        .modal-overlay .modal-box .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0b2a3b;
+            margin-bottom: 0.3rem;
+        }
+        .modal-overlay .modal-box .form-group input,
+        .modal-overlay .modal-box .form-group select,
+        .modal-overlay .modal-box .form-group textarea {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #dce3e9;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .modal-overlay .modal-box .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .modal-overlay .modal-box .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .modal-overlay .modal-box .btn-submit {
+            background: #1e7b6b;
+            color: #fff;
+            border: none;
+            padding: 0.6rem 2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modal-overlay .modal-box .btn-submit:hover {
+            background: #146354;
+        }
+        .modal-overlay .modal-box .btn-close {
+            background: transparent;
+            border: 1px solid #dce3e9;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        .modal-overlay .modal-box .btn-close:hover {
+            background: #f1f5f9;
+        }
+
+        @media (max-width: 768px) {
+            .product-table {
+                font-size: 0.7rem;
+            }
+            .product-table th,
+            .product-table td {
+                padding: 0.3rem 0.5rem;
+            }
+            .modal-overlay .modal-box {
+                padding: 1.5rem;
+            }
+            .modal-overlay .modal-box .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── TOP BAR ─── -->
+<div class="top-bar">
+    <div class="container">
+        <div>
+            <span>Welcome to PSE Wholesale</span>
+            <a href="#" onclick="showToast('✅ Verified Supplier - Trusted partners!', 'success')">
+                <i class="fa-regular fa-circle-check"></i> Verified Supplier
+            </a>
+            <a href="#" onclick="showToast('🚚 Bulk Shipping - Free on orders over $250!', 'info')">
+                <i class="fa-regular fa-truck"></i> Bulk Shipping
+            </a>
+        </div>
+        <div id="authLinks">
+            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
+            <a href="#" onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</a>
+            <a href="seller-dashboard.html" style="display:none;">Become a Seller</a>
+            <a href="login.html" id="loginLink" style="display:none;">Login</a>
+            <a href="register.html" id="registerLink" style="display:none;">Register</a>
+            <select class="lang-select" onchange="showToast('🌐 Language changed to ' + this.value, 'info')">
+                <option value="EN">EN</option>
+                <option value="ES">ES</option>
+                <option value="FR">FR</option>
+                <option value="DE">DE</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+    <div class="container">
+        <a href="index.html" class="logo">
+    <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+</a>
+        <div class="search-bar">
+            <select><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
+            <input type="text" placeholder="Search wholesale products..." />
+            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <div class="header-actions">
+            <div class="location-selector"><i class="fa-solid fa-location-dot"></i> Sacramento, 95829</div>
+            <a href="#" class="icon-btn"><i class="fa-regular fa-heart"></i><span>Wishlist</span><span class="badge-count wishlist-count">0</span></a>
+            <a href="#" class="icon-btn"><i class="fa-regular fa-bell"></i><span>Alerts</span><span class="badge-count">3</span></a>
+            <a href="#" class="icon-btn" id="accountBtn"><i class="fa-regular fa-user"></i><span id="accountLabel">Account</span></a>
+            <a href="#" class="icon-btn" onclick="window.location.href='cart.html'">
+                <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ─── NAVIGATION ─── -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="index.html"><i class="fa-solid fa-bars"></i> All Departments</a>
+        <a href="#">Today's Deals</a>
+        <a href="#">New Arrivals</a>
+        <a href="#" class="wholesale-nav"><i class="fa-solid fa-cubes"></i> Wholesale</a>
+        <a href="#">Brands</a>
+        <a href="#">Clearance</a>
+        <a href="#">Flash Deals</a>
+        <a href="#">Gift Cards</a>
+        <a href="#">Business Solutions</a>
+        <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Customer Service</a>
+    </div>
+</nav>
+
+<!-- ─── MAIN CONTENT ─── -->
+<div class="container">
+
+    <!-- PAGE LINKS -->
+    <div class="page-links">
+        <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products.html"><i class="fa-solid fa-grid-2"></i> Products</a>
+        <a href="product-detail.html"><i class="fa-solid fa-eye"></i> Detail</a>
+        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+        <a href="checkout.html"><i class="fa-solid fa-credit-card"></i> Checkout</a>
+        <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+        <a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a>
+        <a href="account.html"><i class="fa-solid fa-user"></i> Account</a>
+        <a href="seller-dashboard.html" class="active"><i class="fa-solid fa-store"></i> Seller</a>
+        <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Admin</a>
+        <a href="about.html"><i class="fa-solid fa-info-circle"></i> About</a>
+    </div>
+
+    <!-- Dashboard Stats -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="icon"><i class="fa-regular fa-box"></i></div>
+            <div class="number" id="sellerProducts">0</div>
+            <div class="label">Total Products</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon"><i class="fa-regular fa-receipt"></i></div>
+            <div class="number" id="sellerOrders">0</div>
+            <div class="label">Total Orders</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon"><i class="fa-regular fa-dollar-sign"></i></div>
+            <div class="number" id="sellerRevenue">$0</div>
+            <div class="label">Revenue</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon"><i class="fa-regular fa-star"></i></div>
+            <div class="number" id="sellerRating">4.8</div>
+            <div class="label">Seller Rating</div>
+        </div>
+    </div>
+
+    <!-- Seller Tabs -->
+    <div class="seller-tabs">
+        <button class="active" onclick="showSellerTab('products')">Products</button>
+        <button onclick="showSellerTab('orders')">Orders</button>
+        <button onclick="showSellerTab('analytics')">Analytics</button>
+        <button onclick="showSellerTab('settings')">Settings</button>
+    </div>
+
+    <!-- Seller Content -->
+    <div class="seller-content" id="sellerContent">
+        <!-- Products Tab -->
+        <div id="seller-products">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
+                <div class="section-title"><i class="fa-regular fa-box"></i> My Products</div>
+                <button class="btn-add-product" onclick="openAddProduct()">
+                    <i class="fa-regular fa-plus"></i> Add New Product
+                </button>
+            </div>
+            <table class="product-table" id="sellerProductTable">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>MOQ</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="sellerProductBody">
+                    <tr>
+                        <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                            No products yet. Click "Add New Product" to get started.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Orders Tab -->
+        <div id="seller-orders" style="display:none;">
+            <div class="section-title"><i class="fa-regular fa-receipt"></i> Orders</div>
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="sellerOrderBody">
+                    <tr>
+                        <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                            No orders yet.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="seller-analytics" style="display:none;">
+            <div class="section-title"><i class="fa-regular fa-chart-simple"></i> Analytics</div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:1rem; margin-top:1rem;">
+                <div class="stat-card">
+                    <div class="number" id="analyticsViews">0</div>
+                    <div class="label">Total Views</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="analyticsSales">0</div>
+                    <div class="label">Total Sales</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="analyticsConversion">0%</div>
+                    <div class="label">Conversion Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="analyticsRevenue">$0</div>
+                    <div class="label">Revenue</div>
+                </div>
+            </div>
+            <div style="text-align:center; padding:2rem; color:#6a889a; margin-top:1rem; background:#f8fafc; border-radius:1rem;">
+                <i class="fa-regular fa-chart-bar" style="font-size:2rem;"></i>
+                <p style="margin-top:0.5rem;">Detailed analytics coming soon. Start selling to see data!</p>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="seller-settings" style="display:none;">
+            <div class="section-title"><i class="fa-regular fa-gear"></i> Store Settings</div>
+            <form class="profile-form" style="max-width:600px;">
+                <div class="form-group">
+                    <label>Store Name</label>
+                    <input type="text" id="storeName" placeholder="Your store name" />
+                </div>
+                <div class="form-group">
+                    <label>Store Description</label>
+                    <textarea id="storeDescription" placeholder="Describe your store..." rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Store Category</label>
+                    <select>
+                        <option>Select category</option>
+                        <option>Electronics</option>
+                        <option>Fashion</option>
+                        <option>Home & Kitchen</option>
+                        <option>Grocery</option>
+                    </select>
+                </div>
+                <button class="btn-save" onclick="showToast('✅ Store settings saved!', 'success')">
+                    <i class="fa-regular fa-floppy-disk"></i> Save Settings
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!-- ─── ADD PRODUCT MODAL ─── -->
+<div class="modal-overlay" id="addProductModal">
+    <div class="modal-box">
+        <h3><i class="fa-regular fa-plus"></i> Add New Product</h3>
+        <form id="addProductForm">
+            <div class="form-group">
+                <label>Product Title *</label>
+                <input type="text" id="newProductTitle" placeholder="Enter product title" required />
+            </div>
+            <div class="form-group">
+                <label>Brand</label>
+                <input type="text" id="newProductBrand" placeholder="Brand name" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Price *</label>
+                    <input type="number" id="newProductPrice" placeholder="0.00" step="0.01" required />
+                </div>
+                <div class="form-group">
+                    <label>Old Price</label>
+                    <input type="number" id="newProductOldPrice" placeholder="0.00" step="0.01" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>MOQ</label>
+                    <input type="number" id="newProductMoq" placeholder="Minimum order quantity" />
+                </div>
+                <div class="form-group">
+                    <label>Stock</label>
+                    <input type="number" id="newProductStock" placeholder="100" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="newProductCategory">
+                    <option value="electronics">Electronics</option>
+                    <option value="fashion">Fashion</option>
+                    <option value="home">Home</option>
+                    <option value="kitchen">Kitchen</option>
+                    <option value="grocery">Grocery</option>
+                    <option value="beauty">Beauty</option>
+                    <option value="sports">Sports</option>
+                    <option value="office">Office</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Product Image URL</label>
+                <input type="text" id="newProductImage" placeholder="https://example.com/image.jpg" />
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="newProductDescription" placeholder="Describe your product..." rows="3"></textarea>
+            </div>
+            <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+                <button type="button" class="btn-close" onclick="closeAddProduct()">Cancel</button>
+                <button type="submit" class="btn-submit"><i class="fa-regular fa-plus"></i> Add Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ─── HELP MODAL ─── -->
+<div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
+    <div class="modal-content">
+        <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
+        <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
+        <p>Choose from our support options below:</p>
+        <ul>
+            <li><i class="fa-regular fa-message" style="color:#1e7b6b; width:20px;"></i> Live Chat (24/7)</li>
+            <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
+            <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
+            <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
+        </ul>
+        <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
+    </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+    <div class="container">
+        <div>
+            <h4>PSE Wholesale</h4>
+            <ul>
+                <li onclick="window.location.href='about.html'">About Us</li>
+                <li>Careers</li>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
+                <li>Blog</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Customer Service</h4>
+            <ul>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
+                <li>Returns & Refunds</li>
+                <li>Shipping Policy</li>
+                <li onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</li>
+            </ul>
+        </div>
+        <div>
+            <h4>B2B</h4>
+            <ul>
+                <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
+                <li>Wholesale Pricing</li>
+                <li>Bulk Orders</li>
+                <li>Supplier Program</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Legal</h4>
+            <ul>
+                <li>Privacy Policy</li>
+                <li>Terms & Conditions</li>
+                <li>Cookie Policy</li>
+            </ul>
+        </div>
+        <div class="bottom">
+            &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- ADMIN QUICK ACCESS -->
+<a href="admin-dashboard.html" class="admin-quick">
+    <i class="fa-solid fa-gauge-high"></i> Admin
+</a>
+
+<!-- ─── SCRIPTS ─── -->
+<script src="js/main.js"></script>
+<script>
+    let sellerProducts = [];
+
+    function loadSellerData() {
+        const user = JSON.parse(localStorage.getItem('pse_user') || 'null');
+        if (!user || (user.role !== 'seller' && user.role !== 'admin')) {
+            showToast('⚠️ Seller access required', 'error');
+            setTimeout(() => window.location.href = 'login.html', 1500);
+            return;
+        }
+
+        // Load products from localStorage (using sample data for demo)
+        sellerProducts = JSON.parse(localStorage.getItem('seller_products') || '[]');
+        if (sellerProducts.length === 0) {
+            // Add sample products for demo
+            sellerProducts = [
+                { id: 1, title: 'Premium Cotton Tee', brand: 'TextilePro', price: 6.80, old_price: 11.50, moq: 12, stock: 500, category: 'fashion', status: 'active' },
+                { id: 2, title: 'Ceramic Mug Set', brand: 'HomeCraft', price: 4.20, old_price: 6.00, moq: 24, stock: 300, category: 'kitchen', status: 'active' },
+                { id: 3, title: 'Wireless Buds Pro', brand: 'AudioMax', price: 14.50, old_price: 24.99, moq: 10, stock: 150, category: 'electronics', status: 'active' }
+            ];
+            localStorage.setItem('seller_products', JSON.stringify(sellerProducts));
+        }
+
+        renderSellerProducts();
+        updateSellerStats();
+        renderSellerOrders();
+        updateAnalytics();
+    }
+
+    function renderSellerProducts() {
+        const tbody = document.getElementById('sellerProductBody');
+        if (sellerProducts.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                        No products yet. Click "Add New Product" to get started.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = sellerProducts.map(p => `
+            <tr>
+                <td><strong>${p.title}</strong><br><span style="font-size:0.7rem; color:#6a889a;">${p.brand || ''}</span></td>
+                <td>$${p.price.toFixed(2)}</td>
+                <td>${p.moq || 1}</td>
+                <td>${p.stock || 0}</td>
+                <td><span class="status-badge ${p.status || 'active'}">${p.status || 'Active'}</span></td>
+                <td>
+                    <button class="btn-action edit" onclick="editProduct(${p.id})"><i class="fa-regular fa-pen"></i></button>
+                    <button class="btn-action delete" onclick="deleteProduct(${p.id})"><i class="fa-regular fa-trash-can"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function updateSellerStats() {
+        document.getElementById('sellerProducts').textContent = sellerProducts.length;
+        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+        document.getElementById('sellerOrders').textContent = orders.length;
+        const revenue = orders.reduce((sum, o) => sum + (o.totals?.total || 0), 0);
+        document.getElementById('sellerRevenue').textContent = '$' + revenue.toFixed(0);
+    }
+
+    function renderSellerOrders() {
+        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+        const tbody = document.getElementById('sellerOrderBody');
+        
+        if (orders.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                        No orders yet.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = orders.map(o => `
+            <tr>
+                <td><strong>${o.orderNumber}</strong></td>
+                <td>${o.customer?.firstName || 'Guest'} ${o.customer?.lastName || ''}</td>
+                <td>${o.items?.length || 0} items</td>
+                <td>$${(o.totals?.total || 0).toFixed(2)}</td>
+                <td><span class="status-badge ${o.status || 'pending'}">${o.status || 'Pending'}</span></td>
+                <td>${new Date(o.date).toLocaleDateString()}</td>
+            </tr>
+        `).join('');
+    }
+
+    function updateAnalytics() {
+        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+        const totalSales = orders.length;
+        const revenue = orders.reduce((sum, o) => sum + (o.totals?.total || 0), 0);
+        
+        document.getElementById('analyticsViews').textContent = (totalSales * 50 + 100);
+        document.getElementById('analyticsSales').textContent = totalSales;
+        document.getElementById('analyticsConversion').textContent = totalSales > 0 ? '2.4%' : '0%';
+        document.getElementById('analyticsRevenue').textContent = '$' + revenue.toFixed(0);
+    }
+
+    function showSellerTab(tab) {
+        document.querySelectorAll('.seller-tabs button').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.seller-tabs button[onclick="showSellerTab('${tab}')"]`).classList.add('active');
+        
+        document.querySelectorAll('#sellerContent > div').forEach(d => d.style.display = 'none');
+        document.getElementById('seller-' + tab).style.display = 'block';
+    }
+
+    function openAddProduct() {
+        document.getElementById('addProductModal').style.display = 'flex';
+        document.getElementById('addProductForm').reset();
+    }
+
+    function closeAddProduct() {
+        document.getElementById('addProductModal').style.display = 'none';
+    }
+
+    document.getElementById('addProductForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const newProduct = {
+            id: Date.now(),
+            title: document.getElementById('newProductTitle').value,
+            brand: document.getElementById('newProductBrand').value,
+            price: parseFloat(document.getElementById('newProductPrice').value) || 0,
+            old_price: parseFloat(document.getElementById('newProductOldPrice').value) || null,
+            moq: parseInt(document.getElementById('newProductMoq').value) || 1,
+            stock: parseInt(document.getElementById('newProductStock').value) || 100,
+            category: document.getElementById('newProductCategory').value,
+            image_url: document.getElementById('newProductImage').value,
+            description: document.getElementById('newProductDescription').value,
+            status: 'active'
+        };
+
+        sellerProducts.push(newProduct);
+        localStorage.setItem('seller_products', JSON.stringify(sellerProducts));
+        
+        closeAddProduct();
+        renderSellerProducts();
+        updateSellerStats();
+        showToast('✅ Product added successfully!', 'success');
+    });
+
+    function editProduct(id) {
+        showToast('✏️ Edit product feature coming soon', 'info');
+    }
+
+    function deleteProduct(id) {
+        if (confirm('Are you sure you want to delete this product?')) {
+            sellerProducts = sellerProducts.filter(p => p.id !== id);
+            localStorage.setItem('seller_products', JSON.stringify(sellerProducts));
+            renderSellerProducts();
+            updateSellerStats();
+            showToast('🗑️ Product deleted', 'info');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadSellerData);
+</script>
+
+</body>
+</html>

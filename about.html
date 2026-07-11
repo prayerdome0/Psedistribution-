@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About Us - PSE Wholesale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        .about-page {
+            background: #fff;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            border: 1px solid #e9edf2;
+            margin: 1.5rem 0;
+        }
+        .about-page .hero-section {
+            text-align: center;
+            padding: 2rem 0 3rem;
+        }
+        .about-page .hero-section h1 {
+            font-size: 2.5rem;
+            color: #0b2a3b;
+            margin-bottom: 0.5rem;
+        }
+        .about-page .hero-section h1 span {
+            color: #1e7b6b;
+        }
+        .about-page .hero-section .subtitle {
+            font-size: 1.1rem;
+            color: #6a889a;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .about-page .hero-section .big-icon {
+            font-size: 4rem;
+            color: #1e7b6b;
+            margin-bottom: 1rem;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .about-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 1.2rem;
+            border: 1px solid #e9edf2;
+            transition: 0.2s;
+        }
+        .about-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        }
+        .about-card i {
+            font-size: 2.5rem;
+            color: #1e7b6b;
+            margin-bottom: 0.8rem;
+        }
+        .about-card h3 {
+            font-size: 1.1rem;
+            color: #0b2a3b;
+            margin-bottom: 0.3rem;
+        }
+        .about-card p {
+            font-size: 0.9rem;
+            color: #6a889a;
+            line-height: 1.6;
+        }
+
+        .about-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, #0b2a3b 0%, #1a4b5e 100%);
+            border-radius: 1.5rem;
+            color: #fff;
+        }
+        .about-stats .stat {
+            text-align: center;
+        }
+        .about-stats .stat .number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #f1c40f;
+        }
+        .about-stats .stat .label {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .about-mission {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+            align-items: center;
+        }
+        .about-mission .content h2 {
+            font-size: 1.8rem;
+            color: #0b2a3b;
+            margin-bottom: 0.5rem;
+        }
+        .about-mission .content h2 span {
+            color: #1e7b6b;
+        }
+        .about-mission .content p {
+            color: #6a889a;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+        .about-mission .image {
+            background: #f4f8fa;
+            border-radius: 1.2rem;
+            aspect-ratio: 16/10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+            color: #3a6b7a;
+            border: 1px solid #e9edf2;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .team-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 1.2rem;
+            border: 1px solid #e9edf2;
+        }
+        .team-card .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #1e7b6b;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 0.8rem;
+        }
+        .team-card h4 {
+            font-size: 1rem;
+            color: #0b2a3b;
+        }
+        .team-card .role {
+            font-size: 0.8rem;
+            color: #6a889a;
+        }
+
+        .contact-section {
+            background: #f8fafc;
+            border-radius: 1.2rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px solid #e9edf2;
+        }
+        .contact-section h3 {
+            font-size: 1.3rem;
+            color: #0b2a3b;
+            margin-bottom: 1rem;
+        }
+        .contact-section .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .contact-section .contact-info .item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .contact-section .contact-info .item i {
+            font-size: 1.5rem;
+            color: #1e7b6b;
+            width: 40px;
+        }
+        .contact-section .contact-info .item .label {
+            font-size: 0.8rem;
+            color: #6a889a;
+        }
+        .contact-section .contact-info .item .value {
+            font-weight: 600;
+            color: #0b2a3b;
+        }
+
+        @media (max-width: 768px) {
+            .about-page {
+                padding: 1.5rem;
+            }
+            .about-page .hero-section h1 {
+                font-size: 1.8rem;
+            }
+            .about-mission {
+                grid-template-columns: 1fr;
+            }
+            .about-mission .image {
+                aspect-ratio: 16/9;
+                font-size: 4rem;
+            }
+            .about-stats {
+                grid-template-columns: 1fr 1fr;
+                padding: 1.5rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .about-stats {
+                grid-template-columns: 1fr;
+            }
+            .contact-section .contact-info .item {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── TOP BAR ─── -->
+<div class="top-bar">
+    <div class="container">
+        <div>
+            <span>Welcome to PSE Wholesale</span>
+            <a href="#" onclick="showToast('✅ Verified Supplier - Trusted partners!', 'success')">
+                <i class="fa-regular fa-circle-check"></i> Verified Supplier
+            </a>
+            <a href="#" onclick="showToast('🚚 Bulk Shipping - Free on orders over $250!', 'info')">
+                <i class="fa-regular fa-truck"></i> Bulk Shipping
+            </a>
+        </div>
+        <div id="authLinks">
+            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
+            <a href="#" onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</a>
+            <a href="seller-dashboard.html">Become a Seller</a>
+            <a href="login.html" id="loginLink">Login</a>
+            <a href="register.html" id="registerLink">Register</a>
+            <select class="lang-select" onchange="showToast('🌐 Language changed to ' + this.value, 'info')">
+                <option value="EN">EN</option>
+                <option value="ES">ES</option>
+                <option value="FR">FR</option>
+                <option value="DE">DE</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+    <div class="container">
+        <a href="index.html" class="logo">
+    <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+</a>
+        <div class="search-bar">
+            <select><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
+            <input type="text" placeholder="Search wholesale products..." />
+            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <div class="header-actions">
+            <div class="location-selector"><i class="fa-solid fa-location-dot"></i> Sacramento, 95829</div>
+            <a href="#" class="icon-btn"><i class="fa-regular fa-heart"></i><span>Wishlist</span><span class="badge-count wishlist-count">0</span></a>
+            <a href="#" class="icon-btn"><i class="fa-regular fa-bell"></i><span>Alerts</span><span class="badge-count">3</span></a>
+            <a href="#" class="icon-btn" id="accountBtn"><i class="fa-regular fa-user"></i><span id="accountLabel">Account</span></a>
+            <a href="#" class="icon-btn" onclick="window.location.href='cart.html'">
+                <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ─── NAVIGATION ─── -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="index.html"><i class="fa-solid fa-bars"></i> All Departments</a>
+        <a href="#">Today's Deals</a>
+        <a href="#">New Arrivals</a>
+        <a href="#" class="wholesale-nav"><i class="fa-solid fa-cubes"></i> Wholesale</a>
+        <a href="#">Brands</a>
+        <a href="#">Clearance</a>
+        <a href="#">Flash Deals</a>
+        <a href="#">Gift Cards</a>
+        <a href="#">Business Solutions</a>
+        <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Customer Service</a>
+    </div>
+</nav>
+
+<!-- ─── MAIN CONTENT ─── -->
+<div class="container">
+
+    <!-- PAGE LINKS -->
+    <div class="page-links">
+        <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products.html"><i class="fa-solid fa-grid-2"></i> Products</a>
+        <a href="product-detail.html"><i class="fa-solid fa-eye"></i> Detail</a>
+        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+        <a href="checkout.html"><i class="fa-solid fa-credit-card"></i> Checkout</a>
+        <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+        <a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a>
+        <a href="account.html"><i class="fa-solid fa-user"></i> Account</a>
+        <a href="seller-dashboard.html"><i class="fa-solid fa-store"></i> Seller</a>
+        <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Admin</a>
+        <a href="about.html" class="active"><i class="fa-solid fa-info-circle"></i> About</a>
+    </div>
+
+    <!-- About Page -->
+    <div class="about-page">
+
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="big-icon"><i class="fa-solid fa-whale"></i></div>
+            <h1>About <span>PSE Wholesale</span></h1>
+            <p class="subtitle">Your trusted partner for bulk purchasing and wholesale distribution since 2020</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="about-stats">
+            <div class="stat">
+                <div class="number">12K+</div>
+                <div class="label">Products</div>
+            </div>
+            <div class="stat">
+                <div class="number">580+</div>
+                <div class="label">Suppliers</div>
+            </div>
+            <div class="stat">
+                <div class="number">99.7%</div>
+                <div class="label">Satisfaction Rate</div>
+            </div>
+            <div class="stat">
+                <div class="number">24/7</div>
+                <div class="label">Customer Support</div>
+            </div>
+        </div>
+
+        <!-- Mission -->
+        <div class="about-mission">
+            <div class="content">
+                <h2>Our <span>Mission</span></h2>
+                <p>
+                    PSE Wholesale is dedicated to connecting businesses with high-quality products at competitive wholesale prices. 
+                    We believe in empowering businesses of all sizes with access to verified suppliers, bulk ordering capabilities, 
+                    and seamless logistics solutions.
+                </p>
+                <p style="margin-top:0.5rem;">
+                    Our platform is built on trust, transparency, and efficiency — making wholesale purchasing as simple as retail.
+                </p>
+            </div>
+            <div class="image">
+                <i class="fa-solid fa-handshake"></i>
+            </div>
+        </div>
+
+        <!-- Values -->
+        <h2 style="font-size:1.5rem; color:#0b2a3b; margin-top:2rem;">Our <span style="color:#1e7b6b;">Values</span></h2>
+        <div class="about-grid">
+            <div class="about-card">
+                <i class="fa-regular fa-shield"></i>
+                <h3>Trust & Transparency</h3>
+                <p>Verified suppliers, authentic products, and clear pricing with no hidden fees.</p>
+            </div>
+            <div class="about-card">
+                <i class="fa-regular fa-bolt"></i>
+                <h3>Speed & Efficiency</h3>
+                <p>Quick ordering, fast shipping, and streamlined logistics for bulk purchases.</p>
+            </div>
+            <div class="about-card">
+                <i class="fa-regular fa-handshake"></i>
+                <h3>Partnership</h3>
+                <p>We grow with our customers and suppliers, building lasting business relationships.</p>
+            </div>
+            <div class="about-card">
+                <i class="fa-regular fa-globe"></i>
+                <h3>Global Reach</h3>
+                <p>Serving businesses worldwide with international shipping and multi-currency support.</p>
+            </div>
+        </div>
+
+        <!-- Team -->
+        <h2 style="font-size:1.5rem; color:#0b2a3b; margin-top:2rem;">Meet Our <span style="color:#1e7b6b;">Team</span></h2>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="avatar"><i class="fa-regular fa-user"></i></div>
+                <h4>John PSE</h4>
+                <div class="role">CEO & Founder</div>
+            </div>
+            <div class="team-card">
+                <div class="avatar"><i class="fa-regular fa-user"></i></div>
+                <h4>Sarah Johnson</h4>
+                <div class="role">Head of Operations</div>
+            </div>
+            <div class="team-card">
+                <div class="avatar"><i class="fa-regular fa-user"></i></div>
+                <h4>Michael Chen</h4>
+                <div class="role">Supply Chain Director</div>
+            </div>
+            <div class="team-card">
+                <div class="avatar"><i class="fa-regular fa-user"></i></div>
+                <h4>Emily Rodriguez</h4>
+                <div class="role">Customer Experience Lead</div>
+            </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="contact-section">
+            <h3><i class="fa-regular fa-envelope" style="color:#1e7b6b;"></i> Get in Touch</h3>
+            <div class="contact-info">
+                <div class="item">
+                    <i class="fa-regular fa-envelope"></i>
+                    <div>
+                        <div class="label">Email</div>
+                        <div class="value">support@psewholesale.com</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="fa-regular fa-phone"></i>
+                    <div>
+                        <div class="label">Phone</div>
+                        <div class="value">+1 (800) 555-PSEW</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="fa-regular fa-location-dot"></i>
+                    <div>
+                        <div class="label">Address</div>
+                        <div class="value">123 Commerce St, Sacramento, CA 95829</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="fa-regular fa-clock"></i>
+                    <div>
+                        <div class="label">Hours</div>
+                        <div class="value">Mon-Fri: 8AM - 8PM EST</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ─── HELP MODAL ─── -->
+<div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
+    <div class="modal-content">
+        <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
+        <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
+        <p>Choose from our support options below:</p>
+        <ul>
+            <li><i class="fa-regular fa-message" style="color:#1e7b6b; width:20px;"></i> Live Chat (24/7)</li>
+            <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
+            <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
+            <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
+        </ul>
+        <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
+    </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+    <div class="container">
+        <div>
+            <h4>PSE Wholesale</h4>
+            <ul>
+                <li onclick="window.location.href='about.html'">About Us</li>
+                <li>Careers</li>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
+                <li>Blog</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Customer Service</h4>
+            <ul>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
+                <li>Returns & Refunds</li>
+                <li>Shipping Policy</li>
+                <li onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</li>
+            </ul>
+        </div>
+        <div>
+            <h4>B2B</h4>
+            <ul>
+                <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
+                <li>Wholesale Pricing</li>
+                <li>Bulk Orders</li>
+                <li>Supplier Program</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Legal</h4>
+            <ul>
+                <li>Privacy Policy</li>
+                <li>Terms & Conditions</li>
+                <li>Cookie Policy</li>
+            </ul>
+        </div>
+        <div class="bottom">
+            &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- ADMIN QUICK ACCESS -->
+<a href="admin-dashboard.html" class="admin-quick">
+    <i class="fa-solid fa-gauge-high"></i> Admin
+</a>
+
+<!-- ─── SCRIPTS ─── -->
+<script src="js/main.js"></script>
+
+</body>
+</html>
