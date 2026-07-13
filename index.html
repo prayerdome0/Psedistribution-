@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PSE Wholesale Marketplace</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ─── TOP BAR ─── -->
+<div class="top-bar">
+    <div class="container">
+        <div>
+            <span>Welcome to PSE Wholesale</span>
+            <a href="#" onclick="showToast('✅ Verified Supplier - Trusted partners!', 'success')">
+                <i class="fa-regular fa-circle-check"></i> Verified Supplier
+            </a>
+            <a href="#" onclick="showToast('🚚 Bulk Shipping - Free on orders over $250!', 'info')">
+                <i class="fa-regular fa-truck"></i> Bulk Shipping
+            </a>
+        </div>
+        <div id="authLinks">
+            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
+            <a href="#" onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</a>
+            <a href="seller-dashboard.html">Become a Seller</a>
+            <a href="login.html" id="loginLink">Login</a>
+            <a href="register.html" id="registerLink">Register</a>
+            <select class="lang-select" onchange="showToast('🌐 Language changed to ' + this.value, 'info')">
+                <option value="EN">EN</option>
+                <option value="ES">ES</option>
+                <option value="FR">FR</option>
+                <option value="DE">DE</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+    <div class="container">
+        <a href="index.html" class="logo">
+    <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+</a>
+        <div class="search-bar">
+            <select id="categoryFilter"><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
+            <input type="text" id="searchInput" placeholder="Search wholesale products..." onkeyup="searchProducts(event)" />
+            <button onclick="searchProducts()"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <div class="header-actions">
+            <div class="location-selector"><i class="fa-solid fa-location-dot"></i> Sacramento, 95829</div>
+            <a href="#" class="icon-btn" onclick="if(!JSON.parse(localStorage.getItem('pse_user')||'null')){showToast('Please login first','error')}else{window.location.href='wishlist.html'}">
+                <i class="fa-regular fa-heart"></i><span>Wishlist</span>
+                <span class="badge-count wishlist-count">0</span>
+            </a>
+            <a href="#" class="icon-btn">
+                <i class="fa-regular fa-bell"></i><span>Alerts</span>
+                <span class="badge-count">3</span>
+            </a>
+            <a href="#" class="icon-btn" id="accountBtn" onclick="if(!JSON.parse(localStorage.getItem('pse_user')||'null')){window.location.href='login.html'}else{window.location.href='account.html'}">
+                <i class="fa-regular fa-user"></i><span id="accountLabel">Account</span>
+            </a>
+            <a href="#" class="icon-btn" onclick="window.location.href='cart.html'">
+                <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ─── NAVIGATION ─── -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="#"><i class="fa-solid fa-bars"></i> All Departments</a>
+        <a href="#" onclick="filterByCategory('deals')">Today's Deals</a>
+        <a href="#" onclick="filterByCategory('new')">New Arrivals</a>
+        <a href="#" class="wholesale-nav" onclick="filterByCategory('wholesale')"><i class="fa-solid fa-cubes"></i> Wholesale</a>
+        <a href="#" onclick="filterByCategory('all')">Brands</a>
+        <a href="#" onclick="filterByCategory('clearance')">Clearance</a>
+        <a href="#" onclick="document.getElementById('flashDeals').scrollIntoView({behavior:'smooth'})">Flash Deals</a>
+        <a href="#">Gift Cards</a>
+        <a href="#">Business Solutions</a>
+        <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Customer Service</a>
+    </div>
+</nav>
+
+<!-- ─── BANNER ─── -->
+<div class="container">
+    <div class="banner">
+        <img src="https://i.ibb.co/tpNGF109/file-00000000199071f4b3eca093dbee137c.png" alt="PSE Wholesale Banner" />
+    </div>
+</div>
+
+<!-- ─── MAIN CONTENT ─── -->
+<div class="container">
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-content">
+            <div class="tag"><i class="fa-regular fa-clock"></i> Wholesale Exclusive</div>
+            <h2>Bulk Savings Up to 40%</h2>
+            <p>Minimum order quantities from 10 units. Verified suppliers, guaranteed quality.</p>
+            <div class="btn-group">
+                <a href="#" class="btn-primary" onclick="document.getElementById('productGrid').scrollIntoView({behavior:'smooth'})">
+                    <i class="fa-solid fa-cart-plus"></i> Shop Wholesale
+                </a>
+                <a href="#" class="btn-outline-light" onclick="showToast('Learn more about PSE Wholesale', 'info')">Learn More</a>
+            </div>
+        </div>
+        <div class="hero-stats">
+            <div><div class="num" id="statProducts">12K+</div><div class="label">Products</div></div>
+            <div><div class="num" id="statSuppliers">580+</div><div class="label">Suppliers</div></div>
+            <div><div class="num">99.7%</div><div class="label">Satisfaction</div></div>
+        </div>
+    </div>
+
+    <!-- PAGE LINKS -->
+    <div class="page-links">
+        <a href="index.html" class="active"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products.html"><i class="fa-solid fa-grid-2"></i> Products</a>
+        <a href="product-detail.html"><i class="fa-solid fa-eye"></i> Detail</a>
+        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+        <a href="checkout.html"><i class="fa-solid fa-credit-card"></i> Checkout</a>
+        <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+        <a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a>
+        <a href="account.html"><i class="fa-solid fa-user"></i> Account</a>
+        <a href="seller-dashboard.html"><i class="fa-solid fa-store"></i> Seller</a>
+        <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Admin</a>
+        <a href="about.html"><i class="fa-solid fa-info-circle"></i> About</a>
+    </div>
+
+    <!-- CATEGORIES -->
+    <div class="section-title">Shop by Category <span>Wholesale</span></div>
+    <div class="category-grid" id="categoryGrid">
+        <div class="category-item" onclick="filterByCategory('electronics')"><i class="fa-solid fa-laptop"></i><span>Electronics</span></div>
+        <div class="category-item" onclick="filterByCategory('fashion')"><i class="fa-solid fa-shirt"></i><span>Fashion</span></div>
+        <div class="category-item" onclick="filterByCategory('grocery')"><i class="fa-solid fa-carrot"></i><span>Grocery</span></div>
+        <div class="category-item" onclick="filterByCategory('home')"><i class="fa-solid fa-couch"></i><span>Home</span></div>
+        <div class="category-item" onclick="filterByCategory('kitchen')"><i class="fa-solid fa-kitchen-set"></i><span>Kitchen</span></div>
+        <div class="category-item" onclick="filterByCategory('beauty')"><i class="fa-solid fa-spray-can-sparkles"></i><span>Beauty</span></div>
+        <div class="category-item" onclick="filterByCategory('health')"><i class="fa-solid fa-heart-pulse"></i><span>Health</span></div>
+        <div class="category-item" onclick="filterByCategory('sports')"><i class="fa-solid fa-futbol"></i><span>Sports</span></div>
+        <div class="category-item" onclick="filterByCategory('automotive')"><i class="fa-solid fa-car"></i><span>Automotive</span></div>
+        <div class="category-item" onclick="filterByCategory('baby')"><i class="fa-solid fa-baby"></i><span>Baby</span></div>
+        <div class="category-item" onclick="filterByCategory('office')"><i class="fa-solid fa-pen-ruler"></i><span>Office</span></div>
+        <div class="category-item" onclick="filterByCategory('industrial')"><i class="fa-solid fa-tractor"></i><span>Industrial</span></div>
+        <div class="category-item" onclick="filterByCategory('books')"><i class="fa-solid fa-book"></i><span>Books</span></div>
+        <div class="category-item" onclick="filterByCategory('pets')"><i class="fa-solid fa-paw"></i><span>Pets</span></div>
+    </div>
+
+    <!-- FLASH DEALS -->
+    <div class="flash-deals" id="flashDeals">
+        <div class="left">
+            <h3><i class="fa-solid fa-bolt"></i> Flash Deals</h3>
+            <div class="flash-timer">
+                <span id="hours">06</span><span class="sep">:</span>
+                <span id="minutes">42</span><span class="sep">:</span>
+                <span id="seconds">18</span>
+            </div>
+        </div>
+        <a href="#" class="btn-primary" style="background:#f1c40f; color:#0b2a3b;" onclick="filterByCategory('flash')">View All <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="section-title">Best Sellers <span>Wholesale</span></div>
+    <div class="product-grid" id="productGrid">
+        <div class="loading-spinner">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;"></i>
+            <p style="margin-top:0.5rem;">Loading products...</p>
+        </div>
+    </div>
+    
+    <!-- TRUSTED COMPANIES CAROUSEL -->
+<div class="trusted-section">
+    <div class="section-title">
+        <h2>Trusted By <span>Industry Leaders</span></h2>
+        <p>Join thousands of businesses that trust PSE Wholesale</p>
+    </div>
+    <div class="carousel-wrapper">
+        <div class="carousel-track">
+            <!-- First set -->
+            <div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/nike-logo.png" alt="Nike" /></div>
+<div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/apple-logo.png" alt="Apple" /></div>
+<div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/samsung-logo.png" alt="Samsung" /></div>
+<div class="carousel-item"><img src="https://i.ibb.co/9k4fKd26/20260711-154300.png" alt="Adidas" /></div>
+<div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/sony-logo.png" alt="Sony" /></div>
+<div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/lg-logo.png" alt="LG" /></div>
+<div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/p-and-g-logo.png" alt="P&G" /></div>
+<div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/unilever-logo.png" alt="Unilever" /></div>
+        </div>
+    </div>
+</div>
+
+<!-- ─── HELP MODAL ─── -->
+<div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
+    <div class="modal-content">
+        <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
+        <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
+        <p>Choose from our support options below:</p>
+        <ul>
+            <li><i class="fa-regular fa-message" style="color:#1e7b6b; width:20px;"></i> Live Chat (24/7)</li>
+            <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
+            <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
+            <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
+        </ul>
+        <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
+    </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+    <div class="container">
+        <div>
+            <h4>PSE Wholesale</h4>
+            <ul>
+                <li onclick="window.location.href='about.html'">About Us</li>
+                <li>Careers</li>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
+                <li>Blog</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Customer Service</h4>
+            <ul>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
+                <li>Returns & Refunds</li>
+                <li>Shipping Policy</li>
+                <li onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</li>
+            </ul>
+        </div>
+        <div>
+            <h4>B2B</h4>
+            <ul>
+                <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
+                <li>Wholesale Pricing</li>
+                <li>Bulk Orders</li>
+                <li>Supplier Program</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Legal</h4>
+            <ul>
+                <li>Privacy Policy</li>
+                <li>Terms & Conditions</li>
+                <li>Cookie Policy</li>
+            </ul>
+        </div>
+        <div class="bottom">
+            &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- ADMIN QUICK ACCESS -->
+<a href="admin-dashboard.html" class="admin-quick">
+    <i class="fa-solid fa-gauge-high"></i> Admin
+</a>
+
+<!-- ─── SCRIPTS ─── -->
+<script src="js/main.js"></script>
+
+</body>
+</html>
