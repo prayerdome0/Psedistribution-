@@ -802,6 +802,86 @@ ul {
 .toast.error { background: #c0392b; }
 .toast.info { background: #2980b9; }
 
+/* ─── TRUSTED COMPANIES CAROUSEL ─── */
+.trusted-section {
+    background: #fff;
+    border-radius: 1.5rem;
+    padding: 2rem 1rem;
+    margin: 2rem 0;
+    border: 1px solid #e9edf2;
+    overflow: hidden;
+}
+.trusted-section .section-title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+.trusted-section .section-title h2 {
+    font-size: 1.5rem;
+    color: #0b2a3b;
+}
+.trusted-section .section-title h2 span {
+    color: #1e7b6b;
+}
+.trusted-section .section-title p {
+    color: #6a889a;
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+}
+
+.carousel-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+.carousel-track {
+    display: flex;
+    animation: scrollCarousel 30s linear infinite;
+    width: max-content;
+}
+
+.carousel-track:hover {
+    animation-play-state: paused;
+}
+
+.carousel-item {
+    min-width: 160px;
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.carousel-item img {
+    height: 50px;
+    width: auto;
+    max-width: 140px;
+    object-fit: contain;
+    filter: grayscale(0%);
+    transition: transform 0.3s;
+}
+
+.carousel-item:hover img {
+    transform: scale(1.1);
+}
+
+@keyframes scrollCarousel {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+@media (max-width: 768px) {
+    .carousel-item {
+        min-width: 120px;
+        padding: 0.5rem 1rem;
+    }
+    .carousel-item img {
+        height: 35px;
+        max-width: 100px;
+    }
+}
+
 /* ─── LOADING ─── */
 .loading-spinner {
     grid-column: 1 / -1;
