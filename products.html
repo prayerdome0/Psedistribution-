@@ -388,11 +388,6 @@
     </div>
 </footer>
 
-<!-- ADMIN QUICK ACCESS -->
-<a href="admin-dashboard.html" class="admin-quick">
-    <i class="fa-solid fa-gauge-high"></i> Admin
-</a>
-
 <!-- ─── SCRIPTS ─── -->
 <script src="main.js"></script>
 <script>
@@ -401,7 +396,7 @@
     const productsPerPage = 8;
     let filteredProducts = [];
 
-    function applyFilters() {
+    async function applyFilters() {
         // Get selected categories
         const categoryChecks = document.querySelectorAll('.filter-group input[type="checkbox"]');
         const selectedCategories = [];
@@ -432,8 +427,8 @@
         // Get sort
         const sort = document.getElementById('sortSelect').value;
 
-        // Filter products
-        let products = [...sampleProducts];
+        // Fetch products from Supabase
+        let products = await fetchProducts();
 
         // Category filter
         if (selectedCategories.length > 0) {
@@ -471,7 +466,7 @@
                 products.sort((a,b) => (b.rating || 0) - (a.rating || 0));
                 break;
             case 'newest':
-                products.sort((a,b) => b.id - a.id);
+                products.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
                 break;
             default:
                 break;
@@ -550,15 +545,8 @@
         applyFilters();
     }
 
-    // Override loadProducts to show all products
-    const originalLoad = loadProducts;
-    loadProducts = function(filter) {
-        applyFilters();
-    };
-
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
-        // Load all products
         setTimeout(() => {
             applyFilters();
         }, 100);

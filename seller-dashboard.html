@@ -601,40 +601,48 @@
     </div>
 </footer>
 
-<!-- ADMIN QUICK ACCESS -->
-<a href="admin-dashboard.html" class="admin-quick">
-    <i class="fa-solid fa-gauge-high"></i> Admin
-</a>
-
 <!-- ─── SCRIPTS ─── -->
 <script src="main.js"></script>
 <script>
+    // ─── PROTECT SELLER PAGE ───
+    if (!protectSeller()) {
+        throw new Error('Unauthorized');
+    }
+
     let sellerProducts = [];
+    let editingProductId = null;
 
-    function loadSellerData() {
-        const user = JSON.parse(localStorage.getItem('pse_user') || 'null');
-        if (!user || (user.role !== 'seller' && user.role !== 'admin')) {
-            showToast('⚠️ Seller access required', 'error');
-            setTimeout(() => window.location.href = 'login.html', 1500);
-            return;
-        }
-
-        // Load products from localStorage (using sample data for demo)
-        sellerProducts = JSON.parse(localStorage.getItem('seller_products') || '[]');
-        if (sellerProducts.length === 0) {
-            // Add sample products for demo
-            sellerProducts = [
-                { id: 1, title: 'Premium Cotton Tee', brand: 'TextilePro', price: 6.80, old_price: 11.50, moq: 12, stock: 500, category: 'fashion', status: 'active' },
-                { id: 2, title: 'Ceramic Mug Set', brand: 'HomeCraft', price: 4.20, old_price: 6.00, moq: 24, stock: 300, category: 'kitchen', status: 'active' },
-                { id: 3, title: 'Wireless Buds Pro', brand: 'AudioMax', price: 14.50, old_price: 24.99, moq: 10, stock: 150, category: 'electronics', status: 'active' }
-            ];
-            localStorage.setItem('seller_products', JSON.stringify(sellerProducts));
-        }
-
-        renderSellerProducts();
-        updateSellerStats();
-        renderSellerOrders();
+    // ─── LOAD SELLER DATA ───
+    async function loadSellerData() {
+        await loadSellerProducts();
+        await updateSellerStats();
+        await loadSellerOrders();
         updateAnalytics();
+    }
+
+    // ─── LOAD SELLER PRODUCTS ───
+    async function loadSellerProducts() {
+        const user = getCurrentUser();
+        if (!user) return;
+        
+        try {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/products?supplier_id=eq.${user.id}&select=*`, {
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                }
+            });
+            
+            if (response.ok) {
+                sellerProducts = await response.json();
+            } else {
+                sellerProducts = [];
+            }
+        } catch (error) {
+            console.error('Error loading products:', error);
+            sellerProducts = [];
+        }
+        renderSellerProducts();
     }
 
     function renderSellerProducts() {
@@ -653,27 +661,31 @@
         tbody.innerHTML = sellerProducts.map(p => `
             <tr>
                 <td><strong>${p.title}</strong><br><span style="font-size:0.7rem; color:#6a889a;">${p.brand || ''}</span></td>
-                <td>$${p.price.toFixed(2)}</td>
+                <td>$${(p.price || 0).toFixed(2)}</td>
                 <td>${p.moq || 1}</td>
                 <td>${p.stock || 0}</td>
-                <td><span class="status-badge ${p.status || 'active'}">${p.status || 'Active'}</span></td>
+                <td><span class="status-badge ${p.status === 'active' || p.status === 'approved' ? 'active' : 'pending'}">${p.status || 'Pending'}</span></td>
                 <td>
-                    <button class="btn-action edit" onclick="editProduct(${p.id})"><i class="fa-regular fa-pen"></i></button>
-                    <button class="btn-action delete" onclick="deleteProduct(${p.id})"><i class="fa-regular fa-trash-can"></i></button>
+                    <button class="btn-action edit" onclick="editProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
+                    <button class="btn-action delete" onclick="deleteProduct('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
                 </td>
             </tr>
         `).join('');
     }
 
-    function updateSellerStats() {
-        document.getElementById('sellerProducts').textContent = sellerProducts.length;
+    // ─── UPDATE SELLER STATS ───
+    async function updateSellerStats() {
+        document.getElementById('sellerProducts').textContent = sellerProducts.length || 0;
+        
         const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
         document.getElementById('sellerOrders').textContent = orders.length;
+        
         const revenue = orders.reduce((sum, o) => sum + (o.totals?.total || 0), 0);
         document.getElementById('sellerRevenue').textContent = '$' + revenue.toFixed(0);
     }
 
-    function renderSellerOrders() {
+    // ─── LOAD SELLER ORDERS ───
+    function loadSellerOrders() {
         const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
         const tbody = document.getElementById('sellerOrderBody');
         
@@ -700,6 +712,7 @@
         `).join('');
     }
 
+    // ─── UPDATE ANALYTICS ───
     function updateAnalytics() {
         const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
         const totalSales = orders.length;
@@ -711,6 +724,7 @@
         document.getElementById('analyticsRevenue').textContent = '$' + revenue.toFixed(0);
     }
 
+    // ─── SHOW SELLER TAB ───
     function showSellerTab(tab) {
         document.querySelectorAll('.seller-tabs button').forEach(b => b.classList.remove('active'));
         document.querySelector(`.seller-tabs button[onclick="showSellerTab('${tab}')"]`).classList.add('active');
@@ -719,56 +733,132 @@
         document.getElementById('seller-' + tab).style.display = 'block';
     }
 
+    // ─── OPEN ADD PRODUCT ───
     function openAddProduct() {
+        editingProductId = null;
         document.getElementById('addProductModal').style.display = 'flex';
         document.getElementById('addProductForm').reset();
+        document.getElementById('addProductForm').querySelector('.btn-submit').textContent = '<i class="fa-regular fa-plus"></i> Add Product';
     }
 
+    // ─── CLOSE ADD PRODUCT ───
     function closeAddProduct() {
         document.getElementById('addProductModal').style.display = 'none';
     }
 
-    document.getElementById('addProductForm').addEventListener('submit', function(e) {
+    // ─── ADD / UPDATE PRODUCT ───
+    document.getElementById('addProductForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const newProduct = {
-            id: Date.now(),
+        const user = getCurrentUser();
+        if (!user) return;
+        
+        const submitBtn = this.querySelector('.btn-submit');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving...';
+        
+        const productData = {
             title: document.getElementById('newProductTitle').value,
-            brand: document.getElementById('newProductBrand').value,
+            brand: document.getElementById('newProductBrand').value || '',
             price: parseFloat(document.getElementById('newProductPrice').value) || 0,
             old_price: parseFloat(document.getElementById('newProductOldPrice').value) || null,
             moq: parseInt(document.getElementById('newProductMoq').value) || 1,
             stock: parseInt(document.getElementById('newProductStock').value) || 100,
             category: document.getElementById('newProductCategory').value,
-            image_url: document.getElementById('newProductImage').value,
-            description: document.getElementById('newProductDescription').value,
-            status: 'active'
+            image_url: document.getElementById('newProductImage').value || '',
+            description: document.getElementById('newProductDescription').value || '',
+            supplier_id: user.id,
+            status: 'pending'
         };
 
-        sellerProducts.push(newProduct);
-        localStorage.setItem('seller_products', JSON.stringify(sellerProducts));
-        
-        closeAddProduct();
-        renderSellerProducts();
-        updateSellerStats();
-        showToast('✅ Product added successfully!', 'success');
+        try {
+            let response;
+            if (editingProductId) {
+                // Update existing product
+                response = await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${editingProductId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(productData)
+                });
+            } else {
+                // Add new product
+                response = await fetch(`${SUPABASE_URL}/rest/v1/products`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(productData)
+                });
+            }
+
+            if (response.ok) {
+                showToast(editingProductId ? '✅ Product updated!' : '✅ Product added!', 'success');
+                closeAddProduct();
+                await loadSellerProducts();
+                await updateSellerStats();
+            } else {
+                const error = await response.text();
+                showToast('❌ Failed to save product: ' + error, 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('❌ Error saving product', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = editingProductId ? '<i class="fa-regular fa-floppy-disk"></i> Update Product' : '<i class="fa-regular fa-plus"></i> Add Product';
+        }
     });
 
-    function editProduct(id) {
-        showToast('✏️ Edit product feature coming soon', 'info');
+    // ─── EDIT PRODUCT ───
+    async function editProduct(id) {
+        const product = sellerProducts.find(p => p.id === id);
+        if (!product) return;
+        
+        editingProductId = id;
+        document.getElementById('newProductTitle').value = product.title || '';
+        document.getElementById('newProductBrand').value = product.brand || '';
+        document.getElementById('newProductPrice').value = product.price || '';
+        document.getElementById('newProductOldPrice').value = product.old_price || '';
+        document.getElementById('newProductMoq').value = product.moq || 1;
+        document.getElementById('newProductStock').value = product.stock || 0;
+        document.getElementById('newProductCategory').value = product.category || 'electronics';
+        document.getElementById('newProductImage').value = product.image_url || '';
+        document.getElementById('newProductDescription').value = product.description || '';
+        
+        document.getElementById('addProductModal').style.display = 'flex';
+        document.getElementById('addProductForm').querySelector('.btn-submit').innerHTML = '<i class="fa-regular fa-floppy-disk"></i> Update Product';
     }
 
-    function deleteProduct(id) {
-        if (confirm('Are you sure you want to delete this product?')) {
-            sellerProducts = sellerProducts.filter(p => p.id !== id);
-            localStorage.setItem('seller_products', JSON.stringify(sellerProducts));
-            renderSellerProducts();
-            updateSellerStats();
+    // ─── DELETE PRODUCT ───
+    async function deleteProduct(id) {
+        if (!confirm('Are you sure you want to delete this product?')) return;
+        
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                }
+            });
             showToast('🗑️ Product deleted', 'info');
+            await loadSellerProducts();
+            await updateSellerStats();
+        } catch (error) {
+            showToast('❌ Error deleting product', 'error');
         }
     }
 
-    document.addEventListener('DOMContentLoaded', loadSellerData);
+    // ─── INIT ───
+    document.addEventListener('DOMContentLoaded', function() {
+        loadSellerData();
+    });
 </script>
 
 </body>

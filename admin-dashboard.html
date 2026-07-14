@@ -176,6 +176,14 @@
             background: #d1ecf1;
             color: #0c5460;
         }
+        .table-container .status-badge.cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .table-container .status-badge.processing {
+            background: #cce5ff;
+            color: #004085;
+        }
         .table-container .btn-action {
             padding: 0.2rem 0.6rem;
             border: none;
@@ -205,6 +213,13 @@
         .table-container .btn-action.approve:hover {
             background: #c3e6cb;
         }
+        .table-container .btn-action.make-admin {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .table-container .btn-action.make-admin:hover {
+            background: #b8d4f0;
+        }
 
         .admin-actions {
             display: flex;
@@ -232,6 +247,141 @@
         }
         .admin-actions button i {
             margin-right: 0.3rem;
+        }
+
+        /* ─── IMAGE UPLOAD STYLES ─── */
+        .image-upload-box {
+            border: 2px dashed #dce3e9;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 1rem;
+        }
+        .image-upload-box:hover {
+            border-color: #1e7b6b;
+            background: #f8fafc;
+        }
+        .image-upload-box i {
+            font-size: 2.5rem;
+            color: #bcd9d0;
+            margin-bottom: 0.5rem;
+        }
+        .image-upload-box p {
+            color: #6a889a;
+            font-size: 0.85rem;
+        }
+        .image-upload-box .file-name {
+            color: #1e7b6b;
+            font-weight: 600;
+        }
+        .image-preview {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+        .image-preview .preview-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e9edf2;
+        }
+        .image-preview .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .image-preview .preview-item .remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #c0392b;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.6rem;
+            cursor: pointer;
+        }
+
+        /* ─── NOTIFICATIONS ─── */
+        .notif-container {
+            margin-bottom: 1.5rem;
+        }
+        .notif-btn {
+            background: #0b2a3b;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+        .notif-btn:hover {
+            background: #1a4b5e;
+        }
+        .notif-btn .badge {
+            background: #c0392b;
+            padding: 0.1rem 0.5rem;
+            border-radius: 50%;
+            font-size: 0.6rem;
+        }
+        .notif-panel {
+            display: none;
+            background: #fff;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            border: 1px solid #e9edf2;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .notif-panel.show {
+            display: block;
+        }
+        .notif-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid #eef2f6;
+        }
+        .notif-item.unread {
+            background: #f0f8f5;
+            border-left: 3px solid #1e7b6b;
+        }
+        .notif-item .msg {
+            font-size: 0.85rem;
+            color: #0b2a3b;
+        }
+        .notif-item .meta {
+            font-size: 0.7rem;
+            color: #6a889a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.2rem;
+        }
+        .notif-item .mark-read {
+            background: #1e7b6b;
+            color: #fff;
+            border: none;
+            padding: 0.1rem 0.6rem;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            cursor: pointer;
+        }
+        .notif-item .mark-read:hover {
+            background: #146354;
+        }
+        .notif-empty {
+            color: #6a889a;
+            text-align: center;
+            padding: 0.5rem;
         }
 
         @media (max-width: 992px) {
@@ -275,6 +425,92 @@
             .table-container td {
                 padding: 0.3rem 0.5rem;
             }
+            .image-preview .preview-item {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        /* ─── MODAL OVERLAY ─── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay .modal-box {
+            background: #fff;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+        .modal-overlay .modal-box h3 {
+            font-size: 1.3rem;
+            color: #0b2a3b;
+            margin-bottom: 1rem;
+        }
+        .modal-overlay .modal-box .form-group {
+            margin-bottom: 1rem;
+        }
+        .modal-overlay .modal-box .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0b2a3b;
+            margin-bottom: 0.3rem;
+        }
+        .modal-overlay .modal-box .form-group input,
+        .modal-overlay .modal-box .form-group select,
+        .modal-overlay .modal-box .form-group textarea {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #dce3e9;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .modal-overlay .modal-box .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .modal-overlay .modal-box .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .modal-overlay .modal-box .btn-submit {
+            background: #1e7b6b;
+            color: #fff;
+            border: none;
+            padding: 0.6rem 2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modal-overlay .modal-box .btn-submit:hover {
+            background: #146354;
+        }
+        .modal-overlay .modal-box .btn-close {
+            background: transparent;
+            border: 1px solid #dce3e9;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        .modal-overlay .modal-box .btn-close:hover {
+            background: #f1f5f9;
         }
     </style>
 </head>
@@ -294,7 +530,7 @@
         </div>
         <div id="authLinks">
             <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
-            <a href="#" onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</a>
+            <a href="track-order.html">Track Order</a>
             <a href="seller-dashboard.html">Become a Seller</a>
             <a href="login.html" id="loginLink" style="display:none;">Login</a>
             <a href="register.html" id="registerLink" style="display:none;">Register</a>
@@ -312,8 +548,8 @@
 <header class="header">
     <div class="container">
         <a href="index.html" class="logo">
-    <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
-</a>
+            <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+        </a>
         <div class="search-bar">
             <select><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
             <input type="text" placeholder="Search wholesale products..." />
@@ -404,6 +640,19 @@
             <!-- Dashboard Tab -->
             <div class="tab-content active" id="admin-dashboard">
                 <div class="section-title"><i class="fa-regular fa-chart-simple"></i> Dashboard Overview</div>
+
+                <!-- Notifications -->
+                <div class="notif-container">
+                    <button class="notif-btn" onclick="toggleNotifications()">
+                        <i class="fa-regular fa-bell"></i> Notifications
+                        <span class="badge" id="notifBadge">0</span>
+                    </button>
+                    <div class="notif-panel" id="notificationsPanel">
+                        <div id="notificationsList">
+                            <div class="notif-empty">No notifications</div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="admin-stats">
                     <div class="admin-stat-card green">
@@ -607,11 +856,11 @@
 
 </div>
 
-<!-- ─── ADD PRODUCT MODAL (Admin) ─── -->
+<!-- ─── ADD PRODUCT MODAL ─── -->
 <div class="modal-overlay" id="addProductAdminModal">
     <div class="modal-box">
         <h3><i class="fa-regular fa-plus"></i> Add New Product</h3>
-        <form id="addProductAdminForm">
+        <form id="addProductAdminForm" enctype="multipart/form-data">
             <div class="form-group">
                 <label>Product Title *</label>
                 <input type="text" id="adminNewProductTitle" placeholder="Enter product title" required />
@@ -653,17 +902,27 @@
                     <option value="office">Office</option>
                 </select>
             </div>
+            
+            <!-- Image Upload -->
             <div class="form-group">
-                <label>Image URL</label>
-                <input type="text" id="adminNewProductImage" placeholder="https://example.com/image.jpg" />
+                <label>Product Images</label>
+                <div class="image-upload-box" onclick="document.getElementById('adminNewProductImages').click()">
+                    <i class="fa-regular fa-cloud-upload"></i>
+                    <p>Click to upload images or drag and drop</p>
+                    <p style="font-size:0.7rem; color:#bcd9d0;">JPG, PNG, WebP supported (Max 5MB each)</p>
+                    <span class="file-name" id="adminImageFileName">No files selected</span>
+                </div>
+                <input type="file" id="adminNewProductImages" accept="image/*" multiple style="display:none;" />
+                <div class="image-preview" id="adminImagePreview"></div>
             </div>
+
             <div class="form-group">
                 <label>Description</label>
                 <textarea id="adminNewProductDescription" placeholder="Describe your product..." rows="3"></textarea>
             </div>
             <div style="display:flex; gap:0.5rem; margin-top:1rem;">
                 <button type="button" class="btn-close" onclick="closeAddProductAdmin()">Cancel</button>
-                <button type="submit" class="btn-submit"><i class="fa-regular fa-plus"></i> Add Product</button>
+                <button type="submit" class="btn-submit" id="adminSubmitBtn"><i class="fa-regular fa-plus"></i> Add Product</button>
             </div>
         </form>
     </div>
@@ -732,47 +991,192 @@
 <!-- ─── SCRIPTS ─── -->
 <script src="main.js"></script>
 <script>
+    // ─── PROTECT ADMIN PAGE ───
+    if (!protectAdmin()) {
+        throw new Error('Unauthorized');
+    }
+
     let adminProducts = [];
     let adminFilter = 'all';
     let adminOrderFilter = 'all';
     let adminSellerFilter = 'all';
 
-    function loadAdminData() {
-        const user = JSON.parse(localStorage.getItem('pse_user') || 'null');
-        if (!user || user.role !== 'admin') {
-            showToast('⚠️ Admin access required', 'error');
-            setTimeout(() => window.location.href = 'login.html', 1500);
+    // ─── NOTIFICATIONS ───
+    function getNotifications() {
+        return JSON.parse(localStorage.getItem('pse_notifications') || '[]');
+    }
+
+    function markNotificationRead(id) {
+        const notifications = getNotifications();
+        const notif = notifications.find(n => n.id === id);
+        if (notif) {
+            notif.read = true;
+            localStorage.setItem('pse_notifications', JSON.stringify(notifications));
+            renderNotifications();
+            updateNotifBadge();
+        }
+    }
+
+    function getUnreadCount() {
+        return getNotifications().filter(n => !n.read).length;
+    }
+
+    function updateNotifBadge() {
+        const badge = document.getElementById('notifBadge');
+        if (badge) {
+            const unread = getUnreadCount();
+            badge.textContent = unread;
+            badge.style.display = unread > 0 ? 'inline' : 'none';
+        }
+    }
+
+    function renderNotifications() {
+        const notifications = getNotifications();
+        const list = document.getElementById('notificationsList');
+        
+        if (!list) return;
+        
+        if (notifications.length === 0) {
+            list.innerHTML = '<div class="notif-empty">No notifications</div>';
             return;
         }
+        
+        list.innerHTML = notifications.slice().reverse().map(n => `
+            <div class="notif-item ${n.read ? '' : 'unread'}">
+                <div class="msg">${n.message}</div>
+                <div class="meta">
+                    <span>${new Date(n.timestamp).toLocaleString()}</span>
+                    ${!n.read ? `<button class="mark-read" onclick="markNotificationRead('${n.id}')">Mark read</button>` : ''}
+                </div>
+            </div>
+        `).join('');
+    }
 
+    function toggleNotifications() {
+        const panel = document.getElementById('notificationsPanel');
+        if (panel) {
+            panel.classList.toggle('show');
+            if (panel.classList.contains('show')) {
+                renderNotifications();
+            }
+        }
+    }
+
+    // ─── IMAGE UPLOAD HANDLERS ───
+    document.getElementById('adminNewProductImages')?.addEventListener('change', function(e) {
+        const preview = document.getElementById('adminImagePreview');
+        const fileName = document.getElementById('adminImageFileName');
+        const files = Array.from(this.files);
+        
+        preview.innerHTML = '';
+        if (files.length > 0) {
+            fileName.textContent = `${files.length} file(s) selected`;
+        } else {
+            fileName.textContent = 'No files selected';
+        }
+        
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `
+                    <img src="${event.target.result}" alt="Preview" />
+                    <button type="button" class="remove-btn" onclick="removeAdminImage(this, '${file.name}')">&times;</button>
+                `;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    function removeAdminImage(btn, fileName) {
+        const input = document.getElementById('adminNewProductImages');
+        const dt = new DataTransfer();
+        const files = Array.from(input.files);
+        const remaining = files.filter(f => f.name !== fileName);
+        remaining.forEach(f => dt.items.add(f));
+        input.files = dt.files;
+        btn.closest('.preview-item').remove();
+        
+        const fileNameEl = document.getElementById('adminImageFileName');
+        const remainingFiles = Array.from(input.files);
+        fileNameEl.textContent = remainingFiles.length > 0 ? `${remainingFiles.length} file(s) selected` : 'No files selected';
+    }
+
+    // ─── UPLOAD IMAGES TO SUPABASE STORAGE ───
+    async function uploadProductImages(files) {
+        const urls = [];
+        
+        for (const file of files) {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `product_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+            const filePath = `products/${fileName}`;
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/storage/v1/object/products/${filePath}`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': file.type
+                    },
+                    body: file
+                });
+                
+                if (response.ok) {
+                    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${filePath}`;
+                    urls.push(publicUrl);
+                } else {
+                    const error = await response.text();
+                    console.error('Upload failed:', error);
+                    showToast(`❌ Failed to upload ${file.name}`, 'error');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                showToast(`❌ Error uploading ${file.name}`, 'error');
+            }
+        }
+        
+        return urls;
+    }
+
+    // ─── LOAD ADMIN DATA ───
+    function loadAdminData() {
         loadAdminProducts();
         loadAdminOrders();
         loadAdminUsers();
         loadAdminSellers();
         updateAdminStats();
+        updateNotifBadge();
     }
 
-    function loadAdminProducts() {
-        const products = JSON.parse(localStorage.getItem('seller_products') || '[]');
-        // Add sample products if empty
-        if (products.length === 0) {
-            const sample = [
-                { id: 1, title: 'Premium Cotton Tee', brand: 'TextilePro', price: 6.80, old_price: 11.50, moq: 12, stock: 500, category: 'fashion', status: 'active', seller: 'TextilePro' },
-                { id: 2, title: 'Ceramic Mug Set', brand: 'HomeCraft', price: 4.20, old_price: 6.00, moq: 24, stock: 300, category: 'kitchen', status: 'active', seller: 'HomeCraft' },
-                { id: 3, title: 'Wireless Buds Pro', brand: 'AudioMax', price: 14.50, old_price: 24.99, moq: 10, stock: 150, category: 'electronics', status: 'pending', seller: 'AudioMax' }
-            ];
-            localStorage.setItem('seller_products', JSON.stringify(sample));
-            adminProducts = sample;
-        } else {
-            adminProducts = products;
+    // ─── LOAD PRODUCTS ───
+    async function loadAdminProducts() {
+        try {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*`, {
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                }
+            });
+            
+            if (response.ok) {
+                adminProducts = await response.json();
+            } else {
+                adminProducts = [];
+            }
+        } catch (error) {
+            console.error('Error loading products:', error);
+            adminProducts = [];
         }
         renderAdminProducts();
     }
 
     function renderAdminProducts() {
         let filtered = adminProducts;
-        if (adminFilter === 'active') filtered = filtered.filter(p => p.status === 'active');
-        else if (adminFilter === 'pending') filtered = filtered.filter(p => p.status === 'pending');
+        if (adminFilter === 'active') filtered = filtered.filter(p => p.status === 'active' || p.status === 'approved');
+        else if (adminFilter === 'pending') filtered = filtered.filter(p => p.status === 'pending' || p.status === 'draft');
         else if (adminFilter === 'inactive') filtered = filtered.filter(p => p.status === 'inactive');
 
         const tbody = document.getElementById('adminProductBody');
@@ -790,19 +1194,119 @@
         tbody.innerHTML = filtered.map(p => `
             <tr>
                 <td><strong>${p.title}</strong><br><span style="font-size:0.7rem; color:#6a889a;">${p.brand || ''}</span></td>
-                <td>$${p.price.toFixed(2)}</td>
+                <td>$${(p.price || 0).toFixed(2)}</td>
                 <td>${p.stock || 0}</td>
-                <td>${p.seller || 'PSE'}</td>
-                <td><span class="status-badge ${p.status || 'active'}">${p.status || 'Active'}</span></td>
+                <td>${p.seller || 'PSE Admin'}</td>
+                <td><span class="status-badge ${p.status === 'active' || p.status === 'approved' ? 'active' : p.status === 'pending' ? 'pending' : 'inactive'}">${p.status || 'Active'}</span></td>
                 <td>
-                    <button class="btn-action edit" onclick="editAdminProduct(${p.id})"><i class="fa-regular fa-pen"></i></button>
-                    <button class="btn-action delete" onclick="deleteAdminProduct(${p.id})"><i class="fa-regular fa-trash-can"></i></button>
-                    ${p.status === 'pending' ? `<button class="btn-action approve" onclick="approveAdminProduct(${p.id})"><i class="fa-regular fa-circle-check"></i></button>` : ''}
+                    <button class="btn-action edit" onclick="editAdminProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
+                    <button class="btn-action delete" onclick="deleteAdminProduct('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
+                    ${p.status === 'pending' || p.status === 'draft' ? `<button class="btn-action approve" onclick="approveAdminProduct('${p.id}')"><i class="fa-regular fa-circle-check"></i></button>` : ''}
                 </td>
             </tr>
         `).join('');
     }
 
+    // ─── ADD PRODUCT ───
+    document.getElementById('addProductAdminForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('adminSubmitBtn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Uploading...';
+        
+        try {
+            const fileInput = document.getElementById('adminNewProductImages');
+            let imageUrls = [];
+            
+            if (fileInput && fileInput.files.length > 0) {
+                imageUrls = await uploadProductImages(Array.from(fileInput.files));
+            }
+            
+            const newProduct = {
+                title: document.getElementById('adminNewProductTitle').value,
+                brand: document.getElementById('adminNewProductBrand').value || '',
+                price: parseFloat(document.getElementById('adminNewProductPrice').value) || 0,
+                old_price: parseFloat(document.getElementById('adminNewProductOldPrice').value) || null,
+                moq: parseInt(document.getElementById('adminNewProductMoq').value) || 1,
+                stock: parseInt(document.getElementById('adminNewProductStock').value) || 100,
+                category: document.getElementById('adminNewProductCategory').value,
+                image_url: imageUrls.length > 0 ? imageUrls[0] : '',
+                images: imageUrls,
+                description: document.getElementById('adminNewProductDescription').value || '',
+                status: 'active',
+                seller: 'PSE Admin'
+            };
+
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/products`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newProduct)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                adminProducts.push(result);
+                renderAdminProducts();
+                updateAdminStats();
+                closeAddProductAdmin();
+                showToast('✅ Product added with images!', 'success');
+            } else {
+                const error = await response.text();
+                showToast('❌ Failed to add product: ' + error, 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('❌ Error adding product', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa-regular fa-plus"></i> Add Product';
+        }
+    });
+
+    // ─── APPROVE PRODUCT ───
+    async function approveAdminProduct(id) {
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: 'approved' })
+            });
+            showToast('✅ Product approved!', 'success');
+            loadAdminProducts();
+        } catch (error) {
+            showToast('❌ Error approving product', 'error');
+        }
+    }
+
+    // ─── DELETE PRODUCT ───
+    async function deleteAdminProduct(id) {
+        if (!confirm('Delete this product?')) return;
+        
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                }
+            });
+            showToast('🗑️ Product deleted', 'info');
+            loadAdminProducts();
+        } catch (error) {
+            showToast('❌ Error deleting product', 'error');
+        }
+    }
+
+    // ─── ORDERS ───
     function loadAdminOrders() {
         const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
         renderAdminOrders(orders);
@@ -836,36 +1340,54 @@
                 <td><span class="status-badge ${o.status || 'pending'}">${o.status || 'Pending'}</span></td>
                 <td>${new Date(o.date).toLocaleDateString()}</td>
                 <td>
-                    <button class="btn-action edit" onclick="updateOrderStatus('${o.id}', 'processing')">Process</button>
-                    <button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'shipped')">Ship</button>
+                    ${o.status !== 'processing' ? `<button class="btn-action edit" onclick="updateOrderStatus('${o.id}', 'processing')">Process</button>` : ''}
+                    ${o.status !== 'shipped' ? `<button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'shipped')">Ship</button>` : ''}
+                    ${o.status !== 'delivered' ? `<button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'delivered')" style="background:#d4edda; color:#155724;">Deliver</button>` : ''}
+                    ${o.status !== 'cancelled' ? `<button class="btn-action delete" onclick="updateOrderStatus('${o.id}', 'cancelled')">Cancel</button>` : ''}
                 </td>
             </tr>
         `).join('');
     }
 
-    function updateOrderStatus(orderId, status) {
+    // ─── UPDATE ORDER STATUS ───
+    function updateOrderStatus(orderId, newStatus) {
         const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
         const order = orders.find(o => o.id === orderId);
         if (order) {
-            order.status = status;
+            order.status = newStatus;
             localStorage.setItem('pse_orders', JSON.stringify(orders));
-            showToast(`✅ Order status updated to ${status}`, 'success');
+            
+            // Create notification
+            sendOrderStatusEmail(order);
+            
+            showToast(`✅ Order status updated to ${newStatus}`, 'success');
             loadAdminOrders();
             updateAdminStats();
         }
     }
 
+    // ─── SEND ORDER STATUS EMAIL (Simulated) ───
+    function sendOrderStatusEmail(order) {
+        console.log(`📧 Email sent to ${order.customer?.email || 'customer'}`);
+        console.log(`Subject: Order #${order.orderNumber} status updated to ${order.status}`);
+        
+        const notifications = JSON.parse(localStorage.getItem('pse_notifications') || '[]');
+        notifications.push({
+            id: 'NOTIF-' + Date.now().toString().slice(-6),
+            orderId: order.id,
+            orderNumber: order.orderNumber,
+            status: order.status,
+            message: `Order #${order.orderNumber} status updated to ${order.status}`,
+            timestamp: new Date().toISOString(),
+            read: false
+        });
+        localStorage.setItem('pse_notifications', JSON.stringify(notifications));
+        updateNotifBadge();
+    }
+
+    // ─── USERS ───
     function loadAdminUsers() {
         const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
-        // Add sample users if empty
-        if (users.length === 0) {
-            const sample = [
-                { id: 1, firstName: 'Admin', lastName: 'User', email: 'admin@pse.com', role: 'admin', created: new Date().toISOString() },
-                { id: 2, firstName: 'John', lastName: 'Doe', email: 'john@example.com', role: 'customer', created: new Date().toISOString() },
-                { id: 3, firstName: 'Jane', lastName: 'Smith', email: 'jane@example.com', role: 'seller', created: new Date().toISOString() }
-            ];
-            localStorage.setItem('pse_users', JSON.stringify(sample));
-        }
         renderAdminUsers();
     }
 
@@ -893,10 +1415,26 @@
                 <td><span class="status-badge active">Active</span></td>
                 <td>
                     <button class="btn-action edit" onclick="showToast('✏️ Edit user coming soon', 'info')"><i class="fa-regular fa-pen"></i></button>
+                    ${u.role !== 'admin' ? `<button class="btn-action make-admin" onclick="makeAdmin('${u.id}')"><i class="fa-regular fa-user-plus"></i> Make Admin</button>` : ''}
                     ${u.role !== 'admin' ? `<button class="btn-action delete" onclick="deleteUser('${u.id}')"><i class="fa-regular fa-trash-can"></i></button>` : ''}
                 </td>
             </tr>
         `).join('');
+    }
+
+    // ─── MAKE ADMIN ───
+    function makeAdmin(id) {
+        if (confirm('Make this user an admin?')) {
+            let users = JSON.parse(localStorage.getItem('pse_users') || '[]');
+            const user = users.find(u => u.id === id);
+            if (user) {
+                user.role = 'admin';
+                localStorage.setItem('pse_users', JSON.stringify(users));
+                renderAdminUsers();
+                updateAdminStats();
+                showToast('✅ User promoted to Admin!', 'success');
+            }
+        }
     }
 
     function deleteUser(id) {
@@ -910,6 +1448,7 @@
         }
     }
 
+    // ─── SELLERS ───
     function loadAdminSellers() {
         const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
         const sellers = users.filter(u => u.role === 'seller');
@@ -971,18 +1510,33 @@
         }
     }
 
-    function updateAdminStats() {
-        const products = JSON.parse(localStorage.getItem('seller_products') || '[]');
-        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
-        const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
-        const revenue = orders.reduce((sum, o) => sum + (o.totals?.total || 0), 0);
+    // ─── UPDATE STATS ───
+    async function updateAdminStats() {
+        try {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/products?select=count`, {
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                }
+            });
+            const products = await response.json();
+            
+            const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+            const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
+            const quotes = JSON.parse(localStorage.getItem('pse_quotes') || '[]');
+            const allOrders = [...orders, ...quotes];
+            const revenue = orders.reduce((sum, o) => sum + (o.totals?.total || 0), 0);
 
-        document.getElementById('adminTotalProducts').textContent = products.length;
-        document.getElementById('adminTotalOrders').textContent = orders.length;
-        document.getElementById('adminTotalUsers').textContent = users.length;
-        document.getElementById('adminTotalRevenue').textContent = '$' + revenue.toFixed(0);
+            document.getElementById('adminTotalProducts').textContent = products.length || 0;
+            document.getElementById('adminTotalOrders').textContent = allOrders.length;
+            document.getElementById('adminTotalUsers').textContent = users.length;
+            document.getElementById('adminTotalRevenue').textContent = '$' + revenue.toFixed(0);
+        } catch (error) {
+            console.error('Error updating stats:', error);
+        }
     }
 
+    // ─── TAB FUNCTIONS ───
     function showAdminTab(tab) {
         document.querySelectorAll('.admin-sidebar .nav-item').forEach(n => n.classList.remove('active'));
         document.querySelector(`.admin-sidebar .nav-item[onclick="showAdminTab('${tab}')"]`).classList.add('active');
@@ -993,117 +1547,37 @@
 
     function filterAdminProducts(filter) {
         adminFilter = filter;
-        document.querySelectorAll('#admin-products .admin-actions button').forEach(b => b.classList.remove('active'));
-        const btns = document.querySelectorAll('#admin-products .admin-actions button');
-        btns.forEach(b => {
-            if (b.textContent.trim().toLowerCase() === filter || 
-                (filter === 'all' && b.textContent.trim() === 'All') ||
-                (filter === 'active' && b.textContent.trim() === 'Active') ||
-                (filter === 'pending' && b.textContent.trim() === 'Pending') ||
-                (filter === 'inactive' && b.textContent.trim() === 'Inactive')) {
-                b.classList.add('active');
-            }
-        });
         renderAdminProducts();
     }
 
     function filterAdminOrders(filter) {
         adminOrderFilter = filter;
-        document.querySelectorAll('#admin-orders .admin-actions button').forEach(b => b.classList.remove('active'));
-        const btns = document.querySelectorAll('#admin-orders .admin-actions button');
-        btns.forEach(b => {
-            if (b.textContent.trim().toLowerCase() === filter || 
-                (filter === 'all' && b.textContent.trim() === 'All')) {
-                b.classList.add('active');
-            }
-        });
         loadAdminOrders();
     }
 
     function filterAdminSellers(filter) {
         adminSellerFilter = filter;
-        document.querySelectorAll('#admin-sellers .admin-actions button').forEach(b => b.classList.remove('active'));
-        const btns = document.querySelectorAll('#admin-sellers .admin-actions button');
-        btns.forEach(b => {
-            if (b.textContent.trim().toLowerCase() === filter || 
-                (filter === 'all' && b.textContent.trim() === 'All')) {
-                b.classList.add('active');
-            }
-        });
         loadAdminSellers();
     }
 
     function openAddProductAdmin() {
         document.getElementById('addProductAdminModal').style.display = 'flex';
         document.getElementById('addProductAdminForm').reset();
+        document.getElementById('adminImagePreview').innerHTML = '';
+        document.getElementById('adminImageFileName').textContent = 'No files selected';
     }
 
     function closeAddProductAdmin() {
         document.getElementById('addProductAdminModal').style.display = 'none';
     }
 
-    document.getElementById('addProductAdminForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const newProduct = {
-            id: Date.now(),
-            title: document.getElementById('adminNewProductTitle').value,
-            brand: document.getElementById('adminNewProductBrand').value,
-            price: parseFloat(document.getElementById('adminNewProductPrice').value) || 0,
-            old_price: parseFloat(document.getElementById('adminNewProductOldPrice').value) || null,
-            moq: parseInt(document.getElementById('adminNewProductMoq').value) || 1,
-            stock: parseInt(document.getElementById('adminNewProductStock').value) || 100,
-            category: document.getElementById('adminNewProductCategory').value,
-            image_url: document.getElementById('adminNewProductImage').value,
-            description: document.getElementById('adminNewProductDescription').value,
-            status: 'active',
-            seller: 'PSE Admin'
-        };
-
-        const products = JSON.parse(localStorage.getItem('seller_products') || '[]');
-        products.push(newProduct);
-        localStorage.setItem('seller_products', JSON.stringify(products));
-        adminProducts = products;
-        
-        closeAddProductAdmin();
-        renderAdminProducts();
-        updateAdminStats();
-        showToast('✅ Product added successfully!', 'success');
-    });
-
     function editAdminProduct(id) {
         showToast('✏️ Edit product feature coming soon', 'info');
     }
 
-    function deleteAdminProduct(id) {
-        if (confirm('Delete this product?')) {
-            let products = JSON.parse(localStorage.getItem('seller_products') || '[]');
-            products = products.filter(p => p.id !== id);
-            localStorage.setItem('seller_products', JSON.stringify(products));
-            adminProducts = products;
-            renderAdminProducts();
-            updateAdminStats();
-            showToast('🗑️ Product deleted', 'info');
-        }
-    }
-
-    function approveAdminProduct(id) {
-        const products = JSON.parse(localStorage.getItem('seller_products') || '[]');
-        const product = products.find(p => p.id === id);
-        if (product) {
-            product.status = 'active';
-            localStorage.setItem('seller_products', JSON.stringify(products));
-            adminProducts = products;
-            renderAdminProducts();
-            showToast('✅ Product approved!', 'success');
-        }
-    }
-
     function logoutUser() {
         if (confirm('Are you sure you want to logout?')) {
-            localStorage.removeItem('pse_user');
-            showToast('👋 Logged out successfully', 'info');
-            setTimeout(() => window.location.href = 'index.html', 1000);
+            signOut();
         }
     }
 

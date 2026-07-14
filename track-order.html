@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Track Order - PSE Wholesale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        .track-page {
+            max-width: 700px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            border: 1px solid #e9edf2;
+        }
+        .track-page h2 {
+            font-size: 1.8rem;
+            text-align: center;
+            color: #0b2a3b;
+            margin-bottom: 0.5rem;
+        }
+        .track-page .subtitle {
+            text-align: center;
+            color: #6a889a;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .track-search {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+        }
+        .track-search input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1px solid #dce3e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .track-search input:focus {
+            border-color: #1e7b6b;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(30, 123, 107, 0.1);
+        }
+        .track-search button {
+            background: #1e7b6b;
+            color: #fff;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .track-search button:hover {
+            background: #146354;
+        }
+
+        .order-result {
+            display: none;
+            animation: slideUp 0.3s ease;
+        }
+        .order-result.show {
+            display: block;
+        }
+
+        .order-status-timeline {
+            position: relative;
+            padding-left: 2.5rem;
+        }
+        .order-status-timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #e9edf2;
+        }
+        .status-step {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+        .status-step:last-child {
+            padding-bottom: 0;
+        }
+        .status-step .dot {
+            position: absolute;
+            left: -2.5rem;
+            top: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #dce3e9;
+            border: 3px solid #e9edf2;
+        }
+        .status-step .dot.completed {
+            background: #1e7b6b;
+            border-color: #1e7b6b;
+        }
+        .status-step .dot.active {
+            background: #f1c40f;
+            border-color: #f1c40f;
+            animation: pulse 1s infinite;
+        }
+        .status-step .content {
+            padding-left: 0.5rem;
+        }
+        .status-step .content .title {
+            font-weight: 600;
+            color: #0b2a3b;
+        }
+        .status-step .content .title.completed {
+            color: #1e7b6b;
+        }
+        .status-step .content .title.active {
+            color: #e67e22;
+        }
+        .status-step .content .date {
+            font-size: 0.8rem;
+            color: #6a889a;
+        }
+
+        .order-summary {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            border: 1px solid #e9edf2;
+        }
+        .order-summary .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            font-size: 0.9rem;
+        }
+        .order-summary .row.total {
+            font-weight: 700;
+            border-top: 1px solid #dce3e9;
+            padding-top: 0.8rem;
+            margin-top: 0.3rem;
+        }
+        .order-summary .row.total .amount {
+            color: #1e7b6b;
+        }
+        .order-summary .items {
+            font-size: 0.85rem;
+            color: #2c5a6b;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9edf2;
+            margin-bottom: 0.5rem;
+        }
+        .order-summary .items span {
+            display: block;
+            padding: 0.2rem 0;
+        }
+
+        .not-found {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: #6a889a;
+        }
+        .not-found i {
+            font-size: 3rem;
+            color: #dce3e9;
+            margin-bottom: 0.5rem;
+        }
+        .not-found.show {
+            display: block;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .track-page {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            .track-search {
+                flex-direction: column;
+            }
+            .track-search button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── TOP BAR ─── -->
+<div class="top-bar">
+    <div class="container">
+        <div>
+            <span>Welcome to PSE Wholesale</span>
+            <a href="#" onclick="showToast('✅ Verified Supplier - Trusted partners!', 'success')">
+                <i class="fa-regular fa-circle-check"></i> Verified Supplier
+            </a>
+            <a href="#" onclick="showToast('🚚 Bulk Shipping - Free on orders over $250!', 'info')">
+                <i class="fa-regular fa-truck"></i> Bulk Shipping
+            </a>
+        </div>
+        <div id="authLinks">
+            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
+            <a href="track-order.html">Track Order</a>
+            <a href="seller-dashboard.html">Become a Seller</a>
+            <a href="login.html" id="loginLink">Login</a>
+            <a href="register.html" id="registerLink">Register</a>
+            <select class="lang-select" onchange="showToast('🌐 Language changed to ' + this.value, 'info')">
+                <option value="EN">EN</option>
+                <option value="ES">ES</option>
+                <option value="FR">FR</option>
+                <option value="DE">DE</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+    <div class="container">
+        <a href="index.html" class="logo">
+            <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+        </a>
+        <div class="search-bar">
+            <select><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
+            <input type="text" placeholder="Search wholesale products..." />
+            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <div class="header-actions">
+            <div class="location-selector"><i class="fa-solid fa-location-dot"></i> Sacramento, 95829</div>
+            <a href="#" class="icon-btn"><i class="fa-regular fa-heart"></i><span>Wishlist</span><span class="badge-count wishlist-count">0</span></a>
+            <a href="#" class="icon-btn"><i class="fa-regular fa-bell"></i><span>Alerts</span><span class="badge-count">3</span></a>
+            <a href="#" class="icon-btn" id="accountBtn"><i class="fa-regular fa-user"></i><span id="accountLabel">Account</span></a>
+            <a href="#" class="icon-btn" onclick="window.location.href='cart.html'">
+                <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ─── NAVIGATION ─── -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="index.html"><i class="fa-solid fa-bars"></i> All Departments</a>
+        <a href="#">Today's Deals</a>
+        <a href="#">New Arrivals</a>
+        <a href="#" class="wholesale-nav"><i class="fa-solid fa-cubes"></i> Wholesale</a>
+        <a href="#">Brands</a>
+        <a href="#">Clearance</a>
+        <a href="#">Flash Deals</a>
+        <a href="#">Gift Cards</a>
+        <a href="#">Business Solutions</a>
+        <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Customer Service</a>
+    </div>
+</nav>
+
+<!-- ─── MAIN CONTENT ─── -->
+<div class="container">
+
+    <!-- PAGE LINKS -->
+    <div class="page-links">
+        <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products.html"><i class="fa-solid fa-grid-2"></i> Products</a>
+        <a href="product-detail.html"><i class="fa-solid fa-eye"></i> Detail</a>
+        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+        <a href="checkout.html"><i class="fa-solid fa-credit-card"></i> Checkout</a>
+        <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+        <a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a>
+        <a href="account.html"><i class="fa-solid fa-user"></i> Account</a>
+        <a href="seller-dashboard.html"><i class="fa-solid fa-store"></i> Seller</a>
+        <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Admin</a>
+        <a href="about.html"><i class="fa-solid fa-info-circle"></i> About</a>
+    </div>
+
+    <!-- Track Order Page -->
+    <div class="track-page">
+        <h2><i class="fa-regular fa-truck-fast"></i> Track Your Order</h2>
+        <p class="subtitle">Enter your order number to check the status</p>
+
+        <div class="track-search">
+            <input type="text" id="trackInput" placeholder="Enter order number (e.g., PSE-12345678)" />
+            <button onclick="trackOrder()"><i class="fa-solid fa-magnifying-glass"></i> Track</button>
+        </div>
+
+        <!-- Not Found -->
+        <div class="not-found" id="notFound">
+            <i class="fa-regular fa-circle-xmark"></i>
+            <h3>Order Not Found</h3>
+            <p>We couldn't find an order with that number. Please check and try again.</p>
+            <button onclick="document.getElementById('trackInput').value=''; document.getElementById('notFound').classList.remove('show'); document.getElementById('orderResult').classList.remove('show');" style="margin-top:1rem; background:#1e7b6b; color:#fff; border:none; padding:0.5rem 1.5rem; border-radius:30px; cursor:pointer;">
+                Try Again
+            </button>
+        </div>
+
+        <!-- Order Result -->
+        <div class="order-result" id="orderResult">
+            <div id="orderContent"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ─── HELP MODAL ─── -->
+<div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
+    <div class="modal-content">
+        <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
+        <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
+        <p>Choose from our support options below:</p>
+        <ul>
+            <li><i class="fa-regular fa-message" style="color:#1e7b6b; width:20px;"></i> Live Chat (24/7)</li>
+            <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
+            <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
+            <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
+        </ul>
+        <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
+    </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+    <div class="container">
+        <div>
+            <h4>PSE Wholesale</h4>
+            <ul>
+                <li onclick="window.location.href='about.html'">About Us</li>
+                <li>Careers</li>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
+                <li>Blog</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Customer Service</h4>
+            <ul>
+                <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
+                <li>Returns & Refunds</li>
+                <li>Shipping Policy</li>
+                <li onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</li>
+            </ul>
+        </div>
+        <div>
+            <h4>B2B</h4>
+            <ul>
+                <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
+                <li>Wholesale Pricing</li>
+                <li>Bulk Orders</li>
+                <li>Supplier Program</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Legal</h4>
+            <ul>
+                <li>Privacy Policy</li>
+                <li>Terms & Conditions</li>
+                <li>Cookie Policy</li>
+            </ul>
+        </div>
+        <div class="bottom">
+            &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- ─── SCRIPTS ─── -->
+<script src="main.js"></script>
+<script>
+    // ─── TRACK ORDER ───
+    function trackOrder() {
+        const orderNumber = document.getElementById('trackInput').value.trim().toUpperCase();
+        const resultDiv = document.getElementById('orderResult');
+        const notFoundDiv = document.getElementById('notFound');
+        const contentDiv = document.getElementById('orderContent');
+        
+        // Hide previous results
+        resultDiv.classList.remove('show');
+        notFoundDiv.classList.remove('show');
+        
+        if (!orderNumber) {
+            showToast('❌ Please enter an order number', 'error');
+            return;
+        }
+
+        // Search in orders
+        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+        const quotes = JSON.parse(localStorage.getItem('pse_quotes') || '[]');
+        
+        let order = orders.find(o => o.orderNumber === orderNumber);
+        let isQuote = false;
+        
+        if (!order) {
+            order = quotes.find(q => q.quoteNumber === orderNumber);
+            isQuote = true;
+        }
+
+        if (!order) {
+            notFoundDiv.classList.add('show');
+            return;
+        }
+
+        // Display order
+        const statusSteps = [
+            { key: 'pending', label: 'Order Received', icon: 'fa-regular fa-receipt' },
+            { key: 'processing', label: 'Processing', icon: 'fa-regular fa-gear' },
+            { key: 'shipped', label: 'Shipped', icon: 'fa-regular fa-truck' },
+            { key: 'delivered', label: 'Delivered', icon: 'fa-regular fa-circle-check' }
+        ];
+
+        const currentStatus = order.status || 'pending';
+        const currentIndex = statusSteps.findIndex(s => s.key === currentStatus);
+        const orderDate = new Date(order.date);
+
+        let itemsHtml = order.items.map(item => 
+            `<span>${item.quantity || 1}x ${item.title} - $${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</span>`
+        ).join('');
+
+        let timelineHtml = statusSteps.map((step, index) => {
+            let statusClass = '';
+            if (index < currentIndex) statusClass = 'completed';
+            else if (index === currentIndex) statusClass = 'active';
+            
+            return `
+                <div class="status-step">
+                    <div class="dot ${statusClass}"></div>
+                    <div class="content">
+                        <div class="title ${statusClass}">
+                            ${step.icon ? `<i class="${step.icon}"></i>` : ''} ${step.label}
+                            ${index === currentIndex ? ' <span style="font-size:0.7rem; background:#e3f0eb; color:#1e7b6b; padding:0.1rem 0.6rem; border-radius:30px;">Current</span>' : ''}
+                        </div>
+                        ${index <= currentIndex ? `<div class="date">${orderDate.toLocaleDateString()} ${index === currentIndex ? '(Current)' : '(Completed)'}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        contentDiv.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:1rem;">
+                <h3 style="color:#0b2a3b;">${isQuote ? 'Quote' : 'Order'} #${order.orderNumber}</h3>
+                <span style="background: ${currentStatus === 'delivered' ? '#d4edda' : currentStatus === 'cancelled' ? '#f8d7da' : '#fff3cd'}; color: ${currentStatus === 'delivered' ? '#155724' : currentStatus === 'cancelled' ? '#721c24' : '#856404'}; padding:0.2rem 1rem; border-radius:30px; font-weight:600; font-size:0.8rem; text-transform:capitalize;">
+                    ${currentStatus}
+                </span>
+            </div>
+
+            <div class="order-summary">
+                <div class="items">${itemsHtml}</div>
+                <div class="row"><span>Subtotal</span><span>$${(order.totals?.subtotal || 0).toFixed(2)}</span></div>
+                ${order.totals?.discount > 0 ? `<div class="row"><span>Discount</span><span style="color:#1e7b6b;">-$${order.totals.discount.toFixed(2)}</span></div>` : ''}
+                <div class="row"><span>Shipping</span><span>${order.totals?.shipping === 0 ? 'FREE' : '$' + (order.totals?.shipping || 0).toFixed(2)}</span></div>
+                <div class="row"><span>Tax</span><span>$${(order.totals?.tax || 0).toFixed(2)}</span></div>
+                <div class="row total"><span>Total</span><span class="amount">$${(order.totals?.total || 0).toFixed(2)}</span></div>
+            </div>
+
+            <div style="margin-bottom:1rem; font-size:0.85rem; color:#2c5a6b;">
+                <i class="fa-regular fa-calendar"></i> Order placed: ${orderDate.toLocaleString()}
+                ${order.customer ? `<br><i class="fa-regular fa-user"></i> ${order.customer.firstName || ''} ${order.customer.lastName || ''} (${order.customer.email || ''})` : ''}
+            </div>
+
+            <div class="order-status-timeline">
+                ${timelineHtml}
+            </div>
+
+            ${!isQuote && currentStatus !== 'delivered' ? `
+                <div style="margin-top:1.5rem; padding:1rem; background:#f8fafc; border-radius:8px; border:1px solid #e9edf2; text-align:center;">
+                    <p style="font-size:0.85rem; color:#6a889a;">
+                        <i class="fa-regular fa-envelope"></i> We'll send you email updates when your order status changes.
+                    </p>
+                </div>
+            ` : ''}
+
+            ${isQuote ? `
+                <div style="margin-top:1rem; padding:1rem; background:#f8fafc; border-radius:8px; border:1px solid #e9edf2; text-align:center;">
+                    <p style="font-size:0.85rem; color:#6a889a;">
+                        <i class="fa-regular fa-file-lines"></i> This is a quote request. We'll get back to you shortly!
+                    </p>
+                </div>
+            ` : ''}
+        `;
+
+        resultDiv.classList.add('show');
+    }
+
+    // ─── ENTER KEY ───
+    document.getElementById('trackInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') trackOrder();
+    });
+</script>
+
+</body>
+</html>

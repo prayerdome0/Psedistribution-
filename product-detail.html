@@ -647,40 +647,38 @@
     </div>
 </footer>
 
-<!-- ADMIN QUICK ACCESS -->
-<a href="admin-dashboard.html" class="admin-quick">
-    <i class="fa-solid fa-gauge-high"></i> Admin
-</a>
-
 <!-- ─── SCRIPTS ─── -->
 <script src="main.js"></script>
 <script>
     let currentProductId = null;
 
-    function loadProductDetail() {
+    // ─── LOAD PRODUCT DETAIL ───
+    async function loadProductDetail() {
         const params = new URLSearchParams(window.location.search);
-        const id = parseInt(params.get('id'));
+        const id = params.get('id');
         
         if (!id) {
             showToast('Product not found', 'error');
             return;
         }
 
-        const product = sampleProducts.find(p => p.id === id);
+        const product = await fetchProductById(id);
         if (!product) {
             showToast('Product not found', 'error');
             return;
         }
 
         currentProductId = id;
+        
+        // Update page
         document.getElementById('productName').textContent = product.title;
         document.getElementById('detailTitle').textContent = product.title;
-        document.getElementById('detailBrand').innerHTML = `by <a href="#">${product.brand || 'PSE Wholesale'}</a> · SKU: PSE-${String(id).padStart(3,'0')}`;
+        document.getElementById('detailBrand').innerHTML = `by <a href="#">${product.brand || 'PSE Wholesale'}</a> · SKU: ${product.id.substring(0, 8)}`;
         document.getElementById('detailRating').innerHTML = `${'★'.repeat(Math.floor(product.rating || 4))}${'☆'.repeat(5 - Math.floor(product.rating || 4))} <span>(${product.reviews || 0} reviews)</span>`;
         
         const discount = product.old_price ? Math.round((1 - product.price / product.old_price) * 100) : 0;
         document.getElementById('detailPrice').innerHTML = `
-            $${product.price.toFixed(2)} 
+            $${(product.price || 0).toFixed(2)} 
             ${product.old_price ? `<span class="old">$${product.old_price.toFixed(2)}</span>` : ''}
             ${discount > 0 ? `<span class="discount">-${discount}%</span>` : ''}
         `;
@@ -698,89 +696,97 @@
 
         // Update main image
         const mainImage = document.getElementById('mainImage');
-        if (product.image) {
-            mainImage.innerHTML = `<img src="${product.image}" alt="${product.title}" />`;
+        if (product.image_url) {
+            mainImage.innerHTML = `<img src="${product.image_url}" alt="${product.title}" />`;
         } else {
-            mainImage.innerHTML = `<i class="fa-solid fa-${product.icon || 'box'}"></i>`;
+            mainImage.innerHTML = `<i class="fa-solid fa-box"></i>`;
         }
 
         // Update thumbnails
         const thumbnails = document.getElementById('thumbnails');
         thumbnails.innerHTML = `
-            <div class="thumb active">${product.image ? `<img src="${product.image}" alt="${product.title}" />` : `<i class="fa-solid fa-${product.icon || 'box'}"></i>`}</div>
-            <div class="thumb">${product.image ? `<img src="${product.image}" alt="${product.title}" />` : `<i class="fa-solid fa-${product.icon || 'box'}"></i>`}</div>
-            <div class="thumb"><i class="fa-solid fa-${product.icon || 'box'}"></i></div>
+            <div class="thumb active">${product.image_url ? `<img src="${product.image_url}" alt="${product.title}" />` : `<i class="fa-solid fa-box"></i>`}</div>
+            <div class="thumb"><i class="fa-solid fa-box"></i></div>
+            <div class="thumb"><i class="fa-solid fa-box"></i></div>
         `;
 
         // Update bulk pricing
         const bulkBody = document.getElementById('bulkPricingBody');
+        const price = product.price || 0;
         const tiers = [
-            { min: 1, max: 49, price: product.price },
-            { min: 50, max: 99, price: Math.round((product.price * 0.90) * 100) / 100 },
-            { min: 100, max: 499, price: Math.round((product.price * 0.80) * 100) / 100 },
-            { min: 500, max: null, price: Math.round((product.price * 0.70) * 100) / 100 }
+            { min: product.moq || 1, max: 49, price: price },
+            { min: 50, max: 99, price: Math.round((price * 0.90) * 100) / 100 },
+            { min: 100, max: 499, price: Math.round((price * 0.80) * 100) / 100 },
+            { min: 500, max: null, price: Math.round((price * 0.70) * 100) / 100 }
         ];
         bulkBody.innerHTML = tiers.map(t => `
             <tr>
                 <td>${t.min}${t.max ? ` – ${t.max} units` : '+ units'}</td>
                 <td>$${t.price.toFixed(2)}</td>
-                <td>${t.max ? `Save $${(product.price - t.price).toFixed(2)}` : 'Best value'}</td>
+                <td>${t.max ? `Save $${(price - t.price).toFixed(2)}` : 'Best value'}</td>
             </tr>
         `).join('');
+
+        loadRelatedProducts(product);
     }
 
-    function addToCartFromDetail() {
-        if (currentProductId) {
-            addToCart(currentProductId);
-        }
-    }
-
-    function toggleWishlistFromDetail() {
-        if (currentProductId) {
-            toggleWishlist(currentProductId);
-            // Update heart icon
-            const btn = document.querySelector('.btn-wishlist i');
-            if (wishlist.includes(currentProductId)) {
-                btn.className = 'fa-solid fa-heart';
-            } else {
-                btn.className = 'fa-regular fa-heart';
-            }
-        }
-    }
-
-    function buyNow() {
-        const qty = parseInt(document.getElementById('qty').value) || 1;
-        const product = sampleProducts.find(p => p.id === currentProductId);
-        if (product) {
-            showToast(`🛒 ${qty}x ${product.title} added - Redirecting to checkout...`, 'success');
-            setTimeout(() => window.location.href = 'checkout.html', 1000);
-        }
-    }
-
-    // Load related products
-    function loadRelated() {
+    // ─── LOAD RELATED PRODUCTS ───
+    async function loadRelatedProducts(currentProduct) {
         const grid = document.getElementById('relatedGrid');
-        if (!currentProductId) return;
+        const products = await fetchProducts();
         
-        const related = sampleProducts
-            .filter(p => p.id !== currentProductId)
+        const related = products
+            .filter(p => p.id !== currentProduct.id && p.category === currentProduct.category)
             .slice(0, 4);
         
+        if (related.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; padding:1rem; color:#6a889a; font-size:0.9rem;">
+                    No related products found.
+                </div>
+            `;
+            return;
+        }
+
         grid.innerHTML = related.map(p => `
             <div class="related-card" onclick="window.location.href='product-detail.html?id=${p.id}'">
                 <div class="image">
-                    ${p.image ? `<img src="${p.image}" alt="${p.title}" />` : `<i class="fa-solid fa-${p.icon || 'box'}"></i>`}
+                    ${p.image_url ? `<img src="${p.image_url}" alt="${p.title}" />` : `<i class="fa-solid fa-box"></i>`}
                 </div>
                 <div class="title">${p.title}</div>
-                <div class="price">$${p.price.toFixed(2)}</div>
+                <div class="price">$${(p.price || 0).toFixed(2)}</div>
             </div>
         `).join('');
     }
 
-    // Initialize
+    // ─── ADD TO CART ───
+    function addToCartFromDetail() {
+        const qty = parseInt(document.getElementById('qty').value) || 1;
+        if (currentProductId) {
+            addToCartSupabase(currentProductId, qty);
+        }
+    }
+
+    // ─── TOGGLE WISHLIST ───
+    function toggleWishlistFromDetail() {
+        if (currentProductId) {
+            toggleWishlistSupabase(currentProductId);
+        }
+    }
+
+    // ─── BUY NOW ───
+    function buyNow() {
+        const qty = parseInt(document.getElementById('qty').value) || 1;
+        if (currentProductId) {
+            addToCartSupabase(currentProductId, qty);
+            setTimeout(() => window.location.href = 'checkout.html', 1000);
+        }
+    }
+
+    // ─── INIT ───
     document.addEventListener('DOMContentLoaded', function() {
         loadProductDetail();
-        loadRelated();
+        loadCartCount();
     });
 </script>
 

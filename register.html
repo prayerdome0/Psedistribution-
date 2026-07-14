@@ -222,8 +222,8 @@
 <header class="header">
     <div class="container">
         <a href="index.html" class="logo">
-    <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
-</a>
+            <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+        </a>
         <div class="search-bar">
             <select><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
             <input type="text" placeholder="Search wholesale products..." />
@@ -344,10 +344,11 @@
         <div class="divider"><span>or continue with</span></div>
 
         <div class="social-login">
-            <button onclick="showToast('🔵 Google registration coming soon', 'info')">
-                <i class="fa-brands fa-google" style="color:#ea4335;"></i> Google
+            <button onclick="signUpWithGoogle()" style="background:#fff; border:1px solid #dce3e9; padding:0.6rem; border-radius:8px; cursor:pointer; width:100%; font-size:0.9rem; font-weight:500; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+                <img src="https://www.google.com/favicon.ico" style="width:18px; height:18px;" alt="Google" />
+                Sign up with Google
             </button>
-            <button onclick="showToast('🔵 Facebook registration coming soon', 'info')">
+            <button onclick="showToast('🔵 Facebook registration coming soon', 'info')" style="flex:1; padding:0.6rem; border:1px solid #dce3e9; border-radius:8px; background:#fff; cursor:pointer; transition:0.2s; font-size:0.9rem; font-weight:500;">
                 <i class="fa-brands fa-facebook" style="color:#1877f2;"></i> Facebook
             </button>
         </div>
@@ -423,11 +424,6 @@
     </div>
 </footer>
 
-<!-- ADMIN QUICK ACCESS -->
-<a href="admin-dashboard.html" class="admin-quick">
-    <i class="fa-solid fa-gauge-high"></i> Admin
-</a>
-
 <!-- ─── SCRIPTS ─── -->
 <script src="main.js"></script>
 <script>
@@ -446,7 +442,8 @@
         }
     }
 
-    document.getElementById('registerForm').addEventListener('submit', function(e) {
+    // ─── REGISTER FORM ───
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const firstName = document.getElementById('regFirstName').value.trim();
@@ -454,6 +451,8 @@
         const email = document.getElementById('regEmail').value.trim();
         const password = document.getElementById('regPassword').value;
         const confirm = document.getElementById('regConfirmPassword').value;
+        const company = document.getElementById('regCompany').value.trim();
+        const businessType = document.getElementById('regBusinessType').value;
 
         if (!firstName || !lastName || !email || !password) {
             showToast('❌ Please fill in all required fields', 'error');
@@ -470,25 +469,28 @@
             return;
         }
 
-        // Save user
-        const user = {
-            id: Date.now(),
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            role: selectedRole,
-            company: document.getElementById('regCompany').value,
-            businessType: document.getElementById('regBusinessType').value,
-            created: new Date().toISOString()
-        };
+        showToast('⏳ Creating account...', 'info');
 
-        localStorage.setItem('pse_user', JSON.stringify(user));
-        
-        showToast('🎉 Registration successful! Welcome ' + firstName, 'success');
-        
-        setTimeout(() => {
-            window.location.href = selectedRole === 'seller' ? 'seller-dashboard.html' : 'index.html';
-        }, 1500);
+        const result = await signUp(email, password, {
+            full_name: `${firstName} ${lastName}`,
+            role: selectedRole,
+            company_name: company,
+            business_type: businessType
+        });
+
+        if (result.success) {
+            showToast(`🎉 Welcome ${firstName}! Account created!`, 'success');
+            
+            setTimeout(() => {
+                if (selectedRole === 'seller') {
+                    window.location.href = 'seller-dashboard.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }, 1500);
+        } else {
+            showToast('❌ ' + result.error, 'error');
+        }
     });
 </script>
 
