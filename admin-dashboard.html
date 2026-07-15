@@ -6,6 +6,14 @@
     <title>Admin Dashboard - PSE Wholesale</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+    
     <style>
         .admin-layout {
             display: grid;
@@ -249,7 +257,6 @@
             margin-right: 0.3rem;
         }
 
-        /* ─── IMAGE UPLOAD STYLES ─── */
         .image-upload-box {
             border: 2px dashed #dce3e9;
             border-radius: 1rem;
@@ -309,129 +316,6 @@
             cursor: pointer;
         }
 
-        /* ─── NOTIFICATIONS ─── */
-        .notif-container {
-            margin-bottom: 1.5rem;
-        }
-        .notif-btn {
-            background: #0b2a3b;
-            color: #fff;
-            border: none;
-            padding: 0.5rem 1.2rem;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.8rem;
-            transition: 0.2s;
-        }
-        .notif-btn:hover {
-            background: #1a4b5e;
-        }
-        .notif-btn .badge {
-            background: #c0392b;
-            padding: 0.1rem 0.5rem;
-            border-radius: 50%;
-            font-size: 0.6rem;
-        }
-        .notif-panel {
-            display: none;
-            background: #fff;
-            border-radius: 1rem;
-            padding: 1rem;
-            margin-top: 0.5rem;
-            border: 1px solid #e9edf2;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .notif-panel.show {
-            display: block;
-        }
-        .notif-item {
-            padding: 0.5rem;
-            border-bottom: 1px solid #eef2f6;
-        }
-        .notif-item.unread {
-            background: #f0f8f5;
-            border-left: 3px solid #1e7b6b;
-        }
-        .notif-item .msg {
-            font-size: 0.85rem;
-            color: #0b2a3b;
-        }
-        .notif-item .meta {
-            font-size: 0.7rem;
-            color: #6a889a;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 0.2rem;
-        }
-        .notif-item .mark-read {
-            background: #1e7b6b;
-            color: #fff;
-            border: none;
-            padding: 0.1rem 0.6rem;
-            border-radius: 30px;
-            font-size: 0.6rem;
-            cursor: pointer;
-        }
-        .notif-item .mark-read:hover {
-            background: #146354;
-        }
-        .notif-empty {
-            color: #6a889a;
-            text-align: center;
-            padding: 0.5rem;
-        }
-
-        @media (max-width: 992px) {
-            .admin-layout {
-                grid-template-columns: 1fr;
-            }
-            .admin-sidebar {
-                position: static;
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-                gap: 0.3rem;
-                padding: 1rem;
-            }
-            .admin-sidebar .admin-brand {
-                grid-column: 1 / -1;
-                border-bottom: 1px solid #1a4055;
-            }
-        }
-        @media (max-width: 768px) {
-            .admin-content {
-                padding: 1rem;
-            }
-            .admin-stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .admin-sidebar {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-        @media (max-width: 480px) {
-            .admin-stats {
-                grid-template-columns: 1fr 1fr;
-            }
-            .admin-sidebar {
-                grid-template-columns: 1fr;
-            }
-            .table-container table {
-                font-size: 0.7rem;
-            }
-            .table-container th,
-            .table-container td {
-                padding: 0.3rem 0.5rem;
-            }
-            .image-preview .preview-item {
-                width: 60px;
-                height: 60px;
-            }
-        }
-
-        /* ─── MODAL OVERLAY ─── */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -511,6 +395,127 @@
         }
         .modal-overlay .modal-box .btn-close:hover {
             background: #f1f5f9;
+        }
+
+        .notif-container {
+            margin-bottom: 1.5rem;
+        }
+        .notif-btn {
+            background: #0b2a3b;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+        .notif-btn:hover {
+            background: #1a4b5e;
+        }
+        .notif-btn .badge {
+            background: #c0392b;
+            padding: 0.1rem 0.5rem;
+            border-radius: 50%;
+            font-size: 0.6rem;
+        }
+        .notif-panel {
+            display: none;
+            background: #fff;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            border: 1px solid #e9edf2;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .notif-panel.show {
+            display: block;
+        }
+        .notif-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid #eef2f6;
+        }
+        .notif-item.unread {
+            background: #f0f8f5;
+            border-left: 3px solid #1e7b6b;
+        }
+        .notif-item .msg {
+            font-size: 0.85rem;
+            color: #0b2a3b;
+        }
+        .notif-item .meta {
+            font-size: 0.7rem;
+            color: #6a889a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.2rem;
+        }
+        .notif-item .mark-read {
+            background: #1e7b6b;
+            color: #fff;
+            border: none;
+            padding: 0.1rem 0.6rem;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            cursor: pointer;
+        }
+        .notif-empty {
+            color: #6a889a;
+            text-align: center;
+            padding: 0.5rem;
+        }
+
+        @media (max-width: 992px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+            }
+            .admin-sidebar {
+                position: static;
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 0.3rem;
+                padding: 1rem;
+            }
+            .admin-sidebar .admin-brand {
+                grid-column: 1 / -1;
+                border-bottom: 1px solid #1a4055;
+            }
+        }
+        @media (max-width: 768px) {
+            .admin-content {
+                padding: 1rem;
+            }
+            .admin-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .admin-sidebar {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 480px) {
+            .admin-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            .admin-sidebar {
+                grid-template-columns: 1fr;
+            }
+            .table-container table {
+                font-size: 0.7rem;
+            }
+            .table-container th,
+            .table-container td {
+                padding: 0.3rem 0.5rem;
+            }
+            .image-preview .preview-item {
+                width: 60px;
+                height: 60px;
+            }
+            .modal-overlay .modal-box .form-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -615,6 +620,7 @@
             </div>
             <div class="nav-item" onclick="showAdminTab('products')">
                 <i class="fa-regular fa-box"></i> Products
+                <span class="badge" id="adminProductBadge">0</span>
             </div>
             <div class="nav-item" onclick="showAdminTab('orders')">
                 <i class="fa-regular fa-receipt"></i> Orders
@@ -622,9 +628,11 @@
             </div>
             <div class="nav-item" onclick="showAdminTab('users')">
                 <i class="fa-regular fa-users"></i> Users
+                <span class="badge" id="adminUserBadge">0</span>
             </div>
             <div class="nav-item" onclick="showAdminTab('sellers')">
                 <i class="fa-regular fa-store"></i> Sellers
+                <span class="badge" id="adminSellerBadge">0</span>
             </div>
             <div class="nav-item" onclick="showAdminTab('settings')">
                 <i class="fa-regular fa-gear"></i> Settings
@@ -818,33 +826,34 @@
                 <form class="profile-form" style="max-width:600px;">
                     <div class="form-group">
                         <label>Store Name</label>
-                        <input type="text" value="PSE Wholesale Marketplace" />
+                        <input type="text" id="settingsStoreName" value="PSE Wholesale Marketplace" />
                     </div>
                     <div class="form-group">
                         <label>Store Email</label>
-                        <input type="email" value="info@psewholesale.com" />
+                        <input type="email" id="settingsStoreEmail" value="info@psewholesale.com" />
                     </div>
                     <div class="form-group">
                         <label>Phone</label>
-                        <input type="tel" value="+1 (800) 555-PSEW" />
+                        <input type="tel" id="settingsStorePhone" value="+1 (800) 555-PSEW" />
                     </div>
                     <div class="form-group">
                         <label>Address</label>
-                        <input type="text" value="123 Commerce St, Sacramento, CA 95829" />
+                        <input type="text" id="settingsStoreAddress" value="123 Commerce St, Sacramento, CA 95829" />
                     </div>
                     <div class="form-group">
                         <label>Currency</label>
-                        <select>
+                        <select id="settingsCurrency">
                             <option value="USD">USD ($)</option>
                             <option value="EUR">EUR (€)</option>
                             <option value="GBP">GBP (£)</option>
+                            <option value="CAD">CAD (CA$)</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Tax Rate (%)</label>
-                        <input type="number" value="8.0" step="0.1" />
+                        <input type="number" id="settingsTaxRate" value="8.0" step="0.1" />
                     </div>
-                    <button class="btn-save" onclick="showToast('✅ Settings saved!', 'success')">
+                    <button type="button" class="btn-save" onclick="saveSettings()">
                         <i class="fa-regular fa-floppy-disk"></i> Save Settings
                     </button>
                 </form>
@@ -900,6 +909,12 @@
                     <option value="beauty">Beauty</option>
                     <option value="sports">Sports</option>
                     <option value="office">Office</option>
+                    <option value="industrial">Industrial</option>
+                    <option value="books">Books</option>
+                    <option value="pets">Pets</option>
+                    <option value="baby">Baby</option>
+                    <option value="automotive">Automotive</option>
+                    <option value="health">Health</option>
                 </select>
             </div>
             
@@ -988,226 +1003,145 @@
     </div>
 </footer>
 
-<!-- ─── SCRIPTS ─── -->
+<!-- ─── MAIN JS ─── -->
 <script src="main.js"></script>
+
 <script>
-    // ─── PROTECT ADMIN PAGE ───
-    if (!protectAdmin()) {
-        throw new Error('Unauthorized');
+// ─── PROTECT ADMIN PAGE ───
+if (!window.protectAdmin()) {
+    throw new Error('Unauthorized');
+}
+
+let adminProducts = [];
+let adminFilter = 'all';
+let adminOrderFilter = 'all';
+let adminSellerFilter = 'all';
+let editingProductId = null;
+
+// ─── NOTIFICATIONS ───
+function updateNotifBadge() {
+    const badge = document.getElementById('notifBadge');
+    if (badge) {
+        const unread = window.getUnreadCount();
+        badge.textContent = unread;
+        badge.style.display = unread > 0 ? 'inline' : 'none';
     }
+}
 
-    let adminProducts = [];
-    let adminFilter = 'all';
-    let adminOrderFilter = 'all';
-    let adminSellerFilter = 'all';
+function renderNotifications() {
+    window.renderNotifications();
+}
 
-    // ─── NOTIFICATIONS ───
-    function getNotifications() {
-        return JSON.parse(localStorage.getItem('pse_notifications') || '[]');
+function toggleNotifications() {
+    window.toggleNotifications();
+}
+window.toggleNotifications = toggleNotifications;
+
+// ─── IMAGE UPLOAD HANDLERS ───
+document.getElementById('adminNewProductImages')?.addEventListener('change', function(e) {
+    const preview = document.getElementById('adminImagePreview');
+    const fileName = document.getElementById('adminImageFileName');
+    const files = Array.from(this.files);
+    
+    preview.innerHTML = '';
+    if (files.length > 0) {
+        fileName.textContent = `${files.length} file(s) selected`;
+    } else {
+        fileName.textContent = 'No files selected';
     }
-
-    function markNotificationRead(id) {
-        const notifications = getNotifications();
-        const notif = notifications.find(n => n.id === id);
-        if (notif) {
-            notif.read = true;
-            localStorage.setItem('pse_notifications', JSON.stringify(notifications));
-            renderNotifications();
-            updateNotifBadge();
-        }
-    }
-
-    function getUnreadCount() {
-        return getNotifications().filter(n => !n.read).length;
-    }
-
-    function updateNotifBadge() {
-        const badge = document.getElementById('notifBadge');
-        if (badge) {
-            const unread = getUnreadCount();
-            badge.textContent = unread;
-            badge.style.display = unread > 0 ? 'inline' : 'none';
-        }
-    }
-
-    function renderNotifications() {
-        const notifications = getNotifications();
-        const list = document.getElementById('notificationsList');
-        
-        if (!list) return;
-        
-        if (notifications.length === 0) {
-            list.innerHTML = '<div class="notif-empty">No notifications</div>';
-            return;
-        }
-        
-        list.innerHTML = notifications.slice().reverse().map(n => `
-            <div class="notif-item ${n.read ? '' : 'unread'}">
-                <div class="msg">${n.message}</div>
-                <div class="meta">
-                    <span>${new Date(n.timestamp).toLocaleString()}</span>
-                    ${!n.read ? `<button class="mark-read" onclick="markNotificationRead('${n.id}')">Mark read</button>` : ''}
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function toggleNotifications() {
-        const panel = document.getElementById('notificationsPanel');
-        if (panel) {
-            panel.classList.toggle('show');
-            if (panel.classList.contains('show')) {
-                renderNotifications();
-            }
-        }
-    }
-
-    // ─── IMAGE UPLOAD HANDLERS ───
-    document.getElementById('adminNewProductImages')?.addEventListener('change', function(e) {
-        const preview = document.getElementById('adminImagePreview');
-        const fileName = document.getElementById('adminImageFileName');
-        const files = Array.from(this.files);
-        
-        preview.innerHTML = '';
-        if (files.length > 0) {
-            fileName.textContent = `${files.length} file(s) selected`;
-        } else {
-            fileName.textContent = 'No files selected';
-        }
-        
-        files.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const div = document.createElement('div');
-                div.className = 'preview-item';
-                div.innerHTML = `
-                    <img src="${event.target.result}" alt="Preview" />
-                    <button type="button" class="remove-btn" onclick="removeAdminImage(this, '${file.name}')">&times;</button>
-                `;
-                preview.appendChild(div);
-            };
-            reader.readAsDataURL(file);
-        });
-    });
-
-    function removeAdminImage(btn, fileName) {
-        const input = document.getElementById('adminNewProductImages');
-        const dt = new DataTransfer();
-        const files = Array.from(input.files);
-        const remaining = files.filter(f => f.name !== fileName);
-        remaining.forEach(f => dt.items.add(f));
-        input.files = dt.files;
-        btn.closest('.preview-item').remove();
-        
-        const fileNameEl = document.getElementById('adminImageFileName');
-        const remainingFiles = Array.from(input.files);
-        fileNameEl.textContent = remainingFiles.length > 0 ? `${remainingFiles.length} file(s) selected` : 'No files selected';
-    }
-
-    // ─── UPLOAD IMAGES TO SUPABASE STORAGE ───
-    async function uploadProductImages(files) {
-        const urls = [];
-        
-        for (const file of files) {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `product_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-            const filePath = `products/${fileName}`;
-            
-            try {
-                const response = await fetch(`${SUPABASE_URL}/storage/v1/object/products/${filePath}`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': file.type
-                    },
-                    body: file
-                });
-                
-                if (response.ok) {
-                    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${filePath}`;
-                    urls.push(publicUrl);
-                } else {
-                    const error = await response.text();
-                    console.error('Upload failed:', error);
-                    showToast(`❌ Failed to upload ${file.name}`, 'error');
-                }
-            } catch (error) {
-                console.error('Upload error:', error);
-                showToast(`❌ Error uploading ${file.name}`, 'error');
-            }
-        }
-        
-        return urls;
-    }
-
-    // ─── LOAD ADMIN DATA ───
-    function loadAdminData() {
-        loadAdminProducts();
-        loadAdminOrders();
-        loadAdminUsers();
-        loadAdminSellers();
-        updateAdminStats();
-        updateNotifBadge();
-    }
-
-    // ─── LOAD PRODUCTS ───
-    async function loadAdminProducts() {
-        try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*`, {
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                }
-            });
-            
-            if (response.ok) {
-                adminProducts = await response.json();
-            } else {
-                adminProducts = [];
-            }
-        } catch (error) {
-            console.error('Error loading products:', error);
-            adminProducts = [];
-        }
-        renderAdminProducts();
-    }
-
-    function renderAdminProducts() {
-        let filtered = adminProducts;
-        if (adminFilter === 'active') filtered = filtered.filter(p => p.status === 'active' || p.status === 'approved');
-        else if (adminFilter === 'pending') filtered = filtered.filter(p => p.status === 'pending' || p.status === 'draft');
-        else if (adminFilter === 'inactive') filtered = filtered.filter(p => p.status === 'inactive');
-
-        const tbody = document.getElementById('adminProductBody');
-        if (filtered.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
-                        No products found.
-                    </td>
-                </tr>
+    
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const div = document.createElement('div');
+            div.className = 'preview-item';
+            div.innerHTML = `
+                <img src="${event.target.result}" alt="Preview" />
+                <button type="button" class="remove-btn" onclick="removeAdminImage(this, '${file.name}')">&times;</button>
             `;
-            return;
-        }
+            preview.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    });
+});
 
-        tbody.innerHTML = filtered.map(p => `
+function removeAdminImage(btn, fileName) {
+    const input = document.getElementById('adminNewProductImages');
+    const dt = new DataTransfer();
+    const files = Array.from(input.files);
+    const remaining = files.filter(f => f.name !== fileName);
+    remaining.forEach(f => dt.items.add(f));
+    input.files = dt.files;
+    btn.closest('.preview-item').remove();
+    
+    const fileNameEl = document.getElementById('adminImageFileName');
+    const remainingFiles = Array.from(input.files);
+    fileNameEl.textContent = remainingFiles.length > 0 ? `${remainingFiles.length} file(s) selected` : 'No files selected';
+}
+window.removeAdminImage = removeAdminImage;
+
+// ─── LOAD ADMIN DATA ───
+async function loadAdminData() {
+    await loadAdminProducts();
+    await loadAdminOrders();
+    await loadAdminUsers();
+    await loadAdminSellers();
+    await updateAdminStats();
+    updateNotifBadge();
+    renderNotifications();
+}
+
+// ─── LOAD PRODUCTS ───
+async function loadAdminProducts() {
+    try {
+        const snapshot = await db.collection('products').get();
+        adminProducts = [];
+        snapshot.forEach(doc => {
+            adminProducts.push({ id: doc.id, ...doc.data() });
+        });
+        document.getElementById('adminProductBadge').textContent = adminProducts.length;
+    } catch (error) {
+        console.error('Error loading products:', error);
+        adminProducts = [];
+    }
+    renderAdminProducts();
+}
+
+function renderAdminProducts() {
+    let filtered = adminProducts;
+    if (adminFilter === 'active') filtered = filtered.filter(p => p.status === 'active' || p.status === 'approved');
+    else if (adminFilter === 'pending') filtered = filtered.filter(p => p.status === 'pending' || p.status === 'draft');
+    else if (adminFilter === 'inactive') filtered = filtered.filter(p => p.status === 'inactive');
+
+    const tbody = document.getElementById('adminProductBody');
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
             <tr>
-                <td><strong>${p.title}</strong><br><span style="font-size:0.7rem; color:#6a889a;">${p.brand || ''}</span></td>
-                <td>$${(p.price || 0).toFixed(2)}</td>
-                <td>${p.stock || 0}</td>
-                <td>${p.seller || 'PSE Admin'}</td>
-                <td><span class="status-badge ${p.status === 'active' || p.status === 'approved' ? 'active' : p.status === 'pending' ? 'pending' : 'inactive'}">${p.status || 'Active'}</span></td>
-                <td>
-                    <button class="btn-action edit" onclick="editAdminProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
-                    <button class="btn-action delete" onclick="deleteAdminProduct('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
-                    ${p.status === 'pending' || p.status === 'draft' ? `<button class="btn-action approve" onclick="approveAdminProduct('${p.id}')"><i class="fa-regular fa-circle-check"></i></button>` : ''}
+                <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                    No products found.
                 </td>
             </tr>
-        `).join('');
+        `;
+        return;
     }
 
-    // ─── ADD PRODUCT ───
+    tbody.innerHTML = filtered.map(p => `
+        <tr>
+            <td><strong>${p.title}</strong><br><span style="font-size:0.7rem; color:#6a889a;">${p.brand || ''}</span></td>
+            <td>$${(p.price || 0).toFixed(2)}</td>
+            <td>${p.stock || 0}</td>
+            <td>${p.seller || p.supplier_id || 'PSE Admin'}</td>
+            <td><span class="status-badge ${p.status === 'active' || p.status === 'approved' ? 'active' : p.status === 'pending' ? 'pending' : 'inactive'}">${p.status || 'Active'}</span></td>
+            <td>
+                <button class="btn-action edit" onclick="editAdminProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
+                <button class="btn-action delete" onclick="deleteAdminProduct('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
+                ${p.status === 'pending' || p.status === 'draft' ? `<button class="btn-action approve" onclick="approveAdminProduct('${p.id}')"><i class="fa-regular fa-circle-check"></i></button>` : ''}
+            </td>
+        </tr>
+    `).join('');
+}
+
+// ─── ADD PRODUCT ───
 document.getElementById('addProductAdminForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -1220,369 +1154,501 @@ document.getElementById('addProductAdminForm')?.addEventListener('submit', async
         let imageUrls = [];
         
         if (fileInput && fileInput.files.length > 0) {
-            imageUrls = await uploadProductImages(Array.from(fileInput.files));
+            imageUrls = await window.uploadProductImages(Array.from(fileInput.files));
         }
         
         const newProduct = {
-    title: document.getElementById('adminNewProductTitle').value,
-    brand: document.getElementById('adminNewProductBrand').value || '',
-    price: parseFloat(document.getElementById('adminNewProductPrice').value) || 0,
-    old_price: parseFloat(document.getElementById('adminNewProductOldPrice').value) || null,
-    moq: parseInt(document.getElementById('adminNewProductMoq').value) || 1,
-    stock: parseInt(document.getElementById('adminNewProductStock').value) || 100,
-    category: document.getElementById('adminNewProductCategory').value,
-    image_url: imageUrls.length > 0 ? imageUrls[0] : '',
-    // images: imageUrls,  // REMOVE this line if column missing
-    description: document.getElementById('adminNewProductDescription').value || '',
-    status: 'active'
-    // REMOVE: seller: 'PSE Admin'
-};
+            title: document.getElementById('adminNewProductTitle').value,
+            brand: document.getElementById('adminNewProductBrand').value || '',
+            price: parseFloat(document.getElementById('adminNewProductPrice').value) || 0,
+            old_price: parseFloat(document.getElementById('adminNewProductOldPrice').value) || null,
+            moq: parseInt(document.getElementById('adminNewProductMoq').value) || 1,
+            stock: parseInt(document.getElementById('adminNewProductStock').value) || 100,
+            category: document.getElementById('adminNewProductCategory').value,
+            image_url: imageUrls.length > 0 ? imageUrls[0] : '',
+            images: imageUrls,
+            description: document.getElementById('adminNewProductDescription').value || '',
+            status: 'active',
+            seller: 'PSE Admin',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
 
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/products`, {
-            method: 'POST',
-            headers: {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(newProduct)
-        });
-
-        if (response.ok) {
-            const result = await response.json();
-            adminProducts.push(result);
-            renderAdminProducts();
-            updateAdminStats();
-            closeAddProductAdmin();
-            showToast('✅ Product added with images!', 'success');
+        if (editingProductId) {
+            await db.collection('products').doc(editingProductId).update(newProduct);
+            showToast('✅ Product updated!', 'success');
         } else {
-            const error = await response.text();
-            console.error('Error response:', error);
-            showToast('❌ Failed to add product. Please check console.', 'error');
+            await db.collection('products').add(newProduct);
+            showToast('✅ Product added with images!', 'success');
         }
+        
+        await loadAdminProducts();
+        await updateAdminStats();
+        closeAddProductAdmin();
     } catch (error) {
         console.error('Error:', error);
         showToast('❌ Error adding product: ' + error.message, 'error');
     } finally {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fa-regular fa-plus"></i> Add Product';
+        submitBtn.innerHTML = editingProductId ? '<i class="fa-regular fa-floppy-disk"></i> Update Product' : '<i class="fa-regular fa-plus"></i> Add Product';
     }
 });
 
-    // ─── APPROVE PRODUCT ───
-    async function approveAdminProduct(id) {
-        try {
-            await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${id}`, {
-                method: 'PATCH',
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ status: 'approved' })
-            });
-            showToast('✅ Product approved!', 'success');
-            loadAdminProducts();
-        } catch (error) {
-            showToast('❌ Error approving product', 'error');
-        }
-    }
-
-    // ─── DELETE PRODUCT ───
-    async function deleteAdminProduct(id) {
-        if (!confirm('Delete this product?')) return;
-        
-        try {
-            await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                }
-            });
-            showToast('🗑️ Product deleted', 'info');
-            loadAdminProducts();
-        } catch (error) {
-            showToast('❌ Error deleting product', 'error');
-        }
-    }
-
-    // ─── ORDERS ───
-    function loadAdminOrders() {
-        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
-        renderAdminOrders(orders);
-        document.getElementById('adminOrderBadge').textContent = orders.filter(o => o.status === 'pending').length;
-    }
-
-    function renderAdminOrders(orders) {
-        let filtered = orders;
-        if (adminOrderFilter !== 'all') {
-            filtered = filtered.filter(o => o.status === adminOrderFilter);
-        }
-
-        const tbody = document.getElementById('adminOrderBody');
-        if (filtered.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="7" style="text-align:center; color:#6a889a; padding:2rem;">
-                        No orders found.
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        tbody.innerHTML = filtered.map(o => `
-            <tr>
-                <td><strong>${o.orderNumber}</strong></td>
-                <td>${o.customer?.firstName || 'Guest'} ${o.customer?.lastName || ''}</td>
-                <td>${o.items?.length || 0}</td>
-                <td>$${(o.totals?.total || 0).toFixed(2)}</td>
-                <td><span class="status-badge ${o.status || 'pending'}">${o.status || 'Pending'}</span></td>
-                <td>${new Date(o.date).toLocaleDateString()}</td>
-                <td>
-                    ${o.status !== 'processing' ? `<button class="btn-action edit" onclick="updateOrderStatus('${o.id}', 'processing')">Process</button>` : ''}
-                    ${o.status !== 'shipped' ? `<button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'shipped')">Ship</button>` : ''}
-                    ${o.status !== 'delivered' ? `<button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'delivered')" style="background:#d4edda; color:#155724;">Deliver</button>` : ''}
-                    ${o.status !== 'cancelled' ? `<button class="btn-action delete" onclick="updateOrderStatus('${o.id}', 'cancelled')">Cancel</button>` : ''}
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    // ─── UPDATE ORDER STATUS ───
-    function updateOrderStatus(orderId, newStatus) {
-        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
-        const order = orders.find(o => o.id === orderId);
-        if (order) {
-            order.status = newStatus;
-            localStorage.setItem('pse_orders', JSON.stringify(orders));
-            
-            // Create notification
-            sendOrderStatusEmail(order);
-            
-            showToast(`✅ Order status updated to ${newStatus}`, 'success');
-            loadAdminOrders();
-            updateAdminStats();
-        }
-    }
-
-    // ─── SEND ORDER STATUS EMAIL (Simulated) ───
-    function sendOrderStatusEmail(order) {
-        console.log(`📧 Email sent to ${order.customer?.email || 'customer'}`);
-        console.log(`Subject: Order #${order.orderNumber} status updated to ${order.status}`);
-        
-        const notifications = JSON.parse(localStorage.getItem('pse_notifications') || '[]');
-        notifications.push({
-            id: 'NOTIF-' + Date.now().toString().slice(-6),
-            orderId: order.id,
-            orderNumber: order.orderNumber,
-            status: order.status,
-            message: `Order #${order.orderNumber} status updated to ${order.status}`,
-            timestamp: new Date().toISOString(),
-            read: false
+// ─── APPROVE PRODUCT ───
+async function approveAdminProduct(id) {
+    try {
+        await db.collection('products').doc(id).update({
+            status: 'approved',
+            updated_at: new Date().toISOString()
         });
-        localStorage.setItem('pse_notifications', JSON.stringify(notifications));
-        updateNotifBadge();
+        showToast('✅ Product approved!', 'success');
+        await loadAdminProducts();
+    } catch (error) {
+        showToast('❌ Error approving product', 'error');
     }
+}
+window.approveAdminProduct = approveAdminProduct;
 
-    // ─── USERS ───
-    function loadAdminUsers() {
-        const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
-        renderAdminUsers();
-    }
-
-    function renderAdminUsers() {
-        const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
-        const tbody = document.getElementById('adminUserBody');
-
-        if (users.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
-                        No users found.
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        tbody.innerHTML = users.map(u => `
-            <tr>
-                <td>${u.firstName || ''} ${u.lastName || ''}</td>
-                <td>${u.email}</td>
-                <td><span class="status-badge ${u.role === 'admin' ? 'active' : u.role === 'seller' ? 'pending' : ''}">${u.role || 'customer'}</span></td>
-                <td>${new Date(u.created).toLocaleDateString()}</td>
-                <td><span class="status-badge active">Active</span></td>
-                <td>
-                    <button class="btn-action edit" onclick="showToast('✏️ Edit user coming soon', 'info')"><i class="fa-regular fa-pen"></i></button>
-                    ${u.role !== 'admin' ? `<button class="btn-action make-admin" onclick="makeAdmin('${u.id}')"><i class="fa-regular fa-user-plus"></i> Make Admin</button>` : ''}
-                    ${u.role !== 'admin' ? `<button class="btn-action delete" onclick="deleteUser('${u.id}')"><i class="fa-regular fa-trash-can"></i></button>` : ''}
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    // ─── MAKE ADMIN ───
-    function makeAdmin(id) {
-        if (confirm('Make this user an admin?')) {
-            let users = JSON.parse(localStorage.getItem('pse_users') || '[]');
-            const user = users.find(u => u.id === id);
-            if (user) {
-                user.role = 'admin';
-                localStorage.setItem('pse_users', JSON.stringify(users));
-                renderAdminUsers();
-                updateAdminStats();
-                showToast('✅ User promoted to Admin!', 'success');
+// ─── DELETE PRODUCT ───
+async function deleteAdminProduct(id) {
+    if (!confirm('Delete this product?')) return;
+    
+    try {
+        const product = adminProducts.find(p => p.id === id);
+        if (product && product.images) {
+            for (const imageUrl of product.images) {
+                try {
+                    await window.deleteImageFromStorage(imageUrl);
+                } catch (e) {
+                    console.log('Could not delete image:', e);
+                }
             }
         }
+        
+        await db.collection('products').doc(id).delete();
+        showToast('🗑️ Product deleted', 'info');
+        await loadAdminProducts();
+        await updateAdminStats();
+    } catch (error) {
+        showToast('❌ Error deleting product', 'error');
     }
+}
+window.deleteAdminProduct = deleteAdminProduct;
 
-    function deleteUser(id) {
-        if (confirm('Delete this user?')) {
-            let users = JSON.parse(localStorage.getItem('pse_users') || '[]');
-            users = users.filter(u => u.id !== id);
-            localStorage.setItem('pse_users', JSON.stringify(users));
-            renderAdminUsers();
-            updateAdminStats();
-            showToast('🗑️ User deleted', 'info');
+// ─── EDIT PRODUCT ───
+function editAdminProduct(id) {
+    const product = adminProducts.find(p => p.id === id);
+    if (!product) return;
+    
+    editingProductId = id;
+    document.getElementById('adminNewProductTitle').value = product.title || '';
+    document.getElementById('adminNewProductBrand').value = product.brand || '';
+    document.getElementById('adminNewProductPrice').value = product.price || '';
+    document.getElementById('adminNewProductOldPrice').value = product.old_price || '';
+    document.getElementById('adminNewProductMoq').value = product.moq || 1;
+    document.getElementById('adminNewProductStock').value = product.stock || 0;
+    document.getElementById('adminNewProductCategory').value = product.category || 'electronics';
+    document.getElementById('adminNewProductDescription').value = product.description || '';
+    
+    document.getElementById('addProductAdminModal').style.display = 'flex';
+    document.getElementById('adminSubmitBtn').innerHTML = '<i class="fa-regular fa-floppy-disk"></i> Update Product';
+}
+window.editAdminProduct = editAdminProduct;
+
+// ─── ORDERS ───
+async function loadAdminOrders() {
+    const user = getCurrentUser();
+    let orders = [];
+    
+    try {
+        if (user) {
+            const snapshot = await db.collection('orders').get();
+            snapshot.forEach(doc => {
+                orders.push({ id: doc.id, ...doc.data() });
+            });
         }
+    } catch (error) {
+        console.error('Error loading orders from Firestore:', error);
+    }
+    
+    // Also check localStorage for guest orders
+    const localOrders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+    const localQuotes = JSON.parse(localStorage.getItem('pse_quotes') || '[]');
+    const allOrders = [...orders, ...localOrders, ...localQuotes];
+    
+    renderAdminOrders(allOrders);
+    document.getElementById('adminOrderBadge').textContent = allOrders.filter(o => o.status === 'pending').length;
+}
+
+function renderAdminOrders(orders) {
+    let filtered = orders;
+    if (adminOrderFilter !== 'all') {
+        filtered = filtered.filter(o => o.status === adminOrderFilter);
     }
 
-    // ─── SELLERS ───
-    function loadAdminSellers() {
-        const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
-        const sellers = users.filter(u => u.role === 'seller');
-        renderAdminSellers(sellers);
-    }
-
-    function renderAdminSellers(sellers) {
-        let filtered = sellers;
-        if (adminSellerFilter === 'approved') filtered = filtered.filter(s => s.status === 'approved');
-        else if (adminSellerFilter === 'pending') filtered = filtered.filter(s => s.status === 'pending' || !s.status);
-        else if (adminSellerFilter === 'suspended') filtered = filtered.filter(s => s.status === 'suspended');
-
-        const tbody = document.getElementById('adminSellerBody');
-        if (filtered.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
-                        No sellers found.
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        tbody.innerHTML = filtered.map(s => `
+    const tbody = document.getElementById('adminOrderBody');
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
             <tr>
-                <td>${s.company || 'N/A'}</td>
-                <td>${s.firstName || ''} ${s.lastName || ''}</td>
-                <td>${s.email}</td>
-                <td>0</td>
-                <td><span class="status-badge ${s.status === 'approved' ? 'active' : s.status === 'suspended' ? 'inactive' : 'pending'}">${s.status || 'Pending'}</span></td>
-                <td>
-                    ${s.status !== 'approved' ? `<button class="btn-action approve" onclick="approveSeller('${s.id}')"><i class="fa-regular fa-circle-check"></i> Approve</button>` : ''}
-                    ${s.status === 'approved' ? `<button class="btn-action delete" onclick="suspendSeller('${s.id}')"><i class="fa-regular fa-ban"></i> Suspend</button>` : ''}
+                <td colspan="7" style="text-align:center; color:#6a889a; padding:2rem;">
+                    No orders found.
                 </td>
             </tr>
-        `).join('');
+        `;
+        return;
     }
 
-    function approveSeller(id) {
-        const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
-        const user = users.find(u => u.id === id);
-        if (user) {
-            user.status = 'approved';
-            localStorage.setItem('pse_users', JSON.stringify(users));
-            showToast('✅ Seller approved!', 'success');
-            loadAdminSellers();
-        }
-    }
+    tbody.innerHTML = filtered.map(o => `
+        <tr>
+            <td><strong>${o.orderNumber || o.quoteNumber || 'N/A'}</strong></td>
+            <td>${o.customer?.firstName || 'Guest'} ${o.customer?.lastName || ''}</td>
+            <td>${o.items?.length || 0}</td>
+            <td>$${(o.totals?.total || 0).toFixed(2)}</td>
+            <td><span class="status-badge ${o.status || 'pending'}">${o.status || 'Pending'}</span></td>
+            <td>${new Date(o.date || o.created_at || Date.now()).toLocaleDateString()}</td>
+            <td>
+                ${o.status !== 'processing' ? `<button class="btn-action edit" onclick="updateOrderStatus('${o.id}', 'processing')">Process</button>` : ''}
+                ${o.status !== 'shipped' ? `<button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'shipped')">Ship</button>` : ''}
+                ${o.status !== 'delivered' ? `<button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'delivered')" style="background:#d4edda; color:#155724;">Deliver</button>` : ''}
+                ${o.status !== 'cancelled' ? `<button class="btn-action delete" onclick="updateOrderStatus('${o.id}', 'cancelled')">Cancel</button>` : ''}
+            </td>
+        </tr>
+    `).join('');
+}
 
-    function suspendSeller(id) {
-        const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
-        const user = users.find(u => u.id === id);
-        if (user) {
-            user.status = 'suspended';
-            localStorage.setItem('pse_users', JSON.stringify(users));
-            showToast('⛔ Seller suspended', 'info');
-            loadAdminSellers();
-        }
-    }
-
-    // ─── UPDATE STATS ───
-    async function updateAdminStats() {
-        try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/products?select=count`, {
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                }
+async function updateOrderStatus(orderId, newStatus) {
+    try {
+        // Try updating in Firestore first
+        const docRef = db.collection('orders').doc(orderId);
+        const doc = await docRef.get();
+        if (doc.exists) {
+            await docRef.update({
+                status: newStatus,
+                updated_at: new Date().toISOString()
             });
-            const products = await response.json();
-            
+        } else {
+            // Update in localStorage
             const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
-            const users = JSON.parse(localStorage.getItem('pse_users') || '[]');
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = newStatus;
+                localStorage.setItem('pse_orders', JSON.stringify(orders));
+            }
             const quotes = JSON.parse(localStorage.getItem('pse_quotes') || '[]');
-            const allOrders = [...orders, ...quotes];
-            const revenue = orders.reduce((sum, o) => sum + (o.totals?.total || 0), 0);
-
-            document.getElementById('adminTotalProducts').textContent = products.length || 0;
-            document.getElementById('adminTotalOrders').textContent = allOrders.length;
-            document.getElementById('adminTotalUsers').textContent = users.length;
-            document.getElementById('adminTotalRevenue').textContent = '$' + revenue.toFixed(0);
-        } catch (error) {
-            console.error('Error updating stats:', error);
+            const quote = quotes.find(q => q.id === orderId);
+            if (quote) {
+                quote.status = newStatus;
+                localStorage.setItem('pse_quotes', JSON.stringify(quotes));
+            }
         }
-    }
-
-    // ─── TAB FUNCTIONS ───
-    function showAdminTab(tab) {
-        document.querySelectorAll('.admin-sidebar .nav-item').forEach(n => n.classList.remove('active'));
-        document.querySelector(`.admin-sidebar .nav-item[onclick="showAdminTab('${tab}')"]`).classList.add('active');
         
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.getElementById('admin-' + tab).classList.add('active');
+        showToast(`✅ Order status updated to ${newStatus}`, 'success');
+        await loadAdminOrders();
+        await updateAdminStats();
+    } catch (error) {
+        console.error('Error updating order:', error);
+        showToast('❌ Error updating order', 'error');
+    }
+}
+window.updateOrderStatus = updateOrderStatus;
+
+// ─── USERS ───
+async function loadAdminUsers() {
+    try {
+        const snapshot = await db.collection('users').get();
+        const users = [];
+        snapshot.forEach(doc => {
+            users.push({ id: doc.id, ...doc.data() });
+        });
+        renderAdminUsers(users);
+        document.getElementById('adminUserBadge').textContent = users.length;
+    } catch (error) {
+        console.error('Error loading users:', error);
+        renderAdminUsers([]);
+    }
+}
+
+function renderAdminUsers(users) {
+    const tbody = document.getElementById('adminUserBody');
+    if (users.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                    No users found.
+                </td>
+            </tr>
+        `;
+        return;
     }
 
-    function filterAdminProducts(filter) {
-        adminFilter = filter;
-        renderAdminProducts();
+    tbody.innerHTML = users.map(u => `
+        <tr>
+            <td>${u.full_name || ''}</td>
+            <td>${u.email}</td>
+            <td><span class="status-badge ${u.role === 'admin' ? 'active' : u.role === 'seller' ? 'pending' : ''}">${u.role || 'customer'}</span></td>
+            <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
+            <td><span class="status-badge ${u.status === 'active' ? 'active' : 'inactive'}">${u.status || 'active'}</span></td>
+            <td>
+                <button class="btn-action edit" onclick="showToast('✏️ Edit user coming soon', 'info')"><i class="fa-regular fa-pen"></i></button>
+                ${u.role !== 'admin' ? `<button class="btn-action make-admin" onclick="makeAdmin('${u.id}')"><i class="fa-regular fa-user-plus"></i> Make Admin</button>` : ''}
+            </td>
+        </tr>
+    `).join('');
+}
+
+async function makeAdmin(id) {
+    if (!confirm('Make this user an admin?')) return;
+    try {
+        await db.collection('users').doc(id).update({
+            role: 'admin',
+            updated_at: new Date().toISOString()
+        });
+        showToast('✅ User promoted to Admin!', 'success');
+        await loadAdminUsers();
+        await updateAdminStats();
+    } catch (error) {
+        showToast('❌ Error making admin', 'error');
+    }
+}
+window.makeAdmin = makeAdmin;
+
+// ─── SELLERS ───
+async function loadAdminSellers() {
+    try {
+        const snapshot = await db.collection('users')
+            .where('role', '==', 'seller')
+            .get();
+        const sellers = [];
+        snapshot.forEach(doc => {
+            sellers.push({ id: doc.id, ...doc.data() });
+        });
+        renderAdminSellers(sellers);
+        document.getElementById('adminSellerBadge').textContent = sellers.length;
+    } catch (error) {
+        console.error('Error loading sellers:', error);
+        renderAdminSellers([]);
+    }
+}
+
+function renderAdminSellers(sellers) {
+    let filtered = sellers;
+    if (adminSellerFilter === 'approved') filtered = filtered.filter(s => s.status === 'approved');
+    else if (adminSellerFilter === 'pending') filtered = filtered.filter(s => s.status === 'pending' || !s.status);
+    else if (adminSellerFilter === 'suspended') filtered = filtered.filter(s => s.status === 'suspended');
+
+    const tbody = document.getElementById('adminSellerBody');
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                    No sellers found.
+                </td>
+            </tr>
+        `;
+        return;
     }
 
-    function filterAdminOrders(filter) {
-        adminOrderFilter = filter;
-        loadAdminOrders();
-    }
+    tbody.innerHTML = filtered.map(s => `
+        <tr>
+            <td>${s.company || 'N/A'}</td>
+            <td>${s.full_name || ''}</td>
+            <td>${s.email}</td>
+            <td>0</td>
+            <td><span class="status-badge ${s.status === 'approved' ? 'active' : s.status === 'suspended' ? 'inactive' : 'pending'}">${s.status || 'Pending'}</span></td>
+            <td>
+                ${s.status !== 'approved' ? `<button class="btn-action approve" onclick="approveSeller('${s.id}')"><i class="fa-regular fa-circle-check"></i> Approve</button>` : ''}
+                ${s.status === 'approved' ? `<button class="btn-action delete" onclick="suspendSeller('${s.id}')"><i class="fa-regular fa-ban"></i> Suspend</button>` : ''}
+            </td>
+        </tr>
+    `).join('');
+}
 
-    function filterAdminSellers(filter) {
-        adminSellerFilter = filter;
-        loadAdminSellers();
+async function approveSeller(id) {
+    try {
+        await db.collection('users').doc(id).update({
+            status: 'approved',
+            updated_at: new Date().toISOString()
+        });
+        showToast('✅ Seller approved!', 'success');
+        await loadAdminSellers();
+    } catch (error) {
+        showToast('❌ Error approving seller', 'error');
     }
+}
+window.approveSeller = approveSeller;
 
-    function openAddProductAdmin() {
-        document.getElementById('addProductAdminModal').style.display = 'flex';
-        document.getElementById('addProductAdminForm').reset();
-        document.getElementById('adminImagePreview').innerHTML = '';
-        document.getElementById('adminImageFileName').textContent = 'No files selected';
+async function suspendSeller(id) {
+    if (!confirm('Suspend this seller?')) return;
+    try {
+        await db.collection('users').doc(id).update({
+            status: 'suspended',
+            updated_at: new Date().toISOString()
+        });
+        showToast('⛔ Seller suspended', 'info');
+        await loadAdminSellers();
+    } catch (error) {
+        showToast('❌ Error suspending seller', 'error');
     }
+}
+window.suspendSeller = suspendSeller;
 
-    function closeAddProductAdmin() {
-        document.getElementById('addProductAdminModal').style.display = 'none';
+// ─── UPDATE STATS ───
+async function updateAdminStats() {
+    try {
+        // Product count
+        const productSnapshot = await db.collection('products').get();
+        document.getElementById('adminTotalProducts').textContent = productSnapshot.size;
+
+        // User count
+        const userSnapshot = await db.collection('users').get();
+        document.getElementById('adminTotalUsers').textContent = userSnapshot.size;
+
+        // Orders (Firestore + localStorage)
+        let orders = [];
+        try {
+            const orderSnapshot = await db.collection('orders').get();
+            orderSnapshot.forEach(doc => {
+                orders.push({ ...doc.data() });
+            });
+        } catch (e) {}
+        
+        const localOrders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+        const localQuotes = JSON.parse(localStorage.getItem('pse_quotes') || '[]');
+        const allOrders = [...orders, ...localOrders, ...localQuotes];
+        
+        const revenue = allOrders.reduce((sum, o) => sum + (o.totals?.total || 0), 0);
+        document.getElementById('adminTotalOrders').textContent = allOrders.length;
+        document.getElementById('adminTotalRevenue').textContent = '$' + revenue.toFixed(0);
+    } catch (error) {
+        console.error('Error updating stats:', error);
     }
+}
 
-    function editAdminProduct(id) {
-        showToast('✏️ Edit product feature coming soon', 'info');
-    }
+// ─── SETTINGS ───
+function saveSettings() {
+    const settings = {
+        storeName: document.getElementById('settingsStoreName').value,
+        storeEmail: document.getElementById('settingsStoreEmail').value,
+        storePhone: document.getElementById('settingsStorePhone').value,
+        storeAddress: document.getElementById('settingsStoreAddress').value,
+        currency: document.getElementById('settingsCurrency').value,
+        taxRate: parseFloat(document.getElementById('settingsTaxRate').value) || 0
+    };
+    
+    localStorage.setItem('pse_settings', JSON.stringify(settings));
+    showToast('✅ Settings saved!', 'success');
+}
+window.saveSettings = saveSettings;
 
-    function logoutUser() {
-        if (confirm('Are you sure you want to logout?')) {
-            signOut();
+function loadSettings() {
+    try {
+        const settings = JSON.parse(localStorage.getItem('pse_settings'));
+        if (settings) {
+            document.getElementById('settingsStoreName').value = settings.storeName || 'PSE Wholesale Marketplace';
+            document.getElementById('settingsStoreEmail').value = settings.storeEmail || 'info@psewholesale.com';
+            document.getElementById('settingsStorePhone').value = settings.storePhone || '+1 (800) 555-PSEW';
+            document.getElementById('settingsStoreAddress').value = settings.storeAddress || '123 Commerce St, Sacramento, CA 95829';
+            document.getElementById('settingsCurrency').value = settings.currency || 'USD';
+            document.getElementById('settingsTaxRate').value = settings.taxRate || 8.0;
         }
-    }
+    } catch (e) {}
+}
+window.loadSettings = loadSettings;
 
-    document.addEventListener('DOMContentLoaded', loadAdminData);
+// ─── TAB FUNCTIONS ───
+function showAdminTab(tab) {
+    document.querySelectorAll('.admin-sidebar .nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelector(`.admin-sidebar .nav-item[onclick="showAdminTab('${tab}')"]`)?.classList.add('active');
+    
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    const target = document.getElementById('admin-' + tab);
+    if (target) target.classList.add('active');
+    
+    if (tab === 'settings') loadSettings();
+}
+window.showAdminTab = showAdminTab;
+
+function filterAdminProducts(filter) {
+    adminFilter = filter;
+    renderAdminProducts();
+}
+window.filterAdminProducts = filterAdminProducts;
+
+function filterAdminOrders(filter) {
+    adminOrderFilter = filter;
+    loadAdminOrders();
+}
+window.filterAdminOrders = filterAdminOrders;
+
+function filterAdminSellers(filter) {
+    adminSellerFilter = filter;
+    loadAdminSellers();
+}
+window.filterAdminSellers = filterAdminSellers;
+
+function openAddProductAdmin() {
+    editingProductId = null;
+    document.getElementById('addProductAdminModal').style.display = 'flex';
+    document.getElementById('addProductAdminForm').reset();
+    document.getElementById('adminImagePreview').innerHTML = '';
+    document.getElementById('adminImageFileName').textContent = 'No files selected';
+    document.getElementById('adminSubmitBtn').innerHTML = '<i class="fa-regular fa-plus"></i> Add Product';
+}
+window.openAddProductAdmin = openAddProductAdmin;
+
+function closeAddProductAdmin() {
+    document.getElementById('addProductAdminModal').style.display = 'none';
+}
+window.closeAddProductAdmin = closeAddProductAdmin;
+
+function logoutUser() {
+    if (confirm('Are you sure you want to logout?')) {
+        window.signOutUser();
+    }
+}
+window.logoutUser = logoutUser;
+
+// ─── REAL-TIME LISTENERS ───
+function setupRealtimeListeners() {
+    // Products listener
+    db.collection('products').onSnapshot((snapshot) => {
+        adminProducts = [];
+        snapshot.forEach(doc => {
+            adminProducts.push({ id: doc.id, ...doc.data() });
+        });
+        document.getElementById('adminProductBadge').textContent = adminProducts.length;
+        renderAdminProducts();
+        updateAdminStats();
+    }, (error) => {
+        console.error('Products listener error:', error);
+    });
+    
+    // Users listener
+    db.collection('users').onSnapshot((snapshot) => {
+        const users = [];
+        snapshot.forEach(doc => {
+            users.push({ id: doc.id, ...doc.data() });
+        });
+        renderAdminUsers(users);
+        document.getElementById('adminUserBadge').textContent = users.length;
+        updateAdminStats();
+    }, (error) => {
+        console.error('Users listener error:', error);
+    });
+}
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if admin is protected
+    if (!window.protectAdmin()) {
+        return;
+    }
+    
+    loadAdminData();
+    setupRealtimeListeners();
+    loadSettings();
+    updateNotifBadge();
+});
 </script>
 
 </body>

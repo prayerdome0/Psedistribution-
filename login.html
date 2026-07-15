@@ -6,6 +6,14 @@
     <title>Login - PSE Wholesale</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+    
     <style>
         .auth-page {
             max-width: 480px;
@@ -59,6 +67,7 @@
         }
         .auth-page .form-options a {
             color: #1e7b6b;
+            cursor: pointer;
         }
         .auth-page .form-options a:hover {
             text-decoration: underline;
@@ -132,34 +141,10 @@
         .auth-page .register-link a {
             color: #1e7b6b;
             font-weight: 600;
+            text-decoration: none;
         }
         .auth-page .register-link a:hover {
             text-decoration: underline;
-        }
-
-        .demo-credentials {
-            background: #f8fafc;
-            border-radius: 8px;
-            padding: 0.8rem 1rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #e9edf2;
-            font-size: 0.8rem;
-        }
-        .demo-credentials strong {
-            color: #0b2a3b;
-        }
-        .demo-credentials .cred {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            margin-top: 0.3rem;
-        }
-        .demo-credentials .cred span {
-            color: #2c5a6b;
-        }
-        .demo-credentials .cred .highlight {
-            color: #1e7b6b;
-            font-weight: 600;
         }
 
         @media (max-width: 480px) {
@@ -266,18 +251,10 @@
         <h2><i class="fa-regular fa-circle-user"></i> Welcome Back</h2>
         <p class="subtitle">Sign in to your PSE Wholesale account</p>
 
-        <div class="demo-credentials">
-            <strong>Quick Login:</strong>
-            <div class="cred">
-                <span>👤 <span class="highlight">admin</span> / <span class="highlight">1234</span> (Admin)</span>
-                <span>👤 <span class="highlight">Any email</span> / <span class="highlight">Any password</span> (Customer)</span>
-            </div>
-        </div>
-
         <form id="loginForm">
             <div class="form-group">
-                <label>Email / Username</label>
-                <input type="text" id="loginEmail" placeholder="admin or you@example.com" required />
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="you@example.com" required />
             </div>
             <div class="form-group">
                 <label>Password</label>
@@ -285,7 +262,7 @@
             </div>
             <div class="form-options">
                 <label><input type="checkbox" /> Remember me</label>
-                <a href="#" onclick="showToast('📧 Password reset link sent to your email', 'info')">Forgot password?</a>
+                <a onclick="resetPassword()">Forgot password?</a>
             </div>
             <button type="submit" class="btn-login"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
         </form>
@@ -369,40 +346,41 @@
     </div>
 </footer>
 
-<!-- ─── SCRIPTS ─── -->
+<!-- ─── MAIN JS ─── -->
 <script src="main.js"></script>
+
 <script>
-    // ─── LOGIN FORM ───
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
+// ─── LOGIN FORM HANDLER ───
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!email || !password) {
+        showToast('❌ Please fill in all fields', 'error');
+        return;
+    }
+    
+    showToast('⏳ Signing in...', 'info');
+    
+    const result = await signIn(email, password);
+    
+    if (result.success) {
+        showToast('✅ Welcome back!', 'success');
         
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        
-        if (!email || !password) {
-            showToast('❌ Please fill in all fields', 'error');
-            return;
-        }
-        
-        showToast('⏳ Signing in...', 'info');
-        
-        const result = await signIn(email, password);
-        
-        if (result.success) {
-            showToast('✅ Welcome back!', 'success');
-            
-            const user = getCurrentUser();
-            if (user.role === 'admin') {
-                setTimeout(() => window.location.href = 'admin-dashboard.html', 1000);
-            } else if (user.role === 'seller') {
-                setTimeout(() => window.location.href = 'seller-dashboard.html', 1000);
-            } else {
-                setTimeout(() => window.location.href = 'index.html', 1000);
-            }
+        const user = getCurrentUser();
+        if (user.role === 'admin') {
+            setTimeout(() => window.location.href = 'admin-dashboard.html', 1000);
+        } else if (user.role === 'seller') {
+            setTimeout(() => window.location.href = 'seller-dashboard.html', 1000);
         } else {
-            showToast('❌ ' + result.error, 'error');
+            setTimeout(() => window.location.href = 'index.html', 1000);
         }
-    });
+    } else {
+        showToast('❌ ' + result.error, 'error');
+    }
+});
 </script>
 
 </body>

@@ -6,6 +6,14 @@
     <title>Shopping Cart - PSE Wholesale</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+    
     <style>
         .cart-layout {
             display: grid;
@@ -331,8 +339,8 @@
 <header class="header">
     <div class="container">
         <a href="index.html" class="logo">
-    <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
-</a>
+            <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+        </a>
         <div class="search-bar">
             <select id="categoryFilter"><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
             <input type="text" id="searchInput" placeholder="Search wholesale products..." onkeyup="searchProducts(event)" />
@@ -517,62 +525,98 @@
     </div>
 </footer>
 
-<!-- ─── SCRIPTS ─── -->
+<!-- ─── MAIN JS ─── -->
 <script src="main.js"></script>
+
 <script>
-    let couponApplied = false;
+let couponApplied = false;
 
-    function loadCart() {
-        const cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
-        const list = document.getElementById('cartItemsList');
-        const count = document.getElementById('cartItemCount');
-
-        if (cart.length === 0) {
-            list.innerHTML = `
-                <div class="empty-cart">
-                    <i class="fa-regular fa-cart-shopping"></i>
-                    <h3>Your cart is empty</h3>
-                    <p>Browse our wholesale products and find great deals!</p>
-                    <a href="products.html"><button class="btn-continue"><i class="fa-solid fa-arrow-left"></i> Start Shopping</button></a>
-                </div>
-            `;
-            count.textContent = '0';
-            updateCartSummary(cart);
-            return;
+// ─── LOAD CART ───
+async function loadCart() {
+    const user = getCurrentUser();
+    let cartItems = [];
+    
+    if (user) {
+        cartItems = await getCartItems();
+        // Get product details
+        const cartWithProducts = [];
+        for (const item of cartItems) {
+            const product = await fetchProductById(item.product_id);
+            if (product) {
+                cartWithProducts.push({
+                    id: item.id,
+                    product_id: item.product_id,
+                    title: product.title,
+                    price: product.price,
+                    old_price: product.old_price,
+                    image: product.image_url,
+                    brand: product.brand,
+                    moq: product.moq,
+                    quantity: item.quantity || 1
+                });
+            }
         }
+        cartItems = cartWithProducts;
+    } else {
+        // Fallback to localStorage for guests
+        cartItems = JSON.parse(localStorage.getItem('pse_cart') || '[]');
+    }
+    
+    renderCartItems(cartItems);
+    updateCartSummary(cartItems);
+}
 
-        count.textContent = cart.length;
+function renderCartItems(cart) {
+    const list = document.getElementById('cartItemsList');
+    const count = document.getElementById('cartItemCount');
 
-        list.innerHTML = cart.map(item => `
-            <div class="cart-item">
-                <div class="item-image">
-                    ${item.image ? `<img src="${item.image}" alt="${item.title}" />` : `<i class="fa-solid fa-${item.icon || 'box'}"></i>`}
-                </div>
-                <div class="item-details">
-                    <div class="item-title">${item.title}</div>
-                    <div class="item-brand">${item.brand || 'PSE Wholesale'}</div>
-                    <div class="item-price">
-                        $${item.price.toFixed(2)}
-                        ${item.old_price ? `<span class="old">$${item.old_price.toFixed(2)}</span>` : ''}
-                        ${item.moq ? `<span style="font-size:0.6rem; background:#e3f0eb; padding:0.1rem 0.5rem; border-radius:30px; color:#1e7b6b; margin-left:0.3rem;">MOQ ${item.moq}</span>` : ''}
-                    </div>
-                </div>
-                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
-                    <div class="item-qty">
-                        <button onclick="updateCartItem(${item.id}, -1)">−</button>
-                        <input type="number" id="qty_${item.id}" value="${item.quantity || 1}" min="${item.moq || 1}" onchange="updateCartItemQty(${item.id}, this.value)" />
-                        <button onclick="updateCartItem(${item.id}, 1)">+</button>
-                    </div>
-                    <button class="item-remove" onclick="removeCartItem(${item.id})"><i class="fa-regular fa-trash-can"></i> Remove</button>
-                </div>
-                <div class="item-subtotal">$${(item.price * (item.quantity || 1)).toFixed(2)}</div>
+    if (cart.length === 0) {
+        list.innerHTML = `
+            <div class="empty-cart">
+                <i class="fa-regular fa-cart-shopping"></i>
+                <h3>Your cart is empty</h3>
+                <p>Browse our wholesale products and find great deals!</p>
+                <a href="products.html"><button class="btn-continue"><i class="fa-solid fa-arrow-left"></i> Start Shopping</button></a>
             </div>
-        `).join('');
-
-        updateCartSummary(cart);
+        `;
+        count.textContent = '0';
+        return;
     }
 
-    function updateCartItem(productId, change) {
+    count.textContent = cart.length;
+
+    list.innerHTML = cart.map(item => `
+        <div class="cart-item">
+            <div class="item-image">
+                ${item.image ? `<img src="${item.image}" alt="${item.title}" />` : `<i class="fa-solid fa-box"></i>`}
+            </div>
+            <div class="item-details">
+                <div class="item-title">${item.title}</div>
+                <div class="item-brand">${item.brand || 'PSE Wholesale'}</div>
+                <div class="item-price">
+                    $${item.price.toFixed(2)}
+                    ${item.old_price ? `<span class="old">$${item.old_price.toFixed(2)}</span>` : ''}
+                    ${item.moq ? `<span style="font-size:0.6rem; background:#e3f0eb; padding:0.1rem 0.5rem; border-radius:30px; color:#1e7b6b; margin-left:0.3rem;">MOQ ${item.moq}</span>` : ''}
+                </div>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
+                <div class="item-qty">
+                    <button onclick="updateCartItem('${item.id}', '${item.product_id}', -1)">−</button>
+                    <input type="number" id="qty_${item.id}" value="${item.quantity || 1}" min="${item.moq || 1}" onchange="updateCartItemQty('${item.id}', '${item.product_id}', this.value)" />
+                    <button onclick="updateCartItem('${item.id}', '${item.product_id}', 1)">+</button>
+                </div>
+                <button class="item-remove" onclick="removeCartItem('${item.id}', '${item.product_id}')"><i class="fa-regular fa-trash-can"></i> Remove</button>
+            </div>
+            <div class="item-subtotal">$${(item.price * (item.quantity || 1)).toFixed(2)}</div>
+        </div>
+    `).join('');
+}
+
+// ─── UPDATE CART ITEM ───
+async function updateCartItem(cartId, productId, change) {
+    const user = getCurrentUser();
+    if (!user) {
+        // Local storage fallback
         let cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
         const item = cart.find(i => i.id === productId);
         if (item) {
@@ -581,14 +625,36 @@
                 item.quantity = newQty;
                 localStorage.setItem('pse_cart', JSON.stringify(cart));
                 loadCart();
-                updateCartCount();
+                loadCartCount();
             } else {
                 showToast(`Minimum quantity is ${item.moq || 1}`, 'error');
             }
         }
+        return;
     }
+    
+    try {
+        const cartItems = await getCartItems();
+        const item = cartItems.find(i => i.id === cartId);
+        if (item) {
+            const newQty = (item.quantity || 1) + change;
+            if (newQty >= 1) {
+                await updateCartItem(cartId, newQty);
+                loadCart();
+                loadCartCount();
+            } else {
+                showToast('Quantity must be at least 1', 'error');
+            }
+        }
+    } catch (error) {
+        console.error('Error updating cart:', error);
+        showToast('❌ Failed to update cart', 'error');
+    }
+}
 
-    function updateCartItemQty(productId, value) {
+async function updateCartItemQty(cartId, productId, value) {
+    const user = getCurrentUser();
+    if (!user) {
         let cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
         const item = cart.find(i => i.id === productId);
         if (item) {
@@ -597,88 +663,121 @@
                 item.quantity = newQty;
                 localStorage.setItem('pse_cart', JSON.stringify(cart));
                 loadCart();
-                updateCartCount();
+                loadCartCount();
             } else {
                 showToast(`Minimum quantity is ${item.moq || 1}`, 'error');
-                document.getElementById(`qty_${productId}`).value = item.quantity || 1;
+                document.getElementById(`qty_${cartId}`).value = item.quantity || 1;
             }
         }
+        return;
     }
+    
+    try {
+        const newQty = parseInt(value) || 1;
+        if (newQty >= 1) {
+            await updateCartItem(cartId, newQty);
+            loadCart();
+            loadCartCount();
+        } else {
+            showToast('Quantity must be at least 1', 'error');
+        }
+    } catch (error) {
+        console.error('Error updating cart:', error);
+        showToast('❌ Failed to update cart', 'error');
+    }
+}
 
-    function removeCartItem(productId) {
+// ─── REMOVE CART ITEM ───
+async function removeCartItem(cartId, productId) {
+    const user = getCurrentUser();
+    if (!user) {
         let cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
         cart = cart.filter(i => i.id !== productId);
         localStorage.setItem('pse_cart', JSON.stringify(cart));
         loadCart();
-        updateCartCount();
+        loadCartCount();
         showToast('🗑️ Item removed from cart', 'info');
+        return;
+    }
+    
+    try {
+        await removeCartItem(cartId);
+        loadCart();
+        loadCartCount();
+        showToast('🗑️ Item removed from cart', 'info');
+    } catch (error) {
+        console.error('Error removing cart item:', error);
+        showToast('❌ Failed to remove item', 'error');
+    }
+}
+
+// ─── UPDATE CART SUMMARY ───
+function updateCartSummary(cart) {
+    let subtotal = 0;
+    let discount = 0;
+    let shipping = 0;
+
+    cart.forEach(item => {
+        const qty = item.quantity || 1;
+        subtotal += item.price * qty;
+        if (item.old_price) {
+            discount += (item.old_price - item.price) * qty;
+        }
+    });
+
+    if (subtotal >= 250) {
+        shipping = 0;
+    } else {
+        shipping = 15.00;
     }
 
-    function updateCartSummary(cart) {
-        let subtotal = 0;
-        let discount = 0;
-        let shipping = 0;
+    const tax = subtotal * 0.08;
+    const total = subtotal - discount + shipping + tax;
 
-        cart.forEach(item => {
-            const qty = item.quantity || 1;
-            subtotal += item.price * qty;
-            if (item.old_price) {
-                discount += (item.old_price - item.price) * qty;
-            }
-        });
+    document.getElementById('summarySubtotal').textContent = `$${subtotal.toFixed(2)}`;
+    document.getElementById('summaryDiscount').textContent = `−$${discount.toFixed(2)}`;
+    document.getElementById('summaryShipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
+    document.getElementById('summaryTax').textContent = `$${tax.toFixed(2)}`;
+    document.getElementById('summaryTotal').textContent = `$${total.toFixed(2)}`;
+}
 
-        // Free shipping over $250
-        if (subtotal >= 250) {
-            shipping = 0;
-        } else {
-            shipping = 15.00;
-        }
+// ─── APPLY COUPON ───
+function applyCoupon() {
+    const input = document.getElementById('couponInput');
+    const code = input.value.trim().toUpperCase();
+    
+    if (couponApplied) {
+        showToast('Coupon already applied', 'info');
+        return;
+    }
 
-        const tax = subtotal * 0.08; // 8% tax
-        const total = subtotal - discount + shipping + tax;
-
-        document.getElementById('summarySubtotal').textContent = `$${subtotal.toFixed(2)}`;
+    if (code === 'SAVE10' || code === 'WHOLESALE10') {
+        couponApplied = true;
+        showToast('🎉 Coupon SAVE10 applied! 10% off', 'success');
+        const cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
+        let subtotal = cart.reduce((sum, i) => sum + (i.price * (i.quantity || 1)), 0);
+        const discount = subtotal * 0.10;
+        const tax = (subtotal - discount) * 0.08;
+        const total = subtotal - discount + tax;
+        
         document.getElementById('summaryDiscount').textContent = `−$${discount.toFixed(2)}`;
-        document.getElementById('summaryShipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
         document.getElementById('summaryTax').textContent = `$${tax.toFixed(2)}`;
         document.getElementById('summaryTotal').textContent = `$${total.toFixed(2)}`;
+        input.value = '';
+        input.disabled = true;
+    } else if (code === '') {
+        showToast('Please enter a coupon code', 'error');
+    } else {
+        showToast('❌ Invalid coupon code', 'error');
     }
+}
 
-    function applyCoupon() {
-        const input = document.getElementById('couponInput');
-        const code = input.value.trim().toUpperCase();
-        
-        if (couponApplied) {
-            showToast('Coupon already applied', 'info');
-            return;
-        }
-
-        if (code === 'SAVE10' || code === 'WHOLESALE10') {
-            couponApplied = true;
-            showToast('🎉 Coupon SAVE10 applied! 10% off', 'success');
-            // Recalculate with discount
-            const cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
-            let subtotal = cart.reduce((sum, i) => sum + (i.price * (i.quantity || 1)), 0);
-            const discount = subtotal * 0.10;
-            const tax = (subtotal - discount) * 0.08;
-            const total = subtotal - discount + tax;
-            
-            document.getElementById('summaryDiscount').textContent = `−$${discount.toFixed(2)}`;
-            document.getElementById('summaryTax').textContent = `$${tax.toFixed(2)}`;
-            document.getElementById('summaryTotal').textContent = `$${total.toFixed(2)}`;
-            input.value = '';
-            input.disabled = true;
-        } else if (code === '') {
-            showToast('Please enter a coupon code', 'error');
-        } else {
-            showToast('❌ Invalid coupon code', 'error');
-        }
-    }
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        loadCart();
-    });
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', function() {
+    loadCart();
+    loadCartCount();
+    loadWishlistStatus();
+});
 </script>
 
 </body>

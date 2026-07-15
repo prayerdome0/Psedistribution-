@@ -6,6 +6,13 @@
     <title>PSE Wholesale Marketplace</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
 </head>
 <body>
 
@@ -41,8 +48,8 @@
 <header class="header">
     <div class="container">
         <a href="index.html" class="logo">
-    <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
-</a>
+            <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+        </a>
         <div class="search-bar">
             <select id="categoryFilter"><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
             <input type="text" id="searchInput" placeholder="Search wholesale products..." onkeyup="searchProducts(event)" />
@@ -172,88 +179,87 @@
     </div>
     
     <!-- TRUSTED COMPANIES CAROUSEL -->
-<div class="trusted-section">
-    <div class="section-title">
-        <h2>Trusted By <span>Industry Leaders</span></h2>
-        <p>Join thousands of businesses that trust PSE Wholesale</p>
-    </div>
-    <div class="carousel-wrapper">
-        <div class="carousel-track">
-            <!-- First set -->
-            <div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/nike-logo.png" alt="Nike" /></div>
-<div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/apple-logo.png" alt="Apple" /></div>
-<div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/samsung-logo.png" alt="Samsung" /></div>
-<div class="carousel-item"><img src="https://i.ibb.co/9k4fKd26/20260711-154300.png" alt="Adidas" /></div>
-<div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/sony-logo.png" alt="Sony" /></div>
-<div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/lg-logo.png" alt="LG" /></div>
-<div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/p-and-g-logo.png" alt="P&G" /></div>
-<div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/unilever-logo.png" alt="Unilever" /></div>
+    <div class="trusted-section">
+        <div class="section-title">
+            <h2>Trusted By <span>Industry Leaders</span></h2>
+            <p>Join thousands of businesses that trust PSE Wholesale</p>
+        </div>
+        <div class="carousel-wrapper">
+            <div class="carousel-track">
+                <div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/nike-logo.png" alt="Nike" /></div>
+                <div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/apple-logo.png" alt="Apple" /></div>
+                <div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/samsung-logo.png" alt="Samsung" /></div>
+                <div class="carousel-item"><img src="https://i.ibb.co/9k4fKd26/20260711-154300.png" alt="Adidas" /></div>
+                <div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/sony-logo.png" alt="Sony" /></div>
+                <div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/lg-logo.png" alt="LG" /></div>
+                <div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/p-and-g-logo.png" alt="P&G" /></div>
+                <div class="carousel-item"><img src="https://cdn.freebiesupply.com/images/thumbs/2x/unilever-logo.png" alt="Unilever" /></div>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- ─── HELP MODAL ─── -->
-<div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
-    <div class="modal-content">
-        <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
-        <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
-        <p>Choose from our support options below:</p>
-        <ul>
-            <li><i class="fa-regular fa-message" style="color:#1e7b6b; width:20px;"></i> Live Chat (24/7)</li>
-            <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
-            <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
-            <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
-        </ul>
-        <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
-    </div>
-</div>
-
-<!-- ─── FOOTER ─── -->
-<footer class="footer">
-    <div class="container">
-        <div>
-            <h4>PSE Wholesale</h4>
+    <!-- ─── HELP MODAL ─── -->
+    <div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
+        <div class="modal-content">
+            <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
+            <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
+            <p>Choose from our support options below:</p>
             <ul>
-                <li onclick="window.location.href='about.html'">About Us</li>
-                <li>Careers</li>
-                <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
-                <li>Blog</li>
+                <li><i class="fa-regular fa-message" style="color:#1e7b6b; width:20px;"></i> Live Chat (24/7)</li>
+                <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
+                <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
+                <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
             </ul>
-        </div>
-        <div>
-            <h4>Customer Service</h4>
-            <ul>
-                <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
-                <li>Returns & Refunds</li>
-                <li>Shipping Policy</li>
-                <li onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</li>
-            </ul>
-        </div>
-        <div>
-            <h4>B2B</h4>
-            <ul>
-                <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
-                <li>Wholesale Pricing</li>
-                <li>Bulk Orders</li>
-                <li>Supplier Program</li>
-            </ul>
-        </div>
-        <div>
-            <h4>Legal</h4>
-            <ul>
-                <li>Privacy Policy</li>
-                <li>Terms & Conditions</li>
-                <li>Cookie Policy</li>
-            </ul>
-        </div>
-        <div class="bottom">
-            &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+            <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
         </div>
     </div>
-</footer>
 
-<!-- ─── SCRIPTS ─── -->
-<script src="js/main.js"></script>
+    <!-- ─── FOOTER ─── -->
+    <footer class="footer">
+        <div class="container">
+            <div>
+                <h4>PSE Wholesale</h4>
+                <ul>
+                    <li onclick="window.location.href='about.html'">About Us</li>
+                    <li>Careers</li>
+                    <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
+                    <li>Blog</li>
+                </ul>
+            </div>
+            <div>
+                <h4>Customer Service</h4>
+                <ul>
+                    <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
+                    <li>Returns & Refunds</li>
+                    <li>Shipping Policy</li>
+                    <li onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</li>
+                </ul>
+            </div>
+            <div>
+                <h4>B2B</h4>
+                <ul>
+                    <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
+                    <li>Wholesale Pricing</li>
+                    <li>Bulk Orders</li>
+                    <li>Supplier Program</li>
+                </ul>
+            </div>
+            <div>
+                <h4>Legal</h4>
+                <ul>
+                    <li>Privacy Policy</li>
+                    <li>Terms & Conditions</li>
+                    <li>Cookie Policy</li>
+                </ul>
+            </div>
+            <div class="bottom">
+                &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- ─── SCRIPTS ─── -->
+    <script src="main.js"></script>
 
 </body>
 </html>

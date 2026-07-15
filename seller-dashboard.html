@@ -6,6 +6,14 @@
     <title>Seller Dashboard - PSE Wholesale</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+    
     <style>
         .dashboard-stats {
             display: grid;
@@ -280,8 +288,8 @@
 <header class="header">
     <div class="container">
         <a href="index.html" class="logo">
-    <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
-</a>
+            <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+        </a>
         <div class="search-bar">
             <select><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
             <input type="text" placeholder="Search wholesale products..." />
@@ -451,7 +459,7 @@
         <!-- Settings Tab -->
         <div id="seller-settings" style="display:none;">
             <div class="section-title"><i class="fa-regular fa-gear"></i> Store Settings</div>
-            <form class="profile-form" style="max-width:600px;">
+            <form class="profile-form" style="max-width:600px;" id="sellerSettingsForm">
                 <div class="form-group">
                     <label>Store Name</label>
                     <input type="text" id="storeName" placeholder="Your store name" />
@@ -462,15 +470,19 @@
                 </div>
                 <div class="form-group">
                     <label>Store Category</label>
-                    <select>
-                        <option>Select category</option>
-                        <option>Electronics</option>
-                        <option>Fashion</option>
-                        <option>Home & Kitchen</option>
-                        <option>Grocery</option>
+                    <select id="storeCategory">
+                        <option value="">Select category</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="fashion">Fashion</option>
+                        <option value="home">Home & Kitchen</option>
+                        <option value="grocery">Grocery</option>
+                        <option value="beauty">Beauty</option>
+                        <option value="sports">Sports</option>
+                        <option value="office">Office</option>
+                        <option value="industrial">Industrial</option>
                     </select>
                 </div>
-                <button class="btn-save" onclick="showToast('✅ Store settings saved!', 'success')">
+                <button type="button" class="btn-save" onclick="saveSellerSettings()">
                     <i class="fa-regular fa-floppy-disk"></i> Save Settings
                 </button>
             </form>
@@ -523,6 +535,12 @@
                     <option value="beauty">Beauty</option>
                     <option value="sports">Sports</option>
                     <option value="office">Office</option>
+                    <option value="industrial">Industrial</option>
+                    <option value="books">Books</option>
+                    <option value="pets">Pets</option>
+                    <option value="baby">Baby</option>
+                    <option value="automotive">Automotive</option>
+                    <option value="health">Health</option>
                 </select>
             </div>
             <div class="form-group">
@@ -601,264 +619,329 @@
     </div>
 </footer>
 
-<!-- ─── SCRIPTS ─── -->
+<!-- ─── MAIN JS ─── -->
 <script src="main.js"></script>
+
 <script>
-    // ─── PROTECT SELLER PAGE ───
-    if (!protectSeller()) {
-        throw new Error('Unauthorized');
+// ─── PROTECT SELLER PAGE ───
+if (!window.protectSeller()) {
+    throw new Error('Unauthorized');
+}
+
+let sellerProducts = [];
+let editingProductId = null;
+
+// ─── LOAD SELLER DATA ───
+async function loadSellerData() {
+    await loadSellerProducts();
+    await updateSellerStats();
+    await loadSellerOrders();
+    updateAnalytics();
+    loadSellerSettings();
+}
+
+// ─── LOAD SELLER PRODUCTS ───
+async function loadSellerProducts() {
+    const user = getCurrentUser();
+    if (!user) return;
+    
+    try {
+        const snapshot = await db.collection('products')
+            .where('supplier_id', '==', user.id)
+            .get();
+        sellerProducts = [];
+        snapshot.forEach(doc => {
+            sellerProducts.push({ id: doc.id, ...doc.data() });
+        });
+    } catch (error) {
+        console.error('Error loading products:', error);
+        sellerProducts = [];
     }
+    renderSellerProducts();
+}
 
-    let sellerProducts = [];
-    let editingProductId = null;
-
-    // ─── LOAD SELLER DATA ───
-    async function loadSellerData() {
-        await loadSellerProducts();
-        await updateSellerStats();
-        await loadSellerOrders();
-        updateAnalytics();
-    }
-
-    // ─── LOAD SELLER PRODUCTS ───
-    async function loadSellerProducts() {
-        const user = getCurrentUser();
-        if (!user) return;
-        
-        try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/products?supplier_id=eq.${user.id}&select=*`, {
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                }
-            });
-            
-            if (response.ok) {
-                sellerProducts = await response.json();
-            } else {
-                sellerProducts = [];
-            }
-        } catch (error) {
-            console.error('Error loading products:', error);
-            sellerProducts = [];
-        }
-        renderSellerProducts();
-    }
-
-    function renderSellerProducts() {
-        const tbody = document.getElementById('sellerProductBody');
-        if (sellerProducts.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
-                        No products yet. Click "Add New Product" to get started.
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        tbody.innerHTML = sellerProducts.map(p => `
+function renderSellerProducts() {
+    const tbody = document.getElementById('sellerProductBody');
+    if (sellerProducts.length === 0) {
+        tbody.innerHTML = `
             <tr>
-                <td><strong>${p.title}</strong><br><span style="font-size:0.7rem; color:#6a889a;">${p.brand || ''}</span></td>
-                <td>$${(p.price || 0).toFixed(2)}</td>
-                <td>${p.moq || 1}</td>
-                <td>${p.stock || 0}</td>
-                <td><span class="status-badge ${p.status === 'active' || p.status === 'approved' ? 'active' : 'pending'}">${p.status || 'Pending'}</span></td>
-                <td>
-                    <button class="btn-action edit" onclick="editProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
-                    <button class="btn-action delete" onclick="deleteProduct('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
+                <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                    No products yet. Click "Add New Product" to get started.
                 </td>
             </tr>
-        `).join('');
+        `;
+        return;
     }
 
-    // ─── UPDATE SELLER STATS ───
-    async function updateSellerStats() {
-        document.getElementById('sellerProducts').textContent = sellerProducts.length || 0;
-        
-        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
-        document.getElementById('sellerOrders').textContent = orders.length;
-        
-        const revenue = orders.reduce((sum, o) => sum + (o.totals?.total || 0), 0);
-        document.getElementById('sellerRevenue').textContent = '$' + revenue.toFixed(0);
-    }
+    tbody.innerHTML = sellerProducts.map(p => `
+        <tr>
+            <td><strong>${p.title}</strong><br><span style="font-size:0.7rem; color:#6a889a;">${p.brand || ''}</span></td>
+            <td>$${(p.price || 0).toFixed(2)}</td>
+            <td>${p.moq || 1}</td>
+            <td>${p.stock || 0}</td>
+            <td><span class="status-badge ${p.status === 'active' || p.status === 'approved' ? 'active' : 'pending'}">${p.status || 'Pending'}</span></td>
+            <td>
+                <button class="btn-action edit" onclick="editProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
+                <button class="btn-action delete" onclick="deleteProduct('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
 
-    // ─── LOAD SELLER ORDERS ───
-    function loadSellerOrders() {
-        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
-        const tbody = document.getElementById('sellerOrderBody');
-        
-        if (orders.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
-                        No orders yet.
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        tbody.innerHTML = orders.map(o => `
-            <tr>
-                <td><strong>${o.orderNumber}</strong></td>
-                <td>${o.customer?.firstName || 'Guest'} ${o.customer?.lastName || ''}</td>
-                <td>${o.items?.length || 0} items</td>
-                <td>$${(o.totals?.total || 0).toFixed(2)}</td>
-                <td><span class="status-badge ${o.status || 'pending'}">${o.status || 'Pending'}</span></td>
-                <td>${new Date(o.date).toLocaleDateString()}</td>
-            </tr>
-        `).join('');
-    }
-
-    // ─── UPDATE ANALYTICS ───
-    function updateAnalytics() {
-        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
-        const totalSales = orders.length;
-        const revenue = orders.reduce((sum, o) => sum + (o.totals?.total || 0), 0);
-        
-        document.getElementById('analyticsViews').textContent = (totalSales * 50 + 100);
-        document.getElementById('analyticsSales').textContent = totalSales;
-        document.getElementById('analyticsConversion').textContent = totalSales > 0 ? '2.4%' : '0%';
-        document.getElementById('analyticsRevenue').textContent = '$' + revenue.toFixed(0);
-    }
-
-    // ─── SHOW SELLER TAB ───
-    function showSellerTab(tab) {
-        document.querySelectorAll('.seller-tabs button').forEach(b => b.classList.remove('active'));
-        document.querySelector(`.seller-tabs button[onclick="showSellerTab('${tab}')"]`).classList.add('active');
-        
-        document.querySelectorAll('#sellerContent > div').forEach(d => d.style.display = 'none');
-        document.getElementById('seller-' + tab).style.display = 'block';
-    }
-
-    // ─── OPEN ADD PRODUCT ───
-    function openAddProduct() {
-        editingProductId = null;
-        document.getElementById('addProductModal').style.display = 'flex';
-        document.getElementById('addProductForm').reset();
-        document.getElementById('addProductForm').querySelector('.btn-submit').textContent = '<i class="fa-regular fa-plus"></i> Add Product';
-    }
-
-    // ─── CLOSE ADD PRODUCT ───
-    function closeAddProduct() {
-        document.getElementById('addProductModal').style.display = 'none';
-    }
-
-    // ─── ADD / UPDATE PRODUCT ───
-    document.getElementById('addProductForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
+// ─── UPDATE SELLER STATS ───
+async function updateSellerStats() {
+    document.getElementById('sellerProducts').textContent = sellerProducts.length || 0;
+    
+    // Get orders from Firestore and localStorage
+    let orders = [];
+    try {
         const user = getCurrentUser();
-        if (!user) return;
-        
-        const submitBtn = this.querySelector('.btn-submit');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Saving...';
-        
-        const productData = {
-            title: document.getElementById('newProductTitle').value,
-            brand: document.getElementById('newProductBrand').value || '',
-            price: parseFloat(document.getElementById('newProductPrice').value) || 0,
-            old_price: parseFloat(document.getElementById('newProductOldPrice').value) || null,
-            moq: parseInt(document.getElementById('newProductMoq').value) || 1,
-            stock: parseInt(document.getElementById('newProductStock').value) || 100,
-            category: document.getElementById('newProductCategory').value,
-            image_url: document.getElementById('newProductImage').value || '',
-            description: document.getElementById('newProductDescription').value || '',
-            supplier_id: user.id,
-            status: 'pending'
-        };
-
-        try {
-            let response;
-            if (editingProductId) {
-                // Update existing product
-                response = await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${editingProductId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(productData)
-                });
-            } else {
-                // Add new product
-                response = await fetch(`${SUPABASE_URL}/rest/v1/products`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(productData)
-                });
-            }
-
-            if (response.ok) {
-                showToast(editingProductId ? '✅ Product updated!' : '✅ Product added!', 'success');
-                closeAddProduct();
-                await loadSellerProducts();
-                await updateSellerStats();
-            } else {
-                const error = await response.text();
-                showToast('❌ Failed to save product: ' + error, 'error');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showToast('❌ Error saving product', 'error');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = editingProductId ? '<i class="fa-regular fa-floppy-disk"></i> Update Product' : '<i class="fa-regular fa-plus"></i> Add Product';
-        }
-    });
-
-    // ─── EDIT PRODUCT ───
-    async function editProduct(id) {
-        const product = sellerProducts.find(p => p.id === id);
-        if (!product) return;
-        
-        editingProductId = id;
-        document.getElementById('newProductTitle').value = product.title || '';
-        document.getElementById('newProductBrand').value = product.brand || '';
-        document.getElementById('newProductPrice').value = product.price || '';
-        document.getElementById('newProductOldPrice').value = product.old_price || '';
-        document.getElementById('newProductMoq').value = product.moq || 1;
-        document.getElementById('newProductStock').value = product.stock || 0;
-        document.getElementById('newProductCategory').value = product.category || 'electronics';
-        document.getElementById('newProductImage').value = product.image_url || '';
-        document.getElementById('newProductDescription').value = product.description || '';
-        
-        document.getElementById('addProductModal').style.display = 'flex';
-        document.getElementById('addProductForm').querySelector('.btn-submit').innerHTML = '<i class="fa-regular fa-floppy-disk"></i> Update Product';
-    }
-
-    // ─── DELETE PRODUCT ───
-    async function deleteProduct(id) {
-        if (!confirm('Are you sure you want to delete this product?')) return;
-        
-        try {
-            await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                }
+        if (user) {
+            const snapshot = await db.collection('orders')
+                .where('seller_id', '==', user.id)
+                .get();
+            snapshot.forEach(doc => {
+                orders.push({ ...doc.data() });
             });
-            showToast('🗑️ Product deleted', 'info');
-            await loadSellerProducts();
-            await updateSellerStats();
-        } catch (error) {
-            showToast('❌ Error deleting product', 'error');
         }
+    } catch (e) {}
+    
+    const localOrders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+    const localQuotes = JSON.parse(localStorage.getItem('pse_quotes') || '[]');
+    const allOrders = [...orders, ...localOrders, ...localQuotes];
+    
+    document.getElementById('sellerOrders').textContent = allOrders.length;
+    const revenue = allOrders.reduce((sum, o) => sum + (o.totals?.total || 0), 0);
+    document.getElementById('sellerRevenue').textContent = '$' + revenue.toFixed(0);
+}
+
+// ─── LOAD SELLER ORDERS ───
+async function loadSellerOrders() {
+    let orders = [];
+    try {
+        const user = getCurrentUser();
+        if (user) {
+            const snapshot = await db.collection('orders')
+                .where('seller_id', '==', user.id)
+                .get();
+            snapshot.forEach(doc => {
+                orders.push({ id: doc.id, ...doc.data() });
+            });
+        }
+    } catch (e) {}
+    
+    const localOrders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+    const localQuotes = JSON.parse(localStorage.getItem('pse_quotes') || '[]');
+    const allOrders = [...orders, ...localOrders, ...localQuotes];
+    
+    const tbody = document.getElementById('sellerOrderBody');
+    if (allOrders.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center; color:#6a889a; padding:2rem;">
+                    No orders yet.
+                </td>
+            </tr>
+        `;
+        return;
     }
 
-    // ─── INIT ───
-    document.addEventListener('DOMContentLoaded', function() {
-        loadSellerData();
-    });
+    tbody.innerHTML = allOrders.map(o => `
+        <tr>
+            <td><strong>${o.orderNumber || o.quoteNumber || 'N/A'}</strong></td>
+            <td>${o.customer?.firstName || 'Guest'} ${o.customer?.lastName || ''}</td>
+            <td>${o.items?.length || 0} items</td>
+            <td>$${(o.totals?.total || 0).toFixed(2)}</td>
+            <td><span class="status-badge ${o.status || 'pending'}">${o.status || 'Pending'}</span></td>
+            <td>${new Date(o.date || o.created_at || Date.now()).toLocaleDateString()}</td>
+        </tr>
+    `).join('');
+}
+
+// ─── UPDATE ANALYTICS ───
+function updateAnalytics() {
+    const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+    const totalSales = orders.length;
+    const revenue = orders.reduce((sum, o) => sum + (o.totals?.total || 0), 0);
+    
+    document.getElementById('analyticsViews').textContent = (totalSales * 50 + 100);
+    document.getElementById('analyticsSales').textContent = totalSales;
+    document.getElementById('analyticsConversion').textContent = totalSales > 0 ? '2.4%' : '0%';
+    document.getElementById('analyticsRevenue').textContent = '$' + revenue.toFixed(0);
+}
+
+// ─── SELLER SETTINGS ───
+function loadSellerSettings() {
+    try {
+        const settings = JSON.parse(localStorage.getItem('pse_seller_settings'));
+        if (settings) {
+            document.getElementById('storeName').value = settings.storeName || '';
+            document.getElementById('storeDescription').value = settings.storeDescription || '';
+            document.getElementById('storeCategory').value = settings.storeCategory || '';
+        }
+    } catch (e) {}
+}
+
+function saveSellerSettings() {
+    const settings = {
+        storeName: document.getElementById('storeName').value,
+        storeDescription: document.getElementById('storeDescription').value,
+        storeCategory: document.getElementById('storeCategory').value
+    };
+    localStorage.setItem('pse_seller_settings', JSON.stringify(settings));
+    showToast('✅ Store settings saved!', 'success');
+}
+window.saveSellerSettings = saveSellerSettings;
+
+// ─── SHOW SELLER TAB ───
+function showSellerTab(tab) {
+    document.querySelectorAll('.seller-tabs button').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.seller-tabs button[onclick="showSellerTab('${tab}')"]`)?.classList.add('active');
+    
+    document.querySelectorAll('#sellerContent > div').forEach(d => d.style.display = 'none');
+    const target = document.getElementById('seller-' + tab);
+    if (target) target.style.display = 'block';
+    
+    if (tab === 'settings') loadSellerSettings();
+}
+window.showSellerTab = showSellerTab;
+
+// ─── OPEN ADD PRODUCT ───
+function openAddProduct() {
+    editingProductId = null;
+    document.getElementById('addProductModal').style.display = 'flex';
+    document.getElementById('addProductForm').reset();
+    document.querySelector('#addProductForm .btn-submit').innerHTML = '<i class="fa-regular fa-plus"></i> Add Product';
+}
+window.openAddProduct = openAddProduct;
+
+// ─── CLOSE ADD PRODUCT ───
+function closeAddProduct() {
+    document.getElementById('addProductModal').style.display = 'none';
+}
+window.closeAddProduct = closeAddProduct;
+
+// ─── ADD / UPDATE PRODUCT ───
+document.getElementById('addProductForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const user = getCurrentUser();
+    if (!user) return;
+    
+    const submitBtn = this.querySelector('.btn-submit');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Saving...';
+    
+    const productData = {
+        title: document.getElementById('newProductTitle').value,
+        brand: document.getElementById('newProductBrand').value || '',
+        price: parseFloat(document.getElementById('newProductPrice').value) || 0,
+        old_price: parseFloat(document.getElementById('newProductOldPrice').value) || null,
+        moq: parseInt(document.getElementById('newProductMoq').value) || 1,
+        stock: parseInt(document.getElementById('newProductStock').value) || 100,
+        category: document.getElementById('newProductCategory').value,
+        image_url: document.getElementById('newProductImage').value || '',
+        description: document.getElementById('newProductDescription').value || '',
+        supplier_id: user.id,
+        status: 'pending',
+        updated_at: new Date().toISOString()
+    };
+
+    try {
+        if (editingProductId) {
+            await db.collection('products').doc(editingProductId).update(productData);
+            showToast('✅ Product updated!', 'success');
+        } else {
+            productData.created_at = new Date().toISOString();
+            await db.collection('products').add(productData);
+            showToast('✅ Product added!', 'success');
+        }
+        
+        closeAddProduct();
+        await loadSellerProducts();
+        await updateSellerStats();
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('❌ Error saving product', 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = editingProductId ? '<i class="fa-regular fa-floppy-disk"></i> Update Product' : '<i class="fa-regular fa-plus"></i> Add Product';
+    }
+});
+
+// ─── EDIT PRODUCT ───
+function editProduct(id) {
+    const product = sellerProducts.find(p => p.id === id);
+    if (!product) return;
+    
+    editingProductId = id;
+    document.getElementById('newProductTitle').value = product.title || '';
+    document.getElementById('newProductBrand').value = product.brand || '';
+    document.getElementById('newProductPrice').value = product.price || '';
+    document.getElementById('newProductOldPrice').value = product.old_price || '';
+    document.getElementById('newProductMoq').value = product.moq || 1;
+    document.getElementById('newProductStock').value = product.stock || 0;
+    document.getElementById('newProductCategory').value = product.category || 'electronics';
+    document.getElementById('newProductImage').value = product.image_url || '';
+    document.getElementById('newProductDescription').value = product.description || '';
+    
+    document.getElementById('addProductModal').style.display = 'flex';
+    document.querySelector('#addProductForm .btn-submit').innerHTML = '<i class="fa-regular fa-floppy-disk"></i> Update Product';
+}
+window.editProduct = editProduct;
+
+// ─── DELETE PRODUCT ───
+async function deleteProduct(id) {
+    if (!confirm('Are you sure you want to delete this product?')) return;
+    
+    try {
+        // Delete images from Supabase if they exist
+        const product = sellerProducts.find(p => p.id === id);
+        if (product && product.images) {
+            for (const imageUrl of product.images) {
+                try {
+                    await window.deleteImageFromStorage(imageUrl);
+                } catch (e) {
+                    console.log('Could not delete image:', e);
+                }
+            }
+        }
+        
+        await db.collection('products').doc(id).delete();
+        showToast('🗑️ Product deleted', 'info');
+        await loadSellerProducts();
+        await updateSellerStats();
+    } catch (error) {
+        showToast('❌ Error deleting product', 'error');
+    }
+}
+window.deleteProduct = deleteProduct;
+
+// ─── REAL-TIME LISTENERS ───
+function setupSellerListeners() {
+    const user = getCurrentUser();
+    if (!user) return;
+    
+    db.collection('products')
+        .where('supplier_id', '==', user.id)
+        .onSnapshot((snapshot) => {
+            sellerProducts = [];
+            snapshot.forEach(doc => {
+                sellerProducts.push({ id: doc.id, ...doc.data() });
+            });
+            renderSellerProducts();
+            updateSellerStats();
+        }, (error) => {
+            console.error('Products listener error:', error);
+        });
+}
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', function() {
+    if (!window.protectSeller()) return;
+    loadSellerData();
+    setupSellerListeners();
+});
 </script>
 
 </body>

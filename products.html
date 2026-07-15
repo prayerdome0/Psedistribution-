@@ -6,15 +6,21 @@
     <title>All Products - PSE Wholesale</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+    
     <style>
-        /* Products page specific styles */
         .products-layout {
             display: grid;
             grid-template-columns: 260px 1fr;
             gap: 2rem;
             margin: 1.5rem 0;
         }
-
         .filters {
             background: #fff;
             border-radius: 1.2rem;
@@ -71,7 +77,6 @@
             cursor: pointer;
             text-decoration: underline;
         }
-
         .pagination {
             display: flex;
             gap: 0.5rem;
@@ -99,7 +104,6 @@
             color: #fff;
             border-color: #0b2a3b;
         }
-
         .sort-bar {
             display: flex;
             justify-content: space-between;
@@ -181,8 +185,8 @@
 <header class="header">
     <div class="container">
         <a href="index.html" class="logo">
-    <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
-</a>
+            <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+        </a>
         <div class="search-bar">
             <select id="categoryFilter"><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
             <input type="text" id="searchInput" placeholder="Search wholesale products..." onkeyup="searchProducts(event)" />
@@ -295,7 +299,6 @@
 
         <!-- Product Grid Area -->
         <div>
-            <!-- Sort Bar -->
             <div class="sort-bar">
                 <span style="font-size:0.85rem; color:#2c5a6b;" id="productCount">Showing all products</span>
                 <select id="sortSelect" onchange="applyFilters()">
@@ -307,7 +310,6 @@
                 </select>
             </div>
 
-            <!-- Product Grid -->
             <div class="product-grid" id="productGrid">
                 <div class="loading-spinner">
                     <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;"></i>
@@ -315,7 +317,6 @@
                 </div>
             </div>
 
-            <!-- Pagination -->
             <div class="pagination" id="pagination">
                 <a onclick="changePage('prev')">&laquo;</a>
                 <a class="active" onclick="changePage(1)">1</a>
@@ -388,169 +389,158 @@
     </div>
 </footer>
 
-<!-- ─── SCRIPTS ─── -->
+<!-- ─── MAIN JS ─── -->
 <script src="main.js"></script>
+
 <script>
-    // Products page specific functions
-    let currentPage = 1;
-    const productsPerPage = 8;
-    let filteredProducts = [];
+// Products page specific functions
+let currentPage = 1;
+const productsPerPage = 8;
+let filteredProducts = [];
 
-    async function applyFilters() {
-        // Get selected categories
-        const categoryChecks = document.querySelectorAll('.filter-group input[type="checkbox"]');
-        const selectedCategories = [];
-        const selectedRatings = [];
-        const selectedTypes = [];
-        
-        categoryChecks.forEach(cb => {
-            if (cb.checked) {
-                const val = cb.value;
-                if (['electronics','fashion','home','grocery','beauty','sports','office','baby','automotive','books','pets','industrial','kitchen'].includes(val)) {
-                    selectedCategories.push(val);
-                } else if (['5','4','3'].includes(val)) {
-                    selectedRatings.push(parseInt(val));
-                } else if (['Wholesale','Bulk'].includes(val)) {
-                    selectedTypes.push(val);
-                }
+async function applyFilters() {
+    const categoryChecks = document.querySelectorAll('.filter-group input[type="checkbox"]');
+    const selectedCategories = [];
+    const selectedRatings = [];
+    const selectedTypes = [];
+    
+    categoryChecks.forEach(cb => {
+        if (cb.checked) {
+            const val = cb.value;
+            if (['electronics','fashion','home','grocery','beauty','sports','office','baby','automotive','books','pets','industrial','kitchen'].includes(val)) {
+                selectedCategories.push(val);
+            } else if (['5','4','3'].includes(val)) {
+                selectedRatings.push(parseInt(val));
+            } else if (['Wholesale','Bulk'].includes(val)) {
+                selectedTypes.push(val);
             }
-        });
-
-        // Get price range
-        const priceMin = parseFloat(document.getElementById('priceMin').value) || 0;
-        const priceMax = parseFloat(document.getElementById('priceMax').value) || 999;
-
-        // Get MOQ
-        const moqRadio = document.querySelector('input[name="moq"]:checked');
-        const moqValue = moqRadio ? parseInt(moqRadio.value) : 0;
-
-        // Get sort
-        const sort = document.getElementById('sortSelect').value;
-
-        // Fetch products from Supabase
-        let products = await fetchProducts();
-
-        // Category filter
-        if (selectedCategories.length > 0) {
-            products = products.filter(p => selectedCategories.includes(p.category));
         }
-
-        // Price filter
-        products = products.filter(p => p.price >= priceMin && p.price <= priceMax);
-
-        // MOQ filter
-        if (moqValue && moqValue !== 'any') {
-            products = products.filter(p => (p.moq || 0) >= moqValue);
-        }
-
-        // Rating filter
-        if (selectedRatings.length > 0) {
-            const minRating = Math.min(...selectedRatings);
-            products = products.filter(p => (p.rating || 0) >= minRating);
-        }
-
-        // Type filter
-        if (selectedTypes.length > 0) {
-            products = products.filter(p => selectedTypes.includes(p.type));
-        }
-
-        // Sort
-        switch(sort) {
-            case 'price-asc':
-                products.sort((a,b) => a.price - b.price);
-                break;
-            case 'price-desc':
-                products.sort((a,b) => b.price - a.price);
-                break;
-            case 'rating':
-                products.sort((a,b) => (b.rating || 0) - (a.rating || 0));
-                break;
-            case 'newest':
-                products.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-                break;
-            default:
-                break;
-        }
-
-        filteredProducts = products;
-        document.getElementById('productCount').textContent = `Showing ${products.length} products`;
-        renderProductsPage(1);
-    }
-
-    function renderProductsPage(page) {
-        const start = (page - 1) * productsPerPage;
-        const end = start + productsPerPage;
-        const pageProducts = filteredProducts.slice(start, end);
-        
-        const grid = document.getElementById('productGrid');
-        if (pageProducts.length === 0) {
-            grid.innerHTML = `
-                <div style="grid-column:1/-1; text-align:center; padding:2rem; color:#6a889a;">
-                    <i class="fa-regular fa-box" style="font-size:2rem; color:#1e7b6b;"></i>
-                    <p style="margin-top:0.5rem;">No products match your filters.</p>
-                    <button onclick="clearFilters()" style="margin-top:1rem; background:#1e7b6b; color:#fff; border:none; padding:0.5rem 1.5rem; border-radius:30px; cursor:pointer;">
-                        Clear Filters
-                    </button>
-                </div>
-            `;
-            return;
-        }
-
-        renderProducts(pageProducts, 'productGrid');
-        updatePagination(page);
-    }
-
-    function updatePagination(page) {
-        const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-        const pagination = document.getElementById('pagination');
-        if (totalPages <= 1) {
-            pagination.innerHTML = '';
-            return;
-        }
-
-        let html = `<a onclick="changePage('prev')">&laquo;</a>`;
-        for (let i = 1; i <= Math.min(totalPages, 5); i++) {
-            html += `<a class="${i === page ? 'active' : ''}" onclick="changePage(${i})">${i}</a>`;
-        }
-        if (totalPages > 5) {
-            html += `<span style="padding:0.4rem 0.4rem;">...</span>`;
-            html += `<a onclick="changePage(${totalPages})">${totalPages}</a>`;
-        }
-        html += `<a onclick="changePage('next')">&raquo;</a>`;
-        pagination.innerHTML = html;
-        currentPage = page;
-    }
-
-    function changePage(direction) {
-        const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-        let newPage = currentPage;
-        if (direction === 'prev') {
-            newPage = Math.max(1, currentPage - 1);
-        } else if (direction === 'next') {
-            newPage = Math.min(totalPages, currentPage + 1);
-        } else if (typeof direction === 'number') {
-            newPage = direction;
-        }
-        if (newPage !== currentPage) {
-            renderProductsPage(newPage);
-        }
-    }
-
-    function clearFilters() {
-        document.querySelectorAll('.filter-group input[type="checkbox"]').forEach(cb => cb.checked = false);
-        document.querySelector('input[name="moq"][value="any"]').checked = true;
-        document.getElementById('priceMin').value = 0;
-        document.getElementById('priceMax').value = 50;
-        document.getElementById('sortSelect').value = 'default';
-        applyFilters();
-    }
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(() => {
-            applyFilters();
-        }, 100);
     });
+
+    const priceMin = parseFloat(document.getElementById('priceMin').value) || 0;
+    const priceMax = parseFloat(document.getElementById('priceMax').value) || 999;
+
+    const moqRadio = document.querySelector('input[name="moq"]:checked');
+    const moqValue = moqRadio ? parseInt(moqRadio.value) : 0;
+
+    const sort = document.getElementById('sortSelect').value;
+
+    let products = await fetchProducts();
+
+    if (selectedCategories.length > 0) {
+        products = products.filter(p => selectedCategories.includes(p.category));
+    }
+
+    products = products.filter(p => p.price >= priceMin && p.price <= priceMax);
+
+    if (moqValue && moqValue !== 'any') {
+        products = products.filter(p => (p.moq || 0) >= moqValue);
+    }
+
+    if (selectedRatings.length > 0) {
+        const minRating = Math.min(...selectedRatings);
+        products = products.filter(p => (p.rating || 0) >= minRating);
+    }
+
+    if (selectedTypes.length > 0) {
+        products = products.filter(p => selectedTypes.includes(p.type));
+    }
+
+    switch(sort) {
+        case 'price-asc':
+            products.sort((a,b) => a.price - b.price);
+            break;
+        case 'price-desc':
+            products.sort((a,b) => b.price - a.price);
+            break;
+        case 'rating':
+            products.sort((a,b) => (b.rating || 0) - (a.rating || 0));
+            break;
+        case 'newest':
+            products.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+            break;
+        default:
+            break;
+    }
+
+    filteredProducts = products;
+    document.getElementById('productCount').textContent = `Showing ${products.length} products`;
+    renderProductsPage(1);
+}
+
+function renderProductsPage(page) {
+    const start = (page - 1) * productsPerPage;
+    const end = start + productsPerPage;
+    const pageProducts = filteredProducts.slice(start, end);
+    
+    const grid = document.getElementById('productGrid');
+    if (pageProducts.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:2rem; color:#6a889a;">
+                <i class="fa-regular fa-box" style="font-size:2rem; color:#1e7b6b;"></i>
+                <p style="margin-top:0.5rem;">No products match your filters.</p>
+                <button onclick="clearFilters()" style="margin-top:1rem; background:#1e7b6b; color:#fff; border:none; padding:0.5rem 1.5rem; border-radius:30px; cursor:pointer;">
+                    Clear Filters
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    renderProducts(pageProducts, 'productGrid');
+    updatePagination(page);
+}
+
+function updatePagination(page) {
+    const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+    const pagination = document.getElementById('pagination');
+    if (totalPages <= 1) {
+        pagination.innerHTML = '';
+        return;
+    }
+
+    let html = `<a onclick="changePage('prev')">&laquo;</a>`;
+    for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+        html += `<a class="${i === page ? 'active' : ''}" onclick="changePage(${i})">${i}</a>`;
+    }
+    if (totalPages > 5) {
+        html += `<span style="padding:0.4rem 0.4rem;">...</span>`;
+        html += `<a onclick="changePage(${totalPages})">${totalPages}</a>`;
+    }
+    html += `<a onclick="changePage('next')">&raquo;</a>`;
+    pagination.innerHTML = html;
+    currentPage = page;
+}
+
+function changePage(direction) {
+    const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+    let newPage = currentPage;
+    if (direction === 'prev') {
+        newPage = Math.max(1, currentPage - 1);
+    } else if (direction === 'next') {
+        newPage = Math.min(totalPages, currentPage + 1);
+    } else if (typeof direction === 'number') {
+        newPage = direction;
+    }
+    if (newPage !== currentPage) {
+        renderProductsPage(newPage);
+    }
+}
+
+function clearFilters() {
+    document.querySelectorAll('.filter-group input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.querySelector('input[name="moq"][value="any"]').checked = true;
+    document.getElementById('priceMin').value = 0;
+    document.getElementById('priceMax').value = 50;
+    document.getElementById('sortSelect').value = 'default';
+    applyFilters();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        applyFilters();
+    }, 100);
+});
 </script>
 
 </body>

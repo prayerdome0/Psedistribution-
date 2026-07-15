@@ -6,6 +6,14 @@
     <title>Checkout - PSE Wholesale</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+    
     <style>
         .checkout-layout {
             display: grid;
@@ -548,276 +556,248 @@
     </div>
 </footer>
 
-<!-- ─── SCRIPTS ─── -->
+<!-- ─── MAIN JS ─── -->
 <script src="main.js"></script>
+
 <script>
-    let selectedPayment = 'whatsapp';
+let selectedPayment = 'whatsapp';
 
-    function selectPayment(el) {
-        document.querySelectorAll('.payment-methods .method').forEach(m => m.classList.remove('active'));
-        el.classList.add('active');
-        selectedPayment = el.dataset.method;
-        
-        const cardDetails = document.getElementById('cardDetails');
-        if (selectedPayment === 'card') {
-            cardDetails.style.display = 'block';
-        } else {
-            cardDetails.style.display = 'none';
+function selectPayment(el) {
+    document.querySelectorAll('.payment-methods .method').forEach(m => m.classList.remove('active'));
+    el.classList.add('active');
+    selectedPayment = el.dataset.method;
+    
+    const cardDetails = document.getElementById('cardDetails');
+    if (selectedPayment === 'card') {
+        cardDetails.style.display = 'block';
+    } else {
+        cardDetails.style.display = 'none';
+    }
+}
+
+// ─── LOAD CHECKOUT SUMMARY ───
+async function loadCheckoutSummary() {
+    const user = getCurrentUser();
+    let cart = [];
+    
+    if (user) {
+        const cartItems = await getCartItems();
+        for (const item of cartItems) {
+            const product = await fetchProductById(item.product_id);
+            if (product) {
+                cart.push({
+                    id: item.id,
+                    product_id: item.product_id,
+                    title: product.title,
+                    price: product.price,
+                    old_price: product.old_price,
+                    image: product.image_url,
+                    brand: product.brand,
+                    moq: product.moq,
+                    quantity: item.quantity || 1,
+                    type: product.type || 'Wholesale'
+                });
+            }
         }
+    } else {
+        cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
     }
 
-    // ─── LOAD CHECKOUT SUMMARY ───
-    async function loadCheckoutSummary() {
-        const user = getCurrentUser();
-        let cart = [];
-        
-        if (user) {
-            // Load from Supabase
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/cart?user_id=eq.${user.id}&select=*,products(*)`, {
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    }
-                });
-                const data = await response.json();
-                cart = data.map(item => ({
-                    id: item.product_id,
-                    title: item.products?.title || 'Product',
-                    price: item.products?.price || 0,
-                    old_price: item.products?.old_price || null,
-                    quantity: item.quantity || 1,
-                    image_url: item.products?.image_url || '',
-                    moq: item.products?.moq || 1,
-                    type: item.products?.type || 'Wholesale'
-                }));
-            } catch (error) {
-                console.error('Error loading cart:', error);
-            }
-        } else {
-            // Load from localStorage
-            cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
-        }
+    const container = document.getElementById('orderItems');
 
-        const container = document.getElementById('orderItems');
-
-        if (cart.length === 0) {
-            container.innerHTML = `
-                <div style="text-align:center; padding:1rem 0; color:#6a889a;">
-                    <i class="fa-regular fa-cart-shopping" style="font-size:2rem;"></i>
-                    <p style="margin-top:0.5rem;">Your cart is empty</p>
-                    <a href="products.html" style="color:#1e7b6b; font-size:0.8rem;">Browse products</a>
-                </div>
-            `;
-            updateTotals(cart);
-            return;
-        }
-
-        container.innerHTML = cart.map(item => `
-            <div class="order-item">
-                <div class="item-image">
-                    ${item.image_url ? `<img src="${item.image_url}" alt="${item.title}" />` : `<i class="fa-solid fa-box"></i>`}
-                </div>
-                <div class="item-info">
-                    <div class="title">${item.title}</div>
-                    <div class="qty">Qty: ${item.quantity || 1}</div>
-                </div>
-                <div class="item-price">$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</div>
+    if (cart.length === 0) {
+        container.innerHTML = `
+            <div style="text-align:center; padding:1rem 0; color:#6a889a;">
+                <i class="fa-regular fa-cart-shopping" style="font-size:2rem;"></i>
+                <p style="margin-top:0.5rem;">Your cart is empty</p>
+                <a href="products.html" style="color:#1e7b6b; font-size:0.8rem;">Browse products</a>
             </div>
-        `).join('');
-
+        `;
         updateTotals(cart);
+        return;
     }
 
-    function updateTotals(cart) {
-        let subtotal = cart.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
-        let discount = 0;
-        
-        cart.forEach(item => {
-            if (item.old_price && item.old_price > item.price) {
-                discount += (item.old_price - item.price) * (item.quantity || 1);
-            }
-        });
+    container.innerHTML = cart.map(item => `
+        <div class="order-item">
+            <div class="item-image">
+                ${item.image ? `<img src="${item.image}" alt="${item.title}" />` : `<i class="fa-solid fa-box"></i>`}
+            </div>
+            <div class="item-info">
+                <div class="title">${item.title}</div>
+                <div class="qty">Qty: ${item.quantity || 1}</div>
+            </div>
+            <div class="item-price">$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</div>
+        </div>
+    `).join('');
 
-        const shipping = subtotal >= 250 ? 0 : 15;
-        const tax = (subtotal - discount) * 0.08;
-        const total = subtotal - discount + shipping + tax;
+    updateTotals(cart);
+}
 
-        document.getElementById('checkoutSubtotal').textContent = `$${subtotal.toFixed(2)}`;
-        document.getElementById('checkoutDiscount').textContent = `−$${discount.toFixed(2)}`;
-        document.getElementById('checkoutShipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
-        document.getElementById('checkoutTax').textContent = `$${tax.toFixed(2)}`;
-        document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
-    }
-
-    // ─── PLACE ORDER / SEND WHATSAPP QUOTE ───
-    async function placeOrder() {
-        // Validate required fields
-        const firstName = document.getElementById('firstName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        const address = document.getElementById('address').value.trim();
-        const city = document.getElementById('city').value.trim();
-        const state = document.getElementById('state').value;
-        const zip = document.getElementById('zip').value.trim();
-        const notes = document.getElementById('notes').value.trim();
-
-        if (!firstName || !lastName || !email || !address || !city || !state || !zip) {
-            showToast('❌ Please fill in all required fields', 'error');
-            return;
+function updateTotals(cart) {
+    let subtotal = cart.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+    let discount = 0;
+    
+    cart.forEach(item => {
+        if (item.old_price && item.old_price > item.price) {
+            discount += (item.old_price - item.price) * (item.quantity || 1);
         }
-
-        // Get cart from Supabase if logged in, else localStorage
-        const user = getCurrentUser();
-        let cart = [];
-        
-        if (user) {
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/cart?user_id=eq.${user.id}&select=*,products(*)`, {
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    }
-                });
-                const data = await response.json();
-                cart = data.map(item => ({
-                    id: item.product_id,
-                    title: item.products?.title || 'Product',
-                    price: item.products?.price || 0,
-                    old_price: item.products?.old_price || null,
-                    quantity: item.quantity || 1,
-                    image_url: item.products?.image_url || '',
-                    moq: item.products?.moq || 1,
-                    type: item.products?.type || 'Wholesale'
-                }));
-            } catch (error) {
-                console.error('Error loading cart:', error);
-            }
-        } else {
-            cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
-        }
-
-        if (cart.length === 0) {
-            showToast('❌ Your cart is empty', 'error');
-            return;
-        }
-
-        // Generate quote number
-        const quoteNumber = 'QTE-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 5).toUpperCase();
-        
-        // Calculate totals
-        let subtotal = cart.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
-        let discount = 0;
-        cart.forEach(item => {
-            if (item.old_price && item.old_price > item.price) {
-                discount += (item.old_price - item.price) * (item.quantity || 1);
-            }
-        });
-        const shipping = subtotal >= 250 ? 0 : 15;
-        const tax = (subtotal - discount) * 0.08;
-        const total = subtotal - discount + shipping + tax;
-
-        // ─── BUILD WHATSAPP MESSAGE ───
-        const phoneNumber = '19099384682'; // Your WhatsApp number
-        let message = '📋 *NEW QUOTE REQUEST - PSE Wholesale*%0A';
-        message += `📄 *Quote #:* ${quoteNumber}%0A`;
-        message += `📅 *Date:* ${new Date().toLocaleString()}%0A%0A`;
-        
-        message += '*👤 Customer Details*%0A';
-        message += `Name: ${firstName} ${lastName}%0A`;
-        message += `Email: ${email}%0A`;
-        message += `Phone: ${phone || 'Not provided'}%0A`;
-        message += `Address: ${address}, ${city}, ${state} ${zip}%0A%0A`;
-        
-        message += '*📦 Items Requested*%0A';
-        cart.forEach((item, index) => {
-            const qty = item.quantity || 1;
-            const price = item.price || 0;
-            const totalItem = price * qty;
-            message += `${index + 1}. ${item.title}%0A`;
-            message += `   Qty: ${qty} x $${price.toFixed(2)} = $${totalItem.toFixed(2)}%0A`;
-            if (item.moq) message += `   MOQ: ${item.moq} units%0A`;
-            message += `   Type: ${item.type || 'Wholesale'}%0A`;
-        });
-        
-        message += `%0A*💰 Quote Summary*%0A`;
-        message += `Subtotal: $${subtotal.toFixed(2)}%0A`;
-        message += `Discount: -$${discount.toFixed(2)}%0A`;
-        message += `Shipping: ${shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2)}%0A`;
-        message += `Tax (8%): $${tax.toFixed(2)}%0A`;
-        message += `*TOTAL: $${total.toFixed(2)}*%0A%0A`;
-        
-        if (notes) {
-            message += `📝 *Notes:* ${notes}%0A%0A`;
-        }
-        
-        message += `📌 *Payment Method:* ${selectedPayment.toUpperCase()}%0A%0A`;
-        message += `✅ *Next Steps:*%0A`;
-        message += `1. We will review your quote request%0A`;
-        message += `2. Confirm availability and pricing%0A`;
-        message += `3. Send you a formal invoice%0A`;
-        message += `4. Arrange delivery%0A%0A`;
-        
-        message += `🙏 *Thank you for choosing PSE Wholesale!*%0A`;
-        message += `📧 support@psewholesale.com%0A`;
-        message += `📞 +1 (800) 555-PSEW`;
-
-        // ─── SAVE QUOTE ───
-        const quotes = JSON.parse(localStorage.getItem('pse_quotes') || '[]');
-        const quote = {
-            id: 'QTE-' + Date.now().toString().slice(-6),
-            quoteNumber: quoteNumber,
-            date: new Date().toISOString(),
-            items: cart.map(item => ({ ...item })),
-            customer: { firstName, lastName, email, phone },
-            shipping: { address, city, state, zip },
-            totals: { subtotal, discount, shipping, tax, total },
-            paymentMethod: selectedPayment,
-            status: 'pending',
-            notes: notes,
-            source: 'website'
-        };
-
-        quotes.push(quote);
-        localStorage.setItem('pse_quotes', JSON.stringify(quotes));
-        
-        // ─── CLEAR CART ───
-        if (user) {
-            // Clear cart from Supabase
-            try {
-                await fetch(`${SUPABASE_URL}/rest/v1/cart?user_id=eq.${user.id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    }
-                });
-            } catch (error) {
-                console.error('Error clearing cart:', error);
-            }
-        } else {
-            localStorage.setItem('pse_cart', '[]');
-        }
-        loadCartCount();
-
-        // ─── OPEN WHATSAPP ───
-        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
-        window.open(whatsappUrl, '_blank');
-
-        showToast('✅ Quote sent! We will confirm shortly.', 'success');
-        
-        // ─── REDIRECT ───
-        setTimeout(() => {
-            window.location.href = `order-success.html?quote=${quoteNumber}`;
-        }, 2000);
-    }
-
-    // ─── INIT ───
-    document.addEventListener('DOMContentLoaded', function() {
-        loadCheckoutSummary();
-        loadCartCount();
     });
+
+    const shipping = subtotal >= 250 ? 0 : 15;
+    const tax = (subtotal - discount) * 0.08;
+    const total = subtotal - discount + shipping + tax;
+
+    document.getElementById('checkoutSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+    document.getElementById('checkoutDiscount').textContent = `−$${discount.toFixed(2)}`;
+    document.getElementById('checkoutShipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
+    document.getElementById('checkoutTax').textContent = `$${tax.toFixed(2)}`;
+    document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
+}
+
+// ─── PLACE ORDER ───
+async function placeOrder() {
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const city = document.getElementById('city').value.trim();
+    const state = document.getElementById('state').value;
+    const zip = document.getElementById('zip').value.trim();
+    const notes = document.getElementById('notes').value.trim();
+
+    if (!firstName || !lastName || !email || !address || !city || !state || !zip) {
+        showToast('❌ Please fill in all required fields', 'error');
+        return;
+    }
+
+    const user = getCurrentUser();
+    let cart = [];
+    
+    if (user) {
+        const cartItems = await getCartItems();
+        for (const item of cartItems) {
+            const product = await fetchProductById(item.product_id);
+            if (product) {
+                cart.push({
+                    id: item.id,
+                    product_id: item.product_id,
+                    title: product.title,
+                    price: product.price,
+                    old_price: product.old_price,
+                    quantity: item.quantity || 1,
+                    moq: product.moq,
+                    type: product.type || 'Wholesale'
+                });
+            }
+        }
+    } else {
+        cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
+    }
+
+    if (cart.length === 0) {
+        showToast('❌ Your cart is empty', 'error');
+        return;
+    }
+
+    const quoteNumber = 'QTE-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 5).toUpperCase();
+    
+    let subtotal = cart.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+    let discount = 0;
+    cart.forEach(item => {
+        if (item.old_price && item.old_price > item.price) {
+            discount += (item.old_price - item.price) * (item.quantity || 1);
+        }
+    });
+    const shipping = subtotal >= 250 ? 0 : 15;
+    const tax = (subtotal - discount) * 0.08;
+    const total = subtotal - discount + shipping + tax;
+
+    // ─── BUILD WHATSAPP MESSAGE ───
+    const phoneNumber = '19099384682';
+    let message = '📋 *NEW QUOTE REQUEST - PSE Wholesale*%0A';
+    message += `📄 *Quote #:* ${quoteNumber}%0A`;
+    message += `📅 *Date:* ${new Date().toLocaleString()}%0A%0A`;
+    
+    message += '*👤 Customer Details*%0A';
+    message += `Name: ${firstName} ${lastName}%0A`;
+    message += `Email: ${email}%0A`;
+    message += `Phone: ${phone || 'Not provided'}%0A`;
+    message += `Address: ${address}, ${city}, ${state} ${zip}%0A%0A`;
+    
+    message += '*📦 Items Requested*%0A';
+    cart.forEach((item, index) => {
+        const qty = item.quantity || 1;
+        const price = item.price || 0;
+        const totalItem = price * qty;
+        message += `${index + 1}. ${item.title}%0A`;
+        message += `   Qty: ${qty} x $${price.toFixed(2)} = $${totalItem.toFixed(2)}%0A`;
+        if (item.moq) message += `   MOQ: ${item.moq} units%0A`;
+        message += `   Type: ${item.type || 'Wholesale'}%0A`;
+    });
+    
+    message += `%0A*💰 Quote Summary*%0A`;
+    message += `Subtotal: $${subtotal.toFixed(2)}%0A`;
+    message += `Discount: -$${discount.toFixed(2)}%0A`;
+    message += `Shipping: ${shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2)}%0A`;
+    message += `Tax (8%): $${tax.toFixed(2)}%0A`;
+    message += `*TOTAL: $${total.toFixed(2)}*%0A%0A`;
+    
+    if (notes) {
+        message += `📝 *Notes:* ${notes}%0A%0A`;
+    }
+    
+    message += `📌 *Payment Method:* ${selectedPayment.toUpperCase()}%0A%0A`;
+    message += `✅ *Next Steps:*%0A`;
+    message += `1. We will review your quote request%0A`;
+    message += `2. Confirm availability and pricing%0A`;
+    message += `3. Send you a formal invoice%0A`;
+    message += `4. Arrange delivery%0A%0A`;
+    
+    message += `🙏 *Thank you for choosing PSE Wholesale!*%0A`;
+    message += `📧 support@psewholesale.com%0A`;
+    message += `📞 +1 (800) 555-PSEW`;
+
+    // ─── SAVE QUOTE ───
+    const quote = {
+        quoteNumber: quoteNumber,
+        date: new Date().toISOString(),
+        items: cart.map(item => ({ ...item })),
+        customer: { firstName, lastName, email, phone },
+        shipping: { address, city, state, zip },
+        totals: { subtotal, discount, shipping, tax, total },
+        paymentMethod: selectedPayment,
+        status: 'pending',
+        notes: notes,
+        source: 'website'
+    };
+
+    await saveOrder(quote);
+    
+    // ─── CLEAR CART ───
+    if (user) {
+        await clearCart();
+    } else {
+        localStorage.setItem('pse_cart', '[]');
+    }
+    loadCartCount();
+
+    // ─── OPEN WHATSAPP ───
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+
+    showToast('✅ Quote sent! We will confirm shortly.', 'success');
+    
+    setTimeout(() => {
+        window.location.href = `order-success.html?quote=${quoteNumber}`;
+    }, 2000);
+}
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', function() {
+    loadCheckoutSummary();
+    loadCartCount();
+});
 </script>
 
 </body>

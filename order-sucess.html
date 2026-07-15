@@ -6,6 +6,14 @@
     <title>Order Success - PSE Wholesale</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+    
     <style>
         .success-page {
             max-width: 650px;
@@ -266,13 +274,11 @@
         <h2>🎉 Thank You for Your Order!</h2>
         <p class="subtitle">Your quote/order has been received and is being processed.</p>
 
-        <!-- Order Number -->
         <div class="order-number-box">
             <div class="label">📋 Order / Quote Number</div>
             <div class="number" id="orderNumberDisplay">Loading...</div>
         </div>
 
-        <!-- Order Details -->
         <div class="order-details" id="orderDetails">
             <div style="display:flex; justify-content:space-between; font-weight:600; color:#0b2a3b; padding-bottom:0.3rem; border-bottom:1px solid #e9edf2;">
                 <span>Items</span>
@@ -286,7 +292,6 @@
             </div>
         </div>
 
-        <!-- Next Steps -->
         <div class="next-steps">
             <h4><i class="fa-regular fa-clock"></i> What Happens Next?</h4>
             <ul>
@@ -297,12 +302,10 @@
             </ul>
         </div>
 
-        <!-- WhatsApp Contact -->
         <a href="https://wa.me/19099384682" target="_blank" class="whatsapp-btn">
             <i class="fa-brands fa-whatsapp"></i> Contact us on WhatsApp
         </a>
 
-        <!-- Buttons -->
         <div class="btn-group">
             <a href="index.html" class="btn-primary-custom"><i class="fa-regular fa-house"></i> Continue Shopping</a>
             <a href="track-order.html" class="btn-outline-custom"><i class="fa-regular fa-truck"></i> Track Order</a>
@@ -375,69 +378,84 @@
     </div>
 </footer>
 
-<!-- ─── SCRIPTS ─── -->
+<!-- ─── MAIN JS ─── -->
 <script src="main.js"></script>
+
 <script>
-    // ─── LOAD ORDER DETAILS ───
-    function loadOrderDetails() {
-        const params = new URLSearchParams(window.location.search);
-        const orderNumber = params.get('order') || params.get('quote') || 'N/A';
-        
-        // Display order number
-        document.getElementById('orderNumberDisplay').textContent = orderNumber;
+// ─── LOAD ORDER DETAILS ───
+async function loadOrderDetails() {
+    const params = new URLSearchParams(window.location.search);
+    const orderNumber = params.get('order') || params.get('quote') || 'N/A';
+    
+    document.getElementById('orderNumberDisplay').textContent = orderNumber;
 
-        // Try to find order in localStorage
-        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
-        const quotes = JSON.parse(localStorage.getItem('pse_quotes') || '[]');
-        
-        let order = orders.find(o => o.orderNumber === orderNumber);
-        let isQuote = false;
-        
-        if (!order) {
-            order = quotes.find(q => q.quoteNumber === orderNumber);
-            isQuote = true;
-        }
-
-        const list = document.getElementById('orderItemsList');
-        const totalEl = document.getElementById('orderTotal');
-
-        if (order) {
-            // Display items
-            if (order.items && order.items.length > 0) {
-                list.innerHTML = order.items.map(item => `
-                    <div class="item">
-                        <span>${item.quantity || 1}x ${item.title}</span>
-                        <span>$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</span>
-                    </div>
-                `).join('');
-            } else {
-                list.innerHTML = `<p style="color:#6a889a; padding:0.5rem 0;">No items listed</p>`;
+    // Try to find order in localStorage
+    const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+    const quotes = JSON.parse(localStorage.getItem('pse_quotes') || '[]');
+    
+    let order = orders.find(o => o.orderNumber === orderNumber);
+    let isQuote = false;
+    
+    if (!order) {
+        order = quotes.find(q => q.quoteNumber === orderNumber);
+        isQuote = true;
+    }
+    
+    // If not found in localStorage, check Firestore
+    if (!order) {
+        try {
+            const user = getCurrentUser();
+            if (user) {
+                const snapshot = await db.collection('orders')
+                    .where('user_id', '==', user.id)
+                    .where('orderNumber', '==', orderNumber)
+                    .get();
+                
+                if (!snapshot.empty) {
+                    order = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+                }
             }
-
-            // Display total
-            const total = order.totals?.total || 0;
-            totalEl.textContent = `Total: $${total.toFixed(2)}`;
-            
-            // Update page title for quote vs order
-            if (isQuote) {
-                document.querySelector('.success-page h2').textContent = '📄 Quote Request Received!';
-                document.querySelector('.success-page .subtitle').textContent = 'Your quote request has been submitted. We\'ll get back to you shortly.';
-            }
-        } else {
-            // Order not found in localStorage - show generic details
-            list.innerHTML = `
-                <p style="color:#6a889a; padding:0.5rem 0;">Order details will be sent to your email.</p>
-                <p style="color:#6a889a; font-size:0.85rem;">Please check your email for confirmation.</p>
-            `;
-            totalEl.textContent = 'Total: Please check your email';
+        } catch (error) {
+            console.error('Error searching Firestore:', error);
         }
     }
 
-    // ─── INIT ───
-    document.addEventListener('DOMContentLoaded', function() {
-        loadOrderDetails();
-        loadCartCount();
-    });
+    const list = document.getElementById('orderItemsList');
+    const totalEl = document.getElementById('orderTotal');
+
+    if (order) {
+        if (order.items && order.items.length > 0) {
+            list.innerHTML = order.items.map(item => `
+                <div class="item">
+                    <span>${item.quantity || 1}x ${item.title}</span>
+                    <span>$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</span>
+                </div>
+            `).join('');
+        } else {
+            list.innerHTML = `<p style="color:#6a889a; padding:0.5rem 0;">No items listed</p>`;
+        }
+
+        const total = order.totals?.total || 0;
+        totalEl.textContent = `Total: $${total.toFixed(2)}`;
+        
+        if (isQuote) {
+            document.querySelector('.success-page h2').textContent = '📄 Quote Request Received!';
+            document.querySelector('.success-page .subtitle').textContent = 'Your quote request has been submitted. We\'ll get back to you shortly.';
+        }
+    } else {
+        list.innerHTML = `
+            <p style="color:#6a889a; padding:0.5rem 0;">Order details will be sent to your email.</p>
+            <p style="color:#6a889a; font-size:0.85rem;">Please check your email for confirmation.</p>
+        `;
+        totalEl.textContent = 'Total: Please check your email';
+    }
+}
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', function() {
+    loadOrderDetails();
+    loadCartCount();
+});
 </script>
 
 </body>

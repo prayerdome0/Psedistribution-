@@ -6,6 +6,14 @@
     <title>Track Order - PSE Wholesale</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+    
     <style>
         .track-page {
             max-width: 700px;
@@ -293,7 +301,6 @@
             <button onclick="trackOrder()"><i class="fa-solid fa-magnifying-glass"></i> Track</button>
         </div>
 
-        <!-- Not Found -->
         <div class="not-found" id="notFound">
             <i class="fa-regular fa-circle-xmark"></i>
             <h3>Order Not Found</h3>
@@ -303,7 +310,6 @@
             </button>
         </div>
 
-        <!-- Order Result -->
         <div class="order-result" id="orderResult">
             <div id="orderContent"></div>
         </div>
@@ -371,127 +377,150 @@
     </div>
 </footer>
 
-<!-- ─── SCRIPTS ─── -->
+<!-- ─── MAIN JS ─── -->
 <script src="main.js"></script>
+
 <script>
-    // ─── TRACK ORDER ───
-    function trackOrder() {
-        const orderNumber = document.getElementById('trackInput').value.trim().toUpperCase();
-        const resultDiv = document.getElementById('orderResult');
-        const notFoundDiv = document.getElementById('notFound');
-        const contentDiv = document.getElementById('orderContent');
-        
-        // Hide previous results
-        resultDiv.classList.remove('show');
-        notFoundDiv.classList.remove('show');
-        
-        if (!orderNumber) {
-            showToast('❌ Please enter an order number', 'error');
-            return;
-        }
-
-        // Search in orders
-        const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
-        const quotes = JSON.parse(localStorage.getItem('pse_quotes') || '[]');
-        
-        let order = orders.find(o => o.orderNumber === orderNumber);
-        let isQuote = false;
-        
-        if (!order) {
-            order = quotes.find(q => q.quoteNumber === orderNumber);
-            isQuote = true;
-        }
-
-        if (!order) {
-            notFoundDiv.classList.add('show');
-            return;
-        }
-
-        // Display order
-        const statusSteps = [
-            { key: 'pending', label: 'Order Received', icon: 'fa-regular fa-receipt' },
-            { key: 'processing', label: 'Processing', icon: 'fa-regular fa-gear' },
-            { key: 'shipped', label: 'Shipped', icon: 'fa-regular fa-truck' },
-            { key: 'delivered', label: 'Delivered', icon: 'fa-regular fa-circle-check' }
-        ];
-
-        const currentStatus = order.status || 'pending';
-        const currentIndex = statusSteps.findIndex(s => s.key === currentStatus);
-        const orderDate = new Date(order.date);
-
-        let itemsHtml = order.items.map(item => 
-            `<span>${item.quantity || 1}x ${item.title} - $${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</span>`
-        ).join('');
-
-        let timelineHtml = statusSteps.map((step, index) => {
-            let statusClass = '';
-            if (index < currentIndex) statusClass = 'completed';
-            else if (index === currentIndex) statusClass = 'active';
-            
-            return `
-                <div class="status-step">
-                    <div class="dot ${statusClass}"></div>
-                    <div class="content">
-                        <div class="title ${statusClass}">
-                            ${step.icon ? `<i class="${step.icon}"></i>` : ''} ${step.label}
-                            ${index === currentIndex ? ' <span style="font-size:0.7rem; background:#e3f0eb; color:#1e7b6b; padding:0.1rem 0.6rem; border-radius:30px;">Current</span>' : ''}
-                        </div>
-                        ${index <= currentIndex ? `<div class="date">${orderDate.toLocaleDateString()} ${index === currentIndex ? '(Current)' : '(Completed)'}</div>` : ''}
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        contentDiv.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:1rem;">
-                <h3 style="color:#0b2a3b;">${isQuote ? 'Quote' : 'Order'} #${order.orderNumber}</h3>
-                <span style="background: ${currentStatus === 'delivered' ? '#d4edda' : currentStatus === 'cancelled' ? '#f8d7da' : '#fff3cd'}; color: ${currentStatus === 'delivered' ? '#155724' : currentStatus === 'cancelled' ? '#721c24' : '#856404'}; padding:0.2rem 1rem; border-radius:30px; font-weight:600; font-size:0.8rem; text-transform:capitalize;">
-                    ${currentStatus}
-                </span>
-            </div>
-
-            <div class="order-summary">
-                <div class="items">${itemsHtml}</div>
-                <div class="row"><span>Subtotal</span><span>$${(order.totals?.subtotal || 0).toFixed(2)}</span></div>
-                ${order.totals?.discount > 0 ? `<div class="row"><span>Discount</span><span style="color:#1e7b6b;">-$${order.totals.discount.toFixed(2)}</span></div>` : ''}
-                <div class="row"><span>Shipping</span><span>${order.totals?.shipping === 0 ? 'FREE' : '$' + (order.totals?.shipping || 0).toFixed(2)}</span></div>
-                <div class="row"><span>Tax</span><span>$${(order.totals?.tax || 0).toFixed(2)}</span></div>
-                <div class="row total"><span>Total</span><span class="amount">$${(order.totals?.total || 0).toFixed(2)}</span></div>
-            </div>
-
-            <div style="margin-bottom:1rem; font-size:0.85rem; color:#2c5a6b;">
-                <i class="fa-regular fa-calendar"></i> Order placed: ${orderDate.toLocaleString()}
-                ${order.customer ? `<br><i class="fa-regular fa-user"></i> ${order.customer.firstName || ''} ${order.customer.lastName || ''} (${order.customer.email || ''})` : ''}
-            </div>
-
-            <div class="order-status-timeline">
-                ${timelineHtml}
-            </div>
-
-            ${!isQuote && currentStatus !== 'delivered' ? `
-                <div style="margin-top:1.5rem; padding:1rem; background:#f8fafc; border-radius:8px; border:1px solid #e9edf2; text-align:center;">
-                    <p style="font-size:0.85rem; color:#6a889a;">
-                        <i class="fa-regular fa-envelope"></i> We'll send you email updates when your order status changes.
-                    </p>
-                </div>
-            ` : ''}
-
-            ${isQuote ? `
-                <div style="margin-top:1rem; padding:1rem; background:#f8fafc; border-radius:8px; border:1px solid #e9edf2; text-align:center;">
-                    <p style="font-size:0.85rem; color:#6a889a;">
-                        <i class="fa-regular fa-file-lines"></i> This is a quote request. We'll get back to you shortly!
-                    </p>
-                </div>
-            ` : ''}
-        `;
-
-        resultDiv.classList.add('show');
+// ─── TRACK ORDER ───
+async function trackOrder() {
+    const orderNumber = document.getElementById('trackInput').value.trim().toUpperCase();
+    const resultDiv = document.getElementById('orderResult');
+    const notFoundDiv = document.getElementById('notFound');
+    const contentDiv = document.getElementById('orderContent');
+    
+    resultDiv.classList.remove('show');
+    notFoundDiv.classList.remove('show');
+    
+    if (!orderNumber) {
+        showToast('❌ Please enter an order number', 'error');
+        return;
     }
 
-    // ─── ENTER KEY ───
-    document.getElementById('trackInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') trackOrder();
-    });
+    // Search in orders (Firestore + localStorage fallback)
+    let order = null;
+    let isQuote = false;
+    
+    // Check localStorage first
+    const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
+    const quotes = JSON.parse(localStorage.getItem('pse_quotes') || '[]');
+    
+    order = orders.find(o => o.orderNumber === orderNumber);
+    if (!order) {
+        order = quotes.find(q => q.quoteNumber === orderNumber);
+        isQuote = true;
+    }
+    
+    // If not found in localStorage, check Firestore
+    if (!order) {
+        try {
+            const user = getCurrentUser();
+            if (user) {
+                const snapshot = await db.collection('orders')
+                    .where('user_id', '==', user.id)
+                    .where('orderNumber', '==', orderNumber)
+                    .get();
+                
+                if (!snapshot.empty) {
+                    order = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+                }
+            }
+        } catch (error) {
+            console.error('Error searching Firestore:', error);
+        }
+    }
+
+    if (!order) {
+        notFoundDiv.classList.add('show');
+        return;
+    }
+
+    // Display order
+    const statusSteps = [
+        { key: 'pending', label: 'Order Received', icon: 'fa-regular fa-receipt' },
+        { key: 'processing', label: 'Processing', icon: 'fa-regular fa-gear' },
+        { key: 'shipped', label: 'Shipped', icon: 'fa-regular fa-truck' },
+        { key: 'delivered', label: 'Delivered', icon: 'fa-regular fa-circle-check' }
+    ];
+
+    const currentStatus = order.status || 'pending';
+    const currentIndex = statusSteps.findIndex(s => s.key === currentStatus);
+    const orderDate = new Date(order.date || order.created_at || Date.now());
+
+    let itemsHtml = (order.items || []).map(item => 
+        `<span>${item.quantity || 1}x ${item.title} - $${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</span>`
+    ).join('');
+
+    let timelineHtml = statusSteps.map((step, index) => {
+        let statusClass = '';
+        if (index < currentIndex) statusClass = 'completed';
+        else if (index === currentIndex) statusClass = 'active';
+        
+        return `
+            <div class="status-step">
+                <div class="dot ${statusClass}"></div>
+                <div class="content">
+                    <div class="title ${statusClass}">
+                        ${step.icon ? `<i class="${step.icon}"></i>` : ''} ${step.label}
+                        ${index === currentIndex ? ' <span style="font-size:0.7rem; background:#e3f0eb; color:#1e7b6b; padding:0.1rem 0.6rem; border-radius:30px;">Current</span>' : ''}
+                    </div>
+                    ${index <= currentIndex ? `<div class="date">${orderDate.toLocaleDateString()} ${index === currentIndex ? '(Current)' : '(Completed)'}</div>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    const orderNumberDisplay = order.orderNumber || order.quoteNumber || 'N/A';
+
+    contentDiv.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:1rem;">
+            <h3 style="color:#0b2a3b;">${isQuote ? 'Quote' : 'Order'} #${orderNumberDisplay}</h3>
+            <span style="background: ${currentStatus === 'delivered' ? '#d4edda' : currentStatus === 'cancelled' ? '#f8d7da' : '#fff3cd'}; color: ${currentStatus === 'delivered' ? '#155724' : currentStatus === 'cancelled' ? '#721c24' : '#856404'}; padding:0.2rem 1rem; border-radius:30px; font-weight:600; font-size:0.8rem; text-transform:capitalize;">
+                ${currentStatus}
+            </span>
+        </div>
+
+        <div class="order-summary">
+            <div class="items">${itemsHtml}</div>
+            <div class="row"><span>Subtotal</span><span>$${(order.totals?.subtotal || 0).toFixed(2)}</span></div>
+            ${order.totals?.discount > 0 ? `<div class="row"><span>Discount</span><span style="color:#1e7b6b;">-$${order.totals.discount.toFixed(2)}</span></div>` : ''}
+            <div class="row"><span>Shipping</span><span>${order.totals?.shipping === 0 ? 'FREE' : '$' + (order.totals?.shipping || 0).toFixed(2)}</span></div>
+            <div class="row"><span>Tax</span><span>$${(order.totals?.tax || 0).toFixed(2)}</span></div>
+            <div class="row total"><span>Total</span><span class="amount">$${(order.totals?.total || 0).toFixed(2)}</span></div>
+        </div>
+
+        <div style="margin-bottom:1rem; font-size:0.85rem; color:#2c5a6b;">
+            <i class="fa-regular fa-calendar"></i> Order placed: ${orderDate.toLocaleString()}
+            ${order.customer ? `<br><i class="fa-regular fa-user"></i> ${order.customer.firstName || ''} ${order.customer.lastName || ''} (${order.customer.email || ''})` : ''}
+        </div>
+
+        <div class="order-status-timeline">
+            ${timelineHtml}
+        </div>
+
+        ${!isQuote && currentStatus !== 'delivered' ? `
+            <div style="margin-top:1.5rem; padding:1rem; background:#f8fafc; border-radius:8px; border:1px solid #e9edf2; text-align:center;">
+                <p style="font-size:0.85rem; color:#6a889a;">
+                    <i class="fa-regular fa-envelope"></i> We'll send you email updates when your order status changes.
+                </p>
+            </div>
+        ` : ''}
+
+        ${isQuote ? `
+            <div style="margin-top:1rem; padding:1rem; background:#f8fafc; border-radius:8px; border:1px solid #e9edf2; text-align:center;">
+                <p style="font-size:0.85rem; color:#6a889a;">
+                    <i class="fa-regular fa-file-lines"></i> This is a quote request. We'll get back to you shortly!
+                </p>
+            </div>
+        ` : ''}
+    `;
+
+    resultDiv.classList.add('show');
+}
+
+// ─── ENTER KEY ───
+document.getElementById('trackInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') trackOrder();
+});
 </script>
 
 </body>
