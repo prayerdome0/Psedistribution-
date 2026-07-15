@@ -137,6 +137,31 @@
             text-decoration: underline;
         }
 
+        .demo-credentials {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e9edf2;
+            font-size: 0.8rem;
+        }
+        .demo-credentials strong {
+            color: #0b2a3b;
+        }
+        .demo-credentials .cred {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.3rem;
+        }
+        .demo-credentials .cred span {
+            color: #2c5a6b;
+        }
+        .demo-credentials .cred .highlight {
+            color: #1e7b6b;
+            font-weight: 600;
+        }
+
         @media (max-width: 480px) {
             .auth-page {
                 padding: 1.5rem;
@@ -164,7 +189,7 @@
         </div>
         <div id="authLinks">
             <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
-            <a href="#" onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</a>
+            <a href="track-order.html">Track Order</a>
             <a href="seller-dashboard.html">Become a Seller</a>
             <a href="login.html" id="loginLink" style="display:none;">Login</a>
             <a href="register.html" id="registerLink">Register</a>
@@ -241,10 +266,18 @@
         <h2><i class="fa-regular fa-circle-user"></i> Welcome Back</h2>
         <p class="subtitle">Sign in to your PSE Wholesale account</p>
 
+        <div class="demo-credentials">
+            <strong>Quick Login:</strong>
+            <div class="cred">
+                <span>👤 <span class="highlight">admin</span> / <span class="highlight">1234</span> (Admin)</span>
+                <span>👤 <span class="highlight">Any email</span> / <span class="highlight">Any password</span> (Customer)</span>
+            </div>
+        </div>
+
         <form id="loginForm">
             <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="loginEmail" placeholder="you@example.com" required />
+                <label>Email / Username</label>
+                <input type="text" id="loginEmail" placeholder="admin or you@example.com" required />
             </div>
             <div class="form-group">
                 <label>Password</label>

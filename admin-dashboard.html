@@ -1208,65 +1208,66 @@
     }
 
     // ─── ADD PRODUCT ───
-    document.getElementById('addProductAdminForm')?.addEventListener('submit', async function(e) {
-        e.preventDefault();
+document.getElementById('addProductAdminForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('adminSubmitBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Uploading...';
+    
+    try {
+        const fileInput = document.getElementById('adminNewProductImages');
+        let imageUrls = [];
         
-        const submitBtn = document.getElementById('adminSubmitBtn');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Uploading...';
-        
-        try {
-            const fileInput = document.getElementById('adminNewProductImages');
-            let imageUrls = [];
-            
-            if (fileInput && fileInput.files.length > 0) {
-                imageUrls = await uploadProductImages(Array.from(fileInput.files));
-            }
-            
-            const newProduct = {
-                title: document.getElementById('adminNewProductTitle').value,
-                brand: document.getElementById('adminNewProductBrand').value || '',
-                price: parseFloat(document.getElementById('adminNewProductPrice').value) || 0,
-                old_price: parseFloat(document.getElementById('adminNewProductOldPrice').value) || null,
-                moq: parseInt(document.getElementById('adminNewProductMoq').value) || 1,
-                stock: parseInt(document.getElementById('adminNewProductStock').value) || 100,
-                category: document.getElementById('adminNewProductCategory').value,
-                image_url: imageUrls.length > 0 ? imageUrls[0] : '',
-                images: imageUrls,
-                description: document.getElementById('adminNewProductDescription').value || '',
-                status: 'active',
-                seller: 'PSE Admin'
-            };
-
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/products`, {
-                method: 'POST',
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(newProduct)
-            });
-
-            if (response.ok) {
-                const result = await response.json();
-                adminProducts.push(result);
-                renderAdminProducts();
-                updateAdminStats();
-                closeAddProductAdmin();
-                showToast('✅ Product added with images!', 'success');
-            } else {
-                const error = await response.text();
-                showToast('❌ Failed to add product: ' + error, 'error');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showToast('❌ Error adding product', 'error');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-regular fa-plus"></i> Add Product';
+        if (fileInput && fileInput.files.length > 0) {
+            imageUrls = await uploadProductImages(Array.from(fileInput.files));
         }
-    });
+        
+        const newProduct = {
+    title: document.getElementById('adminNewProductTitle').value,
+    brand: document.getElementById('adminNewProductBrand').value || '',
+    price: parseFloat(document.getElementById('adminNewProductPrice').value) || 0,
+    old_price: parseFloat(document.getElementById('adminNewProductOldPrice').value) || null,
+    moq: parseInt(document.getElementById('adminNewProductMoq').value) || 1,
+    stock: parseInt(document.getElementById('adminNewProductStock').value) || 100,
+    category: document.getElementById('adminNewProductCategory').value,
+    image_url: imageUrls.length > 0 ? imageUrls[0] : '',
+    // images: imageUrls,  // REMOVE this line if column missing
+    description: document.getElementById('adminNewProductDescription').value || '',
+    status: 'active'
+    // REMOVE: seller: 'PSE Admin'
+};
+
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/products`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newProduct)
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            adminProducts.push(result);
+            renderAdminProducts();
+            updateAdminStats();
+            closeAddProductAdmin();
+            showToast('✅ Product added with images!', 'success');
+        } else {
+            const error = await response.text();
+            console.error('Error response:', error);
+            showToast('❌ Failed to add product. Please check console.', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('❌ Error adding product: ' + error.message, 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-regular fa-plus"></i> Add Product';
+    }
+});
 
     // ─── APPROVE PRODUCT ───
     async function approveAdminProduct(id) {
