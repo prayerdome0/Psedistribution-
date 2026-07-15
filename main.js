@@ -9,30 +9,27 @@ const firebaseConfig = {
     measurementId: "G-YR4G1C73DS"
 };
 
-// ─── SUPABASE STORAGE CONFIG ───
-const SUPABASE_URL = 'https://ukecaqmauhkqtdimrkdo.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_jvc9rEAD2EoBYl3IuGNaXw_TEl2zww9';
+// ─── CLOUDINARY CONFIG ───
+const CLOUDINARY_CONFIG = {
+    cloudName: 'nqyylkmd',
+    uploadPreset: 'pse_products' // You need to create this in Cloudinary Console (unsigned)
+};
 
-// ─── CHECK IF FIREBASE IS LOADED ───
-if (typeof firebase === 'undefined') {
-    console.error('Firebase SDK not loaded! Please check your script tags.');
-    // Show error to user
-    document.addEventListener('DOMContentLoaded', function() {
-        const body = document.body;
-        const errorDiv = document.createElement('div');
-        errorDiv.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#c0392b;color:#fff;padding:1rem;text-align:center;z-index:9999;font-family:sans-serif;';
-        errorDiv.innerHTML = '⚠️ Firebase SDK failed to load. Please check your internet connection and refresh the page.';
-        body.prepend(errorDiv);
-    });
-} else {
-    console.log('Firebase SDK loaded successfully!');
+// ─── EXPOSE CLOUDINARY ───
+window.CLOUDINARY_CONFIG = CLOUDINARY_CONFIG;
+
+// ─── INITIALIZE FIREBASE ───
+function initFirebase() {
+    if (typeof firebase === 'undefined') {
+        console.log('Waiting for Firebase to load...');
+        setTimeout(initFirebase, 100);
+        return;
+    }
     
-    // ─── INITIALIZE FIREBASE ───
+    console.log('Firebase loaded, initializing...');
+    
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
-        console.log('Firebase initialized!');
-    } else {
-        console.log('Firebase already initialized');
     }
     
     const analytics = firebase.analytics();
@@ -41,13 +38,10 @@ if (typeof firebase === 'undefined') {
     const messaging = firebase.messaging();
     const googleProvider = new firebase.auth.GoogleAuthProvider();
 
-    // ─── EXPOSE FOR GLOBAL USE ───
     window.auth = auth;
     window.db = db;
     window.messaging = messaging;
     window.googleProvider = googleProvider;
-    window.SUPABASE_URL = SUPABASE_URL;
-    window.SUPABASE_ANON_KEY = SUPABASE_ANON_KEY;
 
     // ─── TOAST ───
     window.showToast = function(message, type = 'info') {
@@ -66,9 +60,106 @@ if (typeof firebase === 'undefined') {
         }, 3000);
     };
 
+    // ─── CLOUDINARY UPLOAD FUNCTION (NO JQUERY) ───
+    window.uploadToCloudinary = async function(file, folder = 'products') {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+            formData.append('folder', folder);
+            
+            // Add image optimization parameters
+            const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`;
+
+            const response = await fetch(uploadUrl, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || 'Upload failed');
+            }
+
+            const data = await response.json();
+            return {
+                secure_url: data.secure_url,
+                public_id: data.public_id,
+                width: data.width,
+                height: data.height,
+                format: data.format,
+                bytes: data.bytes,
+                original_filename: data.original_filename,
+                created_at: data.created_at
+            };
+        } catch (error) {
+            console.error('Cloudinary upload error:', error);
+            showToast('Failed to upload image: ' + error.message, 'error');
+            throw error;
+        }
+    };
+
+    // ─── UPLOAD MULTIPLE IMAGES ───
+    window.uploadMultipleToCloudinary = async function(files, folder = 'products') {
+        const results = [];
+        let uploadedCount = 0;
+        
+        showToast(`Uploading ${files.length} images to Cloudinary...`, 'info');
+        
+        for (const file of files) {
+            try {
+                const result = await window.uploadToCloudinary(file, folder);
+                results.push(result);
+                uploadedCount++;
+                showToast(`Uploaded ${uploadedCount}/${files.length}: ${result.original_filename}`, 'success');
+            } catch (error) {
+                console.error('Upload failed for:', file.name, error);
+                showToast(`Failed to upload ${file.name}`, 'error');
+            }
+        }
+        
+        if (results.length === files.length) {
+            showToast(`✅ All ${results.length} images uploaded successfully!`, 'success');
+        } else {
+            showToast(`⚠️ Uploaded ${results.length} of ${files.length} images`, 'info');
+        }
+        
+        return results;
+    };
+
+    // ─── GET OPTIMIZED CLOUDINARY URL ───
+    window.getOptimizedCloudinaryUrl = function(publicId, options = {}) {
+        let transformations = [];
+        
+        // Add quality auto
+        transformations.push('q_auto:good');
+        
+        // Add format auto
+        transformations.push('f_auto');
+        
+        // Add width if specified
+        if (options.width) {
+            transformations.push(`w_${options.width}`);
+        }
+        
+        // Add height if specified
+        if (options.height) {
+            transformations.push(`h_${options.height}`);
+        }
+        
+        // Add crop if specified
+        if (options.crop) {
+            transformations.push(`c_${options.crop}`);
+        } else {
+            transformations.push('c_scale');
+        }
+        
+        const transformationString = transformations.join(',');
+        return `https://res.cloudinary.com/${CLOUDINARY_CONFIG.cloudName}/image/upload/${transformationString}/${publicId}`;
+    };
+
     // ─── AUTH FUNCTIONS ───
 
-    // Sign In
     window.signIn = async function(email, password) {
         try {
             const userCredential = await auth.signInWithEmailAndPassword(email, password);
@@ -94,7 +185,6 @@ if (typeof firebase === 'undefined') {
         }
     };
 
-    // Sign Up
     window.signUp = async function(email, password, userData = {}) {
         try {
             const userCredential = await auth.createUserWithEmailAndPassword(email, password);
@@ -127,7 +217,6 @@ if (typeof firebase === 'undefined') {
         }
     };
 
-    // Sign Out
     window.signOutUser = async function() {
         try {
             await auth.signOut();
@@ -145,7 +234,6 @@ if (typeof firebase === 'undefined') {
         }
     };
 
-    // Google Sign In
     window.signInWithGoogle = async function() {
         try {
             const result = await auth.signInWithPopup(googleProvider);
@@ -180,7 +268,6 @@ if (typeof firebase === 'undefined') {
         }
     };
 
-    // Reset Password
     window.resetPassword = async function() {
         const email = document.getElementById('loginEmail')?.value;
         if (!email) {
@@ -216,7 +303,6 @@ if (typeof firebase === 'undefined') {
         return user && (user.role === 'seller' || user.role === 'admin');
     };
 
-    // Update Auth UI
     window.updateAuthUI = function() {
         const user = getCurrentUser();
         const loginLink = document.getElementById('loginLink');
@@ -293,6 +379,41 @@ if (typeof firebase === 'undefined') {
         } catch (error) {
             console.error('Error fetching product:', error);
             return null;
+        }
+    };
+
+    // ─── PRODUCT FUNCTIONS WITH CLOUDINARY ───
+    window.addProductWithImages = async function(productData, imageFiles) {
+        try {
+            let imageUrls = [];
+            let uploadedImages = [];
+            
+            // Upload images to Cloudinary
+            if (imageFiles && imageFiles.length > 0) {
+                uploadedImages = await window.uploadMultipleToCloudinary(imageFiles, 'products');
+                imageUrls = uploadedImages.map(img => img.secure_url);
+            }
+            
+            const docRef = await db.collection('products').add({
+                ...productData,
+                image_url: imageUrls.length > 0 ? imageUrls[0] : '',
+                images: imageUrls,
+                cloudinary_images: uploadedImages.map(img => ({
+                    public_id: img.public_id,
+                    secure_url: img.secure_url,
+                    format: img.format,
+                    width: img.width,
+                    height: img.height,
+                    bytes: img.bytes
+                })),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            });
+            
+            return { id: docRef.id, ...productData };
+        } catch (error) {
+            console.error('Error adding product with images:', error);
+            throw error;
         }
     };
 
@@ -720,7 +841,7 @@ if (typeof firebase === 'undefined') {
         }, 1000);
     };
 
-    // ─── NOTIFICATIONS (Local Storage) ───
+    // ─── NOTIFICATIONS ───
     window.getNotifications = function() {
         return JSON.parse(localStorage.getItem('pse_notifications') || '[]');
     };
@@ -777,61 +898,6 @@ if (typeof firebase === 'undefined') {
         }
     };
 
-    // ─── SUPABASE STORAGE FUNCTIONS ───
-    window.uploadProductImages = async function(files, path = 'products') {
-        const urls = [];
-        
-        for (const file of files) {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `product_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-            
-            try {
-                const response = await fetch(`${SUPABASE_URL}/storage/v1/object/${path}/${fileName}`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': file.type
-                    },
-                    body: file
-                });
-                
-                if (response.ok) {
-                    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${path}/${fileName}`;
-                    urls.push(publicUrl);
-                } else {
-                    console.error('Upload failed:', await response.text());
-                    showToast(`Failed to upload ${file.name}`, 'error');
-                }
-            } catch (error) {
-                console.error('Upload error:', error);
-                showToast(`Error uploading ${file.name}`, 'error');
-            }
-        }
-        
-        return urls;
-    };
-
-    window.deleteImageFromStorage = async function(imageUrl) {
-        try {
-            const urlParts = imageUrl.split('/');
-            const path = urlParts[urlParts.length - 2] + '/' + urlParts[urlParts.length - 1];
-            
-            const response = await fetch(`${SUPABASE_URL}/storage/v1/object/${path}`, {
-                method: 'DELETE',
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                }
-            });
-            
-            return response.ok;
-        } catch (error) {
-            console.error('Delete image error:', error);
-            return false;
-        }
-    };
-
     // ─── AUTH STATE LISTENER ───
     auth.onAuthStateChanged(async (user) => {
         if (user) {
@@ -872,3 +938,6 @@ if (typeof firebase === 'undefined') {
     
     console.log('Firebase initialized successfully!');
 }
+
+// ─── START FIREBASE INITIALIZATION ───
+initFirebase();

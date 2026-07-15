@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
     
+    <script src="https://cdn.jsdelivr.net/npm/cloudinary-core@2.11.3/cloudinary-core-shrinkwrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cloudinary-jquery-file-upload@2.11.3/cloudinary-jquery-file-upload.js"></script>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -1138,20 +1141,24 @@ function renderAdminProducts() {
     `).join('');
 }
 
-// ─── ADD PRODUCT ───
+// ─── ADD PRODUCT WITH CLOUDINARY (NO JQUERY) ───
 document.getElementById('addProductAdminForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const submitBtn = document.getElementById('adminSubmitBtn');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Uploading...';
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
     
     try {
         const fileInput = document.getElementById('adminNewProductImages');
         let imageUrls = [];
+        let uploadedImages = [];
         
         if (fileInput && fileInput.files.length > 0) {
-            imageUrls = await window.uploadProductImages(Array.from(fileInput.files));
+            // Upload to Cloudinary using the direct upload function
+            const files = Array.from(fileInput.files);
+            uploadedImages = await window.uploadMultipleToCloudinary(files, 'products');
+            imageUrls = uploadedImages.map(img => img.secure_url);
         }
         
         const newProduct = {
@@ -1164,6 +1171,14 @@ document.getElementById('addProductAdminForm')?.addEventListener('submit', async
             category: document.getElementById('adminNewProductCategory').value,
             image_url: imageUrls.length > 0 ? imageUrls[0] : '',
             images: imageUrls,
+            cloudinary_images: uploadedImages.map(img => ({
+                public_id: img.public_id,
+                secure_url: img.secure_url,
+                format: img.format,
+                width: img.width,
+                height: img.height,
+                bytes: img.bytes
+            })),
             description: document.getElementById('adminNewProductDescription').value || '',
             status: 'active',
             seller: 'PSE Admin',
@@ -1173,10 +1188,10 @@ document.getElementById('addProductAdminForm')?.addEventListener('submit', async
 
         if (editingProductId) {
             await db.collection('products').doc(editingProductId).update(newProduct);
-            showToast('Product updated!', 'success');
+            showToast('Product updated with Cloudinary images!', 'success');
         } else {
             await db.collection('products').add(newProduct);
-            showToast('Product added with images!', 'success');
+            showToast('Product added with Cloudinary images!', 'success');
         }
         
         await loadAdminProducts();
