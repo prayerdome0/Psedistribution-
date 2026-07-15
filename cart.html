@@ -312,20 +312,14 @@
     <div class="container">
         <div>
             <span>Welcome to PSE Wholesale</span>
-            <a href="#" onclick="showToast('✅ Verified Supplier - Trusted partners!', 'success')">
-                <i class="fa-regular fa-circle-check"></i> Verified Supplier
-            </a>
-            <a href="#" onclick="showToast('🚚 Bulk Shipping - Free on orders over $250!', 'info')">
-                <i class="fa-regular fa-truck"></i> Bulk Shipping
-            </a>
+            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
+            <a href="track-order.html">Track Order</a>
+            <a href="seller-dashboard.html">Become a Seller</a>
         </div>
         <div id="authLinks">
-            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
-            <a href="#" onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</a>
-            <a href="seller-dashboard.html">Become a Seller</a>
             <a href="login.html" id="loginLink">Login</a>
             <a href="register.html" id="registerLink">Register</a>
-            <select class="lang-select" onchange="showToast('🌐 Language changed to ' + this.value, 'info')">
+            <select class="lang-select" onchange="window.location.href='/?lang='+this.value">
                 <option value="EN">EN</option>
                 <option value="ES">ES</option>
                 <option value="FR">FR</option>
@@ -338,8 +332,12 @@
 <!-- ─── HEADER ─── -->
 <header class="header">
     <div class="container">
-        <a href="index.html" class="logo">
-            <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+        <a href="index.html" class="logo" style="display:flex; align-items:center; gap:0.5rem; text-decoration:none;">
+            <img src="logo.jpg" alt="PSE Distribution" style="height:40px; width:auto; border-radius:8px;" />
+            <div style="display:flex; flex-direction:column; line-height:1.1;">
+                <span style="font-size:1.5rem; font-weight:800; color:#0b2a3b;">PSE <span style="color:#1e7b6b;">Distribution</span></span>
+                <span style="font-size:0.55rem; color:#6a889a; font-weight:400; letter-spacing:0.5px;">wholesale Marketplace</span>
+            </div>
         </a>
         <div class="search-bar">
             <select id="categoryFilter"><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
@@ -472,7 +470,6 @@
         <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
         <p>Choose from our support options below:</p>
         <ul>
-            <li><i class="fa-regular fa-message" style="color:#1e7b6b; width:20px;"></i> Live Chat (24/7)</li>
             <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
             <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
             <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
@@ -499,7 +496,7 @@
                 <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
                 <li>Returns & Refunds</li>
                 <li>Shipping Policy</li>
-                <li onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</li>
+                <li onclick="window.location.href='track-order.html'">Track Order</li>
             </ul>
         </div>
         <div>
@@ -538,7 +535,6 @@ async function loadCart() {
     
     if (user) {
         cartItems = await getCartItems();
-        // Get product details
         const cartWithProducts = [];
         for (const item of cartItems) {
             const product = await fetchProductById(item.product_id);
@@ -558,7 +554,6 @@ async function loadCart() {
         }
         cartItems = cartWithProducts;
     } else {
-        // Fallback to localStorage for guests
         cartItems = JSON.parse(localStorage.getItem('pse_cart') || '[]');
     }
     
@@ -616,7 +611,6 @@ function renderCartItems(cart) {
 async function updateCartItem(cartId, productId, change) {
     const user = getCurrentUser();
     if (!user) {
-        // Local storage fallback
         let cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
         const item = cart.find(i => i.id === productId);
         if (item) {
@@ -648,7 +642,7 @@ async function updateCartItem(cartId, productId, change) {
         }
     } catch (error) {
         console.error('Error updating cart:', error);
-        showToast('❌ Failed to update cart', 'error');
+        showToast('Failed to update cart', 'error');
     }
 }
 
@@ -683,7 +677,7 @@ async function updateCartItemQty(cartId, productId, value) {
         }
     } catch (error) {
         console.error('Error updating cart:', error);
-        showToast('❌ Failed to update cart', 'error');
+        showToast('Failed to update cart', 'error');
     }
 }
 
@@ -696,7 +690,7 @@ async function removeCartItem(cartId, productId) {
         localStorage.setItem('pse_cart', JSON.stringify(cart));
         loadCart();
         loadCartCount();
-        showToast('🗑️ Item removed from cart', 'info');
+        showToast('Item removed from cart', 'info');
         return;
     }
     
@@ -704,10 +698,10 @@ async function removeCartItem(cartId, productId) {
         await removeCartItem(cartId);
         loadCart();
         loadCartCount();
-        showToast('🗑️ Item removed from cart', 'info');
+        showToast('Item removed from cart', 'info');
     } catch (error) {
         console.error('Error removing cart item:', error);
-        showToast('❌ Failed to remove item', 'error');
+        showToast('Failed to remove item', 'error');
     }
 }
 
@@ -753,7 +747,7 @@ function applyCoupon() {
 
     if (code === 'SAVE10' || code === 'WHOLESALE10') {
         couponApplied = true;
-        showToast('🎉 Coupon SAVE10 applied! 10% off', 'success');
+        showToast('Coupon SAVE10 applied! 10% off', 'success');
         const cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
         let subtotal = cart.reduce((sum, i) => sum + (i.price * (i.quantity || 1)), 0);
         const discount = subtotal * 0.10;
@@ -768,7 +762,7 @@ function applyCoupon() {
     } else if (code === '') {
         showToast('Please enter a coupon code', 'error');
     } else {
-        showToast('❌ Invalid coupon code', 'error');
+        showToast('Invalid coupon code', 'error');
     }
 }
 

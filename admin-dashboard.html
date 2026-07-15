@@ -526,20 +526,14 @@
     <div class="container">
         <div>
             <span>Welcome to PSE Wholesale</span>
-            <a href="#" onclick="showToast('✅ Verified Supplier - Trusted partners!', 'success')">
-                <i class="fa-regular fa-circle-check"></i> Verified Supplier
-            </a>
-            <a href="#" onclick="showToast('🚚 Bulk Shipping - Free on orders over $250!', 'info')">
-                <i class="fa-regular fa-truck"></i> Bulk Shipping
-            </a>
-        </div>
-        <div id="authLinks">
             <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
             <a href="track-order.html">Track Order</a>
             <a href="seller-dashboard.html">Become a Seller</a>
+        </div>
+        <div id="authLinks">
             <a href="login.html" id="loginLink" style="display:none;">Login</a>
             <a href="register.html" id="registerLink" style="display:none;">Register</a>
-            <select class="lang-select" onchange="showToast('🌐 Language changed to ' + this.value, 'info')">
+            <select class="lang-select" onchange="window.location.href='/?lang='+this.value">
                 <option value="EN">EN</option>
                 <option value="ES">ES</option>
                 <option value="FR">FR</option>
@@ -552,8 +546,12 @@
 <!-- ─── HEADER ─── -->
 <header class="header">
     <div class="container">
-        <a href="index.html" class="logo">
-            <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Wholesale" style="height:40px; width:auto;" />
+        <a href="index.html" class="logo" style="display:flex; align-items:center; gap:0.5rem; text-decoration:none;">
+            <img src="logo.jpg" alt="PSE Distribution" style="height:40px; width:auto; border-radius:8px;" />
+            <div style="display:flex; flex-direction:column; line-height:1.1;">
+                <span style="font-size:1.5rem; font-weight:800; color:#0b2a3b;">PSE <span style="color:#1e7b6b;">Distribution</span></span>
+                <span style="font-size:0.55rem; color:#6a889a; font-weight:400; letter-spacing:0.5px;">wholesale Marketplace</span>
+            </div>
         </a>
         <div class="search-bar">
             <select><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
@@ -950,7 +948,6 @@
         <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
         <p>Choose from our support options below:</p>
         <ul>
-            <li><i class="fa-regular fa-message" style="color:#1e7b6b; width:20px;"></i> Live Chat (24/7)</li>
             <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
             <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
             <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
@@ -977,7 +974,7 @@
                 <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
                 <li>Returns & Refunds</li>
                 <li>Shipping Policy</li>
-                <li onclick="showToast('📦 Track your order - Enter your order number', 'info')">Track Order</li>
+                <li onclick="window.location.href='track-order.html'">Track Order</li>
             </ul>
         </div>
         <div>
@@ -1176,10 +1173,10 @@ document.getElementById('addProductAdminForm')?.addEventListener('submit', async
 
         if (editingProductId) {
             await db.collection('products').doc(editingProductId).update(newProduct);
-            showToast('✅ Product updated!', 'success');
+            showToast('Product updated!', 'success');
         } else {
             await db.collection('products').add(newProduct);
-            showToast('✅ Product added with images!', 'success');
+            showToast('Product added with images!', 'success');
         }
         
         await loadAdminProducts();
@@ -1187,7 +1184,7 @@ document.getElementById('addProductAdminForm')?.addEventListener('submit', async
         closeAddProductAdmin();
     } catch (error) {
         console.error('Error:', error);
-        showToast('❌ Error adding product: ' + error.message, 'error');
+        showToast('Error adding product: ' + error.message, 'error');
     } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = editingProductId ? '<i class="fa-regular fa-floppy-disk"></i> Update Product' : '<i class="fa-regular fa-plus"></i> Add Product';
@@ -1201,10 +1198,10 @@ async function approveAdminProduct(id) {
             status: 'approved',
             updated_at: new Date().toISOString()
         });
-        showToast('✅ Product approved!', 'success');
+        showToast('Product approved!', 'success');
         await loadAdminProducts();
     } catch (error) {
-        showToast('❌ Error approving product', 'error');
+        showToast('Error approving product', 'error');
     }
 }
 window.approveAdminProduct = approveAdminProduct;
@@ -1226,11 +1223,11 @@ async function deleteAdminProduct(id) {
         }
         
         await db.collection('products').doc(id).delete();
-        showToast('🗑️ Product deleted', 'info');
+        showToast('Product deleted', 'info');
         await loadAdminProducts();
         await updateAdminStats();
     } catch (error) {
-        showToast('❌ Error deleting product', 'error');
+        showToast('Error deleting product', 'error');
     }
 }
 window.deleteAdminProduct = deleteAdminProduct;
@@ -1271,7 +1268,6 @@ async function loadAdminOrders() {
         console.error('Error loading orders from Firestore:', error);
     }
     
-    // Also check localStorage for guest orders
     const localOrders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
     const localQuotes = JSON.parse(localStorage.getItem('pse_quotes') || '[]');
     const allOrders = [...orders, ...localOrders, ...localQuotes];
@@ -1318,7 +1314,6 @@ function renderAdminOrders(orders) {
 
 async function updateOrderStatus(orderId, newStatus) {
     try {
-        // Try updating in Firestore first
         const docRef = db.collection('orders').doc(orderId);
         const doc = await docRef.get();
         if (doc.exists) {
@@ -1327,7 +1322,6 @@ async function updateOrderStatus(orderId, newStatus) {
                 updated_at: new Date().toISOString()
             });
         } else {
-            // Update in localStorage
             const orders = JSON.parse(localStorage.getItem('pse_orders') || '[]');
             const order = orders.find(o => o.id === orderId);
             if (order) {
@@ -1342,12 +1336,12 @@ async function updateOrderStatus(orderId, newStatus) {
             }
         }
         
-        showToast(`✅ Order status updated to ${newStatus}`, 'success');
+        showToast(`Order status updated to ${newStatus}`, 'success');
         await loadAdminOrders();
         await updateAdminStats();
     } catch (error) {
         console.error('Error updating order:', error);
-        showToast('❌ Error updating order', 'error');
+        showToast('Error updating order', 'error');
     }
 }
 window.updateOrderStatus = updateOrderStatus;
@@ -1389,7 +1383,7 @@ function renderAdminUsers(users) {
             <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
             <td><span class="status-badge ${u.status === 'active' ? 'active' : 'inactive'}">${u.status || 'active'}</span></td>
             <td>
-                <button class="btn-action edit" onclick="showToast('✏️ Edit user coming soon', 'info')"><i class="fa-regular fa-pen"></i></button>
+                <button class="btn-action edit" onclick="showToast('Edit user coming soon', 'info')"><i class="fa-regular fa-pen"></i></button>
                 ${u.role !== 'admin' ? `<button class="btn-action make-admin" onclick="makeAdmin('${u.id}')"><i class="fa-regular fa-user-plus"></i> Make Admin</button>` : ''}
             </td>
         </tr>
@@ -1403,11 +1397,11 @@ async function makeAdmin(id) {
             role: 'admin',
             updated_at: new Date().toISOString()
         });
-        showToast('✅ User promoted to Admin!', 'success');
+        showToast('User promoted to Admin!', 'success');
         await loadAdminUsers();
         await updateAdminStats();
     } catch (error) {
-        showToast('❌ Error making admin', 'error');
+        showToast('Error making admin', 'error');
     }
 }
 window.makeAdmin = makeAdmin;
@@ -1469,10 +1463,10 @@ async function approveSeller(id) {
             status: 'approved',
             updated_at: new Date().toISOString()
         });
-        showToast('✅ Seller approved!', 'success');
+        showToast('Seller approved!', 'success');
         await loadAdminSellers();
     } catch (error) {
-        showToast('❌ Error approving seller', 'error');
+        showToast('Error approving seller', 'error');
     }
 }
 window.approveSeller = approveSeller;
@@ -1484,10 +1478,10 @@ async function suspendSeller(id) {
             status: 'suspended',
             updated_at: new Date().toISOString()
         });
-        showToast('⛔ Seller suspended', 'info');
+        showToast('Seller suspended', 'info');
         await loadAdminSellers();
     } catch (error) {
-        showToast('❌ Error suspending seller', 'error');
+        showToast('Error suspending seller', 'error');
     }
 }
 window.suspendSeller = suspendSeller;
@@ -1495,15 +1489,12 @@ window.suspendSeller = suspendSeller;
 // ─── UPDATE STATS ───
 async function updateAdminStats() {
     try {
-        // Product count
         const productSnapshot = await db.collection('products').get();
         document.getElementById('adminTotalProducts').textContent = productSnapshot.size;
 
-        // User count
         const userSnapshot = await db.collection('users').get();
         document.getElementById('adminTotalUsers').textContent = userSnapshot.size;
 
-        // Orders (Firestore + localStorage)
         let orders = [];
         try {
             const orderSnapshot = await db.collection('orders').get();
@@ -1536,7 +1527,7 @@ function saveSettings() {
     };
     
     localStorage.setItem('pse_settings', JSON.stringify(settings));
-    showToast('✅ Settings saved!', 'success');
+    showToast('Settings saved!', 'success');
 }
 window.saveSettings = saveSettings;
 
@@ -1610,7 +1601,6 @@ window.logoutUser = logoutUser;
 
 // ─── REAL-TIME LISTENERS ───
 function setupRealtimeListeners() {
-    // Products listener
     db.collection('products').onSnapshot((snapshot) => {
         adminProducts = [];
         snapshot.forEach(doc => {
@@ -1623,7 +1613,6 @@ function setupRealtimeListeners() {
         console.error('Products listener error:', error);
     });
     
-    // Users listener
     db.collection('users').onSnapshot((snapshot) => {
         const users = [];
         snapshot.forEach(doc => {
@@ -1639,7 +1628,6 @@ function setupRealtimeListeners() {
 
 // ─── INIT ───
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if admin is protected
     if (!window.protectAdmin()) {
         return;
     }

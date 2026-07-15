@@ -56,6 +56,51 @@ ul {
     cursor: pointer;
 }
 
+/* ─── LOGO STYLES ─── */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+.logo img {
+    height: 40px;
+    width: auto;
+    border-radius: 8px;
+}
+.logo .brand-name {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+.logo .brand-name .main {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0b2a3b;
+}
+.logo .brand-name .main span {
+    color: #1e7b6b;
+}
+.logo .brand-name .sub {
+    font-size: 0.55rem;
+    color: #6a889a;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+
+/* Mobile responsive logo */
+@media (max-width: 768px) {
+    .logo .brand-name .main {
+        font-size: 1.1rem;
+    }
+    .logo .brand-name .sub {
+        font-size: 0.45rem;
+    }
+    .logo img {
+        height: 30px;
+    }
+}
+
 /* ─── UTILITY BAR ─── */
 .utility-bar {
     display: flex;
