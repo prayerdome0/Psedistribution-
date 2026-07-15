@@ -1141,7 +1141,7 @@ function renderAdminProducts() {
     `).join('');
 }
 
-// ─── ADD PRODUCT WITH CLOUDINARY (NO JQUERY) ───
+// ─── ADD PRODUCT WITH CLOUDINARY ───
 document.getElementById('addProductAdminForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -1155,13 +1155,25 @@ document.getElementById('addProductAdminForm')?.addEventListener('submit', async
         let uploadedImages = [];
         
         if (fileInput && fileInput.files.length > 0) {
-            // Upload to Cloudinary using the direct upload function
             const files = Array.from(fileInput.files);
-            uploadedImages = await window.uploadMultipleToCloudinary(files, 'products');
-            imageUrls = uploadedImages.map(img => img.secure_url);
+            console.log('📤 Uploading', files.length, 'images to Cloudinary...');
+            
+            for (const file of files) {
+                try {
+                    const result = await window.uploadToCloudinary(file, 'products');
+                    if (result) {
+                        uploadedImages.push(result);
+                        imageUrls.push(result.secure_url);
+                        console.log('✅ Uploaded:', result.secure_url);
+                    }
+                } catch (err) {
+                    console.error('❌ Upload failed for:', file.name, err);
+                    showToast(`Failed to upload ${file.name}`, 'error');
+                }
+            }
         }
         
-        const newProduct = {
+        const productData = {
             title: document.getElementById('adminNewProductTitle').value,
             brand: document.getElementById('adminNewProductBrand').value || '',
             price: parseFloat(document.getElementById('adminNewProductPrice').value) || 0,
@@ -1186,19 +1198,21 @@ document.getElementById('addProductAdminForm')?.addEventListener('submit', async
             updated_at: new Date().toISOString()
         };
 
+        console.log('📦 Product data:', productData);
+
         if (editingProductId) {
-            await db.collection('products').doc(editingProductId).update(newProduct);
-            showToast('Product updated with Cloudinary images!', 'success');
+            await db.collection('products').doc(editingProductId).update(productData);
+            showToast('✅ Product updated with images!', 'success');
         } else {
-            await db.collection('products').add(newProduct);
-            showToast('Product added with Cloudinary images!', 'success');
+            await db.collection('products').add(productData);
+            showToast('✅ Product added with images!', 'success');
         }
         
         await loadAdminProducts();
         await updateAdminStats();
         closeAddProductAdmin();
     } catch (error) {
-        console.error('Error:', error);
+        console.error('❌ Error:', error);
         showToast('Error adding product: ' + error.message, 'error');
     } finally {
         submitBtn.disabled = false;

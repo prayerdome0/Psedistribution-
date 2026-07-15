@@ -12,7 +12,7 @@ const firebaseConfig = {
 // ─── CLOUDINARY CONFIG ───
 const CLOUDINARY_CONFIG = {
     cloudName: 'nqyylkmd',
-    uploadPreset: 'pse_products' // You need to create this in Cloudinary Console (unsigned)
+    uploadPreset: 'pse_products' // Your unsigned upload preset
 };
 
 // ─── EXPOSE CLOUDINARY ───
@@ -60,17 +60,20 @@ function initFirebase() {
         }, 3000);
     };
 
-    // ─── CLOUDINARY UPLOAD FUNCTION (NO JQUERY) ───
+    // ─── CLOUDINARY UPLOAD (FIXED) ───
     window.uploadToCloudinary = async function(file, folder = 'products') {
         try {
             const formData = new FormData();
             formData.append('file', file);
             formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
-            formData.append('folder', folder);
             
-            // Add image optimization parameters
+            // Add folder
+            formData.append('folder', folder);
+
             const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`;
 
+            console.log('📤 Uploading to Cloudinary:', file.name, `(${(file.size / 1024).toFixed(2)} KB)`);
+            
             const response = await fetch(uploadUrl, {
                 method: 'POST',
                 body: formData
@@ -78,10 +81,13 @@ function initFirebase() {
 
             if (!response.ok) {
                 const errorData = await response.json();
+                console.error('❌ Cloudinary Error:', errorData);
                 throw new Error(errorData.error?.message || 'Upload failed');
             }
 
             const data = await response.json();
+            console.log('✅ Cloudinary Upload Success:', data.secure_url);
+            
             return {
                 secure_url: data.secure_url,
                 public_id: data.public_id,
@@ -93,7 +99,7 @@ function initFirebase() {
                 created_at: data.created_at
             };
         } catch (error) {
-            console.error('Cloudinary upload error:', error);
+            console.error('❌ Cloudinary upload error:', error);
             showToast('Failed to upload image: ' + error.message, 'error');
             throw error;
         }
@@ -104,17 +110,19 @@ function initFirebase() {
         const results = [];
         let uploadedCount = 0;
         
-        showToast(`Uploading ${files.length} images to Cloudinary...`, 'info');
+        showToast(`📤 Uploading ${files.length} images...`, 'info');
         
         for (const file of files) {
             try {
                 const result = await window.uploadToCloudinary(file, folder);
-                results.push(result);
-                uploadedCount++;
-                showToast(`Uploaded ${uploadedCount}/${files.length}: ${result.original_filename}`, 'success');
+                if (result) {
+                    results.push(result);
+                    uploadedCount++;
+                    showToast(`✅ Uploaded ${uploadedCount}/${files.length}: ${result.original_filename}`, 'success');
+                }
             } catch (error) {
-                console.error('Upload failed for:', file.name, error);
-                showToast(`Failed to upload ${file.name}`, 'error');
+                console.error('❌ Upload failed for:', file.name, error);
+                showToast(`❌ Failed to upload ${file.name}`, 'error');
             }
         }
         
@@ -129,12 +137,14 @@ function initFirebase() {
 
     // ─── GET OPTIMIZED CLOUDINARY URL ───
     window.getOptimizedCloudinaryUrl = function(publicId, options = {}) {
+        if (!publicId) return '';
+        
         let transformations = [];
         
-        // Add quality auto
+        // Add quality auto (good balance)
         transformations.push('q_auto:good');
         
-        // Add format auto
+        // Add format auto (WebP/AVIF)
         transformations.push('f_auto');
         
         // Add width if specified
@@ -156,6 +166,13 @@ function initFirebase() {
         
         const transformationString = transformations.join(',');
         return `https://res.cloudinary.com/${CLOUDINARY_CONFIG.cloudName}/image/upload/${transformationString}/${publicId}`;
+    };
+
+    // ─── VERIFY CLOUDINARY IMAGE URL ───
+    window.verifyCloudinaryUrl = function(url) {
+        if (!url) return false;
+        // Check if it's a Cloudinary URL
+        return url.includes('cloudinary.com') && url.includes(CLOUDINARY_CONFIG.cloudName);
     };
 
     // ─── AUTH FUNCTIONS ───
@@ -360,7 +377,13 @@ function initFirebase() {
                 .get();
             const products = [];
             snapshot.forEach(doc => {
-                products.push({ id: doc.id, ...doc.data() });
+                const data = doc.data();
+                products.push({ 
+                    id: doc.id, 
+                    ...data,
+                    // Ensure image_url is valid
+                    image_url: data.image_url || data.images?.[0] || ''
+                });
             });
             return products;
         } catch (error) {
@@ -373,47 +396,17 @@ function initFirebase() {
         try {
             const doc = await db.collection('products').doc(id).get();
             if (doc.exists) {
-                return { id: doc.id, ...doc.data() };
+                const data = doc.data();
+                return { 
+                    id: doc.id, 
+                    ...data,
+                    image_url: data.image_url || data.images?.[0] || ''
+                };
             }
             return null;
         } catch (error) {
             console.error('Error fetching product:', error);
             return null;
-        }
-    };
-
-    // ─── PRODUCT FUNCTIONS WITH CLOUDINARY ───
-    window.addProductWithImages = async function(productData, imageFiles) {
-        try {
-            let imageUrls = [];
-            let uploadedImages = [];
-            
-            // Upload images to Cloudinary
-            if (imageFiles && imageFiles.length > 0) {
-                uploadedImages = await window.uploadMultipleToCloudinary(imageFiles, 'products');
-                imageUrls = uploadedImages.map(img => img.secure_url);
-            }
-            
-            const docRef = await db.collection('products').add({
-                ...productData,
-                image_url: imageUrls.length > 0 ? imageUrls[0] : '',
-                images: imageUrls,
-                cloudinary_images: uploadedImages.map(img => ({
-                    public_id: img.public_id,
-                    secure_url: img.secure_url,
-                    format: img.format,
-                    width: img.width,
-                    height: img.height,
-                    bytes: img.bytes
-                })),
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            });
-            
-            return { id: docRef.id, ...productData };
-        } catch (error) {
-            console.error('Error adding product with images:', error);
-            throw error;
         }
     };
 
@@ -676,7 +669,7 @@ function initFirebase() {
         }
     };
 
-    // ─── RENDER PRODUCTS ───
+    // ─── RENDER PRODUCTS WITH IMAGE DEBUG ───
     window.renderProducts = function(products, containerId = 'productGrid') {
         const grid = document.getElementById(containerId);
         if (!grid) return;
@@ -693,7 +686,19 @@ function initFirebase() {
 
         grid.innerHTML = products.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
-            const imageUrl = p.image_url || '';
+            // Get the best available image URL
+            let imageUrl = p.image_url || '';
+            if (!imageUrl && p.images && p.images.length > 0) {
+                imageUrl = p.images[0];
+            }
+            if (!imageUrl && p.cloudinary_images && p.cloudinary_images.length > 0) {
+                imageUrl = p.cloudinary_images[0].secure_url;
+            }
+            
+            // Log for debugging
+            if (imageUrl) {
+                console.log('🖼️ Product image URL:', p.title, imageUrl);
+            }
             
             return `
             <div class="product-card">
@@ -701,7 +706,7 @@ function initFirebase() {
                 ${discount > 0 ? `<span class="product-badge">-${discount}%</span>` : ''}
                 <div class="product-image" onclick="window.location.href='product-detail.html?id=${p.id}'">
                     ${imageUrl ? 
-                        `<img src="${imageUrl}" alt="${p.title}" />` : 
+                        `<img src="${imageUrl}" alt="${p.title}" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'; console.log('❌ Image failed to load:', '${imageUrl}')" />` : 
                         `<i class="fa-solid fa-box"></i>`
                     }
                 </div>
@@ -936,7 +941,8 @@ function initFirebase() {
         updateAuthUI();
     });
     
-    console.log('Firebase initialized successfully!');
+    console.log('✅ Firebase initialized successfully!');
+    console.log('📦 Cloudinary config:', CLOUDINARY_CONFIG);
 }
 
 // ─── START FIREBASE INITIALIZATION ───
