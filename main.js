@@ -12,10 +12,9 @@ const firebaseConfig = {
 // ─── CLOUDINARY CONFIG ───
 const CLOUDINARY_CONFIG = {
     cloudName: 'nqyylkmd',
-    uploadPreset: 'pse_products' // Your unsigned upload preset
+    uploadPreset: 'pse_products' // Must be created in Cloudinary Console as UNSIGNED
 };
 
-// ─── EXPOSE CLOUDINARY ───
 window.CLOUDINARY_CONFIG = CLOUDINARY_CONFIG;
 
 // ─── INITIALIZE FIREBASE ───
@@ -57,17 +56,15 @@ function initFirebase() {
         clearTimeout(toast._timeout);
         toast._timeout = setTimeout(() => {
             toast.classList.remove('show');
-        }, 3000);
+        }, 3500);
     };
 
-    // ─── CLOUDINARY UPLOAD (FIXED) ───
+    // ─── CLOUDINARY UPLOAD ───
     window.uploadToCloudinary = async function(file, folder = 'products') {
         try {
             const formData = new FormData();
             formData.append('file', file);
             formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
-            
-            // Add folder
             formData.append('folder', folder);
 
             const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`;
@@ -105,12 +102,13 @@ function initFirebase() {
         }
     };
 
-    // ─── UPLOAD MULTIPLE IMAGES ───
     window.uploadMultipleToCloudinary = async function(files, folder = 'products') {
         const results = [];
         let uploadedCount = 0;
         
-        showToast(`📤 Uploading ${files.length} images...`, 'info');
+        if (files.length > 0) {
+            showToast(`📤 Uploading ${files.length} images...`, 'info');
+        }
         
         for (const file of files) {
             try {
@@ -126,38 +124,26 @@ function initFirebase() {
             }
         }
         
-        if (results.length === files.length) {
+        if (results.length === files.length && files.length > 0) {
             showToast(`✅ All ${results.length} images uploaded successfully!`, 'success');
-        } else {
-            showToast(`⚠️ Uploaded ${results.length} of ${files.length} images`, 'info');
         }
         
         return results;
     };
 
-    // ─── GET OPTIMIZED CLOUDINARY URL ───
     window.getOptimizedCloudinaryUrl = function(publicId, options = {}) {
         if (!publicId) return '';
         
         let transformations = [];
-        
-        // Add quality auto (good balance)
         transformations.push('q_auto:good');
-        
-        // Add format auto (WebP/AVIF)
         transformations.push('f_auto');
         
-        // Add width if specified
         if (options.width) {
             transformations.push(`w_${options.width}`);
         }
-        
-        // Add height if specified
         if (options.height) {
             transformations.push(`h_${options.height}`);
         }
-        
-        // Add crop if specified
         if (options.crop) {
             transformations.push(`c_${options.crop}`);
         } else {
@@ -166,13 +152,6 @@ function initFirebase() {
         
         const transformationString = transformations.join(',');
         return `https://res.cloudinary.com/${CLOUDINARY_CONFIG.cloudName}/image/upload/${transformationString}/${publicId}`;
-    };
-
-    // ─── VERIFY CLOUDINARY IMAGE URL ───
-    window.verifyCloudinaryUrl = function(url) {
-        if (!url) return false;
-        // Check if it's a Cloudinary URL
-        return url.includes('cloudinary.com') && url.includes(CLOUDINARY_CONFIG.cloudName);
     };
 
     // ─── AUTH FUNCTIONS ───
@@ -381,7 +360,6 @@ function initFirebase() {
                 products.push({ 
                     id: doc.id, 
                     ...data,
-                    // Ensure image_url is valid
                     image_url: data.image_url || data.images?.[0] || ''
                 });
             });
@@ -407,6 +385,43 @@ function initFirebase() {
         } catch (error) {
             console.error('Error fetching product:', error);
             return null;
+        }
+    };
+
+    window.addProduct = async function(productData) {
+        try {
+            const docRef = await db.collection('products').add({
+                ...productData,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            });
+            return { id: docRef.id, ...productData };
+        } catch (error) {
+            console.error('Error adding product:', error);
+            throw error;
+        }
+    };
+
+    window.updateProduct = async function(id, productData) {
+        try {
+            await db.collection('products').doc(id).update({
+                ...productData,
+                updated_at: new Date().toISOString()
+            });
+            return { id, ...productData };
+        } catch (error) {
+            console.error('Error updating product:', error);
+            throw error;
+        }
+    };
+
+    window.deleteProduct = async function(id) {
+        try {
+            await db.collection('products').doc(id).delete();
+            return true;
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            throw error;
         }
     };
 
@@ -669,7 +684,7 @@ function initFirebase() {
         }
     };
 
-    // ─── RENDER PRODUCTS WITH IMAGE DEBUG ───
+    // ─── RENDER PRODUCTS ───
     window.renderProducts = function(products, containerId = 'productGrid') {
         const grid = document.getElementById(containerId);
         if (!grid) return;
@@ -686,7 +701,8 @@ function initFirebase() {
 
         grid.innerHTML = products.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
-            // Get the best available image URL
+            
+            // Get image URL from multiple possible sources
             let imageUrl = p.image_url || '';
             if (!imageUrl && p.images && p.images.length > 0) {
                 imageUrl = p.images[0];
@@ -695,20 +711,17 @@ function initFirebase() {
                 imageUrl = p.cloudinary_images[0].secure_url;
             }
             
-            // Log for debugging
-            if (imageUrl) {
-                console.log('🖼️ Product image URL:', p.title, imageUrl);
-            }
+            // Fallback image
+            const imageHtml = imageUrl ? 
+                `<img src="${imageUrl}" alt="${p.title}" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />` : 
+                `<i class="fa-solid fa-box"></i>`;
             
             return `
             <div class="product-card">
                 ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
                 ${discount > 0 ? `<span class="product-badge">-${discount}%</span>` : ''}
                 <div class="product-image" onclick="window.location.href='product-detail.html?id=${p.id}'">
-                    ${imageUrl ? 
-                        `<img src="${imageUrl}" alt="${p.title}" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'; console.log('❌ Image failed to load:', '${imageUrl}')" />` : 
-                        `<i class="fa-solid fa-box"></i>`
-                    }
+                    ${imageHtml}
                 </div>
                 <div class="product-title" onclick="window.location.href='product-detail.html?id=${p.id}'">${p.title}</div>
                 <div class="product-brand">${p.brand || 'PSE Wholesale'}</div>

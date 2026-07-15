@@ -9,7 +9,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/cloudinary-core@2.11.3/cloudinary-core-shrinkwrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/cloudinary-jquery-file-upload@2.11.3/cloudinary-jquery-file-upload.js"></script>
-
+    
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -1097,7 +1097,12 @@ async function loadAdminProducts() {
         const snapshot = await db.collection('products').get();
         adminProducts = [];
         snapshot.forEach(doc => {
-            adminProducts.push({ id: doc.id, ...doc.data() });
+            const data = doc.data();
+            adminProducts.push({ 
+                id: doc.id, 
+                ...data,
+                image_url: data.image_url || data.images?.[0] || ''
+            });
         });
         document.getElementById('adminProductBadge').textContent = adminProducts.length;
     } catch (error) {
@@ -1194,17 +1199,21 @@ document.getElementById('addProductAdminForm')?.addEventListener('submit', async
             description: document.getElementById('adminNewProductDescription').value || '',
             status: 'active',
             seller: 'PSE Admin',
+            type: 'Wholesale',
+            rating: 4.0,
+            reviews: 0,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         };
 
-        console.log('📦 Product data:', productData);
+        console.log('📦 Product data being saved:', productData);
 
         if (editingProductId) {
             await db.collection('products').doc(editingProductId).update(productData);
             showToast('✅ Product updated with images!', 'success');
         } else {
-            await db.collection('products').add(productData);
+            const docRef = await db.collection('products').add(productData);
+            console.log('✅ Product added with ID:', docRef.id);
             showToast('✅ Product added with images!', 'success');
         }
         
@@ -1227,10 +1236,10 @@ async function approveAdminProduct(id) {
             status: 'approved',
             updated_at: new Date().toISOString()
         });
-        showToast('Product approved!', 'success');
+        showToast('✅ Product approved!', 'success');
         await loadAdminProducts();
     } catch (error) {
-        showToast('Error approving product', 'error');
+        showToast('❌ Error approving product', 'error');
     }
 }
 window.approveAdminProduct = approveAdminProduct;
@@ -1241,22 +1250,17 @@ async function deleteAdminProduct(id) {
     
     try {
         const product = adminProducts.find(p => p.id === id);
-        if (product && product.images) {
-            for (const imageUrl of product.images) {
-                try {
-                    await window.deleteImageFromStorage(imageUrl);
-                } catch (e) {
-                    console.log('Could not delete image:', e);
-                }
-            }
+        if (product && product.cloudinary_images) {
+            // Note: Cloudinary delete would require API call with secret
+            console.log('⚠️ Cloudinary images not deleted (would require API call)');
         }
         
         await db.collection('products').doc(id).delete();
-        showToast('Product deleted', 'info');
+        showToast('🗑️ Product deleted', 'info');
         await loadAdminProducts();
         await updateAdminStats();
     } catch (error) {
-        showToast('Error deleting product', 'error');
+        showToast('❌ Error deleting product', 'error');
     }
 }
 window.deleteAdminProduct = deleteAdminProduct;
@@ -1365,12 +1369,12 @@ async function updateOrderStatus(orderId, newStatus) {
             }
         }
         
-        showToast(`Order status updated to ${newStatus}`, 'success');
+        showToast(`✅ Order status updated to ${newStatus}`, 'success');
         await loadAdminOrders();
         await updateAdminStats();
     } catch (error) {
         console.error('Error updating order:', error);
-        showToast('Error updating order', 'error');
+        showToast('❌ Error updating order', 'error');
     }
 }
 window.updateOrderStatus = updateOrderStatus;
@@ -1412,7 +1416,7 @@ function renderAdminUsers(users) {
             <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
             <td><span class="status-badge ${u.status === 'active' ? 'active' : 'inactive'}">${u.status || 'active'}</span></td>
             <td>
-                <button class="btn-action edit" onclick="showToast('Edit user coming soon', 'info')"><i class="fa-regular fa-pen"></i></button>
+                <button class="btn-action edit" onclick="showToast('✏️ Edit user coming soon', 'info')"><i class="fa-regular fa-pen"></i></button>
                 ${u.role !== 'admin' ? `<button class="btn-action make-admin" onclick="makeAdmin('${u.id}')"><i class="fa-regular fa-user-plus"></i> Make Admin</button>` : ''}
             </td>
         </tr>
@@ -1426,11 +1430,11 @@ async function makeAdmin(id) {
             role: 'admin',
             updated_at: new Date().toISOString()
         });
-        showToast('User promoted to Admin!', 'success');
+        showToast('✅ User promoted to Admin!', 'success');
         await loadAdminUsers();
         await updateAdminStats();
     } catch (error) {
-        showToast('Error making admin', 'error');
+        showToast('❌ Error making admin', 'error');
     }
 }
 window.makeAdmin = makeAdmin;
@@ -1492,10 +1496,10 @@ async function approveSeller(id) {
             status: 'approved',
             updated_at: new Date().toISOString()
         });
-        showToast('Seller approved!', 'success');
+        showToast('✅ Seller approved!', 'success');
         await loadAdminSellers();
     } catch (error) {
-        showToast('Error approving seller', 'error');
+        showToast('❌ Error approving seller', 'error');
     }
 }
 window.approveSeller = approveSeller;
@@ -1507,10 +1511,10 @@ async function suspendSeller(id) {
             status: 'suspended',
             updated_at: new Date().toISOString()
         });
-        showToast('Seller suspended', 'info');
+        showToast('⛔ Seller suspended', 'info');
         await loadAdminSellers();
     } catch (error) {
-        showToast('Error suspending seller', 'error');
+        showToast('❌ Error suspending seller', 'error');
     }
 }
 window.suspendSeller = suspendSeller;
@@ -1556,7 +1560,7 @@ function saveSettings() {
     };
     
     localStorage.setItem('pse_settings', JSON.stringify(settings));
-    showToast('Settings saved!', 'success');
+    showToast('✅ Settings saved!', 'success');
 }
 window.saveSettings = saveSettings;
 
@@ -1633,7 +1637,12 @@ function setupRealtimeListeners() {
     db.collection('products').onSnapshot((snapshot) => {
         adminProducts = [];
         snapshot.forEach(doc => {
-            adminProducts.push({ id: doc.id, ...doc.data() });
+            const data = doc.data();
+            adminProducts.push({ 
+                id: doc.id, 
+                ...data,
+                image_url: data.image_url || data.images?.[0] || ''
+            });
         });
         document.getElementById('adminProductBadge').textContent = adminProducts.length;
         renderAdminProducts();
