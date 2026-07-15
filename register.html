@@ -16,7 +16,7 @@
     
     <style>
         .auth-page {
-            max-width: 480px;
+            max-width: 520px;
             margin: 2rem auto;
             background: #fff;
             border-radius: 1.5rem;
@@ -83,6 +83,10 @@
         .auth-page .btn-register i {
             margin-right: 0.5rem;
         }
+        .auth-page .btn-register:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
         .auth-page .divider {
             text-align: center;
             margin: 1.5rem 0;
@@ -118,6 +122,10 @@
             transition: 0.2s;
             font-size: 0.9rem;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
         .auth-page .social-login button:hover {
             background: #f1f5f9;
@@ -178,6 +186,31 @@
         .role-selector .role span {
             font-size: 0.8rem;
             font-weight: 600;
+        }
+
+        .password-strength {
+            height: 4px;
+            background: #dce3e9;
+            border-radius: 4px;
+            margin-top: 0.3rem;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        .password-strength .bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+        .password-strength .bar.weak { width: 25%; background: #c0392b; }
+        .password-strength .bar.medium { width: 50%; background: #e67e22; }
+        .password-strength .bar.strong { width: 75%; background: #f1c40f; }
+        .password-strength .bar.very-strong { width: 100%; background: #1e7b6b; }
+        
+        .password-hint {
+            font-size: 0.7rem;
+            color: #6a889a;
+            margin-top: 0.2rem;
         }
 
         @media (max-width: 480px) {
@@ -291,6 +324,7 @@
         <p class="subtitle">Join PSE Wholesale marketplace</p>
 
         <form id="registerForm">
+            <!-- Name Fields -->
             <div class="form-row">
                 <div class="form-group">
                     <label>First Name *</label>
@@ -302,24 +336,33 @@
                 </div>
             </div>
 
+            <!-- Email -->
             <div class="form-group">
                 <label>Email Address *</label>
                 <input type="email" id="regEmail" placeholder="you@example.com" required />
             </div>
 
+            <!-- Password -->
             <div class="form-group">
                 <label>Password *</label>
                 <input type="password" id="regPassword" placeholder="Min 6 characters" required minlength="6" />
+                <div class="password-strength">
+                    <div class="bar" id="passwordStrengthBar"></div>
+                </div>
+                <div class="password-hint" id="passwordHint">Use 6+ characters with a mix of letters and numbers</div>
             </div>
 
+            <!-- Confirm Password -->
             <div class="form-group">
                 <label>Confirm Password *</label>
                 <input type="password" id="regConfirmPassword" placeholder="Confirm your password" required />
+                <div id="passwordMatchHint" style="font-size:0.7rem; margin-top:0.2rem;"></div>
             </div>
 
+            <!-- Role Selection -->
             <label style="font-size:0.85rem; font-weight:600; color:#0b2a3b;">I want to register as:</label>
             <div class="role-selector">
-                <div class="role active" onclick="selectRole(this)" data-role="customer">
+                <div class="role active" onclick="selectRole(this)" data-role="buyer">
                     <i class="fa-regular fa-user"></i>
                     <span>Customer</span>
                 </div>
@@ -329,6 +372,7 @@
                 </div>
             </div>
 
+            <!-- Seller Fields (hidden by default) -->
             <div id="sellerFields" style="display:none;">
                 <div class="form-group">
                     <label>Company Name</label>
@@ -342,22 +386,36 @@
                         <option value="wholesale">Wholesale</option>
                         <option value="manufacturer">Manufacturer</option>
                         <option value="distributor">Distributor</option>
+                        <option value="importer">Importer</option>
+                        <option value="exporter">Exporter</option>
+                        <option value="dropshipper">Dropshipper</option>
                         <option value="other">Other</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="regPhone" placeholder="(555) 123-4567" />
+                </div>
+                <div class="form-group">
+                    <label>Website (Optional)</label>
+                    <input type="url" id="regWebsite" placeholder="https://yourstore.com" />
+                </div>
             </div>
 
-            <button type="submit" class="btn-register"><i class="fa-solid fa-user-plus"></i> Create Account</button>
+            <!-- Submit Button -->
+            <button type="submit" class="btn-register" id="registerBtn">
+                <i class="fa-solid fa-user-plus"></i> Create Account
+            </button>
         </form>
 
         <div class="divider"><span>or continue with</span></div>
 
         <div class="social-login">
-            <button onclick="signUpWithGoogle()" style="background:#fff; border:1px solid #dce3e9; padding:0.6rem; border-radius:8px; cursor:pointer; width:100%; font-size:0.9rem; font-weight:500; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+            <button onclick="signUpWithGoogle()">
                 <img src="https://www.google.com/favicon.ico" style="width:18px; height:18px;" alt="Google" />
                 Sign up with Google
             </button>
-            <button onclick="showToast('🔵 Facebook registration coming soon', 'info')" style="flex:1; padding:0.6rem; border:1px solid #dce3e9; border-radius:8px; background:#fff; cursor:pointer; transition:0.2s; font-size:0.9rem; font-weight:500;">
+            <button onclick="showToast('🔵 Facebook registration coming soon', 'info')">
                 <i class="fa-brands fa-facebook" style="color:#1877f2;"></i> Facebook
             </button>
         </div>
@@ -437,7 +495,8 @@
 <script src="main.js"></script>
 
 <script>
-let selectedRole = 'customer';
+// ─── ROLE SELECTOR ───
+let selectedRole = 'buyer';
 
 function selectRole(el) {
     document.querySelectorAll('.role-selector .role').forEach(r => r.classList.remove('active'));
@@ -452,6 +511,60 @@ function selectRole(el) {
     }
 }
 
+// ─── PASSWORD STRENGTH ───
+document.getElementById('regPassword').addEventListener('input', function() {
+    const password = this.value;
+    const bar = document.getElementById('passwordStrengthBar');
+    const hint = document.getElementById('passwordHint');
+    
+    let strength = 0;
+    let level = '';
+    
+    if (password.length >= 6) strength++;
+    if (password.length >= 10) strength++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[^a-zA-Z0-9]/.test(password)) strength++;
+    
+    if (strength <= 1) {
+        level = 'weak';
+        hint.textContent = 'Weak - Add more characters, numbers, and symbols';
+        hint.style.color = '#c0392b';
+    } else if (strength === 2) {
+        level = 'medium';
+        hint.textContent = 'Medium - Add uppercase letters and symbols';
+        hint.style.color = '#e67e22';
+    } else if (strength === 3) {
+        level = 'strong';
+        hint.textContent = 'Strong - Good password!';
+        hint.style.color = '#f1c40f';
+    } else if (strength >= 4) {
+        level = 'very-strong';
+        hint.textContent = 'Very Strong - Excellent password!';
+        hint.style.color = '#1e7b6b';
+    }
+    
+    bar.className = 'bar ' + level;
+});
+
+// ─── PASSWORD MATCH ───
+document.getElementById('regConfirmPassword').addEventListener('input', function() {
+    const password = document.getElementById('regPassword').value;
+    const confirm = this.value;
+    const hint = document.getElementById('passwordMatchHint');
+    
+    if (confirm.length === 0) {
+        hint.textContent = '';
+        hint.style.color = '';
+    } else if (password === confirm) {
+        hint.textContent = '✅ Passwords match!';
+        hint.style.color = '#1e7b6b';
+    } else {
+        hint.textContent = '❌ Passwords do not match';
+        hint.style.color = '#c0392b';
+    }
+});
+
 // ─── REGISTER FORM HANDLER ───
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -463,7 +576,10 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     const confirm = document.getElementById('regConfirmPassword').value;
     const company = document.getElementById('regCompany').value.trim();
     const businessType = document.getElementById('regBusinessType').value;
+    const phone = document.getElementById('regPhone').value.trim();
+    const website = document.getElementById('regWebsite').value.trim();
 
+    // ─── VALIDATION ───
     if (!firstName || !lastName || !email || !password) {
         showToast('❌ Please fill in all required fields', 'error');
         return;
@@ -479,18 +595,60 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         return;
     }
 
+    if (selectedRole === 'seller' && !company) {
+        showToast('❌ Please enter your company name', 'error');
+        return;
+    }
+
+    // ─── DISABLE BUTTON ───
+    const btn = document.getElementById('registerBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account...';
+
     showToast('⏳ Creating account...', 'info');
 
-    const result = await signUp(email, password, {
-        full_name: `${firstName} ${lastName}`,
-        role: selectedRole,
-        company: company,
-        businessType: businessType
-    });
-
-    if (result.success) {
+    try {
+        // ─── CREATE USER WITH FIREBASE ───
+        const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+        
+        // ─── UPDATE PROFILE ───
+        await user.updateProfile({
+            displayName: `${firstName} ${lastName}`
+        });
+        
+        // ─── SAVE TO FIRESTORE ───
+        const userData = {
+            email: email,
+            full_name: `${firstName} ${lastName}`,
+            first_name: firstName,
+            last_name: lastName,
+            role: selectedRole,
+            company: company || '',
+            business_type: businessType || '',
+            phone: phone || '',
+            website: website || '',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            status: 'active',
+            email_verified: user.emailVerified
+        };
+        
+        await db.collection('users').doc(user.uid).set(userData);
+        
+        // ─── SAVE TO LOCAL STORAGE ───
+        localStorage.setItem('pse_user', JSON.stringify({
+            id: user.uid,
+            email: email,
+            full_name: `${firstName} ${lastName}`,
+            role: selectedRole,
+            company: company || '',
+            business_type: businessType || ''
+        }));
+        
         showToast(`🎉 Welcome ${firstName}! Account created!`, 'success');
         
+        // ─── REDIRECT ───
         setTimeout(() => {
             if (selectedRole === 'seller') {
                 window.location.href = 'seller-dashboard.html';
@@ -498,8 +656,23 @@ document.getElementById('registerForm').addEventListener('submit', async functio
                 window.location.href = 'index.html';
             }
         }, 1500);
-    } else {
-        showToast('❌ ' + result.error, 'error');
+        
+    } catch (error) {
+        console.error('Registration error:', error);
+        
+        let errorMessage = error.message;
+        if (error.code === 'auth/email-already-in-use') {
+            errorMessage = 'This email is already registered. Please login instead.';
+        } else if (error.code === 'auth/invalid-email') {
+            errorMessage = 'Please enter a valid email address.';
+        } else if (error.code === 'auth/weak-password') {
+            errorMessage = 'Password is too weak. Please use at least 6 characters.';
+        }
+        
+        showToast('❌ ' + errorMessage, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Account';
     }
 });
 
@@ -509,16 +682,20 @@ async function signUpWithGoogle() {
         const result = await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
         const user = result.user;
         
-        // Check if user exists in Firestore
+        // ─── CHECK IF USER EXISTS ───
         const userDoc = await db.collection('users').doc(user.uid).get();
         if (!userDoc.exists) {
+            // ─── CREATE NEW USER ───
             await db.collection('users').doc(user.uid).set({
                 email: user.email,
                 full_name: user.displayName || '',
+                first_name: user.displayName?.split(' ')[0] || '',
+                last_name: user.displayName?.split(' ').slice(1).join(' ') || '',
                 role: selectedRole || 'buyer',
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
-                status: 'active'
+                status: 'active',
+                email_verified: true
             });
         }
         
