@@ -3,61 +3,103 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>All Products - PSE Wholesale</title>
+    <title>Products - Pilot Sales Distribution</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Browse 12,000+ wholesale products at Pilot Sales Distribution. Electronics, Fashion, Grocery, Home & more." />
+    <meta name="keywords" content="wholesale products, bulk products, electronics, fashion, grocery" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Products - Pilot Sales Distribution" />
+    <meta property="og:description" content="Wholesale products at bulk prices." />
+    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo-192.png" />
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="style.css" />
-    
-    <script src="https://cdn.jsdelivr.net/npm/cloudinary-core@2.11.3/cloudinary-core-shrinkwrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/cloudinary-jquery-file-upload@2.11.3/cloudinary-jquery-file-upload.js"></script>
-    
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
-    
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css" />
+
     <style>
+        /* ─── PRODUCTS PAGE SPECIFIC STYLES ─── */
         .products-layout {
             display: grid;
             grid-template-columns: 260px 1fr;
             gap: 2rem;
             margin: 1.5rem 0;
         }
-        .filters {
-            background: #fff;
-            border-radius: 1.2rem;
+
+        /* ─── FILTERS SIDEBAR ─── */
+        .filters-sidebar {
+            background: var(--white);
+            border-radius: var(--radius);
             padding: 1.5rem;
-            border: 1px solid #e9edf2;
+            border: 1px solid var(--border);
             height: fit-content;
             position: sticky;
             top: 100px;
         }
-        .filters h3 {
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            color: #0b2a3b;
+
+        .filters-sidebar h3 {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
         }
+
         .filter-group {
             margin-bottom: 1.5rem;
-            border-bottom: 1px solid #eef2f6;
+            border-bottom: 1px solid var(--border);
             padding-bottom: 1rem;
         }
+        .filter-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .filter-group h4 {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
         .filter-group label {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             font-size: 0.8rem;
-            color: #2c5a6b;
-            margin-bottom: 0.3rem;
+            color: var(--text);
+            padding: 0.2rem 0;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .filter-group label:hover {
+            color: var(--primary);
+        }
+
+        .filter-group label input[type="checkbox"],
+        .filter-group label input[type="radio"] {
+            accent-color: var(--primary);
+            width: 16px;
+            height: 16px;
             cursor: pointer;
         }
-        .filter-group label input {
-            margin-right: 0.4rem;
-        }
-        .filter-group h4 {
-            font-size: 0.8rem;
-            color: #0b2a3b;
-            margin-bottom: 0.5rem;
-        }
+
         .filter-group .price-range {
             display: flex;
             gap: 0.5rem;
@@ -65,21 +107,72 @@
         }
         .filter-group .price-range input {
             width: 80px;
-            padding: 0.3rem 0.5rem;
-            border: 1px solid #dce3e9;
+            padding: 0.4rem 0.5rem;
+            border: 1px solid var(--border-dark);
             border-radius: 6px;
             font-size: 0.75rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        .filter-group .price-range input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 123, 107, 0.1);
         }
         .filter-group .price-range span {
             font-size: 0.75rem;
-            color: #6a889a;
+            color: var(--text-light);
         }
-        .filter-group .clear-filter {
+
+        .clear-filters {
             color: #c0392b;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             cursor: pointer;
             text-decoration: underline;
+            margin-top: 0.5rem;
+            display: inline-block;
         }
+        .clear-filters:hover {
+            color: #a93226;
+        }
+
+        /* ─── SORT BAR ─── */
+        .sort-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.2rem;
+            padding: 0.8rem 1rem;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        .sort-bar .result-count {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        .sort-bar .result-count strong {
+            color: var(--secondary);
+        }
+
+        .sort-bar select {
+            padding: 0.4rem 1rem;
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            background: var(--white);
+            outline: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .sort-bar select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 123, 107, 0.1);
+        }
+
+        /* ─── PAGINATION ─── */
         .pagination {
             display: flex;
             gap: 0.5rem;
@@ -88,52 +181,47 @@
             flex-wrap: wrap;
         }
         .pagination a {
-            background: #fff;
+            background: var(--white);
             padding: 0.4rem 0.9rem;
             border-radius: 8px;
-            border: 1px solid #dce3e9;
+            border: 1px solid var(--border-dark);
             font-size: 0.8rem;
-            color: #1a3340;
-            transition: 0.2s;
+            color: var(--text);
+            transition: var(--transition);
             cursor: pointer;
         }
         .pagination a:hover {
-            background: #1e7b6b;
-            color: #fff;
-            border-color: #1e7b6b;
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
         }
         .pagination a.active {
-            background: #0b2a3b;
-            color: #fff;
-            border-color: #0b2a3b;
+            background: var(--secondary);
+            color: var(--white);
+            border-color: var(--secondary);
         }
-        .sort-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1.2rem;
+        .pagination a.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
-        .sort-bar select {
-            padding: 0.3rem 0.8rem;
-            border: 1px solid #dce3e9;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            background: #fff;
+        .pagination a.disabled:hover {
+            background: var(--white);
+            color: var(--text);
+            border-color: var(--border-dark);
         }
 
+        /* ─── RESPONSIVE ─── */
         @media (max-width: 992px) {
             .products-layout {
                 grid-template-columns: 1fr;
             }
-            .filters {
+            .filters-sidebar {
                 position: static;
                 display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
                 gap: 1rem;
             }
-            .filters h3 {
+            .filters-sidebar h3 {
                 grid-column: 1 / -1;
             }
             .filter-group {
@@ -142,13 +230,23 @@
                 margin-bottom: 0;
             }
         }
+
         @media (max-width: 768px) {
-            .filters {
+            .filters-sidebar {
                 grid-template-columns: 1fr 1fr;
             }
+            .sort-bar {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .sort-bar select {
+                width: 100%;
+            }
         }
+
         @media (max-width: 480px) {
-            .filters {
+            .filters-sidebar {
                 grid-template-columns: 1fr;
             }
         }
@@ -156,152 +254,168 @@
 </head>
 <body>
 
-<!-- ─── TOP BAR ─── -->
+<!-- ============================================ -->
+<!-- TOP BAR WITH MOVING WORDS -->
+<!-- ============================================ -->
 <div class="top-bar">
     <div class="container">
-        <div>
-            <span>Welcome to PSE Wholesale</span>
-            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
-            <a href="track-order.html">Track Order</a>
-            <a href="seller-dashboard.html">Become a Seller</a>
+        <div class="moving-words">
+            <div class="words-track">
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+            </div>
         </div>
-        <div id="authLinks">
-            <a href="login.html" id="loginLink">Login</a>
-            <a href="register.html" id="registerLink">Register</a>
-            <select class="lang-select" onchange="window.location.href='/?lang='+this.value">
-                <option value="EN">EN</option>
-                <option value="ES">ES</option>
-                <option value="FR">FR</option>
-                <option value="DE">DE</option>
-            </select>
+        <div class="top-links">
+            <a href="track-order.html"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard.html"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login.html" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register.html" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
 
-<!-- ─── HEADER ─── -->
+<!-- ============================================ -->
+<!-- HEADER -->
+<!-- ============================================ -->
 <header class="header">
     <div class="container">
-        <a href="index.html" class="logo" style="display:flex; align-items:center; gap:0.5rem; text-decoration:none;">
-            <img src="logo.jpg" alt="PSE Distribution" style="height:40px; width:auto; border-radius:8px;" />
-            <div style="display:flex; flex-direction:column; line-height:1.1;">
-                <span style="font-size:1.5rem; font-weight:800; color:#0b2a3b;">PSE <span style="color:#1e7b6b;">Distribution</span></span>
-                <span style="font-size:0.55rem; color:#6a889a; font-weight:400; letter-spacing:0.5px;">wholesale Marketplace</span>
+        <a href="home" class="logo">
+            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+            <div class="brand-name">
+                <span class="main">Pilot <span>Distribution</span></span>
+                <span class="sub">wholesale Marketplace</span>
             </div>
         </a>
-        <div class="search-bar">
-            <select id="categoryFilter"><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
-            <input type="text" id="searchInput" placeholder="Search wholesale products..." onkeyup="searchProducts(event)" />
-            <button onclick="searchProducts()"><i class="fa-solid fa-magnifying-glass"></i></button>
+
+        <!-- Search -->
+        <div class="search-bar" id="searchBar">
+            <input type="text" id="searchInput" placeholder="Search wholesale products..."
+                   onkeyup="searchProductsFirebase(event)" autocomplete="off" />
+            <button onclick="searchProductsFirebase()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <div class="search-results" id="searchResults"></div>
         </div>
+
         <div class="header-actions">
-            <div class="location-selector"><i class="fa-solid fa-location-dot"></i> Sacramento, 95829</div>
-            <a href="#" class="icon-btn" onclick="if(!JSON.parse(localStorage.getItem('pse_user')||'null')){showToast('Please login first','error')}else{window.location.href='wishlist.html'}">
-                <i class="fa-regular fa-heart"></i><span>Wishlist</span>
+            <a href="#" class="icon-btn" onclick="toggleWishlist()">
+                <i class="fa-regular fa-heart"></i>
+                <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="#" class="icon-btn">
-                <i class="fa-regular fa-bell"></i><span>Alerts</span>
-                <span class="badge-count">3</span>
-            </a>
-            <a href="#" class="icon-btn" id="accountBtn" onclick="if(!JSON.parse(localStorage.getItem('pse_user')||'null')){window.location.href='login.html'}else{window.location.href='account.html'}">
-                <i class="fa-regular fa-user"></i><span id="accountLabel">Account</span>
-            </a>
-            <a href="#" class="icon-btn" onclick="window.location.href='cart.html'">
-                <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
+            <a href="cart.html" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
+            </a>
+            <a href="account.html" class="icon-btn" id="accountBtn">
+                <i class="fa-regular fa-user"></i>
+                <span id="accountLabel">Account</span>
             </a>
         </div>
     </div>
 </header>
 
-<!-- ─── NAVIGATION ─── -->
+<!-- ============================================ -->
+<!-- NAVIGATION TABS -->
+<!-- ============================================ -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="index.html"><i class="fa-solid fa-bars"></i> All Departments</a>
-        <a href="#" onclick="filterByCategory('deals')">Today's Deals</a>
-        <a href="#" onclick="filterByCategory('new')">New Arrivals</a>
-        <a href="#" class="wholesale-nav" onclick="filterByCategory('wholesale')"><i class="fa-solid fa-cubes"></i> Wholesale</a>
-        <a href="#" onclick="filterByCategory('all')">Brands</a>
-        <a href="#" onclick="filterByCategory('clearance')">Clearance</a>
-        <a href="#" onclick="document.getElementById('flashDeals').scrollIntoView({behavior:'smooth'})">Flash Deals</a>
-        <a href="#">Gift Cards</a>
-        <a href="#">Business Solutions</a>
-        <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Customer Service</a>
+        <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products.html" class="nav-tab active"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about.html" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact.html" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center.html" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller.html" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
-<!-- ─── MAIN CONTENT ─── -->
+<!-- ============================================ -->
+<!-- MAIN CONTENT -->
+<!-- ============================================ -->
 <div class="container">
 
-    <!-- PAGE LINKS -->
-    <div class="page-links">
-        <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products.html" class="active"><i class="fa-solid fa-grid-2"></i> Products</a>
-        <a href="product-detail.html"><i class="fa-solid fa-eye"></i> Detail</a>
-        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
-        <a href="checkout.html"><i class="fa-solid fa-credit-card"></i> Checkout</a>
-        <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
-        <a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a>
-        <a href="account.html"><i class="fa-solid fa-user"></i> Account</a>
-        <a href="seller-dashboard.html"><i class="fa-solid fa-store"></i> Seller</a>
-        <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Admin</a>
-        <a href="about.html"><i class="fa-solid fa-info-circle"></i> About</a>
+    <!-- Page Header -->
+    <div class="page-header animate-on-scroll">
+        <h1>All <span>Products</span></h1>
+        <p>Browse our extensive wholesale catalog</p>
     </div>
 
-    <!-- Products Layout -->
+    <!-- ========================================== -->
+    <!-- PRODUCTS LAYOUT -->
+    <!-- ========================================== -->
     <div class="products-layout">
 
-        <!-- Filters Sidebar -->
-        <aside class="filters">
+        <!-- ─── FILTERS SIDEBAR ─── -->
+        <aside class="filters-sidebar" id="filtersSidebar">
             <h3><i class="fa-solid fa-sliders"></i> Filters</h3>
 
+            <!-- Category Filter -->
             <div class="filter-group">
                 <h4>Category</h4>
                 <label><input type="checkbox" value="electronics" onchange="applyFilters()" /> Electronics</label>
                 <label><input type="checkbox" value="fashion" onchange="applyFilters()" /> Fashion</label>
-                <label><input type="checkbox" value="home" onchange="applyFilters()" /> Home & Kitchen</label>
                 <label><input type="checkbox" value="grocery" onchange="applyFilters()" /> Grocery</label>
+                <label><input type="checkbox" value="home" onchange="applyFilters()" /> Home & Kitchen</label>
                 <label><input type="checkbox" value="beauty" onchange="applyFilters()" /> Beauty</label>
+                <label><input type="checkbox" value="health" onchange="applyFilters()" /> Health</label>
                 <label><input type="checkbox" value="sports" onchange="applyFilters()" /> Sports</label>
+                <label><input type="checkbox" value="automotive" onchange="applyFilters()" /> Automotive</label>
+                <label><input type="checkbox" value="baby" onchange="applyFilters()" /> Baby</label>
                 <label><input type="checkbox" value="office" onchange="applyFilters()" /> Office</label>
-                <span class="clear-filter" onclick="clearFilters()">Clear all</span>
+                <label><input type="checkbox" value="industrial" onchange="applyFilters()" /> Industrial</label>
             </div>
 
+            <!-- Price Range Filter -->
             <div class="filter-group">
                 <h4>Price Range</h4>
                 <div class="price-range">
                     <input type="number" id="priceMin" placeholder="Min" value="0" onchange="applyFilters()" />
                     <span>—</span>
-                    <input type="number" id="priceMax" placeholder="Max" value="50" onchange="applyFilters()" />
+                    <input type="number" id="priceMax" placeholder="Max" value="1000" onchange="applyFilters()" />
                 </div>
             </div>
 
+            <!-- MOQ Filter -->
             <div class="filter-group">
-                <h4>Wholesale MOQ</h4>
+                <h4>Minimum Order Quantity</h4>
                 <label><input type="radio" name="moq" value="any" checked onchange="applyFilters()" /> Any</label>
                 <label><input type="radio" name="moq" value="10" onchange="applyFilters()" /> 10+ units</label>
                 <label><input type="radio" name="moq" value="24" onchange="applyFilters()" /> 24+ units</label>
                 <label><input type="radio" name="moq" value="50" onchange="applyFilters()" /> 50+ units</label>
             </div>
 
+            <!-- Rating Filter -->
             <div class="filter-group">
                 <h4>Rating</h4>
-                <label><input type="checkbox" value="5" onchange="applyFilters()" /> ★★★★★ & up</label>
-                <label><input type="checkbox" value="4" onchange="applyFilters()" /> ★★★★☆ & up</label>
-                <label><input type="checkbox" value="3" onchange="applyFilters()" /> ★★★☆☆ & up</label>
+                <label><input type="checkbox" value="4" onchange="applyFilters()" /> ★★★★☆ &amp; up</label>
+                <label><input type="checkbox" value="3" onchange="applyFilters()" /> ★★★☆☆ &amp; up</label>
             </div>
 
-            <div class="filter-group" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
+            <!-- Product Type -->
+            <div class="filter-group">
                 <h4>Product Type</h4>
                 <label><input type="checkbox" value="Wholesale" onchange="applyFilters()" /> Wholesale</label>
                 <label><input type="checkbox" value="Bulk" onchange="applyFilters()" /> Bulk</label>
             </div>
+
+            <span class="clear-filters" onclick="clearAllFilters()">Clear all filters</span>
         </aside>
 
-        <!-- Product Grid Area -->
+        <!-- ─── PRODUCTS AREA ─── -->
         <div>
+
+            <!-- Sort Bar -->
             <div class="sort-bar">
-                <span style="font-size:0.85rem; color:#2c5a6b;" id="productCount">Showing all products</span>
+                <span class="result-count" id="resultCount">Showing <strong>0</strong> products</span>
                 <select id="sortSelect" onchange="applyFilters()">
                     <option value="default">Sort by: Best Match</option>
                     <option value="price-asc">Price: Low to High</option>
@@ -311,94 +425,141 @@
                 </select>
             </div>
 
+            <!-- Product Grid -->
             <div class="product-grid" id="productGrid">
                 <div class="loading-spinner">
-                    <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;"></i>
-                    <p style="margin-top:0.5rem;">Loading products...</p>
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <p>Loading products...</p>
                 </div>
             </div>
 
+            <!-- Pagination -->
             <div class="pagination" id="pagination">
-                <a onclick="changePage('prev')">&laquo;</a>
+                <a class="disabled" onclick="changePage('prev')">&laquo;</a>
                 <a class="active" onclick="changePage(1)">1</a>
                 <a onclick="changePage(2)">2</a>
+                <a onclick="changePage(3)">3</a>
                 <a onclick="changePage('next')">&raquo;</a>
             </div>
+
         </div>
 
     </div>
 
 </div>
 
-<!-- ─── HELP MODAL ─── -->
-<div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
-    <div class="modal-content">
-        <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
-        <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
-        <p>Choose from our support options below:</p>
-        <ul>
-            <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
-            <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
-            <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
-        </ul>
-        <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
-    </div>
-</div>
-
-<!-- ─── FOOTER ─── -->
+<!-- ============================================ -->
+<!-- FOOTER -->
+<!-- ============================================ -->
 <footer class="footer">
     <div class="container">
-        <div>
-            <h4>PSE Wholesale</h4>
-            <ul>
-                <li onclick="window.location.href='about.html'">About Us</li>
-                <li>Careers</li>
-                <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
-                <li>Blog</li>
-            </ul>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="help-center.html">Help</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms &amp; Conditions</a>
+                <a href="become-seller.html">Become a Seller</a>
+            </div>
+            <div class="footer-social">
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
         </div>
-        <div>
-            <h4>Customer Service</h4>
-            <ul>
-                <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
-                <li>Returns & Refunds</li>
-                <li>Shipping Policy</li>
-                <li onclick="window.location.href='track-order.html'">Track Order</li>
-            </ul>
-        </div>
-        <div>
-            <h4>B2B</h4>
-            <ul>
-                <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
-                <li>Wholesale Pricing</li>
-                <li>Bulk Orders</li>
-                <li>Supplier Program</li>
-            </ul>
-        </div>
-        <div>
-            <h4>Legal</h4>
-            <ul>
-                <li>Privacy Policy</li>
-                <li>Terms & Conditions</li>
-                <li>Cookie Policy</li>
-            </ul>
-        </div>
-        <div class="bottom">
-            &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+        <div class="footer-bottom">
+            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
         </div>
     </div>
 </footer>
 
-<!-- ─── MAIN JS ─── -->
+<!-- ============================================ -->
+<!-- TOAST NOTIFICATION -->
+<!-- ============================================ -->
+<div id="toast" class="toast"></div>
+
+<!-- ============================================ -->
+<!-- MAIN JAVASCRIPT -->
+<!-- ============================================ -->
 <script src="main.js"></script>
 
 <script>
-// Products page specific functions
-let currentPage = 1;
-const productsPerPage = 8;
-let filteredProducts = [];
+// ============================================
+// PRODUCTS PAGE - JAVASCRIPT
+// ============================================
 
-async function applyFilters() {
+// ─── SET CURRENT YEAR ───
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ─── STATE ───
+let allProducts = [];
+let filteredProducts = [];
+let currentPage = 1;
+const productsPerPage = 12;
+
+// ─── LOAD PRODUCTS ───
+async function loadProducts() {
+    const grid = document.getElementById('productGrid');
+    
+    try {
+        // Parse URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const category = params.get('category');
+        const search = params.get('search');
+        
+        // Fetch products from Firebase
+        allProducts = await fetchProducts();
+        
+        // Filter by category if specified
+        if (category && category !== 'all') {
+            allProducts = allProducts.filter(p => p.category === category);
+        }
+        
+        // Filter by search if specified
+        if (search) {
+            const query = search.toLowerCase();
+            allProducts = allProducts.filter(p => 
+                p.title.toLowerCase().includes(query) ||
+                (p.brand && p.brand.toLowerCase().includes(query))
+            );
+        }
+        
+        // Apply any URL filters
+        if (category === 'deals' || category === 'flash') {
+            allProducts = allProducts.filter(p => p.old_price && p.old_price > p.price);
+        }
+        if (category === 'wholesale') {
+            allProducts = allProducts.filter(p => p.type === 'Wholesale');
+        }
+        if (category === 'new') {
+            allProducts = allProducts.slice(0, 12);
+        }
+        if (category === 'clearance') {
+            allProducts = allProducts.filter(p => p.discount && p.discount > 30);
+        }
+        
+        filteredProducts = [...allProducts];
+        applyFilters();
+        
+    } catch (error) {
+        console.error('Error loading products:', error);
+        grid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);">
+                <i class="fa-regular fa-circle-exclamation" style="font-size:2rem; color:#c0392b;"></i>
+                <p style="margin-top:0.5rem;">Failed to load products.</p>
+                <button onclick="loadProducts()" style="margin-top:1rem; background:var(--primary); color:#fff; border:none; padding:0.5rem 1.5rem; border-radius:30px; cursor:pointer;">
+                    Retry
+                </button>
+            </div>
+        `;
+    }
+}
+
+// ─── APPLY FILTERS ───
+function applyFilters() {
+    // Get selected categories
     const categoryChecks = document.querySelectorAll('.filter-group input[type="checkbox"]');
     const selectedCategories = [];
     const selectedRatings = [];
@@ -407,9 +568,9 @@ async function applyFilters() {
     categoryChecks.forEach(cb => {
         if (cb.checked) {
             const val = cb.value;
-            if (['electronics','fashion','home','grocery','beauty','sports','office','baby','automotive','books','pets','industrial','kitchen'].includes(val)) {
+            if (['electronics','fashion','grocery','home','beauty','health','sports','automotive','baby','office','industrial'].includes(val)) {
                 selectedCategories.push(val);
-            } else if (['5','4','3'].includes(val)) {
+            } else if (['4','3'].includes(val)) {
                 selectedRatings.push(parseInt(val));
             } else if (['Wholesale','Bulk'].includes(val)) {
                 selectedTypes.push(val);
@@ -417,41 +578,51 @@ async function applyFilters() {
         }
     });
 
+    // Get price range
     const priceMin = parseFloat(document.getElementById('priceMin').value) || 0;
-    const priceMax = parseFloat(document.getElementById('priceMax').value) || 999;
+    const priceMax = parseFloat(document.getElementById('priceMax').value) || 9999;
 
+    // Get MOQ
     const moqRadio = document.querySelector('input[name="moq"]:checked');
     const moqValue = moqRadio ? parseInt(moqRadio.value) : 0;
 
+    // Get sort option
     const sort = document.getElementById('sortSelect').value;
 
-    let products = await fetchProducts();
+    // Apply filters
+    let products = [...allProducts];
 
+    // Category filter
     if (selectedCategories.length > 0) {
         products = products.filter(p => selectedCategories.includes(p.category));
     }
 
+    // Price filter
     products = products.filter(p => p.price >= priceMin && p.price <= priceMax);
 
+    // MOQ filter
     if (moqValue && moqValue !== 'any') {
         products = products.filter(p => (p.moq || 0) >= moqValue);
     }
 
+    // Rating filter
     if (selectedRatings.length > 0) {
         const minRating = Math.min(...selectedRatings);
         products = products.filter(p => (p.rating || 0) >= minRating);
     }
 
+    // Type filter
     if (selectedTypes.length > 0) {
         products = products.filter(p => selectedTypes.includes(p.type));
     }
 
+    // Sort
     switch(sort) {
         case 'price-asc':
-            products.sort((a,b) => a.price - b.price);
+            products.sort((a,b) => (a.price || 0) - (b.price || 0));
             break;
         case 'price-desc':
-            products.sort((a,b) => b.price - a.price);
+            products.sort((a,b) => (b.price || 0) - (a.price || 0));
             break;
         case 'rating':
             products.sort((a,b) => (b.rating || 0) - (a.rating || 0));
@@ -464,10 +635,11 @@ async function applyFilters() {
     }
 
     filteredProducts = products;
-    document.getElementById('productCount').textContent = `Showing ${products.length} products`;
+    document.getElementById('resultCount').innerHTML = `Showing <strong>${products.length}</strong> products`;
     renderProductsPage(1);
 }
 
+// ─── RENDER PRODUCTS PAGE ───
 function renderProductsPage(page) {
     const start = (page - 1) * productsPerPage;
     const end = start + productsPerPage;
@@ -476,45 +648,61 @@ function renderProductsPage(page) {
     const grid = document.getElementById('productGrid');
     if (pageProducts.length === 0) {
         grid.innerHTML = `
-            <div style="grid-column:1/-1; text-align:center; padding:2rem; color:#6a889a;">
-                <i class="fa-regular fa-box" style="font-size:2rem; color:#1e7b6b;"></i>
-                <p style="margin-top:0.5rem;">No products match your filters.</p>
-                <button onclick="clearFilters()" style="margin-top:1rem; background:#1e7b6b; color:#fff; border:none; padding:0.5rem 1.5rem; border-radius:30px; cursor:pointer;">
-                    Clear Filters
+            <div style="grid-column:1/-1; text-align:center; padding:3rem 1rem; color:var(--text-light);">
+                <i class="fa-regular fa-box" style="font-size:3rem; color:var(--primary);"></i>
+                <h3 style="margin-top:1rem; color:var(--secondary);">No products found</h3>
+                <p style="margin:0.5rem 0 1.5rem;">Try adjusting your filters or search terms.</p>
+                <button onclick="clearAllFilters()" style="background:var(--primary); color:#fff; border:none; padding:0.6rem 2rem; border-radius:30px; cursor:pointer; transition:var(--transition);">
+                    <i class="fa-regular fa-rotate-left"></i> Clear Filters
                 </button>
             </div>
         `;
+        updatePagination(page);
         return;
     }
 
     renderProducts(pageProducts, 'productGrid');
     updatePagination(page);
+    currentPage = page;
+    
+    // Re-init scroll animations for new products
+    setTimeout(() => {
+        if (typeof initScrollAnimations === 'function') {
+            initScrollAnimations();
+        }
+    }, 100);
 }
 
+// ─── UPDATE PAGINATION ───
 function updatePagination(page) {
     const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
     const pagination = document.getElementById('pagination');
+    
     if (totalPages <= 1) {
         pagination.innerHTML = '';
         return;
     }
 
-    let html = `<a onclick="changePage('prev')">&laquo;</a>`;
+    let html = `<a class="${page === 1 ? 'disabled' : ''}" onclick="changePage('prev')">&laquo;</a>`;
+    
     for (let i = 1; i <= Math.min(totalPages, 5); i++) {
         html += `<a class="${i === page ? 'active' : ''}" onclick="changePage(${i})">${i}</a>`;
     }
+    
     if (totalPages > 5) {
-        html += `<span style="padding:0.4rem 0.4rem;">...</span>`;
+        html += `<span style="padding:0.4rem 0.4rem; color:var(--text-light);">...</span>`;
         html += `<a onclick="changePage(${totalPages})">${totalPages}</a>`;
     }
-    html += `<a onclick="changePage('next')">&raquo;</a>`;
+    
+    html += `<a class="${page === totalPages ? 'disabled' : ''}" onclick="changePage('next')">&raquo;</a>`;
     pagination.innerHTML = html;
-    currentPage = page;
 }
 
+// ─── CHANGE PAGE ───
 function changePage(direction) {
     const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
     let newPage = currentPage;
+    
     if (direction === 'prev') {
         newPage = Math.max(1, currentPage - 1);
     } else if (direction === 'next') {
@@ -522,24 +710,114 @@ function changePage(direction) {
     } else if (typeof direction === 'number') {
         newPage = direction;
     }
-    if (newPage !== currentPage) {
+    
+    if (newPage !== currentPage && newPage >= 1 && newPage <= totalPages) {
         renderProductsPage(newPage);
+        // Scroll to top of product grid
+        document.getElementById('productGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
-function clearFilters() {
+// ─── CLEAR ALL FILTERS ───
+function clearAllFilters() {
+    // Uncheck all checkboxes
     document.querySelectorAll('.filter-group input[type="checkbox"]').forEach(cb => cb.checked = false);
+    
+    // Reset radio buttons
     document.querySelector('input[name="moq"][value="any"]').checked = true;
+    
+    // Reset price range
     document.getElementById('priceMin').value = 0;
-    document.getElementById('priceMax').value = 50;
+    document.getElementById('priceMax').value = 1000;
+    
+    // Reset sort
     document.getElementById('sortSelect').value = 'default';
+    
+    // Apply filters
     applyFilters();
 }
 
+// ─── SEARCH WITH FIREBASE ───
+async function searchProductsFirebase(event) {
+    const input = document.getElementById('searchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    const query = input.value.trim();
+
+    if (event && event.key === 'Enter' && query) {
+        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+        return;
+    }
+
+    if (query.length < 2) {
+        resultsDiv.classList.remove('show');
+        return;
+    }
+
+    try {
+        const snapshot = await db.collection('products')
+            .where('status', 'in', ['active', 'approved'])
+            .limit(5)
+            .get();
+
+        const products = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
+                (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
+                products.push({
+                    id: doc.id,
+                    ...data,
+                    image_url: data.image_url || data.images?.[0] || ''
+                });
+            }
+        });
+
+        if (products.length === 0) {
+            resultsDiv.innerHTML = `
+                <div style="padding:1rem; text-align:center; color:var(--text-light);">
+                    No products found for "${query}"
+                </div>
+            `;
+            resultsDiv.classList.add('show');
+            return;
+        }
+
+        resultsDiv.innerHTML = products.map(p => `
+            <div class="result-item" onclick="window.location.href='product-detail.html?id=${p.id}'">
+                <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
+                <div class="info">
+                    <div class="title">${p.title}</div>
+                    <div class="price">$${(p.price || 0).toFixed(2)}</div>
+                </div>
+            </div>
+        `).join('') + `
+            <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
+                <a href="products.html?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
+                    See all results for "${query}" →
+                </a>
+            </div>
+        `;
+
+        resultsDiv.classList.add('show');
+
+    } catch (error) {
+        console.error('Search error:', error);
+    }
+}
+
+// ─── CLOSE SEARCH RESULTS ───
+document.addEventListener('click', function(e) {
+    const searchBar = document.getElementById('searchBar');
+    if (!searchBar.contains(e.target)) {
+        document.getElementById('searchResults').classList.remove('show');
+    }
+});
+
+// ─── INIT ───
 document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(() => {
-        applyFilters();
-    }, 100);
+    loadProducts();
+    loadCartCount();
+    loadWishlistCount();
 });
 </script>
 

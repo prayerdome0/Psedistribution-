@@ -3,160 +3,626 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PSE Wholesale Marketplace</title>
-    
-    <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com https://cdnjs.cloudflare.com https://*.firebaseapp.com; style-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline'; img-src 'self' data: https://i.ibb.co; font-src 'self' https://cdnjs.cloudflare; connect-src 'self' https://*.firebaseio.com https://*.firebaseapp.com https://*.googleapis.com; frame-src 'self' https://*.firebaseapp.com;">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-    
+    <title>Pilot Sales Distribution - Wholesale Marketplace</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Pilot Sales Distribution - Premium wholesale marketplace for bulk products. 12,000+ products, 580+ verified suppliers." />
+    <meta name="keywords" content="wholesale, bulk products, distribution, b2b, suppliers" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Pilot Sales Distribution" />
+    <meta property="og:description" content="Premium wholesale marketplace for bulk products." />
+    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
+    <meta property="og:url" content="https://pilotsalesdistribution.com/" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo-192.png" />
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="style.css" />
-    
-    <script src="https://cdn.jsdelivr.net/npm/cloudinary-core@2.11.3/cloudinary-core-shrinkwrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/cloudinary-jquery-file-upload@2.11.3/cloudinary-jquery-file-upload.js"></script>
-    
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        /* ─── STATISTICS COUNTER ─── */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+            border-radius: var(--radius);
+            color: var(--white);
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-item .number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .stat-item .label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-top: 0.2rem;
+        }
+
+        /* ─── WHY CHOOSE US ─── */
+        .why-section {
+            margin: 3rem 0;
+        }
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .why-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+        .why-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+        .why-card .why-image {
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            margin-bottom: 1rem;
+        }
+        .why-card .why-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        .why-card:hover .why-image img {
+            transform: scale(1.05);
+        }
+        .why-card h3 {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            margin-bottom: 0.3rem;
+        }
+        .why-card p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* ─── REQUEST QUOTE SECTION ─── */
+        .quote-section {
+            margin: 3rem 0;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(11, 42, 59, 0.92), rgba(26, 75, 94, 0.92)),
+                        url('https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--radius);
+            text-align: center;
+            color: var(--white);
+            position: relative;
+        }
+        .quote-section h2 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .quote-section h2 span { color: var(--accent); }
+        .quote-section p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+        }
+        .quote-section .btn-white {
+            background: var(--white);
+            color: var(--secondary);
+            padding: 0.8rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .quote-section .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255,255,255,0.3);
+        }
+
+        /* ─── TESTIMONIALS ─── */
+        .testimonials-section {
+            margin: 3rem 0;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(11, 42, 59, 0.92), rgba(26, 75, 94, 0.92)),
+                        url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--radius);
+            color: var(--white);
+        }
+        .testimonials-section .section-title {
+            color: var(--white);
+        }
+        .testimonials-section .section-title span { color: var(--accent); }
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .testimonial-card {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(8px);
+            padding: 1.5rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .testimonial-card .stars {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        .testimonial-card .text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 0.8rem;
+        }
+        .testimonial-card .author {
+            font-weight: 600;
+        }
+        .testimonial-card .company {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* ─── NEWSLETTER ─── */
+        .newsletter-section {
+            margin: 3rem 0;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, rgba(11, 42, 59, 0.92), rgba(26, 75, 94, 0.92)),
+                        url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--radius);
+            text-align: center;
+            color: var(--white);
+        }
+        .newsletter-section h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .newsletter-section h2 span { color: var(--accent); }
+        .newsletter-section p {
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+        }
+        .newsletter-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .newsletter-form input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.8rem 1.2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .newsletter-form button {
+            background: var(--accent);
+            color: var(--secondary);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .newsletter-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(241, 196, 15, 0.3);
+        }
+
+        /* ─── FOOTER ─── */
+        .footer {
+            background: var(--secondary);
+            color: #b4d0e0;
+            padding: 2rem 0 1rem;
+            margin-top: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .footer .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        .footer .footer-links {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        .footer .footer-links a {
+            color: #b4d0e0;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+        .footer .footer-links a:hover {
+            color: var(--white);
+        }
+        .footer .footer-bottom {
+            border-top: 1px solid #1a4055;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
+        .footer .footer-bottom strong { color: var(--white); }
+        .footer .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+        .footer .footer-social a {
+            color: #b4d0e0;
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+        .footer .footer-social a:hover {
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 992px) {
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .stats-section {
+                grid-template-columns: 1fr 1fr;
+                padding: 1.5rem;
+            }
+            .stat-item .number {
+                font-size: 1.8rem;
+            }
+            .quote-section h2 {
+                font-size: 1.6rem;
+            }
+            .testimonials-section {
+                padding: 2rem 1rem;
+            }
+            .footer .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            .footer .footer-links {
+                justify-content: center;
+                gap: 1rem;
+            }
+            .newsletter-section h2 {
+                font-size: 1.5rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .stats-section {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            .stat-item .number {
+                font-size: 1.4rem;
+            }
+            .stat-item .label {
+                font-size: 0.7rem;
+            }
+            .why-grid {
+                grid-template-columns: 1fr;
+            }
+            .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<!-- ─── TOP BAR ─── -->
+<!-- ============================================ -->
+<!-- TOP BAR WITH MOVING WORDS -->
+<!-- ============================================ -->
 <div class="top-bar">
     <div class="container">
-        <div>
-            <span>Welcome to PSE Wholesale</span>
-            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
-            <a href="track-order.html">Track Order</a>
-            <a href="seller-dashboard.html">Become a Seller</a>
+        <div class="moving-words">
+            <div class="words-track">
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+            </div>
         </div>
-        <div id="authLinks">
-            <a href="login.html" id="loginLink">Login</a>
-            <a href="register.html" id="registerLink">Register</a>
-            <select class="lang-select" onchange="window.location.href='/?lang='+this.value">
-                <option value="EN">EN</option>
-                <option value="ES">ES</option>
-                <option value="FR">FR</option>
-                <option value="DE">DE</option>
-            </select>
+        <div class="top-links">
+            <a href="track-order.html"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard.html"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login.html" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register.html" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
 
-<!-- ─── HEADER ─── -->
+<!-- ============================================ -->
+<!-- HEADER -->
+<!-- ============================================ -->
 <header class="header">
     <div class="container">
-        <a href="index.html" class="logo" style="display:flex; align-items:center; gap:0.5rem; text-decoration:none;">
-            <img src="https://i.ibb.co/4Z5f5VwD/20260711-125430.jpg" alt="PSE Distribution" style="height:40px; width:auto; border-radius:8px;" />
-            <div style="display:flex; flex-direction:column; line-height:1.1;">
-                <span style="font-size:1.5rem; font-weight:800; color:#0b2a3b;">PSE <span style="color:#1e7b6b;">Distribution</span></span>
-                <span style="font-size:0.55rem; color:#6a889a; font-weight:400; letter-spacing:0.5px;">wholesale Marketplace</span>
+        <a href="home" class="logo">
+            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+            <div class="brand-name">
+                <span class="main">Pilot <span>Distribution</span></span>
+                <span class="sub">wholesale Marketplace</span>
             </div>
         </a>
-        <div class="search-bar">
-            <select id="categoryFilter"><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
-            <input type="text" id="searchInput" placeholder="Search wholesale products..." onkeyup="searchProducts(event)" />
-            <button onclick="searchProducts()"><i class="fa-solid fa-magnifying-glass"></i></button>
+
+        <!-- Search -->
+        <div class="search-bar" id="searchBar">
+            <input type="text" id="searchInput" placeholder="Search wholesale products..."
+                   onkeyup="searchProductsFirebase(event)" autocomplete="off" />
+            <button onclick="searchProductsFirebase()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <div class="search-results" id="searchResults"></div>
         </div>
+
         <div class="header-actions">
-            <a href="#" class="icon-btn" onclick="window.location.href='cart.html'">
-                <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
+            <a href="#" class="icon-btn" onclick="toggleWishlist()">
+                <i class="fa-regular fa-heart"></i>
+                <span>Wishlist</span>
+                <span class="badge-count wishlist-count">0</span>
+            </a>
+            <a href="cart.html" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
+            </a>
+            <a href="account.html" class="icon-btn" id="accountBtn">
+                <i class="fa-regular fa-user"></i>
+                <span id="accountLabel">Account</span>
             </a>
         </div>
     </div>
 </header>
 
-<!-- ─── NAVIGATION ─── -->
+<!-- ============================================ -->
+<!-- NAVIGATION TABS -->
+<!-- ============================================ -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="#"><i class="fa-solid fa-bars"></i> All Departments</a>
-        <a href="#" onclick="filterByCategory('deals')">Today's Deals</a>
-        <a href="#" onclick="filterByCategory('new')">New Arrivals</a>
-        <a href="#" class="wholesale-nav" onclick="filterByCategory('wholesale')"><i class="fa-solid fa-cubes"></i> Wholesale</a>
-        <a href="#" onclick="filterByCategory('clearance')">Clearance</a>
-        <a href="#" onclick="document.getElementById('flashDeals').scrollIntoView({behavior:'smooth'})">Flash Deals</a>
-        <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Customer Service</a>
+        <a href="home" class="nav-tab active"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products.html" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about.html" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact.html" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center.html" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller.html" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
-<!-- ─── BANNER ─── -->
-<div class="container">
-    <div class="banner" style="background: linear-gradient(135deg, #0b2a3b 0%, #1a4b5e 100%); border-radius:1.5rem; padding:3rem; text-align:center; color:#fff;">
-        <h1 style="font-size:2.5rem; margin-bottom:0.5rem;">PSE Wholesale</h1>
-        <p style="font-size:1.2rem; opacity:0.8;">Your trusted B2B wholesale marketplace</p>
-        <div style="margin-top:1rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-            <span style="background:rgba(255,255,255,0.1); padding:0.3rem 1rem; border-radius:30px;">✓ Verified Suppliers</span>
-            <span style="background:rgba(255,255,255,0.1); padding:0.3rem 1rem; border-radius:30px;">✓ Bulk Pricing</span>
-            <span style="background:rgba(255,255,255,0.1); padding:0.3rem 1rem; border-radius:30px;">✓ Fast Shipping</span>
-        </div>
-    </div>
-</div>
-
-<!-- ─── MAIN CONTENT ─── -->
+<!-- ============================================ -->
+<!-- MAIN CONTENT -->
+<!-- ============================================ -->
 <div class="container">
 
-    <!-- HERO -->
-    <div class="hero">
-        <div class="hero-content">
-            <div class="tag"><i class="fa-regular fa-clock"></i> Wholesale Exclusive</div>
-            <h2>Bulk Savings Up to 40%</h2>
-            <p>Minimum order quantities from 10 units. Verified suppliers, guaranteed quality.</p>
-            <div class="btn-group">
-                <a href="#" class="btn-primary" onclick="document.getElementById('productGrid').scrollIntoView({behavior:'smooth'})">
-                    <i class="fa-solid fa-cart-plus"></i> Shop Wholesale
-                </a>
-                <a href="about.html" class="btn-outline-light">Learn More</a>
+    <!-- ========================================== -->
+    <!-- 1. HERO BANNER SLIDER -->
+    <!-- ========================================== -->
+    <div class="banner-slider" id="bannerSlider">
+
+        <div class="slide active" style="background: linear-gradient(135deg, #0b2a3b 0%, #1a4b5e 100%);">
+            <div class="content">
+                <span class="badge">🏪 Wholesale Marketplace</span>
+                <h2>Premium Products at <span>Wholesale Prices</span></h2>
+                <p>12,000+ products from 580+ verified suppliers. Quality guaranteed.</p>
+                <div class="buttons">
+                    <a href="products.html" class="btn-primary"><i class="fa-solid fa-cart-plus"></i> Shop Now</a>
+                    <a href="about.html" class="btn-outline-light">Learn More</a>
+                </div>
+            </div>
+            <div class="slide-image">
+                <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&h=800&q=80" alt="Wholesale Marketplace" loading="lazy" />
             </div>
         </div>
-        <div class="hero-stats">
-            <div><div class="num" id="statProducts">12K+</div><div class="label">Products</div></div>
-            <div><div class="num" id="statSuppliers">580+</div><div class="label">Suppliers</div></div>
-            <div><div class="num">99.7%</div><div class="label">Satisfaction</div></div>
+
+        <div class="slide" style="background: linear-gradient(135deg, #1a7b6b 0%, #0f4f43 100%);">
+            <div class="content">
+                <span class="badge">🚚 Logistics &amp; Distribution</span>
+                <h2>Fast &amp; Reliable <span>Delivery</span></h2>
+                <p>Free shipping on orders over $250. Track your order in real-time.</p>
+                <div class="buttons">
+                    <a href="products.html" class="btn-primary"><i class="fa-solid fa-truck"></i> Browse Products</a>
+                    <a href="track-order.html" class="btn-outline-light">Track Order</a>
+                </div>
+            </div>
+            <div class="slide-image">
+                <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&h=800&q=80" alt="Logistics" loading="lazy" />
+            </div>
+        </div>
+
+        <div class="slide" style="background: linear-gradient(135deg, #2c3e50 0%, #1a2a3a 100%);">
+            <div class="content">
+                <span class="badge">🤝 Business Partnership</span>
+                <h2>Trusted <span>Suppliers</span></h2>
+                <p>Connect with verified suppliers worldwide. Quality products guaranteed.</p>
+                <div class="buttons">
+                    <a href="become-seller.html" class="btn-primary"><i class="fa-regular fa-store"></i> Become a Supplier</a>
+                    <a href="about.html" class="btn-outline-light">About Us</a>
+                </div>
+            </div>
+            <div class="slide-image">
+                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&h=800&q=80" alt="Business Partnership" loading="lazy" />
+            </div>
+        </div>
+
+        <div class="slide" style="background: linear-gradient(135deg, #1a4b5e 0%, #0b2a3b 100%);">
+            <div class="content">
+                <span class="badge">🌍 Global Supply Chain</span>
+                <h2>Worldwide <span>Distribution</span></h2>
+                <p>Electronics, Fashion, Grocery, Home &amp; more. All at wholesale prices.</p>
+                <div class="buttons">
+                    <a href="products.html" class="btn-primary"><i class="fa-regular fa-eye"></i> View All</a>
+                    <a href="#" class="btn-outline-light" onclick="document.getElementById('categories').scrollIntoView({behavior:'smooth'})">Categories</a>
+                </div>
+            </div>
+            <div class="slide-image">
+                <img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&h=800&q=80" alt="Global Supply Chain" loading="lazy" />
+            </div>
+        </div>
+
+        <div class="dots" id="bannerDots"></div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 2. STATISTICS COUNTER -->
+    <!-- ========================================== -->
+    <div class="stats-section animate-on-scroll">
+        <div class="stat-item">
+            <div class="number" id="statProducts">12,000+</div>
+            <div class="label">Products Available</div>
+        </div>
+        <div class="stat-item">
+            <div class="number" id="statSuppliers">580+</div>
+            <div class="label">Verified Suppliers</div>
+        </div>
+        <div class="stat-item">
+            <div class="number" id="statSatisfaction">99.7%</div>
+            <div class="label">Satisfaction Rate</div>
+        </div>
+        <div class="stat-item">
+            <div class="number" id="statDelivery">24/7</div>
+            <div class="label">Customer Support</div>
         </div>
     </div>
 
-    <!-- PAGE LINKS -->
-    <div class="page-links">
-        <a href="index.html" class="active"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products.html"><i class="fa-solid fa-grid-2"></i> Products</a>
-        <a href="product-detail.html"><i class="fa-solid fa-eye"></i> Detail</a>
-        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
-        <a href="checkout.html"><i class="fa-solid fa-credit-card"></i> Checkout</a>
-        <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
-        <a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a>
-        <a href="account.html"><i class="fa-solid fa-user"></i> Account</a>
-        <a href="seller-dashboard.html"><i class="fa-solid fa-store"></i> Seller</a>
-        <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Admin</a>
-        <a href="about.html"><i class="fa-solid fa-info-circle"></i> About</a>
+    <!-- ========================================== -->
+    <!-- 3. CATEGORIES WITH IMAGES -->
+    <!-- ========================================== -->
+    <div id="categories">
+        <div class="section-title animate-on-scroll">
+            <h2>Shop by <span>Category</span></h2>
+            <p>Find the products you need at wholesale prices</p>
+        </div>
+        <div class="category-grid">
+            <div class="category-item" onclick="window.location.href='products.html?category=electronics'">
+                <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=200&h=200&q=80" alt="Electronics" loading="lazy" />
+                <span>Electronics</span>
+            </div>
+            <div class="category-item" onclick="window.location.href='products.html?category=fashion'">
+                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=200&h=200&q=80" alt="Fashion" loading="lazy" />
+                <span>Fashion</span>
+            </div>
+            <div class="category-item" onclick="window.location.href='products.html?category=grocery'">
+                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=200&h=200&q=80" alt="Grocery" loading="lazy" />
+                <span>Grocery</span>
+            </div>
+            <div class="category-item" onclick="window.location.href='products.html?category=home'">
+                <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=200&h=200&q=80" alt="Home" loading="lazy" />
+                <span>Home</span>
+            </div>
+            <div class="category-item" onclick="window.location.href='products.html?category=beauty'">
+                <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=200&h=200&q=80" alt="Beauty" loading="lazy" />
+                <span>Beauty</span>
+            </div>
+            <div class="category-item" onclick="window.location.href='products.html?category=health'">
+                <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=200&h=200&q=80" alt="Health" loading="lazy" />
+                <span>Health</span>
+            </div>
+            <div class="category-item" onclick="window.location.href='products.html?category=sports'">
+                <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=200&h=200&q=80" alt="Sports" loading="lazy" />
+                <span>Sports</span>
+            </div>
+            <div class="category-item" onclick="window.location.href='products.html?category=automotive'">
+                <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=200&h=200&q=80" alt="Automotive" loading="lazy" />
+                <span>Automotive</span>
+            </div>
+        </div>
     </div>
 
-    <!-- CATEGORIES -->
-    <div class="section-title">Shop by Category <span>Wholesale</span></div>
-    <div class="category-grid" id="categoryGrid">
-        <div class="category-item" onclick="filterByCategory('electronics')"><i class="fa-solid fa-laptop"></i><span>Electronics</span></div>
-        <div class="category-item" onclick="filterByCategory('fashion')"><i class="fa-solid fa-shirt"></i><span>Fashion</span></div>
-        <div class="category-item" onclick="filterByCategory('grocery')"><i class="fa-solid fa-carrot"></i><span>Grocery</span></div>
-        <div class="category-item" onclick="filterByCategory('home')"><i class="fa-solid fa-couch"></i><span>Home</span></div>
-        <div class="category-item" onclick="filterByCategory('kitchen')"><i class="fa-solid fa-kitchen-set"></i><span>Kitchen</span></div>
-        <div class="category-item" onclick="filterByCategory('beauty')"><i class="fa-solid fa-spray-can-sparkles"></i><span>Beauty</span></div>
-        <div class="category-item" onclick="filterByCategory('health')"><i class="fa-solid fa-heart-pulse"></i><span>Health</span></div>
-        <div class="category-item" onclick="filterByCategory('sports')"><i class="fa-solid fa-futbol"></i><span>Sports</span></div>
-        <div class="category-item" onclick="filterByCategory('automotive')"><i class="fa-solid fa-car"></i><span>Automotive</span></div>
-        <div class="category-item" onclick="filterByCategory('baby')"><i class="fa-solid fa-baby"></i><span>Baby</span></div>
-        <div class="category-item" onclick="filterByCategory('office')"><i class="fa-solid fa-pen-ruler"></i><span>Office</span></div>
-        <div class="category-item" onclick="filterByCategory('industrial')"><i class="fa-solid fa-tractor"></i><span>Industrial</span></div>
-        <div class="category-item" onclick="filterByCategory('books')"><i class="fa-solid fa-book"></i><span>Books</span></div>
-        <div class="category-item" onclick="filterByCategory('pets')"><i class="fa-solid fa-paw"></i><span>Pets</span></div>
+    <!-- ========================================== -->
+    <!-- 4. WHY CHOOSE PILOT DISTRIBUTION -->
+    <!-- ========================================== -->
+    <div class="why-section animate-on-scroll">
+        <div class="section-title">
+            <h2>Why Choose <span>Pilot Distribution</span></h2>
+            <p>Your trusted partner for wholesale purchasing</p>
+        </div>
+        <div class="why-grid">
+            <div class="why-card">
+                <div class="why-image">
+                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&h=400&q=80" alt="Verified Suppliers" loading="lazy" />
+                </div>
+                <h3>Verified Suppliers</h3>
+                <p>All suppliers are vetted and verified for quality and reliability.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-image">
+                    <img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=600&h=400&q=80" alt="Secure Payments" loading="lazy" />
+                </div>
+                <h3>Secure Payments</h3>
+                <p>Your transactions are safe and protected with industry-standard security.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-image">
+                    <img src="https://images.unsplash.com/photo-1567789884554-0b844b597180?auto=format&fit=crop&w=600&h=400&q=80" alt="Quality Assurance" loading="lazy" />
+                </div>
+                <h3>Quality Assurance</h3>
+                <p>Every product meets our strict quality standards before listing.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-image">
+                    <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=600&h=400&q=80" alt="Fast Delivery" loading="lazy" />
+                </div>
+                <h3>Fast Delivery</h3>
+                <p>Free shipping on orders over $250. Quick and reliable delivery.</p>
+            </div>
+        </div>
     </div>
 
-    <!-- FLASH DEALS -->
-    <div class="flash-deals" id="flashDeals">
+    <!-- ========================================== -->
+    <!-- 5. FLASH DEALS -->
+    <!-- ========================================== -->
+    <div class="flash-deals animate-on-scroll" id="flashDeals">
         <div class="left">
             <h3><i class="fa-solid fa-bolt"></i> Flash Deals</h3>
             <div class="flash-timer">
@@ -165,97 +631,348 @@
                 <span id="seconds">18</span>
             </div>
         </div>
-        <a href="#" class="btn-primary" style="background:#f1c40f; color:#0b2a3b;" onclick="filterByCategory('flash')">View All <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="products.html?filter=flash" class="btn-primary" style="background:#f1c40f; color:#0b2a3b;">
+            View All <i class="fa-solid fa-arrow-right"></i>
+        </a>
     </div>
 
-    <!-- PRODUCTS -->
-    <div class="section-title">Best Sellers <span>Wholesale</span></div>
+    <!-- ========================================== -->
+    <!-- 6. FEATURED PRODUCTS -->
+    <!-- ========================================== -->
+    <div class="section-title animate-on-scroll">
+        <h2>Featured <span>Products</span></h2>
+        <p>Top-rated products from verified suppliers</p>
+    </div>
     <div class="product-grid" id="productGrid">
         <div class="loading-spinner">
-            <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;"></i>
-            <p style="margin-top:0.5rem;">Loading products...</p>
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <p>Loading products...</p>
         </div>
     </div>
-    
-    <!-- TRUSTED COMPANIES -->
-    <div class="trusted-section">
+
+    <!-- ========================================== -->
+    <!-- 7. REQUEST A QUOTE SECTION -->
+    <!-- ========================================== -->
+    <div class="quote-section animate-on-scroll">
+        <h2>Need a <span>Custom Quote?</span></h2>
+        <p>Get competitive pricing for bulk orders. Our team will respond within 24 hours.</p>
+        <a href="contact.html" class="btn-white"><i class="fa-regular fa-file-lines"></i> Request a Quote</a>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 8. TESTIMONIALS -->
+    <!-- ========================================== -->
+    <div class="testimonials-section animate-on-scroll">
+        <div class="section-title">
+            <h2>What Our <span>Clients Say</span></h2>
+            <p>Trusted by businesses worldwide</p>
+        </div>
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="text">"Pilot Distribution has been a game-changer for our business. The quality and pricing are unmatched."</p>
+                <div class="author">Sarah Johnson</div>
+                <div class="company">CEO, TechWholesale</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="text">"We've been using Pilot Distribution for 2 years now. Reliable suppliers and excellent customer service."</p>
+                <div class="author">Michael Chen</div>
+                <div class="company">Operations, Global Retail</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="text">"The best wholesale marketplace I've used. Easy to navigate, great products, fast shipping."</p>
+                <div class="author">Emily Rodriguez</div>
+                <div class="company">Founder, EcoGoods</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 9. TRUSTED PARTNERS - MOVING LOGOS -->
+    <!-- ========================================== -->
+    <div class="trusted-section animate-on-scroll">
         <div class="section-title">
             <h2>Trusted By <span>Industry Leaders</span></h2>
-            <p>Join thousands of businesses that trust PSE Wholesale</p>
+            <p>Join thousands of businesses that trust Pilot Sales Distribution</p>
         </div>
-        <div class="carousel-wrapper">
-            <div class="carousel-track">
-                <div class="carousel-item"><span style="font-weight:700; color:#0b2a3b;">Nike</span></div>
-                <div class="carousel-item"><span style="font-weight:700; color:#0b2a3b;">Apple</span></div>
-                <div class="carousel-item"><span style="font-weight:700; color:#0b2a3b;">Samsung</span></div>
-                <div class="carousel-item"><span style="font-weight:700; color:#0b2a3b;">Adidas</span></div>
-                <div class="carousel-item"><span style="font-weight:700; color:#0b2a3b;">Sony</span></div>
-                <div class="carousel-item"><span style="font-weight:700; color:#0b2a3b;">LG</span></div>
-                <div class="carousel-item"><span style="font-weight:700; color:#0b2a3b;">P&G</span></div>
-                <div class="carousel-item"><span style="font-weight:700; color:#0b2a3b;">Unilever</span></div>
+        <div class="logo-carousel">
+            <div class="logo-track">
+                <div class="logo-item"><span>🏢 Nike</span></div>
+                <div class="logo-item"><span>🍎 Apple</span></div>
+                <div class="logo-item"><span>📱 Samsung</span></div>
+                <div class="logo-item"><span>👟 Adidas</span></div>
+                <div class="logo-item"><span>🎮 Sony</span></div>
+                <div class="logo-item"><span>📺 LG</span></div>
+                <div class="logo-item"><span>🧴 P&amp;G</span></div>
+                <div class="logo-item"><span>🧼 Unilever</span></div>
+                <div class="logo-item"><span>🏢 Nike</span></div>
+                <div class="logo-item"><span>🍎 Apple</span></div>
+                <div class="logo-item"><span>📱 Samsung</span></div>
+                <div class="logo-item"><span>👟 Adidas</span></div>
+                <div class="logo-item"><span>🎮 Sony</span></div>
+                <div class="logo-item"><span>📺 LG</span></div>
+                <div class="logo-item"><span>🧴 P&amp;G</span></div>
+                <div class="logo-item"><span>🧼 Unilever</span></div>
             </div>
-        </div>
-    </div>
-
-    <!-- ─── HELP MODAL ─── -->
-    <div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
-        <div class="modal-content">
-            <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
-            <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
-            <p>Choose from our support options below:</p>
-            <ul>
-                <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
-                <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
-                <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
-            </ul>
-            <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
         </div>
     </div>
 
-    <!-- ─── FOOTER ─── -->
-    <footer class="footer">
-        <div class="container">
-            <div>
-                <h4>PSE Wholesale</h4>
-                <ul>
-                    <li onclick="window.location.href='about.html'">About Us</li>
-                    <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
-                </ul>
+    <!-- ========================================== -->
+    <!-- 10. NEWSLETTER SIGNUP -->
+    <!-- ========================================== -->
+    <div class="newsletter-section animate-on-scroll">
+        <h2>Subscribe to Our <span>Newsletter</span></h2>
+        <p>Get the latest deals, new arrivals, and exclusive offers delivered to your inbox.</p>
+        <form class="newsletter-form" onsubmit="handleNewsletter(event)">
+            <input type="email" id="newsletterEmail" placeholder="Enter your email address" required />
+            <button type="submit"><i class="fa-regular fa-paper-plane"></i> Subscribe</button>
+        </form>
+    </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- 11. PROFESSIONAL FOOTER -->
+<!-- ============================================ -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="help-center.html">Help</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms &amp; Conditions</a>
+                <a href="become-seller.html">Become a Seller</a>
             </div>
-            <div>
-                <h4>Customer Service</h4>
-                <ul>
-                    <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
-                    <li>Returns & Refunds</li>
-                    <li>Shipping Policy</li>
-                    <li onclick="window.location.href='track-order.html'">Track Order</li>
-                </ul>
-            </div>
-            <div>
-                <h4>B2B</h4>
-                <ul>
-                    <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
-                    <li>Wholesale Pricing</li>
-                    <li>Bulk Orders</li>
-                    <li>Supplier Program</li>
-                </ul>
-            </div>
-            <div>
-                <h4>Legal</h4>
-                <ul>
-                    <li>Privacy Policy</li>
-                    <li>Terms & Conditions</li>
-                    <li>Cookie Policy</li>
-                </ul>
-            </div>
-            <div class="bottom">
-                &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+            <div class="footer-social">
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
             </div>
         </div>
-    </footer>
+        <div class="footer-bottom">
+            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
+        </div>
+    </div>
+</footer>
 
-    <!-- ─── SCRIPTS ─── -->
-    <script src="main.js"></script>
+<!-- ============================================ -->
+<!-- TOAST NOTIFICATION -->
+<!-- ============================================ -->
+<div id="toast" class="toast"></div>
+
+<!-- ============================================ -->
+<!-- MAIN JAVASCRIPT -->
+<!-- ============================================ -->
+<script src="main.js"></script>
+
+<script>
+// ============================================
+// HOME PAGE - JAVASCRIPT
+// ============================================
+
+// ─── SET CURRENT YEAR ───
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ─── NEWSLETTER HANDLER ───
+function handleNewsletter(e) {
+    e.preventDefault();
+    const email = document.getElementById('newsletterEmail').value;
+    if (email) {
+        showToast('✅ Subscribed successfully! Welcome to Pilot Distribution.', 'success');
+        document.getElementById('newsletterEmail').value = '';
+    }
+}
+
+// ─── SEARCH WITH FIREBASE ───
+async function searchProductsFirebase(event) {
+    const input = document.getElementById('searchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    const query = input.value.trim();
+
+    if (event && event.key === 'Enter' && query) {
+        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+        return;
+    }
+
+    if (query.length < 2) {
+        resultsDiv.classList.remove('show');
+        return;
+    }
+
+    try {
+        const snapshot = await db.collection('products')
+            .where('status', 'in', ['active', 'approved'])
+            .limit(5)
+            .get();
+
+        const products = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
+                (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
+                products.push({
+                    id: doc.id,
+                    ...data,
+                    image_url: data.image_url || data.images?.[0] || ''
+                });
+            }
+        });
+
+        if (products.length === 0) {
+            resultsDiv.innerHTML = `
+                <div style="padding:1rem; text-align:center; color:var(--text-light);">
+                    No products found for "${query}"
+                </div>
+            `;
+            resultsDiv.classList.add('show');
+            return;
+        }
+
+        resultsDiv.innerHTML = products.map(p => `
+            <div class="result-item" onclick="window.location.href='product-detail.html?id=${p.id}'">
+                <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
+                <div class="info">
+                    <div class="title">${p.title}</div>
+                    <div class="price">$${(p.price || 0).toFixed(2)}</div>
+                </div>
+            </div>
+        `).join('') + `
+            <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
+                <a href="products.html?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
+                    See all results for "${query}" →
+                </a>
+            </div>
+        `;
+
+        resultsDiv.classList.add('show');
+
+    } catch (error) {
+        console.error('Search error:', error);
+    }
+}
+
+// ─── CLOSE SEARCH RESULTS ───
+document.addEventListener('click', function(e) {
+    const searchBar = document.getElementById('searchBar');
+    if (!searchBar.contains(e.target)) {
+        document.getElementById('searchResults').classList.remove('show');
+    }
+});
+
+// ─── LOAD PRODUCTS ───
+async function loadProducts() {
+    const grid = document.getElementById('productGrid');
+
+    try {
+        const snapshot = await db.collection('products')
+            .where('status', 'in', ['active', 'approved'])
+            .limit(8)
+            .get();
+
+        const products = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            products.push({
+                id: doc.id,
+                ...data,
+                image_url: data.image_url || data.images?.[0] || ''
+            });
+        });
+
+        if (products.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);">
+                    <i class="fa-regular fa-box" style="font-size:2rem; color:var(--primary);"></i>
+                    <p style="margin-top:0.5rem;">No products available yet.</p>
+                    <p style="font-size:0.8rem;">Check back soon for new wholesale deals!</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = products.map(p => {
+            const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
+            const imageHtml = p.image_url ?
+                `<img src="${p.image_url}" alt="${p.title}" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />` :
+                `<i class="fa-solid fa-box"></i>`;
+
+            return `
+                <div class="product-card animate-on-scroll">
+                    ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
+                    ${discount > 0 ? `<span class="product-badge">-${discount}%</span>` : ''}
+                    <div class="product-image" onclick="window.location.href='product-detail.html?id=${p.id}'">
+                        ${imageHtml}
+                    </div>
+                    <div class="product-title" onclick="window.location.href='product-detail.html?id=${p.id}'">${p.title}</div>
+                    <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
+                    <div class="product-price">
+                        $${(p.price || 0).toFixed(2)}
+                        ${p.old_price ? `<span class="old">$${p.old_price.toFixed(2)}</span>` : ''}
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn-add" onclick="addToCart({id:'${p.id}', title:'${p.title}', price:${p.price || 0}, old_price:${p.old_price || 0}, image_url:'${p.image_url || ''}', brand:'${p.brand || ''}', moq:${p.moq || 1}})">
+                            <i class="fa-solid fa-cart-plus"></i> Add
+                        </button>
+                        <button class="btn-wish" onclick="toggleWishlist('${p.id}')">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Re-init scroll animations
+        if (typeof initScrollAnimations === 'function') {
+            initScrollAnimations();
+        }
+
+    } catch (error) {
+        console.error('Error loading products:', error);
+        grid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);">
+                <i class="fa-regular fa-circle-exclamation" style="font-size:2rem; color:#c0392b;"></i>
+                <p style="margin-top:0.5rem;">Failed to load products.</p>
+                <button onclick="loadProducts()" style="margin-top:1rem; background:var(--primary); color:#fff; border:none; padding:0.5rem 1.5rem; border-radius:30px; cursor:pointer;">
+                    Retry
+                </button>
+            </div>
+        `;
+    }
+}
+
+// ─── FLASH TIMER ───
+function startFlashTimer() {
+    let h = 6, m = 42, s = 18;
+    const hEl = document.getElementById('hours');
+    const mEl = document.getElementById('minutes');
+    const sEl = document.getElementById('seconds');
+
+    if (!hEl || !mEl || !sEl) return;
+
+    setInterval(() => {
+        s--;
+        if (s < 0) { s = 59; m--; }
+        if (m < 0) { m = 59; h--; }
+        if (h < 0) { h = 6; m = 42; s = 18; }
+        hEl.textContent = String(h).padStart(2, '0');
+        mEl.textContent = String(m).padStart(2, '0');
+        sEl.textContent = String(s).padStart(2, '0');
+    }, 1000);
+}
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', function() {
+    loadProducts();
+    startFlashTimer();
+    updateCartCount();
+    updateWishlistCount();
+});
+</script>
 
 </body>
 </html>

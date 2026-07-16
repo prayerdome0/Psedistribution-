@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Help Center - Pilot Sales Distribution</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Get help with your wholesale orders at Pilot Sales Distribution. FAQs, support articles, and contact information." />
+    <meta name="keywords" content="help center, faq, support, wholesale help, Pilot Sales" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Help Center - Pilot Sales Distribution" />
+    <meta property="og:description" content="Get help with your wholesale orders." />
+    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo-192.png" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        /* ─── HELP CENTER SPECIFIC STYLES ─── */
+        .help-page {
+            max-width: 1000px;
+            margin: 2rem auto;
+        }
+
+        .help-header {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+            border-radius: var(--radius);
+            color: var(--white);
+            margin-bottom: 2rem;
+        }
+        .help-header h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+        }
+        .help-header h1 span {
+            color: var(--accent);
+        }
+        .help-header p {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            margin-top: 0.3rem;
+        }
+
+        /* ─── SEARCH BOX ─── */
+        .help-search {
+            max-width: 600px;
+            margin: 1.5rem auto 0;
+            display: flex;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50px;
+            border: 2px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .help-search:focus-within {
+            border-color: var(--accent);
+            background: rgba(255,255,255,0.2);
+        }
+        .help-search input {
+            flex: 1;
+            border: none;
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
+            background: transparent;
+            color: var(--white);
+            outline: none;
+        }
+        .help-search input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+        .help-search button {
+            background: var(--accent);
+            border: none;
+            color: var(--secondary);
+            padding: 0 1.8rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .help-search button:hover {
+            background: var(--accent-hover);
+        }
+
+        /* ─── CATEGORIES ─── */
+        .help-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .help-category {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        .help-category:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-light);
+        }
+        .help-category i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .help-category h3 {
+            font-size: 1rem;
+            color: var(--secondary);
+            margin-bottom: 0.2rem;
+        }
+        .help-category p {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+        .help-category .count {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.1rem 0.6rem;
+            border-radius: 30px;
+            margin-top: 0.3rem;
+        }
+
+        /* ─── FAQ SECTION ─── */
+        .faq-section {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2rem;
+            border: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        .faq-section .section-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .faq-section .section-title h2 {
+            font-size: 1.6rem;
+            color: var(--secondary);
+        }
+        .faq-section .section-title h2 span {
+            color: var(--primary);
+        }
+        .faq-section .section-title p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--border);
+            padding: 0.8rem 0;
+        }
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-item .question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem 0;
+            transition: var(--transition);
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        .faq-item .question:hover {
+            color: var(--primary);
+        }
+        .faq-item .question i {
+            transition: var(--transition);
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+        .faq-item .question i.open {
+            transform: rotate(180deg);
+        }
+
+        .faq-item .answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+        .faq-item .answer.open {
+            max-height: 500px;
+            padding-bottom: 0.8rem;
+        }
+        .faq-item .answer a {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .faq-item .answer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ─── CONTACT SUPPORT ─── */
+        .contact-support {
+            background: var(--primary-light);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .contact-support h3 {
+            font-size: 1.3rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+        .contact-support p {
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+        .contact-support .support-options {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        .contact-support .support-options .option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--secondary);
+            font-weight: 500;
+        }
+        .contact-support .support-options .option i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        .contact-support .support-options .option a {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .contact-support .support-options .option a:hover {
+            text-decoration: underline;
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 768px) {
+            .help-header h1 {
+                font-size: 2rem;
+            }
+            .help-categories {
+                grid-template-columns: 1fr 1fr;
+            }
+            .faq-section {
+                padding: 1.5rem;
+            }
+            .contact-support .support-options {
+                flex-direction: column;
+                gap: 0.8rem;
+                align-items: center;
+            }
+            .help-search {
+                margin: 1rem 0.5rem 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .help-categories {
+                grid-template-columns: 1fr;
+            }
+            .help-header {
+                padding: 2rem 1rem;
+            }
+            .help-header h1 {
+                font-size: 1.6rem;
+            }
+            .faq-item .question {
+                font-size: 0.9rem;
+            }
+            .faq-item .answer {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- TOP BAR WITH MOVING WORDS -->
+<!-- ============================================ -->
+<div class="top-bar">
+    <div class="container">
+        <div class="moving-words">
+            <div class="words-track">
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+            </div>
+        </div>
+        <div class="top-links">
+            <a href="track-order.html"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard.html"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login.html" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register.html" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- HEADER -->
+<!-- ============================================ -->
+<header class="header">
+    <div class="container">
+        <a href="home" class="logo">
+            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+            <div class="brand-name">
+                <span class="main">Pilot <span>Distribution</span></span>
+                <span class="sub">wholesale Marketplace</span>
+            </div>
+        </a>
+
+        <!-- Search -->
+        <div class="search-bar" id="searchBar">
+            <input type="text" id="searchInput" placeholder="Search wholesale products..."
+                   onkeyup="searchProductsFirebase(event)" autocomplete="off" />
+            <button onclick="searchProductsFirebase()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+
+        <div class="header-actions">
+            <a href="#" class="icon-btn" onclick="toggleWishlist()">
+                <i class="fa-regular fa-heart"></i>
+                <span>Wishlist</span>
+                <span class="badge-count wishlist-count">0</span>
+            </a>
+            <a href="cart.html" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+            <a href="account.html" class="icon-btn" id="accountBtn">
+                <i class="fa-regular fa-user"></i>
+                <span id="accountLabel">Account</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ============================================ -->
+<!-- NAVIGATION TABS -->
+<!-- ============================================ -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products.html" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about.html" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact.html" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center.html" class="nav-tab active"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller.html" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+    </div>
+</nav>
+
+<!-- ============================================ -->
+<!-- MAIN CONTENT -->
+<!-- ============================================ -->
+<div class="container">
+
+    <div class="help-page">
+
+        <!-- ─── HELP HEADER ─── -->
+        <div class="help-header animate-on-scroll">
+            <h1>How Can We <span>Help?</span></h1>
+            <p>Find answers to common questions or get in touch with our support team</p>
+
+            <!-- Search -->
+            <div class="help-search">
+                <input type="text" id="helpSearch" placeholder="Search for help..." onkeyup="searchHelp(event)" />
+                <button onclick="searchHelp()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+        </div>
+
+        <!-- ─── HELP CATEGORIES ─── -->
+        <div class="help-categories animate-on-scroll">
+            <div class="help-category" onclick="filterFaq('orders')">
+                <i class="fa-regular fa-receipt"></i>
+                <h3>Orders</h3>
+                <p>Order status, tracking & issues</p>
+                <span class="count">4 articles</span>
+            </div>
+            <div class="help-category" onclick="filterFaq('shipping')">
+                <i class="fa-regular fa-truck"></i>
+                <h3>Shipping</h3>
+                <p>Delivery times, costs & policies</p>
+                <span class="count">3 articles</span>
+            </div>
+            <div class="help-category" onclick="filterFaq('returns')">
+                <i class="fa-regular fa-rotate-left"></i>
+                <h3>Returns</h3>
+                <p>Return policy & procedures</p>
+                <span class="count">2 articles</span>
+            </div>
+            <div class="help-category" onclick="filterFaq('account')">
+                <i class="fa-regular fa-user"></i>
+                <h3>Account</h3>
+                <p>Profile, security & settings</p>
+                <span class="count">3 articles</span>
+            </div>
+            <div class="help-category" onclick="filterFaq('selling')">
+                <i class="fa-regular fa-store"></i>
+                <h3>Selling</h3>
+                <p>Become a seller & manage products</p>
+                <span class="count">3 articles</span>
+            </div>
+            <div class="help-category" onclick="filterFaq('billing')">
+                <i class="fa-regular fa-credit-card"></i>
+                <h3>Billing</h3>
+                <p>Payments, invoices & pricing</p>
+                <span class="count">2 articles</span>
+            </div>
+        </div>
+
+        <!-- ─── FAQ SECTION ─── -->
+        <div class="faq-section animate-on-scroll" id="faqSection">
+            <div class="section-title">
+                <h2>Frequently Asked <span>Questions</span></h2>
+                <p>Find answers to the most common questions</p>
+            </div>
+
+            <div id="faqList">
+
+                <!-- ORDERS -->
+                <div class="faq-item" data-category="orders">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>How do I track my order?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        You can track your order by visiting our <a href="track-order.html">Track Order</a> page and entering your order number. You'll also receive email updates with tracking information once your order ships.
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="orders">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>How long does delivery take?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        Standard delivery takes <strong>3-5 business days</strong>. Express delivery takes <strong>1-2 business days</strong>. International delivery takes <strong>7-14 business days</strong>. Delivery times may vary based on location and carrier.
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="orders">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>Can I cancel my order?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        Orders can be canceled within <strong>24 hours</strong> of placement. Please contact our support team or the seller directly for assistance with cancellations. Once shipped, orders cannot be canceled.
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="orders">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>What if I receive the wrong item?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        If you receive the wrong item, please contact the seller immediately. Provide your order number and photos of the incorrect item. The seller will arrange for a replacement or refund.
+                    </div>
+                </div>
+
+                <!-- SHIPPING -->
+                <div class="faq-item" data-category="shipping">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>Do you offer free shipping?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        Yes! We offer <strong>free shipping</strong> on all orders over <strong>$250</strong> within the continental US. Standard shipping is <strong>$15</strong> for orders under $250.
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="shipping">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>Do you ship internationally?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        Yes, we ship to select countries worldwide. International shipping rates are calculated at checkout based on destination. Customs fees and duties are the buyer's responsibility.
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="shipping">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>Can I change my shipping address after ordering?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        If your order hasn't shipped yet, please contact us immediately to update the shipping address. Once shipped, we cannot change the address. You may need to contact the carrier directly.
+                    </div>
+                </div>
+
+                <!-- RETURNS -->
+                <div class="faq-item" data-category="returns">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>What is your return policy?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        Returns are handled by individual sellers. Most sellers offer a <strong>30-day return policy</strong>. Items must be in original condition with packaging. Please contact the seller directly for return requests.
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="returns">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>How do I return a damaged item?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        Report damaged items within <strong>48 hours</strong> of delivery. Provide photos of the damage and your order number. The seller will arrange for a return and replacement or refund.
+                    </div>
+                </div>
+
+                <!-- ACCOUNT -->
+                <div class="faq-item" data-category="account">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>How do I create an account?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        You can create an account by clicking the <a href="register.html">Register</a> button at the top of the page. Fill out the form with your details and verify your email to get started.
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="account">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>I forgot my password. How do I reset it?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        Click the <strong>"Forgot Password?"</strong> link on the <a href="login.html">Login</a> page. Enter your email address and we'll send you a password reset link. Follow the instructions to create a new password.
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="account">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>How do I update my account information?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        Log in to your account and go to the <a href="account.html">Account</a> page. From there, you can update your personal information, shipping addresses, and email preferences.
+                    </div>
+                </div>
+
+                <!-- SELLING -->
+                <div class="faq-item" data-category="selling">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>How do I become a seller?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        You can apply to become a seller by visiting our <a href="become-seller.html">Become a Seller</a> page. Fill out the application with your business details and our team will review it within 48 hours.
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="selling">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>How much does it cost to sell?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        We offer flexible pricing plans for sellers. The <strong>Starter</strong> plan is free with basic features. The <strong>Professional</strong> plan is $29/month with advanced features. Visit our <a href="wholesale-pricing.html">Pricing</a> page for details.
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="selling">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>How do I manage my products?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        Once approved as a seller, you can manage your products from the <a href="seller-dashboard.html">Seller Dashboard</a>. You can add, edit, and delete products, track orders, and view analytics.
+                    </div>
+                </div>
+
+                <!-- BILLING -->
+                <div class="faq-item" data-category="billing">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>What payment methods do you accept?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        We accept all major credit cards (Visa, Mastercard, American Express), PayPal, and bank transfers for bulk orders. All transactions are secure and encrypted.
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="billing">
+                    <div class="question" onclick="toggleFaq(this)">
+                        <span>Is my payment information secure?</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        Yes! We use <strong>industry-standard encryption (SSL/TLS)</strong> to protect your payment information. We never store your full payment details on our servers. All transactions are processed through secure payment gateways.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ─── CONTACT SUPPORT ─── -->
+        <div class="contact-support animate-on-scroll">
+            <h3><i class="fa-regular fa-headset"></i> Still Need Help?</h3>
+            <p>Our support team is here to assist you with any questions or concerns.</p>
+            <div class="support-options">
+                <div class="option">
+                    <i class="fa-regular fa-envelope"></i>
+                    <a href="mailto:Pilot.wholesale@yahoo.com">Pilot.wholesale@yahoo.com</a>
+                </div>
+                <div class="option">
+                    <i class="fa-regular fa-phone"></i>
+                    <a href="tel:+19099384682">+1 (909) 938-4682</a>
+                </div>
+                <div class="option">
+                    <i class="fa-brands fa-whatsapp" style="color:#25D366;"></i>
+                    <a href="https://wa.me/19099384682" target="_blank">Chat on WhatsApp</a>
+                </div>
+                <div class="option">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Mon-Fri: 8AM - 8PM EST</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- FOOTER -->
+<!-- ============================================ -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="help-center.html">Help</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms &amp; Conditions</a>
+                <a href="become-seller.html">Become a Seller</a>
+            </div>
+            <div class="footer-social">
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- ============================================ -->
+<!-- TOAST NOTIFICATION -->
+<!-- ============================================ -->
+<div id="toast" class="toast"></div>
+
+<!-- ============================================ -->
+<!-- MAIN JAVASCRIPT -->
+<!-- ============================================ -->
+<script src="main.js"></script>
+
+<script>
+// ============================================
+// HELP CENTER - JAVASCRIPT
+// ============================================
+
+// ─── SET CURRENT YEAR ───
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ─── TOGGLE FAQ ───
+function toggleFaq(el) {
+    const parent = el.closest('.faq-item');
+    const answer = parent.querySelector('.answer');
+    const icon = el.querySelector('i');
+    const isOpen = answer.classList.contains('open');
+
+    // Close all others
+    document.querySelectorAll('.faq-item .answer').forEach(a => a.classList.remove('open'));
+    document.querySelectorAll('.faq-item .question i').forEach(i => i.classList.remove('open'));
+
+    if (!isOpen) {
+        answer.classList.add('open');
+        icon.classList.add('open');
+    }
+}
+
+// ─── SEARCH HELP ───
+function searchHelp(event) {
+    if (event && event.key && event.key !== 'Enter') return;
+
+    const input = document.getElementById('helpSearch');
+    const query = input.value.toLowerCase().trim();
+    const faqs = document.querySelectorAll('.faq-item');
+    const categories = document.querySelectorAll('.help-category');
+
+    if (query.length === 0) {
+        faqs.forEach(f => f.style.display = 'block');
+        categories.forEach(c => c.style.display = 'block');
+        return;
+    }
+
+    let found = false;
+
+    faqs.forEach(f => {
+        const text = f.textContent.toLowerCase();
+        if (text.includes(query)) {
+            f.style.display = 'block';
+            found = true;
+        } else {
+            f.style.display = 'none';
+        }
+    });
+
+    categories.forEach(c => {
+        const text = c.textContent.toLowerCase();
+        c.style.display = text.includes(query) ? 'block' : 'none';
+    });
+
+    // If no results found
+    const faqSection = document.getElementById('faqSection');
+    let noResults = faqSection.querySelector('.no-results');
+
+    if (!found && query.length > 1) {
+        if (!noResults) {
+            noResults = document.createElement('div');
+            noResults.className = 'no-results';
+            noResults.style.cssText = 'text-align:center; padding:2rem; color:var(--text-light);';
+            noResults.innerHTML = `
+                <i class="fa-regular fa-circle-info" style="font-size:2rem; color:var(--primary);"></i>
+                <p style="margin-top:0.5rem;">No results found for "${query}"</p>
+                <p style="font-size:0.85rem;">Try different keywords or contact our support team.</p>
+            `;
+            faqSection.appendChild(noResults);
+        }
+    } else if (noResults) {
+        noResults.remove();
+    }
+}
+
+// ─── FILTER FAQ BY CATEGORY ───
+function filterFaq(category) {
+    const faqs = document.querySelectorAll('.faq-item');
+    const searchInput = document.getElementById('helpSearch');
+
+    // Clear search
+    searchInput.value = '';
+
+    // Highlight the category
+    document.querySelectorAll('.help-category').forEach(c => {
+        c.style.borderColor = 'var(--border)';
+        c.style.background = 'var(--white)';
+    });
+
+    const clicked = event.target.closest('.help-category');
+    if (clicked) {
+        clicked.style.borderColor = 'var(--primary)';
+        clicked.style.background = 'var(--primary-light)';
+    }
+
+    let found = false;
+    faqs.forEach(f => {
+        if (f.dataset.category === category) {
+            f.style.display = 'block';
+            found = true;
+        } else {
+            f.style.display = 'none';
+        }
+    });
+
+    // Show message if no FAQs in category
+    const faqSection = document.getElementById('faqSection');
+    let noResults = faqSection.querySelector('.category-no-results');
+
+    if (!found) {
+        if (!noResults) {
+            noResults = document.createElement('div');
+            noResults.className = 'category-no-results';
+            noResults.style.cssText = 'text-align:center; padding:2rem; color:var(--text-light);';
+            noResults.innerHTML = `
+                <i class="fa-regular fa-circle-info" style="font-size:2rem; color:var(--primary);"></i>
+                <p style="margin-top:0.5rem;">No FAQs available in this category yet.</p>
+                <p style="font-size:0.85rem;">Check back soon or contact our support team.</p>
+            `;
+            faqSection.appendChild(noResults);
+        }
+    } else if (noResults) {
+        noResults.remove();
+    }
+
+    showToast(`Showing ${category} articles`, 'info');
+}
+
+// ─── SEARCH WITH FIREBASE ───
+async function searchProductsFirebase(event) {
+    const input = document.getElementById('searchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    const query = input.value.trim();
+
+    if (event && event.key === 'Enter' && query) {
+        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+        return;
+    }
+
+    if (query.length < 2) {
+        resultsDiv.classList.remove('show');
+        return;
+    }
+
+    try {
+        const snapshot = await db.collection('products')
+            .where('status', 'in', ['active', 'approved'])
+            .limit(5)
+            .get();
+
+        const products = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
+                (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
+                products.push({
+                    id: doc.id,
+                    ...data,
+                    image_url: data.image_url || data.images?.[0] || ''
+                });
+            }
+        });
+
+        if (products.length === 0) {
+            resultsDiv.innerHTML = `
+                <div style="padding:1rem; text-align:center; color:var(--text-light);">
+                    No products found for "${query}"
+                </div>
+            `;
+            resultsDiv.classList.add('show');
+            return;
+        }
+
+        resultsDiv.innerHTML = products.map(p => `
+            <div class="result-item" onclick="window.location.href='product-detail.html?id=${p.id}'">
+                <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
+                <div class="info">
+                    <div class="title">${p.title}</div>
+                    <div class="price">$${(p.price || 0).toFixed(2)}</div>
+                </div>
+            </div>
+        `).join('') + `
+            <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
+                <a href="products.html?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
+                    See all results for "${query}" →
+                </a>
+            </div>
+        `;
+
+        resultsDiv.classList.add('show');
+
+    } catch (error) {
+        console.error('Search error:', error);
+    }
+}
+
+// ─── CLOSE SEARCH RESULTS ───
+document.addEventListener('click', function(e) {
+    const searchBar = document.getElementById('searchBar');
+    if (!searchBar.contains(e.target)) {
+        document.getElementById('searchResults').classList.remove('show');
+    }
+});
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', function() {
+    loadCartCount();
+    loadWishlistCount();
+});
+</script>
+
+</body>
+</html>

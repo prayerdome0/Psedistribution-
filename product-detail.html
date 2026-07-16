@@ -3,208 +3,265 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Product Detail - PSE Wholesale</title>
+    <title>Product Detail - Pilot Sales Distribution</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="View product details at Pilot Sales Distribution. Wholesale prices, bulk ordering, and verified suppliers." />
+    <meta name="keywords" content="product detail, wholesale, bulk, Pilot Sales" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Product Detail - Pilot Sales Distribution" />
+    <meta property="og:description" content="Wholesale product details." />
+    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo-192.png" />
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="style.css" />
-    
-    <script src="https://cdn.jsdelivr.net/npm/cloudinary-core@2.11.3/cloudinary-core-shrinkwrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/cloudinary-jquery-file-upload@2.11.3/cloudinary-jquery-file-upload.js"></script>
-    
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
-    
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css" />
+
     <style>
-        .product-detail {
+        /* ─── PRODUCT DETAIL SPECIFIC STYLES ─── */
+        .product-detail-page {
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            padding: 0.5rem 0;
+        }
+        .breadcrumb a {
+            color: var(--primary);
+            transition: var(--transition);
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb .separator {
+            margin: 0 0.5rem;
+            color: var(--border-dark);
+        }
+
+        /* ─── PRODUCT LAYOUT ─── */
+        .product-detail-layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2.5rem;
-            background: #fff;
-            border-radius: 1.5rem;
-            padding: 2rem;
-            border: 1px solid #e9edf2;
-            margin: 1.5rem 0;
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid var(--border);
         }
 
-        .product-images .main-image {
-            background: #f4f8fa;
-            border-radius: 1.2rem;
+        /* ─── IMAGE GALLERY ─── */
+        .product-gallery {
+            position: relative;
+        }
+
+        .product-gallery .main-image-container {
+            position: relative;
+            background: var(--light);
+            border-radius: var(--radius-sm);
             aspect-ratio: 1/1;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .product-gallery .main-image-container .main-image {
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 6rem;
-            color: #3a6b7a;
-            border: 1px solid #e9edf2;
-            margin-bottom: 1rem;
-            overflow: hidden;
+            transition: transform 0.3s ease;
         }
-        .product-images .main-image img {
+
+        .product-gallery .main-image-container .main-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .thumbnails {
+        .product-gallery .main-image-container .main-image .placeholder {
+            font-size: 5rem;
+            color: var(--text-light);
+        }
+
+        /* Navigation arrows */
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: var(--white);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .gallery-nav:hover {
+            background: rgba(0,0,0,0.8);
+        }
+        .gallery-nav.prev {
+            left: 10px;
+        }
+        .gallery-nav.next {
+            right: 10px;
+        }
+
+        /* Thumbnails */
+        .thumbnail-grid {
             display: flex;
             gap: 0.8rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
         }
-        .thumbnails .thumb {
-            background: #f4f8fa;
-            border-radius: 0.8rem;
-            width: 70px;
-            height: 70px;
+        .thumbnail-grid::-webkit-scrollbar {
+            height: 4px;
+        }
+        .thumbnail-grid::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .thumbnail-grid .thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+            background: var(--light);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
-            color: #3a6b7a;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: 0.2s;
-            overflow: hidden;
         }
-        .thumbnails .thumb img {
+        .thumbnail-grid .thumb:hover {
+            border-color: var(--primary-light);
+        }
+        .thumbnail-grid .thumb.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(26, 123, 107, 0.2);
+        }
+        .thumbnail-grid .thumb img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .thumbnails .thumb:hover,
-        .thumbnails .thumb.active {
-            border-color: #1e7b6b;
+        .thumbnail-grid .thumb .placeholder {
+            font-size: 1.5rem;
+            color: var(--text-light);
         }
 
+        /* ─── PRODUCT INFO ─── */
         .product-info .product-title {
             font-size: 1.8rem;
-            font-weight: 700;
-            color: #0b2a3b;
+            font-weight: 800;
+            color: var(--secondary);
             margin-bottom: 0.3rem;
         }
+
         .product-info .product-brand {
             font-size: 0.9rem;
-            color: #6a889a;
+            color: var(--text-light);
             margin-bottom: 0.5rem;
         }
         .product-info .product-brand a {
-            color: #1e7b6b;
+            color: var(--primary);
             font-weight: 600;
         }
-        .product-info .rating {
-            font-size: 1rem;
-            color: #f1c40f;
+
+        .product-info .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             margin-bottom: 0.5rem;
         }
-        .product-info .rating span {
-            color: #6a889a;
-            margin-left: 0.5rem;
+        .product-info .product-rating .stars {
+            color: #f1c40f;
+            font-size: 1rem;
         }
-        .product-info .price {
+        .product-info .product-rating .review-count {
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .product-info .product-price {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 0.8rem 0;
+        }
+        .product-info .product-price .current {
             font-size: 2.2rem;
             font-weight: 800;
-            color: #0b2a3b;
-            margin: 0.5rem 0;
+            color: var(--primary);
         }
-        .product-info .price .old {
+        .product-info .product-price .old {
             font-size: 1.2rem;
             font-weight: 400;
-            color: #9aafbb;
+            color: var(--text-light);
             text-decoration: line-through;
-            margin-left: 0.5rem;
         }
-        .product-info .price .discount {
-            font-size: 0.9rem;
+        .product-info .product-price .discount-badge {
             background: #c0392b;
-            color: #fff;
-            padding: 0.1rem 0.8rem;
+            color: var(--white);
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.15rem 0.8rem;
             border-radius: 30px;
-            margin-left: 0.5rem;
         }
-        .product-info .moq-info {
-            background: #e3f0eb;
+
+        .product-info .product-moq {
+            background: var(--primary-light);
             padding: 0.5rem 1rem;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             font-size: 0.9rem;
-            color: #1e7b6b;
+            color: var(--primary);
             display: inline-block;
             margin: 0.5rem 0;
         }
-        .product-info .description {
-            color: #2c5a6b;
-            line-height: 1.6;
+        .product-info .product-moq i {
+            margin-right: 0.3rem;
+        }
+
+        .product-info .product-description {
+            color: var(--text);
+            line-height: 1.8;
             margin: 0.8rem 0 1.2rem;
+            font-size: 0.95rem;
         }
 
-        .quantity-selector {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin: 1rem 0;
-            flex-wrap: wrap;
-        }
-        .quantity-selector label {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        .quantity-selector input {
-            width: 70px;
-            padding: 0.5rem;
-            border: 1px solid #dce3e9;
-            border-radius: 8px;
-            font-size: 1rem;
-            text-align: center;
-        }
-
-        .btn-add-cart {
-            background: #1e7b6b;
-            color: #fff;
-            border: none;
-            padding: 0.8rem 2.5rem;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.2s;
-            margin-right: 0.8rem;
-        }
-        .btn-add-cart:hover {
-            background: #146354;
-        }
-        .btn-buy-now {
-            background: #f1c40f;
-            color: #0b2a3b;
-            border: none;
-            padding: 0.8rem 2.5rem;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-buy-now:hover {
-            background: #e0b50e;
-        }
-        .btn-wishlist {
-            background: transparent;
-            border: 2px solid #dce3e9;
-            border-radius: 40px;
-            padding: 0.8rem 1.2rem;
-            cursor: pointer;
-            transition: 0.2s;
-            color: #6a889a;
-            font-size: 1.1rem;
-        }
-        .btn-wishlist:hover {
-            border-color: #1e7b6b;
-            color: #1e7b6b;
-        }
-
+        /* ─── BULK PRICING TABLE ─── */
         .bulk-pricing {
             margin: 1.5rem 0;
-            border: 1px solid #e9edf2;
-            border-radius: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
             overflow: hidden;
         }
         .bulk-pricing table {
@@ -213,584 +270,1087 @@
             font-size: 0.85rem;
         }
         .bulk-pricing th {
-            background: #f1f5f9;
+            background: var(--light);
             padding: 0.6rem 1rem;
             text-align: left;
             font-weight: 600;
-            color: #0b2a3b;
+            color: var(--secondary);
+            border-bottom: 2px solid var(--border);
         }
         .bulk-pricing td {
             padding: 0.6rem 1rem;
-            border-top: 1px solid #e9edf2;
-            color: #2c5a6b;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
         }
         .bulk-pricing td:last-child {
             font-weight: 700;
-            color: #1e7b6b;
+            color: var(--primary);
+        }
+        .bulk-pricing tr:last-child td {
+            border-bottom: none;
+        }
+        .bulk-pricing .best-value {
+            background: var(--primary-light);
+        }
+        .bulk-pricing .best-value td {
+            color: var(--secondary);
+        }
+        .bulk-pricing .best-value td:last-child {
+            color: var(--primary);
         }
 
+        /* ─── QUANTITY & ACTIONS ─── */
+        .quantity-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.2rem 0;
+            flex-wrap: wrap;
+        }
+        .quantity-section label {
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+        .quantity-section .qty-control {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-dark);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        .quantity-section .qty-control button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: var(--light);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .quantity-section .qty-control button:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+        .quantity-section .qty-control input {
+            width: 60px;
+            height: 40px;
+            border: none;
+            border-left: 1px solid var(--border-dark);
+            border-right: 1px solid var(--border-dark);
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin: 0.8rem 0;
+        }
+        .action-buttons .btn-add-cart {
+            flex: 1;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 150px;
+        }
+        .action-buttons .btn-add-cart:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(26, 123, 107, 0.3);
+        }
+        .action-buttons .btn-add-cart.added {
+            background: #27ae60;
+        }
+
+        .action-buttons .btn-buy-now {
+            flex: 1;
+            background: var(--accent);
+            color: var(--secondary);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 150px;
+        }
+        .action-buttons .btn-buy-now:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(241, 196, 15, 0.3);
+        }
+
+        .action-buttons .btn-wishlist {
+            background: transparent;
+            border: 2px solid var(--border-dark);
+            border-radius: 50px;
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-light);
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 60px;
+        }
+        .action-buttons .btn-wishlist:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .action-buttons .btn-wishlist.liked {
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
+        .action-buttons .btn-wishlist.liked i {
+            color: #e74c3c;
+        }
+
+        /* ─── RFQ BUTTON ─── */
+        .btn-rfq {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: transparent;
+            border: 2px solid var(--secondary);
+            color: var(--secondary);
+            padding: 0.6rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 0.5rem;
+        }
+        .btn-rfq:hover {
+            background: var(--secondary);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* ─── SELLER INFO ─── */
         .seller-info {
-            background: #f8fafc;
-            border-radius: 1rem;
-            padding: 1.2rem;
-            margin: 1rem 0;
-            border: 1px solid #e9edf2;
+            background: var(--light);
+            border-radius: var(--radius-sm);
+            padding: 1.2rem 1.5rem;
+            margin: 1.2rem 0;
+            border: 1px solid var(--border);
         }
         .seller-info h4 {
             font-size: 0.9rem;
-            color: #0b2a3b;
+            color: var(--secondary);
             margin-bottom: 0.3rem;
         }
         .seller-info .seller-name {
             font-weight: 600;
-            color: #1e7b6b;
+            color: var(--primary);
+            font-size: 1rem;
         }
         .seller-info .seller-stats {
-            font-size: 0.8rem;
-            color: #6a889a;
             display: flex;
             gap: 1.5rem;
             flex-wrap: wrap;
             margin-top: 0.3rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
         }
         .seller-info .seller-stats i {
             margin-right: 0.3rem;
+            color: var(--primary);
         }
-        .btn-contact-seller {
+        .seller-info .btn-contact-seller {
             background: transparent;
-            border: 1px solid #1e7b6b;
-            color: #1e7b6b;
+            border: 1px solid var(--primary);
+            color: var(--primary);
             padding: 0.4rem 1.2rem;
             border-radius: 30px;
             font-weight: 600;
             font-size: 0.8rem;
             cursor: pointer;
-            transition: 0.2s;
+            transition: var(--transition);
             margin-top: 0.5rem;
         }
-        .btn-contact-seller:hover {
-            background: #1e7b6b;
-            color: #fff;
+        .seller-info .btn-contact-seller:hover {
+            background: var(--primary);
+            color: var(--white);
         }
 
-        .btn-rfq {
-            background: transparent;
-            border: 2px solid #0b2a3b;
-            color: #0b2a3b;
-            padding: 0.6rem 1.8rem;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: 0.2s;
-            margin-top: 0.5rem;
-            display: inline-block;
-        }
-        .btn-rfq:hover {
-            background: #0b2a3b;
-            color: #fff;
-        }
-
+        /* ─── RELATED PRODUCTS ─── */
         .related-section {
-            margin: 2rem 0;
+            margin-top: 3rem;
         }
         .related-section h3 {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
+            color: var(--secondary);
             margin-bottom: 1.2rem;
         }
+        .related-section h3 span {
+            color: var(--primary);
+        }
+
         .related-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 1.5rem;
         }
         .related-card {
-            background: #fff;
-            border-radius: 1.2rem;
+            background: var(--white);
+            border-radius: var(--radius);
             padding: 1rem;
-            border: 1px solid #e9edf2;
-            transition: 0.25s;
-            text-align: center;
+            border: 1px solid var(--border);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
+            text-align: center;
         }
         .related-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-light);
         }
-        .related-card .image {
-            background: #f4f8fa;
-            border-radius: 1rem;
+        .related-card .related-image {
+            background: var(--light);
+            border-radius: var(--radius-sm);
             aspect-ratio: 1/1;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
-            color: #3a6b7a;
             margin-bottom: 0.5rem;
-            overflow: hidden;
         }
-        .related-card .image img {
+        .related-card .related-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.6s ease;
         }
-        .related-card .title {
+        .related-card:hover .related-image img {
+            transform: scale(1.05);
+        }
+        .related-card .related-image .placeholder {
+            font-size: 2.5rem;
+            color: var(--text-light);
+        }
+        .related-card .related-title {
             font-weight: 600;
             font-size: 0.85rem;
+            color: var(--secondary);
             margin-bottom: 0.2rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
-        .related-card .price {
+        .related-card .related-price {
             font-weight: 700;
-            color: #1e7b6b;
+            color: var(--primary);
+            font-size: 0.95rem;
         }
-
-        .breadcrumb {
+        .related-card .related-price .old {
+            font-weight: 400;
+            color: var(--text-light);
+            text-decoration: line-through;
             font-size: 0.8rem;
-            color: #6a889a;
-            margin: 1rem 0 0.5rem;
-        }
-        .breadcrumb a {
-            color: #1e7b6b;
-        }
-        .breadcrumb a:hover {
-            text-decoration: underline;
+            margin-left: 0.3rem;
         }
 
+        /* ─── RESPONSIVE ─── */
         @media (max-width: 992px) {
-            .product-detail {
+            .product-detail-layout {
                 grid-template-columns: 1fr;
+                padding: 1.5rem;
+            }
+            .product-gallery .main-image-container {
+                aspect-ratio: 4/3;
             }
         }
+
         @media (max-width: 768px) {
-            .product-detail {
+            .product-detail-layout {
                 padding: 1rem;
             }
             .product-info .product-title {
                 font-size: 1.4rem;
             }
-            .product-info .price {
+            .product-info .product-price .current {
                 font-size: 1.6rem;
             }
-            .btn-add-cart,
-            .btn-buy-now {
+            .action-buttons {
+                flex-direction: column;
+            }
+            .action-buttons .btn-add-cart,
+            .action-buttons .btn-buy-now {
                 width: 100%;
-                justify-content: center;
             }
-            .quantity-selector {
-                flex-wrap: wrap;
-            }
-            .thumbnails .thumb {
-                width: 50px;
-                height: 50px;
-                font-size: 1.2rem;
-            }
-            .product-images .main-image {
-                font-size: 4rem;
+            .thumbnail-grid .thumb {
+                width: 60px;
+                height: 60px;
             }
             .related-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 0.8rem;
             }
         }
+
         @media (max-width: 480px) {
-            .product-detail {
+            .product-detail-layout {
                 padding: 0.8rem;
+            }
+            .thumbnail-grid .thumb {
+                width: 50px;
+                height: 50px;
+            }
+            .quantity-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .quantity-section .qty-control {
+                width: fit-content;
+                margin: 0 auto;
+            }
+            .related-grid {
+                grid-template-columns: 1fr 1fr;
             }
         }
     </style>
 </head>
 <body>
 
-<!-- ─── TOP BAR ─── -->
+<!-- ============================================ -->
+<!-- TOP BAR WITH MOVING WORDS -->
+<!-- ============================================ -->
 <div class="top-bar">
     <div class="container">
-        <div>
-            <span>Welcome to PSE Wholesale</span>
-            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
-            <a href="track-order.html">Track Order</a>
-            <a href="seller-dashboard.html">Become a Seller</a>
+        <div class="moving-words">
+            <div class="words-track">
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+            </div>
         </div>
-        <div id="authLinks">
-            <a href="login.html" id="loginLink">Login</a>
-            <a href="register.html" id="registerLink">Register</a>
-            <select class="lang-select" onchange="window.location.href='/?lang='+this.value">
-                <option value="EN">EN</option>
-                <option value="ES">ES</option>
-                <option value="FR">FR</option>
-                <option value="DE">DE</option>
-            </select>
+        <div class="top-links">
+            <a href="track-order.html"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard.html"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login.html" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register.html" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
 
-<!-- ─── HEADER ─── -->
+<!-- ============================================ -->
+<!-- HEADER -->
+<!-- ============================================ -->
 <header class="header">
     <div class="container">
-        <a href="index.html" class="logo" style="display:flex; align-items:center; gap:0.5rem; text-decoration:none;">
-            <img src="logo.jpg" alt="PSE Distribution" style="height:40px; width:auto; border-radius:8px;" />
-            <div style="display:flex; flex-direction:column; line-height:1.1;">
-                <span style="font-size:1.5rem; font-weight:800; color:#0b2a3b;">PSE <span style="color:#1e7b6b;">Distribution</span></span>
-                <span style="font-size:0.55rem; color:#6a889a; font-weight:400; letter-spacing:0.5px;">wholesale Marketplace</span>
+        <a href="home" class="logo">
+            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+            <div class="brand-name">
+                <span class="main">Pilot <span>Distribution</span></span>
+                <span class="sub">wholesale Marketplace</span>
             </div>
         </a>
-        <div class="search-bar">
-            <select id="categoryFilter"><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
-            <input type="text" id="searchInput" placeholder="Search wholesale products..." onkeyup="searchProducts(event)" />
-            <button onclick="searchProducts()"><i class="fa-solid fa-magnifying-glass"></i></button>
+
+        <!-- Search -->
+        <div class="search-bar" id="searchBar">
+            <input type="text" id="searchInput" placeholder="Search wholesale products..."
+                   onkeyup="searchProductsFirebase(event)" autocomplete="off" />
+            <button onclick="searchProductsFirebase()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <div class="search-results" id="searchResults"></div>
         </div>
+
         <div class="header-actions">
-            <div class="location-selector"><i class="fa-solid fa-location-dot"></i> Sacramento, 95829</div>
-            <a href="#" class="icon-btn" onclick="if(!JSON.parse(localStorage.getItem('pse_user')||'null')){showToast('Please login first','error')}else{window.location.href='wishlist.html'}">
-                <i class="fa-regular fa-heart"></i><span>Wishlist</span>
+            <a href="#" class="icon-btn" onclick="toggleWishlist()">
+                <i class="fa-regular fa-heart"></i>
+                <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="#" class="icon-btn">
-                <i class="fa-regular fa-bell"></i><span>Alerts</span>
-                <span class="badge-count">3</span>
-            </a>
-            <a href="#" class="icon-btn" id="accountBtn" onclick="if(!JSON.parse(localStorage.getItem('pse_user')||'null')){window.location.href='login.html'}else{window.location.href='account.html'}">
-                <i class="fa-regular fa-user"></i><span id="accountLabel">Account</span>
-            </a>
-            <a href="#" class="icon-btn" onclick="window.location.href='cart.html'">
-                <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
+            <a href="cart.html" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
+            </a>
+            <a href="account.html" class="icon-btn" id="accountBtn">
+                <i class="fa-regular fa-user"></i>
+                <span id="accountLabel">Account</span>
             </a>
         </div>
     </div>
 </header>
 
-<!-- ─── NAVIGATION ─── -->
+<!-- ============================================ -->
+<!-- NAVIGATION TABS -->
+<!-- ============================================ -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="index.html"><i class="fa-solid fa-bars"></i> All Departments</a>
-        <a href="#" onclick="filterByCategory('deals')">Today's Deals</a>
-        <a href="#" onclick="filterByCategory('new')">New Arrivals</a>
-        <a href="#" class="wholesale-nav" onclick="filterByCategory('wholesale')"><i class="fa-solid fa-cubes"></i> Wholesale</a>
-        <a href="#" onclick="filterByCategory('all')">Brands</a>
-        <a href="#" onclick="filterByCategory('clearance')">Clearance</a>
-        <a href="#" onclick="document.getElementById('flashDeals').scrollIntoView({behavior:'smooth'})">Flash Deals</a>
-        <a href="#">Gift Cards</a>
-        <a href="#">Business Solutions</a>
-        <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Customer Service</a>
+        <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products.html" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about.html" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact.html" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center.html" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller.html" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
-<!-- ─── MAIN CONTENT ─── -->
+<!-- ============================================ -->
+<!-- MAIN CONTENT -->
+<!-- ============================================ -->
 <div class="container">
 
-    <!-- PAGE LINKS -->
-    <div class="page-links">
-        <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products.html"><i class="fa-solid fa-grid-2"></i> Products</a>
-        <a href="product-detail.html" class="active"><i class="fa-solid fa-eye"></i> Detail</a>
-        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
-        <a href="checkout.html"><i class="fa-solid fa-credit-card"></i> Checkout</a>
-        <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
-        <a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a>
-        <a href="account.html"><i class="fa-solid fa-user"></i> Account</a>
-        <a href="seller-dashboard.html"><i class="fa-solid fa-store"></i> Seller</a>
-        <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Admin</a>
-        <a href="about.html"><i class="fa-solid fa-info-circle"></i> About</a>
-    </div>
+    <div class="product-detail-page">
 
-    <!-- Breadcrumb -->
-    <div class="breadcrumb">
-        <a href="index.html">Home</a> &gt;
-        <a href="products.html">Products</a> &gt;
-        <span id="productName">Product Detail</span>
-    </div>
-
-    <!-- Product Detail -->
-    <div class="product-detail" id="productDetail">
-        <div class="product-images">
-            <div class="main-image" id="mainImage">
-                <i class="fa-solid fa-box"></i>
-            </div>
-            <div class="thumbnails" id="thumbnails">
-                <div class="thumb active"><i class="fa-solid fa-box"></i></div>
-            </div>
+        <!-- ─── BREADCRUMB ─── -->
+        <div class="breadcrumb">
+            <a href="home">Home</a>
+            <span class="separator">/</span>
+            <a href="products.html">Products</a>
+            <span class="separator">/</span>
+            <span id="breadcrumbProduct">Loading...</span>
         </div>
 
-        <div class="product-info" id="productInfo">
-            <div class="product-title" id="detailTitle">Product Name</div>
-            <div class="product-brand" id="detailBrand">by <a href="#">Brand</a> · SKU: PSE-001</div>
-            <div class="rating" id="detailRating">★★★★★ <span>(0 reviews)</span></div>
+        <!-- ─── PRODUCT DETAIL ─── -->
+        <div class="product-detail-layout" id="productDetail">
 
-            <div class="price" id="detailPrice">
-                $0.00 <span class="old">$0.00</span>
-                <span class="discount">-0%</span>
-            </div>
-
-            <div class="moq-info" id="detailMoq">
-                <i class="fa-regular fa-box"></i> Minimum Order Quantity: 0 units
-            </div>
-
-            <div class="description" id="detailDescription">
-                Product description goes here.
-            </div>
-
-            <!-- Bulk Pricing -->
-            <div class="bulk-pricing" id="bulkPricing">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Quantity</th>
-                            <th>Price per unit</th>
-                            <th>Savings</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bulkPricingBody">
-                        <tr>
-                            <td>1 – 49 units</td>
-                            <td>$0.00</td>
-                            <td>—</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Quantity & Add -->
-            <div class="quantity-selector">
-                <label for="qty">Quantity:</label>
-                <input type="number" id="qty" value="1" min="1" step="1" />
-            </div>
-
-            <div style="display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center;">
-                <button class="btn-add-cart" onclick="addToCartFromDetail()"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
-                <button class="btn-buy-now" onclick="buyNow()"><i class="fa-solid fa-bolt"></i> Buy Now</button>
-                <button class="btn-wishlist" onclick="toggleWishlistFromDetail()"><i class="fa-regular fa-heart"></i></button>
-            </div>
-
-            <div style="margin-top: 0.8rem;">
-                <a href="#" class="btn-rfq" onclick="showToast('Request a quotation sent!', 'success')">
-                    <i class="fa-regular fa-file-lines"></i> Request a Quotation (RFQ)
-                </a>
-            </div>
-
-            <!-- Seller Info -->
-            <div class="seller-info">
-                <h4>Seller Information</h4>
-                <div class="seller-name"><i class="fa-regular fa-building"></i> PSE Wholesale</div>
-                <div class="seller-stats">
-                    <span><i class="fa-regular fa-circle-check" style="color:#1e7b6b;"></i> Verified Supplier</span>
-                    <span><i class="fa-regular fa-star"></i> 4.8 (1,234 reviews)</span>
-                    <span><i class="fa-regular fa-clock"></i> Responds in 2 hours</span>
-                    <span><i class="fa-regular fa-flag"></i> 98% on-time delivery</span>
+            <!-- ─── IMAGE GALLERY ─── -->
+            <div class="product-gallery">
+                <div class="main-image-container">
+                    <div class="main-image" id="mainImage">
+                        <span class="placeholder"><i class="fa-solid fa-box"></i></span>
+                    </div>
+                    <button class="gallery-nav prev" onclick="changeImage(-1)">❮</button>
+                    <button class="gallery-nav next" onclick="changeImage(1)">❯</button>
                 </div>
-                <button class="btn-contact-seller" onclick="showToast('Message sent to seller!', 'success')">
-                    <i class="fa-regular fa-comment"></i> Contact Seller
+                <div class="thumbnail-grid" id="thumbnailGrid">
+                    <!-- Thumbnails will be generated -->
+                </div>
+            </div>
+
+            <!-- ─── PRODUCT INFO ─── -->
+            <div class="product-info">
+                <div class="product-title" id="productTitle">Loading...</div>
+                <div class="product-brand" id="productBrand">by <a href="#">Brand</a></div>
+
+                <div class="product-rating">
+                    <span class="stars" id="productStars">★★★★★</span>
+                    <span class="review-count" id="productReviews">(0 reviews)</span>
+                </div>
+
+                <div class="product-price">
+                    <span class="current" id="productPrice">$0.00</span>
+                    <span class="old" id="productOldPrice">$0.00</span>
+                    <span class="discount-badge" id="productDiscount">-0%</span>
+                </div>
+
+                <div class="product-moq" id="productMoq">
+                    <i class="fa-regular fa-box"></i> Minimum Order Quantity: <span id="moqValue">0</span> units
+                </div>
+
+                <div class="product-description" id="productDescription">
+                    Loading product description...
+                </div>
+
+                <!-- ─── BULK PRICING ─── -->
+                <div class="bulk-pricing" id="bulkPricing">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Price per unit</th>
+                                <th>Savings</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bulkPricingBody">
+                            <tr>
+                                <td>Loading...</td>
+                                <td>Loading...</td>
+                                <td>Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ─── QUANTITY ─── -->
+                <div class="quantity-section">
+                    <label for="qtyInput">Quantity:</label>
+                    <div class="qty-control">
+                        <button onclick="updateQty(-1)">−</button>
+                        <input type="number" id="qtyInput" value="1" min="1" />
+                        <button onclick="updateQty(1)">+</button>
+                    </div>
+                </div>
+
+                <!-- ─── ACTION BUTTONS ─── -->
+                <div class="action-buttons">
+                    <button class="btn-add-cart" onclick="addToCartFromDetail()" id="addToCartBtn">
+                        <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                    </button>
+                    <button class="btn-buy-now" onclick="buyNow()">
+                        <i class="fa-solid fa-bolt"></i> Buy Now
+                    </button>
+                    <button class="btn-wishlist" onclick="toggleWishlistFromDetail()" id="wishlistBtn">
+                        <i class="fa-regular fa-heart"></i>
+                    </button>
+                </div>
+
+                <!-- ─── RFQ ─── -->
+                <button class="btn-rfq" onclick="requestQuote()">
+                    <i class="fa-regular fa-file-lines"></i> Request a Quotation (RFQ)
                 </button>
-            </div>
-        </div>
-    </div>
 
-    <!-- Related Products -->
-    <div class="related-section">
-        <h3>You May Also Like</h3>
-        <div class="related-grid" id="relatedGrid">
-            <div class="loading-spinner">
-                <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;"></i>
-                <p style="margin-top:0.5rem;">Loading recommendations...</p>
+                <!-- ─── SELLER INFO ─── -->
+                <div class="seller-info">
+                    <h4>Seller Information</h4>
+                    <div class="seller-name" id="sellerName"><i class="fa-regular fa-building"></i> Pilot Sales Distribution</div>
+                    <div class="seller-stats">
+                        <span><i class="fa-regular fa-circle-check"></i> Verified Supplier</span>
+                        <span><i class="fa-regular fa-star"></i> <span id="sellerRating">4.8</span> (<span id="sellerReviews">1,234</span> reviews)</span>
+                        <span><i class="fa-regular fa-clock"></i> Responds in 2 hours</span>
+                        <span><i class="fa-regular fa-flag"></i> 98% on-time delivery</span>
+                    </div>
+                    <button class="btn-contact-seller" onclick="contactSeller()">
+                        <i class="fa-regular fa-comment"></i> Contact Seller
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ─── RELATED PRODUCTS ─── -->
+        <div class="related-section">
+            <h3>You May Also <span>Like</span></h3>
+            <div class="related-grid" id="relatedGrid">
+                <div class="loading-spinner">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <p>Loading recommendations...</p>
+                </div>
             </div>
         </div>
+
     </div>
 
 </div>
 
-<!-- ─── HELP MODAL ─── -->
-<div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
-    <div class="modal-content">
-        <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
-        <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
-        <p>Choose from our support options below:</p>
-        <ul>
-            <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
-            <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
-            <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
-        </ul>
-        <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
-    </div>
-</div>
-
-<!-- ─── FOOTER ─── -->
+<!-- ============================================ -->
+<!-- FOOTER -->
+<!-- ============================================ -->
 <footer class="footer">
     <div class="container">
-        <div>
-            <h4>PSE Wholesale</h4>
-            <ul>
-                <li onclick="window.location.href='about.html'">About Us</li>
-                <li>Careers</li>
-                <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
-                <li>Blog</li>
-            </ul>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="help-center.html">Help</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms &amp; Conditions</a>
+                <a href="become-seller.html">Become a Seller</a>
+            </div>
+            <div class="footer-social">
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
         </div>
-        <div>
-            <h4>Customer Service</h4>
-            <ul>
-                <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
-                <li>Returns & Refunds</li>
-                <li>Shipping Policy</li>
-                <li onclick="window.location.href='track-order.html'">Track Order</li>
-            </ul>
-        </div>
-        <div>
-            <h4>B2B</h4>
-            <ul>
-                <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
-                <li>Wholesale Pricing</li>
-                <li>Bulk Orders</li>
-                <li>Supplier Program</li>
-            </ul>
-        </div>
-        <div>
-            <h4>Legal</h4>
-            <ul>
-                <li>Privacy Policy</li>
-                <li>Terms & Conditions</li>
-                <li>Cookie Policy</li>
-            </ul>
-        </div>
-        <div class="bottom">
-            &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+        <div class="footer-bottom">
+            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
         </div>
     </div>
 </footer>
 
-<!-- ─── MAIN JS ─── -->
+<!-- ============================================ -->
+<!-- TOAST NOTIFICATION -->
+<!-- ============================================ -->
+<div id="toast" class="toast"></div>
+
+<!-- ============================================ -->
+<!-- MAIN JAVASCRIPT -->
+<!-- ============================================ -->
 <script src="main.js"></script>
 
 <script>
+// ============================================
+// PRODUCT DETAIL PAGE - JAVASCRIPT
+// ============================================
+
+// ─── STATE ───
+let currentProduct = null;
+let currentImageIndex = 0;
+let productImages = [];
 let currentProductId = null;
+
+// ─── SET CURRENT YEAR ───
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ─── SEARCH WITH FIREBASE ───
+async function searchProductsFirebase(event) {
+    const input = document.getElementById('searchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    const query = input.value.trim();
+
+    if (event && event.key === 'Enter' && query) {
+        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+        return;
+    }
+
+    if (query.length < 2) {
+        resultsDiv.classList.remove('show');
+        return;
+    }
+
+    try {
+        const snapshot = await db.collection('products')
+            .where('status', 'in', ['active', 'approved'])
+            .limit(5)
+            .get();
+
+        const products = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
+                (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
+                products.push({
+                    id: doc.id,
+                    ...data,
+                    image_url: data.image_url || data.images?.[0] || ''
+                });
+            }
+        });
+
+        if (products.length === 0) {
+            resultsDiv.innerHTML = `
+                <div style="padding:1rem; text-align:center; color:var(--text-light);">
+                    No products found for "${query}"
+                </div>
+            `;
+            resultsDiv.classList.add('show');
+            return;
+        }
+
+        resultsDiv.innerHTML = products.map(p => `
+            <div class="result-item" onclick="window.location.href='product-detail.html?id=${p.id}'">
+                <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
+                <div class="info">
+                    <div class="title">${p.title}</div>
+                    <div class="price">$${(p.price || 0).toFixed(2)}</div>
+                </div>
+            </div>
+        `).join('') + `
+            <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
+                <a href="products.html?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
+                    See all results for "${query}" →
+                </a>
+            </div>
+        `;
+
+        resultsDiv.classList.add('show');
+
+    } catch (error) {
+        console.error('Search error:', error);
+    }
+}
+
+// ─── CLOSE SEARCH RESULTS ───
+document.addEventListener('click', function(e) {
+    const searchBar = document.getElementById('searchBar');
+    if (!searchBar.contains(e.target)) {
+        document.getElementById('searchResults').classList.remove('show');
+    }
+});
 
 // ─── LOAD PRODUCT DETAIL ───
 async function loadProductDetail() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
-    
+
     if (!id) {
         showToast('Product not found', 'error');
+        window.location.href = 'products.html';
         return;
     }
 
-    const product = await fetchProductById(id);
-    if (!product) {
-        showToast('Product not found', 'error');
-        return;
+    try {
+        const product = await fetchProductById(id);
+        if (!product) {
+            showToast('Product not found', 'error');
+            window.location.href = 'products.html';
+            return;
+        }
+
+        currentProduct = product;
+        currentProductId = id;
+        
+        // Get all images
+        productImages = [];
+        if (product.images && product.images.length > 0) {
+            productImages = product.images;
+        } else if (product.image_url) {
+            productImages = [product.image_url];
+        }
+
+        renderProduct(product);
+        renderThumbnails();
+        renderBulkPricing(product);
+        loadRelatedProducts(product);
+        
+        // Update wishlist status
+        updateWishlistStatus(id);
+
+    } catch (error) {
+        console.error('Error loading product:', error);
+        showToast('Failed to load product', 'error');
     }
-
-    currentProductId = id;
-    
-    document.getElementById('productName').textContent = product.title;
-    document.getElementById('detailTitle').textContent = product.title;
-    document.getElementById('detailBrand').innerHTML = `by <a href="#">${product.brand || 'PSE Wholesale'}</a> · SKU: ${product.id.substring(0, 8)}`;
-    document.getElementById('detailRating').innerHTML = `${'★'.repeat(Math.floor(product.rating || 4))}${'☆'.repeat(5 - Math.floor(product.rating || 4))} <span>(${product.reviews || 0} reviews)</span>`;
-    
-    const discount = product.old_price ? Math.round((1 - product.price / product.old_price) * 100) : 0;
-    document.getElementById('detailPrice').innerHTML = `
-        $${(product.price || 0).toFixed(2)} 
-        ${product.old_price ? `<span class="old">$${product.old_price.toFixed(2)}</span>` : ''}
-        ${discount > 0 ? `<span class="discount">-${discount}%</span>` : ''}
-    `;
-    
-    document.getElementById('detailMoq').innerHTML = `
-        <i class="fa-regular fa-box"></i> Minimum Order Quantity: ${product.moq || 1} units
-    `;
-    
-    document.getElementById('detailDescription').textContent = product.description || `Premium quality ${product.title.toLowerCase()}. Perfect for bulk orders and wholesale buyers.`;
-
-    const qtyInput = document.getElementById('qty');
-    qtyInput.min = product.moq || 1;
-    qtyInput.value = product.moq || 1;
-
-    const mainImage = document.getElementById('mainImage');
-    if (product.image_url) {
-        mainImage.innerHTML = `<img src="${product.image_url}" alt="${product.title}" />`;
-    } else {
-        mainImage.innerHTML = `<i class="fa-solid fa-box"></i>`;
-    }
-
-    const thumbnails = document.getElementById('thumbnails');
-    thumbnails.innerHTML = `
-        <div class="thumb active">${product.image_url ? `<img src="${product.image_url}" alt="${product.title}" />` : `<i class="fa-solid fa-box"></i>`}</div>
-        <div class="thumb"><i class="fa-solid fa-box"></i></div>
-        <div class="thumb"><i class="fa-solid fa-box"></i></div>
-    `;
-
-    const bulkBody = document.getElementById('bulkPricingBody');
-    const price = product.price || 0;
-    const tiers = [
-        { min: product.moq || 1, max: 49, price: price },
-        { min: 50, max: 99, price: Math.round((price * 0.90) * 100) / 100 },
-        { min: 100, max: 499, price: Math.round((price * 0.80) * 100) / 100 },
-        { min: 500, max: null, price: Math.round((price * 0.70) * 100) / 100 }
-    ];
-    bulkBody.innerHTML = tiers.map(t => `
-        <tr>
-            <td>${t.min}${t.max ? ` – ${t.max} units` : '+ units'}</td>
-            <td>$${t.price.toFixed(2)}</td>
-            <td>${t.max ? `Save $${(price - t.price).toFixed(2)}` : 'Best value'}</td>
-        </tr>
-    `).join('');
-
-    loadRelatedProducts(product);
 }
 
-// ─── LOAD RELATED PRODUCTS ───
-async function loadRelatedProducts(currentProduct) {
-    const grid = document.getElementById('relatedGrid');
-    const products = await fetchProducts();
+// ─── RENDER PRODUCT ───
+function renderProduct(product) {
+    // Breadcrumb
+    document.getElementById('breadcrumbProduct').textContent = product.title || 'Product';
+
+    // Title
+    document.getElementById('productTitle').textContent = product.title || 'Product';
+
+    // Brand
+    document.getElementById('productBrand').innerHTML = `by <a href="products.html?brand=${encodeURIComponent(product.brand || '')}">${product.brand || 'Pilot Distribution'}</a>`;
+
+    // Rating
+    const rating = product.rating || 4.0;
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+    const emptyStars = 5 - fullStars - halfStar;
+    let starsHtml = '★'.repeat(fullStars);
+    if (halfStar) starsHtml += '½';
+    starsHtml += '☆'.repeat(emptyStars);
+    document.getElementById('productStars').textContent = starsHtml;
+    document.getElementById('productReviews').textContent = `(${product.reviews || 0} reviews)`;
+
+    // Price
+    const price = product.price || 0;
+    const oldPrice = product.old_price || 0;
+    const discount = oldPrice > price ? Math.round((1 - price / oldPrice) * 100) : 0;
+    document.getElementById('productPrice').textContent = `$${price.toFixed(2)}`;
+    document.getElementById('productOldPrice').textContent = oldPrice > 0 ? `$${oldPrice.toFixed(2)}` : '';
+    document.getElementById('productOldPrice').style.display = oldPrice > 0 ? 'inline' : 'none';
+    document.getElementById('productDiscount').textContent = discount > 0 ? `-${discount}%` : '';
+    document.getElementById('productDiscount').style.display = discount > 0 ? 'inline-block' : 'none';
+
+    // MOQ
+    const moq = product.moq || 1;
+    document.getElementById('moqValue').textContent = moq;
+    document.getElementById('qtyInput').min = moq;
+    document.getElementById('qtyInput').value = moq;
+
+    // Description
+    document.getElementById('productDescription').textContent = product.description || 'Premium quality product. Perfect for bulk orders and wholesale buyers.';
+
+    // Seller
+    document.getElementById('sellerName').textContent = `🏢 ${product.supplier_name || 'Pilot Sales Distribution'}`;
+    document.getElementById('sellerRating').textContent = product.rating || 4.8;
+    document.getElementById('sellerReviews').textContent = product.reviews || 1234;
+
+    // Main Image
+    if (productImages.length > 0) {
+        const mainImage = document.getElementById('mainImage');
+        mainImage.innerHTML = `<img src="${productImages[0]}" alt="${product.title}" />`;
+        currentImageIndex = 0;
+    }
+}
+
+// ─── RENDER THUMBNAILS ───
+function renderThumbnails() {
+    const grid = document.getElementById('thumbnailGrid');
     
-    const related = products
-        .filter(p => p.id !== currentProduct.id && p.category === currentProduct.category)
-        .slice(0, 4);
-    
-    if (related.length === 0) {
+    if (productImages.length === 0) {
         grid.innerHTML = `
-            <div style="grid-column:1/-1; text-align:center; padding:1rem; color:#6a889a; font-size:0.9rem;">
-                No related products found.
+            <div class="thumb active">
+                <span class="placeholder"><i class="fa-solid fa-box"></i></span>
             </div>
         `;
         return;
     }
 
-    grid.innerHTML = related.map(p => `
-        <div class="related-card" onclick="window.location.href='product-detail.html?id=${p.id}'">
-            <div class="image">
-                ${p.image_url ? `<img src="${p.image_url}" alt="${p.title}" />` : `<i class="fa-solid fa-box"></i>`}
-            </div>
-            <div class="title">${p.title}</div>
-            <div class="price">$${(p.price || 0).toFixed(2)}</div>
+    grid.innerHTML = productImages.map((img, index) => `
+        <div class="thumb ${index === 0 ? 'active' : ''}" onclick="goToImage(${index})">
+            <img src="${img}" alt="Product image ${index + 1}" />
         </div>
     `).join('');
 }
 
-// ─── ADD TO CART ───
-function addToCartFromDetail() {
-    const qty = parseInt(document.getElementById('qty').value) || 1;
-    if (currentProductId) {
-        addToCart(currentProductId, qty);
-    }
+// ─── GO TO IMAGE ───
+function goToImage(index) {
+    if (index < 0 || index >= productImages.length) return;
+    
+    currentImageIndex = index;
+    const mainImage = document.getElementById('mainImage');
+    mainImage.innerHTML = `<img src="${productImages[index]}" alt="${currentProduct?.title || 'Product'}" />`;
+    
+    document.querySelectorAll('.thumbnail-grid .thumb').forEach((thumb, i) => {
+        thumb.classList.toggle('active', i === index);
+    });
 }
 
-// ─── TOGGLE WISHLIST ───
-function toggleWishlistFromDetail() {
-    if (currentProductId) {
-        toggleWishlist(currentProductId);
+function changeImage(direction) {
+    if (productImages.length <= 1) return;
+    const newIndex = (currentImageIndex + direction + productImages.length) % productImages.length;
+    goToImage(newIndex);
+}
+
+// ─── RENDER BULK PRICING ───
+function renderBulkPricing(product) {
+    const tbody = document.getElementById('bulkPricingBody');
+    const price = product.price || 0;
+    const moq = product.moq || 1;
+    
+    const tiers = [
+        { min: moq, max: 49, discount: 0 },
+        { min: 50, max: 99, discount: 0.10 },
+        { min: 100, max: 499, discount: 0.20 },
+        { min: 500, max: null, discount: 0.30 }
+    ];
+
+    tbody.innerHTML = tiers.map((tier, index) => {
+        const tierPrice = price * (1 - tier.discount);
+        const savings = price - tierPrice;
+        const isBest = index === tiers.length - 1;
+        return `
+            <tr class="${isBest ? 'best-value' : ''}">
+                <td>${tier.min}${tier.max ? ` – ${tier.max}` : '+'} units</td>
+                <td>$${tierPrice.toFixed(2)}</td>
+                <td>${tier.max ? `Save $${savings.toFixed(2)}` : 'Best value'}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ─── UPDATE QUANTITY ───
+function updateQty(change) {
+    const input = document.getElementById('qtyInput');
+    let val = parseInt(input.value) || 1;
+    const min = parseInt(input.min) || 1;
+    val = Math.max(min, val + change);
+    input.value = val;
+}
+
+// ─── ADD TO CART ───
+async function addToCartFromDetail() {
+    if (!currentProductId) {
+        showToast('Product not found', 'error');
+        return;
+    }
+
+    const qty = parseInt(document.getElementById('qtyInput').value) || 1;
+    const btn = document.getElementById('addToCartBtn');
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
+    
+    const result = await addToCart(currentProductId, qty);
+    
+    btn.disabled = false;
+    if (result.success) {
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Added!';
+        btn.classList.add('added');
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
+            btn.classList.remove('added');
+        }, 2000);
+    } else {
+        btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
     }
 }
 
 // ─── BUY NOW ───
-function buyNow() {
-    const qty = parseInt(document.getElementById('qty').value) || 1;
-    if (currentProductId) {
-        addToCart(currentProductId, qty);
-        setTimeout(() => window.location.href = 'checkout.html', 1000);
+async function buyNow() {
+    if (!currentProductId) {
+        showToast('Product not found', 'error');
+        return;
+    }
+
+    const qty = parseInt(document.getElementById('qtyInput').value) || 1;
+    const result = await addToCart(currentProductId, qty);
+    
+    if (result.success) {
+        setTimeout(() => {
+            window.location.href = 'checkout.html';
+        }, 500);
     }
 }
+
+// ─── TOGGLE WISHLIST ───
+async function toggleWishlistFromDetail() {
+    if (!currentProductId) {
+        showToast('Product not found', 'error');
+        return;
+    }
+
+    const result = await toggleWishlist(currentProductId);
+    if (result.success) {
+        const btn = document.getElementById('wishlistBtn');
+        if (result.added) {
+            btn.classList.add('liked');
+            btn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        } else {
+            btn.classList.remove('liked');
+            btn.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        }
+    }
+}
+
+// ─── UPDATE WISHLIST STATUS ───
+async function updateWishlistStatus(productId) {
+    const user = getCurrentUser();
+    if (!user) return;
+
+    try {
+        const snapshot = await db.collection('wishlist')
+            .where('user_id', '==', user.id)
+            .where('product_id', '==', productId)
+            .get();
+
+        const btn = document.getElementById('wishlistBtn');
+        if (!snapshot.empty) {
+            btn.classList.add('liked');
+            btn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        } else {
+            btn.classList.remove('liked');
+            btn.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        }
+    } catch (error) {
+        console.error('Error checking wishlist:', error);
+    }
+}
+
+// ─── REQUEST QUOTE ───
+function requestQuote() {
+    if (!currentProduct) {
+        showToast('Product not found', 'error');
+        return;
+    }
+
+    const qty = parseInt(document.getElementById('qtyInput').value) || 1;
+    const product = currentProduct;
+    const message = `📋 *RFQ REQUEST - Pilot Sales Distribution*%0A%0A` +
+        `*Product:* ${product.title}%0A` +
+        `*Brand:* ${product.brand || 'N/A'}%0A` +
+        `*Quantity:* ${qty} units%0A` +
+        `*Price:* $${(product.price || 0).toFixed(2)} per unit%0A` +
+        `*Total:* $${((product.price || 0) * qty).toFixed(2)}%0A%0A` +
+        `*MOQ:* ${product.moq || 1} units%0A` +
+        `*Category:* ${product.category || 'N/A'}%0A%0A` +
+        `Please send me a quote for this product.`;
+
+    window.open(`https://wa.me/19099384682?text=${encodeURIComponent(message)}`, '_blank');
+    showToast('📤 Quote request sent via WhatsApp!', 'success');
+}
+
+// ─── CONTACT SELLER ───
+function contactSeller() {
+    if (!currentProduct) {
+        showToast('Product not found', 'error');
+        return;
+    }
+
+    const product = currentProduct;
+    const message = `👋 *Hello!*%0A%0A` +
+        `I'm interested in your product:%0A` +
+        `*${product.title}*%0A` +
+        `Brand: ${product.brand || 'N/A'}%0A` +
+        `Price: $${(product.price || 0).toFixed(2)}%0A%0A` +
+        `Could you please provide more information?`;
+
+    window.open(`https://wa.me/19099384682?text=${encodeURIComponent(message)}`, '_blank');
+    showToast('📤 Message sent to seller!', 'success');
+}
+
+// ─── LOAD RELATED PRODUCTS ───
+async function loadRelatedProducts(product) {
+    const grid = document.getElementById('relatedGrid');
+    
+    try {
+        const products = await fetchProducts();
+        const related = products
+            .filter(p => p.id !== product.id && p.category === product.category)
+            .slice(0, 4);
+
+        if (related.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);">
+                    <i class="fa-regular fa-box" style="font-size:2rem; color:var(--primary);"></i>
+                    <p style="margin-top:0.5rem;">No related products found.</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = related.map(p => {
+            const imageUrl = p.image_url || p.images?.[0] || '';
+            return `
+                <div class="related-card" onclick="window.location.href='product-detail.html?id=${p.id}'">
+                    <div class="related-image">
+                        ${imageUrl ? `<img src="${imageUrl}" alt="${p.title}" />` : `<span class="placeholder"><i class="fa-solid fa-box"></i></span>`}
+                    </div>
+                    <div class="related-title">${p.title}</div>
+                    <div class="related-price">
+                        $${(p.price || 0).toFixed(2)}
+                        ${p.old_price ? `<span class="old">$${p.old_price.toFixed(2)}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (error) {
+        console.error('Error loading related products:', error);
+        grid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:1rem; color:var(--text-light);">
+                <p>Could not load related products.</p>
+            </div>
+        `;
+    }
+}
+
+// ─── KEYBOARD NAVIGATION ───
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowLeft') {
+        changeImage(-1);
+    } else if (e.key === 'ArrowRight') {
+        changeImage(1);
+    }
+});
 
 // ─── INIT ───
 document.addEventListener('DOMContentLoaded', function() {
     loadProductDetail();
     loadCartCount();
+    loadWishlistCount();
 });
 </script>
 

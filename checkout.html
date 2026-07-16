@@ -3,570 +3,712 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Checkout - PSE Wholesale</title>
+    <title>Checkout - Pilot Sales Distribution</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Complete your wholesale order at Pilot Sales Distribution. Secure checkout with WhatsApp quote integration." />
+    <meta name="keywords" content="checkout, wholesale order, quote, Pilot Sales" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Checkout - Pilot Sales Distribution" />
+    <meta property="og:description" content="Secure wholesale checkout." />
+    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo-192.png" />
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="style.css" />
-    
-    <script src="https://cdn.jsdelivr.net/npm/cloudinary-core@2.11.3/cloudinary-core-shrinkwrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/cloudinary-jquery-file-upload@2.11.3/cloudinary-jquery-file-upload.js"></script>
-    
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
-    
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css" />
+
     <style>
+        /* ─── CHECKOUT PAGE SPECIFIC STYLES ─── */
+        .checkout-page {
+            max-width: 1100px;
+            margin: 2rem auto;
+        }
+
+        .checkout-header {
+            text-align: center;
+            padding: 2rem 0;
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+            border-radius: var(--radius);
+            color: var(--white);
+            margin-bottom: 2rem;
+        }
+        .checkout-header h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+        }
+        .checkout-header h1 span {
+            color: var(--accent);
+        }
+        .checkout-header p {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            margin-top: 0.3rem;
+        }
+
+        /* ─── CHECKOUT LAYOUT ─── */
         .checkout-layout {
             display: grid;
             grid-template-columns: 1fr 380px;
             gap: 2rem;
-            margin: 1.5rem 0;
         }
 
+        /* ─── CHECKOUT FORM ─── */
         .checkout-form {
-            background: #fff;
-            border-radius: 1.5rem;
+            background: var(--white);
+            border-radius: var(--radius);
             padding: 2rem;
-            border: 1px solid #e9edf2;
+            border: 1px solid var(--border);
         }
-        .checkout-form h2 {
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            color: #0b2a3b;
+        .checkout-form .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
         }
+        .checkout-form .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .checkout-form .form-section h2 {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .checkout-form .form-section h2 .step {
+            background: var(--primary);
+            color: var(--white);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
         .checkout-form .form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
         .checkout-form .form-group label {
             display: block;
             font-size: 0.85rem;
             font-weight: 600;
-            color: #0b2a3b;
+            color: var(--secondary);
             margin-bottom: 0.3rem;
         }
+        .checkout-form .form-group label .required {
+            color: #c0392b;
+        }
+
         .checkout-form .form-group input,
         .checkout-form .form-group select,
         .checkout-form .form-group textarea {
             width: 100%;
-            padding: 0.6rem 0.8rem;
-            border: 1px solid #dce3e9;
-            border-radius: 8px;
+            padding: 0.7rem 0.8rem;
+            border: 1px solid var(--border-dark);
+            border-radius: var(--radius-sm);
             font-size: 0.9rem;
-            transition: 0.2s;
+            transition: var(--transition);
+            font-family: inherit;
         }
         .checkout-form .form-group input:focus,
         .checkout-form .form-group select:focus,
         .checkout-form .form-group textarea:focus {
-            border-color: #1e7b6b;
+            border-color: var(--primary);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(30, 123, 107, 0.1);
+            box-shadow: 0 0 0 3px rgba(26, 123, 107, 0.1);
         }
+
         .checkout-form .form-group textarea {
             resize: vertical;
             min-height: 80px;
         }
+
         .checkout-form .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
         }
 
+        /* ─── PAYMENT METHODS ─── */
         .payment-methods {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
             margin-top: 0.5rem;
         }
         .payment-methods .method {
-            flex: 1;
-            min-width: 100px;
-            padding: 0.8rem;
-            border: 2px solid #dce3e9;
-            border-radius: 8px;
+            padding: 1rem;
+            border: 2px solid var(--border-dark);
+            border-radius: var(--radius-sm);
             text-align: center;
             cursor: pointer;
-            transition: 0.2s;
+            transition: var(--transition);
+            background: var(--white);
         }
         .payment-methods .method:hover {
-            border-color: #bcd9d0;
+            border-color: var(--primary-light);
         }
         .payment-methods .method.active {
-            border-color: #1e7b6b;
-            background: #f0f8f5;
+            border-color: var(--primary);
+            background: var(--primary-light);
         }
         .payment-methods .method i {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             display: block;
             margin-bottom: 0.3rem;
         }
-        .payment-methods .method span {
+        .payment-methods .method .method-name {
             font-size: 0.75rem;
             font-weight: 600;
-            color: #0b2a3b;
+            color: var(--secondary);
+        }
+        .payment-methods .method.whatsapp i {
+            color: #25D366;
+        }
+        .payment-methods .method.bank i {
+            color: #2980b9;
+        }
+        .payment-methods .method.card i {
+            color: #e67e22;
         }
 
-        .order-summary-side {
-            background: #fff;
-            border-radius: 1.5rem;
+        /* ─── CARD DETAILS ─── */
+        #cardDetails {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--light);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        /* ─── ORDER SUMMARY SIDEBAR ─── */
+        .order-summary {
+            background: var(--white);
+            border-radius: var(--radius);
             padding: 1.5rem;
-            border: 1px solid #e9edf2;
+            border: 1px solid var(--border);
             height: fit-content;
             position: sticky;
             top: 100px;
         }
-        .order-summary-side h3 {
-            font-size: 1.2rem;
+        .order-summary h3 {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid var(--border);
             margin-bottom: 1rem;
-            color: #0b2a3b;
         }
-        .order-summary-side .order-item {
+
+        .order-summary .order-item {
             display: flex;
             gap: 0.8rem;
             padding: 0.6rem 0;
-            border-bottom: 1px solid #eef2f6;
+            border-bottom: 1px solid var(--border);
             align-items: center;
         }
-        .order-summary-side .order-item .item-image {
+        .order-summary .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-summary .order-item .item-image {
             width: 50px;
             height: 50px;
-            background: #f4f8fa;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: var(--light);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
-            color: #3a6b7a;
-            overflow: hidden;
+            color: var(--text-light);
             flex-shrink: 0;
         }
-        .order-summary-side .order-item .item-image img {
+        .order-summary .order-item .item-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .order-summary-side .order-item .item-info {
+
+        .order-summary .order-item .item-info {
             flex: 1;
         }
-        .order-summary-side .order-item .item-info .title {
+        .order-summary .order-item .item-info .title {
             font-size: 0.85rem;
             font-weight: 600;
-            color: #0b2a3b;
+            color: var(--secondary);
         }
-        .order-summary-side .order-item .item-info .qty {
+        .order-summary .order-item .item-info .qty {
             font-size: 0.75rem;
-            color: #6a889a;
+            color: var(--text-light);
         }
-        .order-summary-side .order-item .item-price {
+        .order-summary .order-item .item-price {
             font-weight: 700;
-            color: #1e7b6b;
+            color: var(--primary);
             font-size: 0.9rem;
         }
 
-        .summary-totals {
+        .order-summary .summary-totals {
             margin-top: 1rem;
+            padding-top: 0.5rem;
+            border-top: 2px solid var(--border);
         }
-        .summary-totals .row {
+        .order-summary .summary-totals .row {
             display: flex;
             justify-content: space-between;
-            padding: 0.4rem 0;
-            font-size: 0.9rem;
-            color: #2c5a6b;
+            padding: 0.3rem 0;
+            font-size: 0.85rem;
+            color: var(--text);
         }
-        .summary-totals .row.total {
-            font-size: 1.2rem;
+        .order-summary .summary-totals .row.total {
+            font-size: 1.1rem;
             font-weight: 700;
-            color: #0b2a3b;
-            border-top: 2px solid #e9edf2;
+            color: var(--secondary);
+            border-top: 1px solid var(--border);
             padding-top: 0.8rem;
             margin-top: 0.3rem;
         }
-        .summary-totals .row.total .amount {
-            color: #1e7b6b;
+        .order-summary .summary-totals .row.total .amount {
+            color: var(--primary);
+        }
+        .order-summary .summary-totals .row .amount {
+            font-weight: 600;
+        }
+        .order-summary .summary-totals .row .discount {
+            color: var(--primary);
         }
 
-        .btn-place-order {
+        .order-summary .btn-place-order {
             background: #25D366;
-            color: #fff;
+            color: var(--white);
             border: none;
             padding: 0.8rem;
-            border-radius: 40px;
+            border-radius: 50px;
             font-weight: 700;
             font-size: 1rem;
             width: 100%;
             cursor: pointer;
-            transition: 0.2s;
+            transition: var(--transition);
             margin-top: 1rem;
-        }
-        .btn-place-order:hover {
-            background: #1da851;
-        }
-        .btn-place-order i {
-            margin-right: 0.5rem;
-        }
-
-        .guest-checkout {
-            margin: 1rem 0;
-            padding: 1rem;
-            background: #f8fafc;
-            border-radius: 8px;
-            border: 1px solid #e9edf2;
-        }
-        .guest-checkout label {
-            display: flex;
+            display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 0.5rem;
-            font-size: 0.9rem;
-            color: #0b2a3b;
-            cursor: pointer;
+        }
+        .order-summary .btn-place-order:hover {
+            background: #1da851;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+        }
+        .order-summary .btn-place-order:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
+        .order-summary .secure-badge {
+            text-align: center;
+            margin-top: 0.8rem;
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+        .order-summary .secure-badge i {
+            color: var(--primary);
+        }
+
+        /* ─── RESPONSIVE ─── */
         @media (max-width: 992px) {
             .checkout-layout {
                 grid-template-columns: 1fr;
             }
-            .order-summary-side {
+            .order-summary {
                 position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .checkout-header h1 {
+                font-size: 2rem;
+            }
+            .checkout-form {
+                padding: 1.5rem;
             }
             .checkout-form .form-row {
                 grid-template-columns: 1fr;
             }
+            .payment-methods {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
         }
-        @media (max-width: 768px) {
+
+        @media (max-width: 480px) {
             .checkout-form {
                 padding: 1rem;
             }
-            .payment-methods .method {
-                min-width: 80px;
-                padding: 0.5rem;
+            .payment-methods {
+                grid-template-columns: 1fr;
+            }
+            .order-summary .order-item {
+                flex-wrap: wrap;
             }
         }
     </style>
 </head>
 <body>
 
-<!-- ─── TOP BAR ─── -->
+<!-- ============================================ -->
+<!-- TOP BAR WITH MOVING WORDS -->
+<!-- ============================================ -->
 <div class="top-bar">
     <div class="container">
-        <div>
-            <span>Welcome to PSE Wholesale</span>
-            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
-            <a href="track-order.html">Track Order</a>
-            <a href="seller-dashboard.html">Become a Seller</a>
+        <div class="moving-words">
+            <div class="words-track">
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+            </div>
         </div>
-        <div id="authLinks">
-            <a href="login.html" id="loginLink">Login</a>
-            <a href="register.html" id="registerLink">Register</a>
-            <select class="lang-select" onchange="window.location.href='/?lang='+this.value">
-                <option value="EN">EN</option>
-                <option value="ES">ES</option>
-                <option value="FR">FR</option>
-                <option value="DE">DE</option>
-            </select>
+        <div class="top-links">
+            <a href="track-order.html"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard.html"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login.html" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register.html" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
 
-<!-- ─── HEADER ─── -->
+<!-- ============================================ -->
+<!-- HEADER -->
+<!-- ============================================ -->
 <header class="header">
     <div class="container">
-        <a href="index.html" class="logo" style="display:flex; align-items:center; gap:0.5rem; text-decoration:none;">
-            <img src="logo.jpg" alt="PSE Distribution" style="height:40px; width:auto; border-radius:8px;" />
-            <div style="display:flex; flex-direction:column; line-height:1.1;">
-                <span style="font-size:1.5rem; font-weight:800; color:#0b2a3b;">PSE <span style="color:#1e7b6b;">Distribution</span></span>
-                <span style="font-size:0.55rem; color:#6a889a; font-weight:400; letter-spacing:0.5px;">wholesale Marketplace</span>
+        <a href="home" class="logo">
+            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+            <div class="brand-name">
+                <span class="main">Pilot <span>Distribution</span></span>
+                <span class="sub">wholesale Marketplace</span>
             </div>
         </a>
-        <div class="search-bar">
-            <select><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
-            <input type="text" placeholder="Search wholesale products..." />
-            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+
+        <!-- Search -->
+        <div class="search-bar" id="searchBar">
+            <input type="text" id="searchInput" placeholder="Search wholesale products..."
+                   onkeyup="searchProductsFirebase(event)" autocomplete="off" />
+            <button onclick="searchProductsFirebase()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <div class="search-results" id="searchResults"></div>
         </div>
+
         <div class="header-actions">
-            <div class="location-selector"><i class="fa-solid fa-location-dot"></i> Sacramento, 95829</div>
-            <a href="#" class="icon-btn"><i class="fa-regular fa-heart"></i><span>Wishlist</span><span class="badge-count wishlist-count">0</span></a>
-            <a href="#" class="icon-btn"><i class="fa-regular fa-bell"></i><span>Alerts</span><span class="badge-count">3</span></a>
-            <a href="#" class="icon-btn" id="accountBtn"><i class="fa-regular fa-user"></i><span id="accountLabel">Account</span></a>
-            <a href="#" class="icon-btn" onclick="window.location.href='cart.html'">
-                <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
+            <a href="#" class="icon-btn" onclick="toggleWishlist()">
+                <i class="fa-regular fa-heart"></i>
+                <span>Wishlist</span>
+                <span class="badge-count wishlist-count">0</span>
+            </a>
+            <a href="cart.html" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
+            </a>
+            <a href="account.html" class="icon-btn" id="accountBtn">
+                <i class="fa-regular fa-user"></i>
+                <span id="accountLabel">Account</span>
             </a>
         </div>
     </div>
 </header>
 
-<!-- ─── NAVIGATION ─── -->
+<!-- ============================================ -->
+<!-- NAVIGATION TABS -->
+<!-- ============================================ -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="index.html"><i class="fa-solid fa-bars"></i> All Departments</a>
-        <a href="#">Today's Deals</a>
-        <a href="#">New Arrivals</a>
-        <a href="#" class="wholesale-nav"><i class="fa-solid fa-cubes"></i> Wholesale</a>
-        <a href="#">Brands</a>
-        <a href="#">Clearance</a>
-        <a href="#">Flash Deals</a>
-        <a href="#">Gift Cards</a>
-        <a href="#">Business Solutions</a>
-        <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Customer Service</a>
+        <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products.html" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about.html" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact.html" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center.html" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller.html" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
-<!-- ─── MAIN CONTENT ─── -->
+<!-- ============================================ -->
+<!-- MAIN CONTENT -->
+<!-- ============================================ -->
 <div class="container">
 
-    <!-- PAGE LINKS -->
-    <div class="page-links">
-        <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products.html"><i class="fa-solid fa-grid-2"></i> Products</a>
-        <a href="product-detail.html"><i class="fa-solid fa-eye"></i> Detail</a>
-        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
-        <a href="checkout.html" class="active"><i class="fa-solid fa-credit-card"></i> Checkout</a>
-        <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
-        <a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a>
-        <a href="account.html"><i class="fa-solid fa-user"></i> Account</a>
-        <a href="seller-dashboard.html"><i class="fa-solid fa-store"></i> Seller</a>
-        <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Admin</a>
-        <a href="about.html"><i class="fa-solid fa-info-circle"></i> About</a>
-    </div>
+    <div class="checkout-page">
 
-    <!-- Checkout Layout -->
-    <div class="checkout-layout">
-
-        <!-- Checkout Form -->
-        <div class="checkout-form">
-            <h2><i class="fa-regular fa-address-card"></i> Shipping Information</h2>
-
-            <div class="guest-checkout">
-                <label>
-                    <input type="checkbox" id="guestCheckout" checked />
-                    Checkout as Guest
-                </label>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>First Name *</label>
-                    <input type="text" id="firstName" placeholder="Caden" required />
-                </div>
-                <div class="form-group">
-                    <label>Last Name *</label>
-                    <input type="text" id="lastName" placeholder="Gibson" required />
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Email Address *</label>
-                <input type="email" id="email" placeholder="Caden@example.com" required />
-            </div>
-
-            <div class="form-group">
-                <label>Phone Number</label>
-                <input type="tel" id="phone" placeholder="(555) 123-4567" />
-            </div>
-
-            <div class="form-group">
-                <label>Street Address *</label>
-                <input type="text" id="address" placeholder="123 Main Street" required />
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>City *</label>
-                    <input type="text" id="city" placeholder="Los Angeles" required />
-                </div>
-                <div class="form-group">
-                    <label>State *</label>
-                    <select id="state" required>
-                        <option value="">Select State</option>
-                        <option value="CA">California</option>
-                        <option value="NY">New York</option>
-                        <option value="TX">Texas</option>
-                        <option value="FL">Florida</option>
-                        <option value="IL">Illinois</option>
-                        <option value="WA">Washington</option>
-                        <option value="OR">Oregon</option>
-                        <option value="NV">Nevada</option>
-                        <option value="AZ">Arizona</option>
-                        <option value="CO">Colorado</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>ZIP Code *</label>
-                    <input type="text" id="zip" placeholder="90210" required />
-                </div>
-                <div class="form-group">
-                    <label>Country</label>
-                    <select id="country">
-                        <option value="US">United States</option>
-                        <option value="CA">Canada</option>
-                        <option value="UK">United Kingdom</option>
-                        <option value="DE">Germany</option>
-                        <option value="FR">France</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Order Notes (Optional)</label>
-                <textarea id="notes" placeholder="Special delivery instructions or notes..."></textarea>
-            </div>
-
-            <h2 style="margin-top:1.5rem;"><i class="fa-regular fa-credit-card"></i> Payment Method</h2>
-
-            <div class="payment-methods" id="paymentMethods">
-                <div class="method active" onclick="selectPayment(this)" data-method="whatsapp">
-                    <i class="fa-brands fa-whatsapp" style="color:#25D366;"></i>
-                    <span>WhatsApp Quote</span>
-                </div>
-                <div class="method" onclick="selectPayment(this)" data-method="bank">
-                    <i class="fa-regular fa-building-columns"></i>
-                    <span>Bank Transfer</span>
-                </div>
-                <div class="method" onclick="selectPayment(this)" data-method="card">
-                    <i class="fa-regular fa-credit-card"></i>
-                    <span>Credit Card</span>
-                </div>
-            </div>
-
-            <div id="cardDetails" style="margin-top:1rem; display:none;">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Card Number</label>
-                        <input type="text" placeholder="4242 4242 4242 4242" />
-                    </div>
-                    <div class="form-group">
-                        <label>Expiry Date</label>
-                        <input type="text" placeholder="MM/YY" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>CVV</label>
-                    <input type="text" placeholder="123" style="max-width:120px;" />
-                </div>
-            </div>
+        <!-- ─── CHECKOUT HEADER ─── -->
+        <div class="checkout-header animate-on-scroll">
+            <h1>Secure <span>Checkout</span></h1>
+            <p>Complete your wholesale order. We'll send a quote via WhatsApp.</p>
         </div>
 
-        <!-- Order Summary Sidebar -->
-        <div class="order-summary-side">
-            <h3><i class="fa-regular fa-receipt"></i> Order Summary</h3>
+        <!-- ─── CHECKOUT LAYOUT ─── -->
+        <div class="checkout-layout">
 
-            <div id="orderItems">
-                <div class="loading-spinner">
-                    <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;"></i>
-                    <p style="margin-top:0.3rem; font-size:0.8rem;">Loading cart...</p>
+            <!-- ─── CHECKOUT FORM ─── -->
+            <div class="checkout-form animate-on-scroll">
+
+                <!-- Shipping Information -->
+                <div class="form-section">
+                    <h2><span class="step">1</span> Shipping Information</h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name <span class="required">*</span></label>
+                            <input type="text" id="firstName" placeholder="John" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name <span class="required">*</span></label>
+                            <input type="text" id="lastName" placeholder="Doe" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email Address <span class="required">*</span></label>
+                        <input type="email" id="email" placeholder="you@example.com" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="phone" placeholder="(555) 123-4567" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Street Address <span class="required">*</span></label>
+                        <input type="text" id="address" placeholder="123 Main Street" required />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>City <span class="required">*</span></label>
+                            <input type="text" id="city" placeholder="Los Angeles" required />
+                        </div>
+                        <div class="form-group">
+                            <label>State <span class="required">*</span></label>
+                            <select id="state" required>
+                                <option value="">Select State</option>
+                                <option value="CA">California</option>
+                                <option value="NY">New York</option>
+                                <option value="TX">Texas</option>
+                                <option value="FL">Florida</option>
+                                <option value="IL">Illinois</option>
+                                <option value="WA">Washington</option>
+                                <option value="OR">Oregon</option>
+                                <option value="NV">Nevada</option>
+                                <option value="AZ">Arizona</option>
+                                <option value="CO">Colorado</option>
+                                <option value="GA">Georgia</option>
+                                <option value="NC">North Carolina</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>ZIP Code <span class="required">*</span></label>
+                            <input type="text" id="zip" placeholder="90210" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Country</label>
+                            <select id="country">
+                                <option value="US">United States</option>
+                                <option value="CA">Canada</option>
+                                <option value="UK">United Kingdom</option>
+                                <option value="DE">Germany</option>
+                                <option value="FR">France</option>
+                                <option value="AU">Australia</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="form-section">
+                    <h2><span class="step">2</span> Payment Method</h2>
+
+                    <div class="payment-methods" id="paymentMethods">
+                        <div class="method whatsapp active" onclick="selectPayment(this)" data-method="whatsapp">
+                            <i class="fa-brands fa-whatsapp"></i>
+                            <span class="method-name">WhatsApp Quote</span>
+                        </div>
+                        <div class="method bank" onclick="selectPayment(this)" data-method="bank">
+                            <i class="fa-regular fa-building-columns"></i>
+                            <span class="method-name">Bank Transfer</span>
+                        </div>
+                        <div class="method card" onclick="selectPayment(this)" data-method="card">
+                            <i class="fa-regular fa-credit-card"></i>
+                            <span class="method-name">Credit Card</span>
+                        </div>
+                    </div>
+
+                    <div id="cardDetails" style="display:none; margin-top:1rem;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Card Number</label>
+                                <input type="text" placeholder="4242 4242 4242 4242" />
+                            </div>
+                            <div class="form-group">
+                                <label>Expiry Date</label>
+                                <input type="text" placeholder="MM/YY" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>CVV</label>
+                            <input type="text" placeholder="123" style="max-width:120px;" />
+                        </div>
+                        <p style="font-size:0.75rem; color:var(--text-light); margin-top:0.5rem;">
+                            <i class="fa-solid fa-lock"></i> Your payment information is secure.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Order Notes -->
+                <div class="form-section">
+                    <h2><span class="step">3</span> Order Notes</h2>
+                    <div class="form-group">
+                        <label>Additional Notes (Optional)</label>
+                        <textarea id="notes" placeholder="Special delivery instructions, order preferences, or any other notes..."></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ─── ORDER SUMMARY SIDEBAR ─── -->
+            <div class="order-summary animate-on-scroll" style="animation-delay: 0.1s;">
+                <h3><i class="fa-regular fa-receipt"></i> Order Summary</h3>
+
+                <div id="orderItems">
+                    <div style="text-align:center; padding:1rem; color:var(--text-light);">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <p style="margin-top:0.3rem; font-size:0.85rem;">Loading cart...</p>
+                    </div>
+                </div>
+
+                <div class="summary-totals">
+                    <div class="row">
+                        <span>Subtotal</span>
+                        <span class="amount" id="checkoutSubtotal">$0.00</span>
+                    </div>
+                    <div class="row">
+                        <span>Discount</span>
+                        <span class="amount discount" id="checkoutDiscount">-$0.00</span>
+                    </div>
+                    <div class="row">
+                        <span>Shipping</span>
+                        <span class="amount" id="checkoutShipping">$0.00</span>
+                    </div>
+                    <div class="row">
+                        <span>Tax (8%)</span>
+                        <span class="amount" id="checkoutTax">$0.00</span>
+                    </div>
+                    <div class="row total">
+                        <span>Total</span>
+                        <span class="amount" id="checkoutTotal">$0.00</span>
+                    </div>
+                </div>
+
+                <button class="btn-place-order" id="placeOrderBtn" onclick="placeOrder()">
+                    <i class="fa-brands fa-whatsapp"></i> Send Quote via WhatsApp
+                </button>
+
+                <div class="secure-badge">
+                    <i class="fa-solid fa-lock"></i> Your information is secure
                 </div>
             </div>
 
-            <div class="summary-totals">
-                <div class="row">
-                    <span>Subtotal</span>
-                    <span id="checkoutSubtotal">$0.00</span>
-                </div>
-                <div class="row">
-                    <span>Discount</span>
-                    <span id="checkoutDiscount" style="color:#1e7b6b;">−$0.00</span>
-                </div>
-                <div class="row">
-                    <span>Shipping</span>
-                    <span id="checkoutShipping" style="color:#1e7b6b;">FREE</span>
-                </div>
-                <div class="row">
-                    <span>Tax (8%)</span>
-                    <span id="checkoutTax">$0.00</span>
-                </div>
-                <div class="row total">
-                    <span>Total</span>
-                    <span class="amount" id="checkoutTotal">$0.00</span>
-                </div>
-            </div>
-
-            <button class="btn-place-order" onclick="placeOrder()">
-                <i class="fa-brands fa-whatsapp"></i> Send Quote via WhatsApp
-            </button>
-
-            <div style="text-align:center; margin-top:0.8rem; font-size:0.7rem; color:#6a889a;">
-                <i class="fa-solid fa-lock"></i> Your information is secure
-            </div>
         </div>
 
     </div>
 
 </div>
 
-<!-- ─── HELP MODAL ─── -->
-<div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
-    <div class="modal-content">
-        <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
-        <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
-        <p>Choose from our support options below:</p>
-        <ul>
-            <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
-            <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
-            <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
-        </ul>
-        <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
-    </div>
-</div>
-
-<!-- ─── FOOTER ─── -->
+<!-- ============================================ -->
+<!-- FOOTER -->
+<!-- ============================================ -->
 <footer class="footer">
     <div class="container">
-        <div>
-            <h4>PSE Wholesale</h4>
-            <ul>
-                <li onclick="window.location.href='about.html'">About Us</li>
-                <li>Careers</li>
-                <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
-                <li>Blog</li>
-            </ul>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="help-center.html">Help</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms &amp; Conditions</a>
+                <a href="become-seller.html">Become a Seller</a>
+            </div>
+            <div class="footer-social">
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
         </div>
-        <div>
-            <h4>Customer Service</h4>
-            <ul>
-                <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
-                <li>Returns & Refunds</li>
-                <li>Shipping Policy</li>
-                <li onclick="window.location.href='track-order.html'">Track Order</li>
-            </ul>
-        </div>
-        <div>
-            <h4>B2B</h4>
-            <ul>
-                <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
-                <li>Wholesale Pricing</li>
-                <li>Bulk Orders</li>
-                <li>Supplier Program</li>
-            </ul>
-        </div>
-        <div>
-            <h4>Legal</h4>
-            <ul>
-                <li>Privacy Policy</li>
-                <li>Terms & Conditions</li>
-                <li>Cookie Policy</li>
-            </ul>
-        </div>
-        <div class="bottom">
-            &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+        <div class="footer-bottom">
+            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
         </div>
     </div>
 </footer>
 
-<!-- ─── MAIN JS ─── -->
+<!-- ============================================ -->
+<!-- TOAST NOTIFICATION -->
+<!-- ============================================ -->
+<div id="toast" class="toast"></div>
+
+<!-- ============================================ -->
+<!-- MAIN JAVASCRIPT -->
+<!-- ============================================ -->
 <script src="main.js"></script>
 
 <script>
-let selectedPayment = 'whatsapp';
+// ============================================
+// CHECKOUT PAGE - JAVASCRIPT
+// ============================================
 
+// ─── SET CURRENT YEAR ───
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ─── STATE ───
+let selectedPayment = 'whatsapp';
+let cartItems = [];
+let couponDiscount = 0;
+
+// ─── SELECT PAYMENT ───
 function selectPayment(el) {
     document.querySelectorAll('.payment-methods .method').forEach(m => m.classList.remove('active'));
     el.classList.add('active');
     selectedPayment = el.dataset.method;
-    
+
     const cardDetails = document.getElementById('cardDetails');
     if (selectedPayment === 'card') {
         cardDetails.style.display = 'block';
@@ -575,80 +717,107 @@ function selectPayment(el) {
     }
 }
 
-// ─── LOAD CHECKOUT SUMMARY ───
-async function loadCheckoutSummary() {
-    const user = getCurrentUser();
-    let cart = [];
-    
-    if (user) {
-        const cartItems = await getCartItems();
-        for (const item of cartItems) {
-            const product = await fetchProductById(item.product_id);
-            if (product) {
-                cart.push({
-                    id: item.id,
-                    product_id: item.product_id,
-                    title: product.title,
-                    price: product.price,
-                    old_price: product.old_price,
-                    image: product.image_url,
-                    brand: product.brand,
-                    moq: product.moq,
-                    quantity: item.quantity || 1,
-                    type: product.type || 'Wholesale'
-                });
-            }
-        }
-    } else {
-        cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
-    }
-
+// ─── LOAD CHECKOUT ───
+async function loadCheckout() {
     const container = document.getElementById('orderItems');
+    const user = getCurrentUser();
+    let items = [];
 
-    if (cart.length === 0) {
+    try {
+        if (user) {
+            const cartData = await getCartItems();
+            for (const item of cartData) {
+                const product = await fetchProductById(item.product_id);
+                if (product) {
+                    items.push({
+                        id: item.id,
+                        product_id: item.product_id,
+                        title: product.title,
+                        price: product.price,
+                        old_price: product.old_price,
+                        image: product.image_url,
+                        brand: product.brand || 'Pilot Distribution',
+                        moq: product.moq || 1,
+                        quantity: item.quantity || 1
+                    });
+                }
+            }
+        } else {
+            items = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+        }
+
+        cartItems = items;
+
+        if (items.length === 0) {
+            container.innerHTML = `
+                <div style="text-align:center; padding:1rem 0; color:var(--text-light);">
+                    <i class="fa-regular fa-cart-shopping" style="font-size:2rem;"></i>
+                    <p style="margin-top:0.5rem;">Your cart is empty</p>
+                    <a href="products.html" style="color:var(--primary); font-size:0.85rem;">Browse products</a>
+                </div>
+            `;
+            document.getElementById('placeOrderBtn').disabled = true;
+            return;
+        }
+
+        container.innerHTML = items.map(item => {
+            const total = (item.price || 0) * (item.quantity || 1);
+            return `
+                <div class="order-item">
+                    <div class="item-image">
+                        ${item.image ? `<img src="${item.image}" alt="${item.title}" />` : `<i class="fa-solid fa-box"></i>`}
+                    </div>
+                    <div class="item-info">
+                        <div class="title">${item.title}</div>
+                        <div class="qty">Qty: ${item.quantity || 1}</div>
+                    </div>
+                    <div class="item-price">$${total.toFixed(2)}</div>
+                </div>
+            `;
+        }).join('');
+
+        updateCheckoutSummary(items);
+        document.getElementById('placeOrderBtn').disabled = false;
+
+    } catch (error) {
+        console.error('Error loading checkout:', error);
         container.innerHTML = `
-            <div style="text-align:center; padding:1rem 0; color:#6a889a;">
-                <i class="fa-regular fa-cart-shopping" style="font-size:2rem;"></i>
-                <p style="margin-top:0.5rem;">Your cart is empty</p>
-                <a href="products.html" style="color:#1e7b6b; font-size:0.8rem;">Browse products</a>
+            <div style="text-align:center; padding:1rem; color:var(--text-light);">
+                <i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i>
+                <p style="margin-top:0.3rem;">Failed to load cart.</p>
+                <button onclick="loadCheckout()" style="margin-top:0.5rem; background:var(--primary); color:#fff; border:none; padding:0.3rem 1.2rem; border-radius:30px; cursor:pointer;">
+                    Retry
+                </button>
             </div>
         `;
-        updateTotals(cart);
-        return;
     }
-
-    container.innerHTML = cart.map(item => `
-        <div class="order-item">
-            <div class="item-image">
-                ${item.image ? `<img src="${item.image}" alt="${item.title}" />` : `<i class="fa-solid fa-box"></i>`}
-            </div>
-            <div class="item-info">
-                <div class="title">${item.title}</div>
-                <div class="qty">Qty: ${item.quantity || 1}</div>
-            </div>
-            <div class="item-price">$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</div>
-        </div>
-    `).join('');
-
-    updateTotals(cart);
 }
 
-function updateTotals(cart) {
-    let subtotal = cart.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+// ─── UPDATE CHECKOUT SUMMARY ───
+function updateCheckoutSummary(items) {
+    let subtotal = 0;
     let discount = 0;
-    
-    cart.forEach(item => {
-        if (item.old_price && item.old_price > item.price) {
-            discount += (item.old_price - item.price) * (item.quantity || 1);
+
+    items.forEach(item => {
+        const qty = item.quantity || 1;
+        const price = item.price || 0;
+        subtotal += price * qty;
+        if (item.old_price && item.old_price > price) {
+            discount += (item.old_price - price) * qty;
         }
     });
 
-    const shipping = subtotal >= 250 ? 0 : 15;
+    // Check for coupon from cart
+    if (localStorage.getItem('pilot_coupon') === 'applied') {
+        discount += subtotal * 0.10;
+    }
+
+    const shipping = (subtotal - discount) < 250 && subtotal > 0 ? 15 : 0;
     const tax = (subtotal - discount) * 0.08;
     const total = subtotal - discount + shipping + tax;
 
     document.getElementById('checkoutSubtotal').textContent = `$${subtotal.toFixed(2)}`;
-    document.getElementById('checkoutDiscount').textContent = `−$${discount.toFixed(2)}`;
+    document.getElementById('checkoutDiscount').textContent = `-$${discount.toFixed(2)}`;
     document.getElementById('checkoutShipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
     document.getElementById('checkoutTax').textContent = `$${tax.toFixed(2)}`;
     document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
@@ -656,6 +825,7 @@ function updateTotals(cart) {
 
 // ─── PLACE ORDER ───
 async function placeOrder() {
+    // Get form data
     const firstName = document.getElementById('firstName').value.trim();
     const lastName = document.getElementById('lastName').value.trim();
     const email = document.getElementById('email').value.trim();
@@ -664,139 +834,286 @@ async function placeOrder() {
     const city = document.getElementById('city').value.trim();
     const state = document.getElementById('state').value;
     const zip = document.getElementById('zip').value.trim();
+    const country = document.getElementById('country').value;
     const notes = document.getElementById('notes').value.trim();
 
-    if (!firstName || !lastName || !email || !address || !city || !state || !zip) {
+    // Validate
+    if (!firstName || !lastName || !email || !phone || !address || !city || !state || !zip) {
         showToast('Please fill in all required fields', 'error');
         return;
     }
 
-    const user = getCurrentUser();
-    let cart = [];
-    
-    if (user) {
-        const cartItems = await getCartItems();
-        for (const item of cartItems) {
-            const product = await fetchProductById(item.product_id);
-            if (product) {
-                cart.push({
-                    id: item.id,
-                    product_id: item.product_id,
-                    title: product.title,
-                    price: product.price,
-                    old_price: product.old_price,
-                    quantity: item.quantity || 1,
-                    moq: product.moq,
-                    type: product.type || 'Wholesale'
-                });
-            }
-        }
-    } else {
-        cart = JSON.parse(localStorage.getItem('pse_cart') || '[]');
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showToast('Please enter a valid email address', 'error');
+        return;
     }
 
-    if (cart.length === 0) {
+    // Validate phone (basic)
+    const phoneRegex = /^[\d\s\-+()]{10,}$/;
+    if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
+        showToast('Please enter a valid phone number', 'error');
+        return;
+    }
+
+    if (cartItems.length === 0) {
         showToast('Your cart is empty', 'error');
         return;
     }
 
-    const quoteNumber = 'QTE-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 5).toUpperCase();
-    
-    let subtotal = cart.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+    // Calculate totals
+    let subtotal = 0;
     let discount = 0;
-    cart.forEach(item => {
-        if (item.old_price && item.old_price > item.price) {
-            discount += (item.old_price - item.price) * (item.quantity || 1);
+    cartItems.forEach(item => {
+        const qty = item.quantity || 1;
+        const price = item.price || 0;
+        subtotal += price * qty;
+        if (item.old_price && item.old_price > price) {
+            discount += (item.old_price - price) * qty;
         }
     });
-    const shipping = subtotal >= 250 ? 0 : 15;
+
+    // Check for coupon
+    if (localStorage.getItem('pilot_coupon') === 'applied') {
+        discount += subtotal * 0.10;
+    }
+
+    const shipping = (subtotal - discount) < 250 && subtotal > 0 ? 15 : 0;
     const tax = (subtotal - discount) * 0.08;
     const total = subtotal - discount + shipping + tax;
 
-    // ─── BUILD WHATSAPP MESSAGE ───
-    const phoneNumber = '19099384682';
-    let message = '📋 *NEW QUOTE REQUEST - PSE Wholesale*%0A';
-    message += `📄 *Quote #:* ${quoteNumber}%0A`;
+    // Generate quote number
+    const quoteNumber = 'QTE-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 5).toUpperCase();
+
+    // Build order data
+    const orderData = {
+        quoteNumber: quoteNumber,
+        date: new Date().toISOString(),
+        items: cartItems.map(item => ({
+            id: item.product_id || item.id,
+            title: item.title,
+            brand: item.brand || 'Pilot Distribution',
+            price: item.price || 0,
+            old_price: item.old_price || null,
+            quantity: item.quantity || 1,
+            moq: item.moq || 1
+        })),
+        customer: {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            phone: phone,
+            address: address,
+            city: city,
+            state: state,
+            zip: zip,
+            country: country
+        },
+        totals: {
+            subtotal: subtotal,
+            discount: discount,
+            shipping: shipping,
+            tax: tax,
+            total: total
+        },
+        paymentMethod: selectedPayment,
+        notes: notes,
+        status: 'pending'
+    };
+
+    // Disable button
+    const btn = document.getElementById('placeOrderBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+
+    try {
+        // Save to Firebase
+        const user = getCurrentUser();
+        if (user) {
+            await db.collection('orders').add({
+                ...orderData,
+                user_id: user.id,
+                user_email: user.email,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            });
+        } else {
+            // Guest order - save to localStorage
+            const orders = JSON.parse(localStorage.getItem('pilot_orders') || '[]');
+            orders.push(orderData);
+            localStorage.setItem('pilot_orders', JSON.stringify(orders));
+        }
+
+        // ─── SEND WHATSAPP QUOTE WITH DETAILED ITEMS ───
+        sendDetailedWhatsAppQuote(orderData);
+
+        // Clear cart
+        if (user) {
+            await clearCart();
+        } else {
+            localStorage.setItem('pilot_cart', '[]');
+            localStorage.removeItem('pilot_coupon');
+        }
+        updateCartCount();
+
+        showToast('✅ Quote sent successfully! We\'ll confirm shortly.', 'success');
+
+        // Redirect to success page
+        setTimeout(() => {
+            window.location.href = `order-success.html?quote=${quoteNumber}`;
+        }, 2000);
+
+    } catch (error) {
+        console.error('Error placing order:', error);
+        showToast('❌ Failed to place order. Please try again.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Send Quote via WhatsApp';
+    }
+}
+
+// ─── SEND DETAILED WHATSAPP QUOTE ───
+function sendDetailedWhatsAppQuote(orderData) {
+    const phone = '+19099384682';
+    
+    // Build the message
+    let message = '📋 *NEW QUOTE REQUEST - Pilot Sales Distribution*%0A';
+    message += `📄 *Quote #:* ${orderData.quoteNumber}%0A`;
     message += `📅 *Date:* ${new Date().toLocaleString()}%0A%0A`;
     
     message += '*👤 Customer Details*%0A';
-    message += `Name: ${firstName} ${lastName}%0A`;
-    message += `Email: ${email}%0A`;
-    message += `Phone: ${phone || 'Not provided'}%0A`;
-    message += `Address: ${address}, ${city}, ${state} ${zip}%0A%0A`;
+    message += `Name: ${orderData.customer.firstName} ${orderData.customer.lastName}%0A`;
+    message += `Email: ${orderData.customer.email}%0A`;
+    message += `Phone: ${orderData.customer.phone}%0A`;
+    message += `Address: ${orderData.customer.address}, ${orderData.customer.city}, ${orderData.customer.state} ${orderData.customer.zip}%0A`;
+    if (orderData.notes) {
+        message += `Notes: ${orderData.notes}%0A`;
+    }
+    message += `%0A`;
     
     message += '*📦 Items Requested*%0A';
-    cart.forEach((item, index) => {
-        const qty = item.quantity || 1;
-        const price = item.price || 0;
-        const totalItem = price * qty;
-        message += `${index + 1}. ${item.title}%0A`;
-        message += `   Qty: ${qty} x $${price.toFixed(2)} = $${totalItem.toFixed(2)}%0A`;
-        if (item.moq) message += `   MOQ: ${item.moq} units%0A`;
-        message += `   Type: ${item.type || 'Wholesale'}%0A`;
+    message += `┌─────────────────────────────────────┐%0A`;
+    message += `│ # │ Item           │ Qty │  Price  │%0A`;
+    message += `├─────────────────────────────────────┤%0A`;
+    
+    orderData.items.forEach((item, index) => {
+        const num = (index + 1).toString().padStart(2);
+        const title = item.title.substring(0, 14).padEnd(14);
+        const qty = item.quantity.toString().padStart(3);
+        const price = `$${item.price.toFixed(2)}`.padStart(7);
+        message += `│ ${num} │ ${title} │ ${qty} │ ${price} │%0A`;
     });
     
-    message += `%0A*💰 Quote Summary*%0A`;
-    message += `Subtotal: $${subtotal.toFixed(2)}%0A`;
-    message += `Discount: -$${discount.toFixed(2)}%0A`;
-    message += `Shipping: ${shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2)}%0A`;
-    message += `Tax (8%): $${tax.toFixed(2)}%0A`;
-    message += `*TOTAL: $${total.toFixed(2)}*%0A%0A`;
+    message += `└─────────────────────────────────────┘%0A%0A`;
     
-    if (notes) {
-        message += `📝 *Notes:* ${notes}%0A%0A`;
+    message += '*💰 Quote Summary*%0A';
+    message += `Subtotal: $${orderData.totals.subtotal.toFixed(2)}%0A`;
+    if (orderData.totals.discount > 0) {
+        message += `Discount: -$${orderData.totals.discount.toFixed(2)}%0A`;
     }
+    message += `Shipping: ${orderData.totals.shipping === 0 ? 'FREE' : '$' + orderData.totals.shipping.toFixed(2)}%0A`;
+    message += `Tax (8%): $${orderData.totals.tax.toFixed(2)}%0A`;
+    message += `*TOTAL: $${orderData.totals.total.toFixed(2)}*%0A%0A`;
     
-    message += `📌 *Payment Method:* ${selectedPayment.toUpperCase()}%0A%0A`;
+    message += `📌 *Payment Method:* ${orderData.paymentMethod.toUpperCase()}%0A%0A`;
     message += `✅ *Next Steps:*%0A`;
     message += `1. We will review your quote request%0A`;
     message += `2. Confirm availability and pricing%0A`;
     message += `3. Send you a formal invoice%0A`;
     message += `4. Arrange delivery%0A%0A`;
     
-    message += `🙏 *Thank you for choosing PSE Wholesale!*%0A`;
-    message += `📧 support@psewholesale.com%0A`;
-    message += `📞 +1 (800) 555-PSEW`;
-
-    // ─── SAVE QUOTE ───
-    const quote = {
-        quoteNumber: quoteNumber,
-        date: new Date().toISOString(),
-        items: cart.map(item => ({ ...item })),
-        customer: { firstName, lastName, email, phone },
-        shipping: { address, city, state, zip },
-        totals: { subtotal, discount, shipping, tax, total },
-        paymentMethod: selectedPayment,
-        status: 'pending',
-        notes: notes,
-        source: 'website'
-    };
-
-    await saveOrder(quote);
+    message += `🙏 *Thank you for choosing Pilot Sales Distribution!*%0A`;
+    message += `📧 Pilot.wholesale@yahoo.com%0A`;
+    message += `📞 +1 (909) 938-4682`;
     
-    // ─── CLEAR CART ───
-    if (user) {
-        await clearCart();
-    } else {
-        localStorage.setItem('pse_cart', '[]');
-    }
-    loadCartCount();
-
-    // ─── OPEN WHATSAPP ───
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+    // Open WhatsApp
+    const whatsappUrl = `https://wa.me/${phone.replace('+', '')}?text=${message}`;
     window.open(whatsappUrl, '_blank');
-
-    showToast('Quote sent! We will confirm shortly.', 'success');
     
-    setTimeout(() => {
-        window.location.href = `order-success.html?quote=${quoteNumber}`;
-    }, 2000);
+    return true;
 }
+
+// ─── SEARCH WITH FIREBASE ───
+async function searchProductsFirebase(event) {
+    const input = document.getElementById('searchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    const query = input.value.trim();
+
+    if (event && event.key === 'Enter' && query) {
+        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+        return;
+    }
+
+    if (query.length < 2) {
+        resultsDiv.classList.remove('show');
+        return;
+    }
+
+    try {
+        const snapshot = await db.collection('products')
+            .where('status', 'in', ['active', 'approved'])
+            .limit(5)
+            .get();
+
+        const products = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
+                (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
+                products.push({
+                    id: doc.id,
+                    ...data,
+                    image_url: data.image_url || data.images?.[0] || ''
+                });
+            }
+        });
+
+        if (products.length === 0) {
+            resultsDiv.innerHTML = `
+                <div style="padding:1rem; text-align:center; color:var(--text-light);">
+                    No products found for "${query}"
+                </div>
+            `;
+            resultsDiv.classList.add('show');
+            return;
+        }
+
+        resultsDiv.innerHTML = products.map(p => `
+            <div class="result-item" onclick="window.location.href='product-detail.html?id=${p.id}'">
+                <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
+                <div class="info">
+                    <div class="title">${p.title}</div>
+                    <div class="price">$${(p.price || 0).toFixed(2)}</div>
+                </div>
+            </div>
+        `).join('') + `
+            <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
+                <a href="products.html?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
+                    See all results for "${query}" →
+                </a>
+            </div>
+        `;
+
+        resultsDiv.classList.add('show');
+
+    } catch (error) {
+        console.error('Search error:', error);
+    }
+}
+
+// ─── CLOSE SEARCH RESULTS ───
+document.addEventListener('click', function(e) {
+    const searchBar = document.getElementById('searchBar');
+    if (!searchBar.contains(e.target)) {
+        document.getElementById('searchResults').classList.remove('show');
+    }
+});
 
 // ─── INIT ───
 document.addEventListener('DOMContentLoaded', function() {
-    loadCheckoutSummary();
+    loadCheckout();
     loadCartCount();
+    loadWishlistCount();
 });
 </script>
 
