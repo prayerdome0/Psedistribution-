@@ -249,56 +249,27 @@
             box-shadow: 0 8px 30px rgba(241, 196, 15, 0.3);
         }
 
-        /* ─── FOOTER ─── */
-        .footer {
-            background: var(--secondary);
-            color: #b4d0e0;
-            padding: 2rem 0 1rem;
-            margin-top: 3rem;
+        /* ─── ADMIN NOTIFICATION BADGE ─── */
+        .admin-badge {
             position: relative;
-            overflow: hidden;
         }
-        .footer .footer-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-        }
-        .footer .footer-links {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-        .footer .footer-links a {
-            color: #b4d0e0;
-            font-size: 0.85rem;
-            transition: var(--transition);
-        }
-        .footer .footer-links a:hover {
+        .admin-badge .badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #c0392b;
             color: var(--white);
-        }
-        .footer .footer-bottom {
-            border-top: 1px solid #1a4055;
-            padding-top: 1rem;
-            margin-top: 1rem;
+            font-size: 0.55rem;
+            font-weight: 700;
+            border-radius: 50%;
+            padding: 0.1rem 0.45rem;
+            min-width: 18px;
             text-align: center;
-            font-size: 0.75rem;
-            opacity: 0.6;
+            animation: badgePulse 1.5s infinite;
         }
-        .footer .footer-bottom strong { color: var(--white); }
-        .footer .footer-social {
-            display: flex;
-            gap: 1rem;
-        }
-        .footer .footer-social a {
-            color: #b4d0e0;
-            transition: var(--transition);
-            font-size: 1.1rem;
-        }
-        .footer .footer-social a:hover {
-            color: var(--white);
-            transform: translateY(-2px);
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
         }
 
         /* ─── RESPONSIVE ─── */
@@ -320,14 +291,6 @@
             }
             .testimonials-section {
                 padding: 2rem 1rem;
-            }
-            .footer .footer-content {
-                flex-direction: column;
-                text-align: center;
-            }
-            .footer .footer-links {
-                justify-content: center;
-                gap: 1rem;
             }
             .newsletter-section h2 {
                 font-size: 1.5rem;
@@ -377,11 +340,12 @@
                 <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
             </div>
         </div>
-        <div class="top-links">
-            <a href="track-order.html"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="seller-dashboard.html"><i class="fa-regular fa-store"></i> Sell</a>
-            <a href="login.html" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="register.html" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+        <div class="top-links" id="topLinks">
+            <!-- Auth links will be auto-updated by main.js -->
+            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -394,8 +358,8 @@
         <a href="home" class="logo">
             <img src="logo.jpg" alt="Pilot Sales Distribution" />
             <div class="brand-name">
-                <span class="main">Pilot <span>Distribution</span></span>
-                <span class="sub">wholesale Marketplace</span>
+                <span class="main">PSE <span>Distribution</span></span>
+                <span class="sub">wholesale</span>
             </div>
         </a>
 
@@ -413,14 +377,21 @@
                 <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="cart.html" class="icon-btn">
+            <a href="cart" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
             </a>
-            <a href="account.html" class="icon-btn" id="accountBtn">
+            <!-- Account button - auto-updates -->
+            <a href="account" class="icon-btn" id="accountBtn">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
+            </a>
+            <!-- Admin badge - shows only for admin users -->
+            <a href="admin-dashboard" class="icon-btn admin-badge" id="adminLink" style="display:none;">
+                <i class="fa-solid fa-gauge-high"></i>
+                <span>Admin</span>
+                <span class="badge" id="adminBadgeCount">0</span>
             </a>
         </div>
     </div>
@@ -431,12 +402,17 @@
 <!-- ============================================ -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="home" class="nav-tab active"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products.html" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about.html" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact.html" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center.html" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller.html" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="home" class="nav-tab active" id="navHome"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products" class="nav-tab" id="navProducts"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about" class="nav-tab" id="navAbout"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact" class="nav-tab" id="navContact"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center" class="nav-tab" id="navHelp"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller" class="nav-tab wholesale-nav" id="navSell"><i class="fa-regular fa-store"></i> Sell</a>
+        <!-- Admin nav - hidden by default, shown only for admin -->
+        <a href="admin-dashboard" class="nav-tab" id="adminNavTab" style="display:none;">
+            <i class="fa-solid fa-gauge-high"></i> Dashboard
+            <span class="badge" id="adminNavBadge" style="background:#c0392b; color:#fff; font-size:0.6rem; padding:0.1rem 0.5rem; border-radius:30px; margin-left:0.3rem;">0</span>
+        </a>
     </div>
 </nav>
 
@@ -456,8 +432,8 @@
                 <h2>Premium Products at <span>Wholesale Prices</span></h2>
                 <p>12,000+ products from 580+ verified suppliers. Quality guaranteed.</p>
                 <div class="buttons">
-                    <a href="products.html" class="btn-primary"><i class="fa-solid fa-cart-plus"></i> Shop Now</a>
-                    <a href="about.html" class="btn-outline-light">Learn More</a>
+                    <a href="products" class="btn-primary"><i class="fa-solid fa-cart-plus"></i> Shop Now</a>
+                    <a href="about" class="btn-outline-light">Learn More</a>
                 </div>
             </div>
             <div class="slide-image">
@@ -471,8 +447,8 @@
                 <h2>Fast &amp; Reliable <span>Delivery</span></h2>
                 <p>Free shipping on orders over $250. Track your order in real-time.</p>
                 <div class="buttons">
-                    <a href="products.html" class="btn-primary"><i class="fa-solid fa-truck"></i> Browse Products</a>
-                    <a href="track-order.html" class="btn-outline-light">Track Order</a>
+                    <a href="products" class="btn-primary"><i class="fa-solid fa-truck"></i> Browse Products</a>
+                    <a href="track-order" class="btn-outline-light">Track Order</a>
                 </div>
             </div>
             <div class="slide-image">
@@ -486,8 +462,8 @@
                 <h2>Trusted <span>Suppliers</span></h2>
                 <p>Connect with verified suppliers worldwide. Quality products guaranteed.</p>
                 <div class="buttons">
-                    <a href="become-seller.html" class="btn-primary"><i class="fa-regular fa-store"></i> Become a Supplier</a>
-                    <a href="about.html" class="btn-outline-light">About Us</a>
+                    <a href="become-seller" class="btn-primary"><i class="fa-regular fa-store"></i> Become a Supplier</a>
+                    <a href="about" class="btn-outline-light">About Us</a>
                 </div>
             </div>
             <div class="slide-image">
@@ -501,7 +477,7 @@
                 <h2>Worldwide <span>Distribution</span></h2>
                 <p>Electronics, Fashion, Grocery, Home &amp; more. All at wholesale prices.</p>
                 <div class="buttons">
-                    <a href="products.html" class="btn-primary"><i class="fa-regular fa-eye"></i> View All</a>
+                    <a href="products" class="btn-primary"><i class="fa-regular fa-eye"></i> View All</a>
                     <a href="#" class="btn-outline-light" onclick="document.getElementById('categories').scrollIntoView({behavior:'smooth'})">Categories</a>
                 </div>
             </div>
@@ -544,35 +520,35 @@
             <p>Find the products you need at wholesale prices</p>
         </div>
         <div class="category-grid">
-            <div class="category-item" onclick="window.location.href='products.html?category=electronics'">
+            <div class="category-item" onclick="window.location.href='products?category=electronics'">
                 <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=200&h=200&q=80" alt="Electronics" loading="lazy" />
                 <span>Electronics</span>
             </div>
-            <div class="category-item" onclick="window.location.href='products.html?category=fashion'">
+            <div class="category-item" onclick="window.location.href='products?category=fashion'">
                 <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=200&h=200&q=80" alt="Fashion" loading="lazy" />
                 <span>Fashion</span>
             </div>
-            <div class="category-item" onclick="window.location.href='products.html?category=grocery'">
+            <div class="category-item" onclick="window.location.href='products?category=grocery'">
                 <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=200&h=200&q=80" alt="Grocery" loading="lazy" />
                 <span>Grocery</span>
             </div>
-            <div class="category-item" onclick="window.location.href='products.html?category=home'">
+            <div class="category-item" onclick="window.location.href='products?category=home'">
                 <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=200&h=200&q=80" alt="Home" loading="lazy" />
                 <span>Home</span>
             </div>
-            <div class="category-item" onclick="window.location.href='products.html?category=beauty'">
+            <div class="category-item" onclick="window.location.href='products?category=beauty'">
                 <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=200&h=200&q=80" alt="Beauty" loading="lazy" />
                 <span>Beauty</span>
             </div>
-            <div class="category-item" onclick="window.location.href='products.html?category=health'">
+            <div class="category-item" onclick="window.location.href='products?category=health'">
                 <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=200&h=200&q=80" alt="Health" loading="lazy" />
                 <span>Health</span>
             </div>
-            <div class="category-item" onclick="window.location.href='products.html?category=sports'">
+            <div class="category-item" onclick="window.location.href='products?category=sports'">
                 <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=200&h=200&q=80" alt="Sports" loading="lazy" />
                 <span>Sports</span>
             </div>
-            <div class="category-item" onclick="window.location.href='products.html?category=automotive'">
+            <div class="category-item" onclick="window.location.href='products?category=automotive'">
                 <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=200&h=200&q=80" alt="Automotive" loading="lazy" />
                 <span>Automotive</span>
             </div>
@@ -631,7 +607,7 @@
                 <span id="seconds">18</span>
             </div>
         </div>
-        <a href="products.html?filter=flash" class="btn-primary" style="background:#f1c40f; color:#0b2a3b;">
+        <a href="products?filter=flash" class="btn-primary" style="background:#f1c40f; color:#0b2a3b;">
             View All <i class="fa-solid fa-arrow-right"></i>
         </a>
     </div>
@@ -656,7 +632,7 @@
     <div class="quote-section animate-on-scroll">
         <h2>Need a <span>Custom Quote?</span></h2>
         <p>Get competitive pricing for bulk orders. Our team will respond within 24 hours.</p>
-        <a href="contact.html" class="btn-white"><i class="fa-regular fa-file-lines"></i> Request a Quote</a>
+        <a href="contact" class="btn-white"><i class="fa-regular fa-file-lines"></i> Request a Quote</a>
     </div>
 
     <!-- ========================================== -->
@@ -734,18 +710,18 @@
 </div>
 
 <!-- ============================================ -->
-<!-- 11. PROFESSIONAL FOOTER -->
+<!-- FOOTER -->
 <!-- ============================================ -->
 <footer class="footer">
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about.html">About</a>
-                <a href="contact.html">Contact</a>
-                <a href="help-center.html">Help</a>
-                <a href="privacy.html">Privacy Policy</a>
-                <a href="terms.html">Terms &amp; Conditions</a>
-                <a href="become-seller.html">Become a Seller</a>
+                <a href="about">About</a>
+                <a href="contact">Contact</a>
+                <a href="help-center">Help</a>
+                <a href="privacy">Privacy Policy</a>
+                <a href="terms">Terms &amp; Conditions</a>
+                <a href="become-seller">Become a Seller</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -795,7 +771,7 @@ async function searchProductsFirebase(event) {
     const query = input.value.trim();
 
     if (event && event.key === 'Enter' && query) {
-        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+        window.location.href = `products?search=${encodeURIComponent(query)}`;
         return;
     }
 
@@ -834,7 +810,7 @@ async function searchProductsFirebase(event) {
         }
 
         resultsDiv.innerHTML = products.map(p => `
-            <div class="result-item" onclick="window.location.href='product-detail.html?id=${p.id}'">
+            <div class="result-item" onclick="window.location.href='product-detail?id=${p.id}'">
                 <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
                 <div class="info">
                     <div class="title">${p.title}</div>
@@ -843,7 +819,7 @@ async function searchProductsFirebase(event) {
             </div>
         `).join('') + `
             <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
-                <a href="products.html?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
+                <a href="products?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
                     See all results for "${query}" →
                 </a>
             </div>
@@ -905,20 +881,20 @@ async function loadProducts() {
                 <div class="product-card animate-on-scroll">
                     ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
                     ${discount > 0 ? `<span class="product-badge">-${discount}%</span>` : ''}
-                    <div class="product-image" onclick="window.location.href='product-detail.html?id=${p.id}'">
+                    <div class="product-image" onclick="window.location.href='product-detail?id=${p.id}'">
                         ${imageHtml}
                     </div>
-                    <div class="product-title" onclick="window.location.href='product-detail.html?id=${p.id}'">${p.title}</div>
+                    <div class="product-title" onclick="window.location.href='product-detail?id=${p.id}'">${p.title}</div>
                     <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
                     <div class="product-price">
                         $${(p.price || 0).toFixed(2)}
                         ${p.old_price ? `<span class="old">$${p.old_price.toFixed(2)}</span>` : ''}
                     </div>
                     <div class="product-actions">
-                        <button class="btn-add" onclick="addToCart({id:'${p.id}', title:'${p.title}', price:${p.price || 0}, old_price:${p.old_price || 0}, image_url:'${p.image_url || ''}', brand:'${p.brand || ''}', moq:${p.moq || 1}})">
+                        <button class="btn-add" onclick="addToCart('${p.id}')" data-product-id="${p.id}">
                             <i class="fa-solid fa-cart-plus"></i> Add
                         </button>
-                        <button class="btn-wish" onclick="toggleWishlist('${p.id}')">
+                        <button class="btn-wish" onclick="toggleWishlist('${p.id}')" data-wishlist-id="${p.id}">
                             <i class="fa-regular fa-heart"></i>
                         </button>
                     </div>
@@ -965,13 +941,121 @@ function startFlashTimer() {
     }, 1000);
 }
 
+// ─── ADMIN AUTO-DETECT ───
+function checkAdminStatus() {
+    const user = getCurrentUser();
+    const adminLink = document.getElementById('adminLink');
+    const adminNavTab = document.getElementById('adminNavTab');
+    
+    if (user && user.role === 'admin') {
+        adminLink.style.display = 'flex';
+        adminNavTab.style.display = 'inline-block';
+        
+        // Update admin badge count
+        updateAdminBadge();
+        
+        // Listen for new messages/orders
+        setupAdminListeners();
+    } else {
+        adminLink.style.display = 'none';
+        adminNavTab.style.display = 'none';
+    }
+}
+
+// ─── UPDATE ADMIN BADGE ───
+async function updateAdminBadge() {
+    try {
+        const msgSnapshot = await db.collection('messages')
+            .where('status', '==', 'unread')
+            .get();
+        const unreadCount = msgSnapshot.size;
+
+        const orderSnapshot = await db.collection('orders')
+            .where('status', '==', 'pending')
+            .get();
+        const pendingCount = orderSnapshot.size;
+
+        const total = unreadCount + pendingCount;
+        
+        document.getElementById('adminBadgeCount').textContent = total;
+        document.getElementById('adminNavBadge').textContent = total;
+        
+        // Show/hide badge based on count
+        const badge = document.getElementById('adminBadgeCount');
+        const navBadge = document.getElementById('adminNavBadge');
+        badge.style.display = total > 0 ? 'inline' : 'none';
+        navBadge.style.display = total > 0 ? 'inline' : 'none';
+        
+        return total;
+    } catch (error) {
+        console.error('Error updating admin badge:', error);
+        return 0;
+    }
+}
+
+// ─── SETUP ADMIN LISTENERS ───
+function setupAdminListeners() {
+    // Listen for new messages
+    db.collection('messages')
+        .where('status', '==', 'unread')
+        .onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach(change => {
+                if (change.type === 'added') {
+                    const data = change.doc.data();
+                    // Update badge
+                    updateAdminBadge();
+                    // Play notification sound if available
+                    try {
+                        const audio = new Audio('data:audio/wav;base64,UklGRnoAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoAAACBhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFg==');
+                        audio.play().catch(e => {});
+                    } catch(e) {}
+                    showToast(`📩 New message from ${data.firstName || 'User'}`, 'info');
+                }
+            });
+        }, (error) => {
+            console.error('Messages listener error:', error);
+        });
+
+    // Listen for new orders
+    db.collection('orders')
+        .where('status', '==', 'pending')
+        .onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach(change => {
+                if (change.type === 'added') {
+                    const data = change.doc.data();
+                    updateAdminBadge();
+                    try {
+                        const audio = new Audio('data:audio/wav;base64,UklGRnoAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoAAACBhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFg==');
+                        audio.play().catch(e => {});
+                    } catch(e) {}
+                    const customer = data.customer || {};
+                    showToast(`📦 New order from ${customer.firstName || 'Guest'} - $${(data.totals?.total || 0).toFixed(2)}`, 'success');
+                }
+            });
+        }, (error) => {
+            console.error('Orders listener error:', error);
+        });
+}
+
 // ─── INIT ───
 document.addEventListener('DOMContentLoaded', function() {
     loadProducts();
     startFlashTimer();
     updateCartCount();
     updateWishlistCount();
+    
+    // Check admin status after auth
+    setTimeout(checkAdminStatus, 1000);
+    
+    // Listen for auth changes
+    document.addEventListener('authChange', function() {
+        checkAdminStatus();
+    });
 });
+
+// ─── EXPOSE FUNCTIONS ───
+window.checkAdminStatus = checkAdminStatus;
+window.updateAdminBadge = updateAdminBadge;
 </script>
 
 </body>

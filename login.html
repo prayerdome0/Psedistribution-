@@ -3,41 +3,61 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - PSE Wholesale</title>
+    <title>Login - Pilot Sales Distribution</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Login to your Pilot Sales Distribution account. Access wholesale marketplace." />
+    <meta name="keywords" content="login, sign in, wholesale account, Pilot Sales" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Login - Pilot Sales Distribution" />
+    <meta property="og:description" content="Login to your wholesale account." />
+    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo-192.png" />
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="style.css" />
-    
-    <script src="https://cdn.jsdelivr.net/npm/cloudinary-core@2.11.3/cloudinary-core-shrinkwrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/cloudinary-jquery-file-upload@2.11.3/cloudinary-jquery-file-upload.js"></script>
-    
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
-    
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css" />
+
     <style>
         .auth-page {
             max-width: 480px;
             margin: 2rem auto;
-            background: #fff;
-            border-radius: 1.5rem;
+            background: var(--white);
+            border-radius: var(--radius);
             padding: 2.5rem;
-            border: 1px solid #e9edf2;
+            border: 1px solid var(--border);
         }
-        .auth-page h2 {
-            font-size: 1.8rem;
+        .auth-page .auth-header {
             text-align: center;
-            color: #0b2a3b;
-            margin-bottom: 0.5rem;
-        }
-        .auth-page .subtitle {
-            text-align: center;
-            color: #6a889a;
-            font-size: 0.9rem;
             margin-bottom: 1.5rem;
         }
+        .auth-page .auth-header h2 {
+            font-size: 1.8rem;
+            color: var(--secondary);
+        }
+        .auth-page .auth-header h2 span {
+            color: var(--primary);
+        }
+        .auth-page .auth-header p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
         .auth-page .form-group {
             margin-bottom: 1.2rem;
         }
@@ -45,22 +65,23 @@
             display: block;
             font-size: 0.85rem;
             font-weight: 600;
-            color: #0b2a3b;
+            color: var(--secondary);
             margin-bottom: 0.3rem;
         }
         .auth-page .form-group input {
             width: 100%;
             padding: 0.7rem 0.8rem;
-            border: 1px solid #dce3e9;
-            border-radius: 8px;
+            border: 1px solid var(--border-dark);
+            border-radius: var(--radius-sm);
             font-size: 0.9rem;
-            transition: 0.2s;
+            transition: var(--transition);
         }
         .auth-page .form-group input:focus {
-            border-color: #1e7b6b;
+            border-color: var(--primary);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(30, 123, 107, 0.1);
+            box-shadow: 0 0 0 3px rgba(26, 123, 107, 0.1);
         }
+
         .auth-page .form-options {
             display: flex;
             justify-content: space-between;
@@ -68,31 +89,55 @@
             margin: 0.5rem 0 1.2rem;
             font-size: 0.85rem;
         }
-        .auth-page .form-options a {
-            color: #1e7b6b;
+        .auth-page .form-options label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text);
             cursor: pointer;
+        }
+        .auth-page .form-options label input[type="checkbox"] {
+            accent-color: var(--primary);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .auth-page .form-options a {
+            color: var(--primary);
+            cursor: pointer;
+            transition: var(--transition);
         }
         .auth-page .form-options a:hover {
             text-decoration: underline;
         }
+
         .auth-page .btn-login {
             width: 100%;
-            background: #1e7b6b;
-            color: #fff;
+            background: var(--primary);
+            color: var(--white);
             border: none;
             padding: 0.8rem;
-            border-radius: 40px;
+            border-radius: 50px;
             font-weight: 700;
             font-size: 1rem;
             cursor: pointer;
-            transition: 0.2s;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
         .auth-page .btn-login:hover {
-            background: #146354;
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(26, 123, 107, 0.3);
         }
-        .auth-page .btn-login i {
-            margin-right: 0.5rem;
+        .auth-page .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
         }
+
         .auth-page .divider {
             text-align: center;
             margin: 1.5rem 0;
@@ -105,15 +150,16 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: #dce3e9;
+            background: var(--border-dark);
         }
         .auth-page .divider span {
-            background: #fff;
+            background: var(--white);
             padding: 0 1rem;
             position: relative;
-            color: #6a889a;
+            color: var(--text-light);
             font-size: 0.8rem;
         }
+
         .auth-page .social-login {
             display: flex;
             gap: 1rem;
@@ -121,30 +167,32 @@
         .auth-page .social-login button {
             flex: 1;
             padding: 0.6rem;
-            border: 1px solid #dce3e9;
-            border-radius: 8px;
-            background: #fff;
+            border: 1px solid var(--border-dark);
+            border-radius: var(--radius-sm);
+            background: var(--white);
             cursor: pointer;
-            transition: 0.2s;
+            transition: var(--transition);
             font-size: 0.9rem;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
         .auth-page .social-login button:hover {
-            background: #f1f5f9;
+            background: var(--light);
         }
-        .auth-page .social-login button i {
-            margin-right: 0.5rem;
-        }
+
         .auth-page .register-link {
             text-align: center;
             margin-top: 1.2rem;
             font-size: 0.9rem;
-            color: #6a889a;
+            color: var(--text-light);
         }
         .auth-page .register-link a {
-            color: #1e7b6b;
+            color: var(--primary);
             font-weight: 600;
-            text-decoration: none;
+            transition: var(--transition);
         }
         .auth-page .register-link a:hover {
             text-decoration: underline;
@@ -163,98 +211,90 @@
 </head>
 <body>
 
-<!-- ─── TOP BAR ─── -->
+<!-- ============================================ -->
+<!-- TOP BAR WITH MOVING WORDS -->
+<!-- ============================================ -->
 <div class="top-bar">
     <div class="container">
-        <div>
-            <span>Welcome to PSE Wholesale</span>
-            <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Help</a>
-            <a href="track-order.html">Track Order</a>
-            <a href="seller-dashboard.html">Become a Seller</a>
+        <div class="moving-words">
+            <div class="words-track">
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+            </div>
         </div>
-        <div id="authLinks">
-            <a href="login.html" id="loginLink" style="display:none;">Login</a>
-            <a href="register.html" id="registerLink">Register</a>
-            <select class="lang-select" onchange="window.location.href='/?lang='+this.value">
-                <option value="EN">EN</option>
-                <option value="ES">ES</option>
-                <option value="FR">FR</option>
-                <option value="DE">DE</option>
-            </select>
+        <div class="top-links">
+            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login" id="loginLink" style="display:none;"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
 
-<!-- ─── HEADER ─── -->
+<!-- ============================================ -->
+<!-- HEADER -->
+<!-- ============================================ -->
 <header class="header">
     <div class="container">
-        <a href="index.html" class="logo" style="display:flex; align-items:center; gap:0.5rem; text-decoration:none;">
-            <img src="logo.jpg" alt="PSE Distribution" style="height:40px; width:auto; border-radius:8px;" />
-            <div style="display:flex; flex-direction:column; line-height:1.1;">
-                <span style="font-size:1.5rem; font-weight:800; color:#0b2a3b;">PSE <span style="color:#1e7b6b;">Distribution</span></span>
-                <span style="font-size:0.55rem; color:#6a889a; font-weight:400; letter-spacing:0.5px;">wholesale Marketplace</span>
+        <a href="home" class="logo">
+            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+            <div class="brand-name">
+                <span class="main">PSE <span>Distribution</span></span>
+                <span class="sub">wholesale</span>
             </div>
         </a>
-        <div class="search-bar">
-            <select><option>All Categories</option><option>Electronics</option><option>Fashion</option></select>
-            <input type="text" placeholder="Search wholesale products..." />
-            <button><i class="fa-solid fa-magnifying-glass"></i></button>
-        </div>
         <div class="header-actions">
-            <div class="location-selector"><i class="fa-solid fa-location-dot"></i> Sacramento, 95829</div>
-            <a href="#" class="icon-btn"><i class="fa-regular fa-heart"></i><span>Wishlist</span><span class="badge-count wishlist-count">0</span></a>
-            <a href="#" class="icon-btn"><i class="fa-regular fa-bell"></i><span>Alerts</span><span class="badge-count">3</span></a>
-            <a href="#" class="icon-btn" id="accountBtn"><i class="fa-regular fa-user"></i><span id="accountLabel">Account</span></a>
-            <a href="#" class="icon-btn" onclick="window.location.href='cart.html'">
-                <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
+            <a href="cart" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
+            </a>
+            <a href="account" class="icon-btn" id="accountBtn">
+                <i class="fa-regular fa-user"></i>
+                <span id="accountLabel">Account</span>
             </a>
         </div>
     </div>
 </header>
 
-<!-- ─── NAVIGATION ─── -->
+<!-- ============================================ -->
+<!-- NAVIGATION TABS -->
+<!-- ============================================ -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="index.html"><i class="fa-solid fa-bars"></i> All Departments</a>
-        <a href="#">Today's Deals</a>
-        <a href="#">New Arrivals</a>
-        <a href="#" class="wholesale-nav"><i class="fa-solid fa-cubes"></i> Wholesale</a>
-        <a href="#">Brands</a>
-        <a href="#">Clearance</a>
-        <a href="#">Flash Deals</a>
-        <a href="#">Gift Cards</a>
-        <a href="#">Business Solutions</a>
-        <a href="#" onclick="document.getElementById('helpModal').style.display='flex'">Customer Service</a>
+        <a href="home"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
-<!-- ─── MAIN CONTENT ─── -->
+<!-- ============================================ -->
+<!-- MAIN CONTENT -->
+<!-- ============================================ -->
 <div class="container">
 
-    <!-- PAGE LINKS -->
-    <div class="page-links">
-        <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products.html"><i class="fa-solid fa-grid-2"></i> Products</a>
-        <a href="product-detail.html"><i class="fa-solid fa-eye"></i> Detail</a>
-        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
-        <a href="checkout.html"><i class="fa-solid fa-credit-card"></i> Checkout</a>
-        <a href="login.html" class="active"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
-        <a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a>
-        <a href="account.html"><i class="fa-solid fa-user"></i> Account</a>
-        <a href="seller-dashboard.html"><i class="fa-solid fa-store"></i> Seller</a>
-        <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Admin</a>
-        <a href="about.html"><i class="fa-solid fa-info-circle"></i> About</a>
-    </div>
-
-    <!-- Login Form -->
     <div class="auth-page">
-        <h2><i class="fa-regular fa-circle-user"></i> Welcome Back</h2>
-        <p class="subtitle">Sign in to your PSE Wholesale account</p>
+        <div class="auth-header">
+            <h2>Welcome <span>Back</span></h2>
+            <p>Sign in to your Pilot Sales Distribution account</p>
+        </div>
 
         <form id="loginForm">
             <div class="form-group">
-                <label>Email</label>
+                <label>Email Address</label>
                 <input type="email" id="loginEmail" placeholder="you@example.com" required />
             </div>
             <div class="form-group">
@@ -262,125 +302,125 @@
                 <input type="password" id="loginPassword" placeholder="Enter your password" required />
             </div>
             <div class="form-options">
-                <label><input type="checkbox" /> Remember me</label>
+                <label><input type="checkbox" id="rememberMe" /> Remember me</label>
                 <a onclick="resetPassword()">Forgot password?</a>
             </div>
-            <button type="submit" class="btn-login"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+            <button type="submit" class="btn-login" id="loginBtn">
+                <i class="fa-solid fa-right-to-bracket"></i> Sign In
+            </button>
         </form>
 
         <div class="divider"><span>or continue with</span></div>
 
         <div class="social-login">
-            <button onclick="signInWithGoogle()" style="background:#fff; border:1px solid #dce3e9; padding:0.6rem; border-radius:8px; cursor:pointer; width:100%; font-size:0.9rem; font-weight:500; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+            <button onclick="signInWithGoogle()">
                 <img src="https://www.google.com/favicon.ico" style="width:18px; height:18px;" alt="Google" />
                 Sign in with Google
             </button>
-            <button onclick="showToast('Facebook login coming soon', 'info')" style="flex:1; padding:0.6rem; border:1px solid #dce3e9; border-radius:8px; background:#fff; cursor:pointer; transition:0.2s; font-size:0.9rem; font-weight:500;">
-                <i class="fa-brands fa-facebook" style="color:#1877f2;"></i> Facebook
+            <button onclick="showToast('Facebook login coming soon', 'info')">
+                <i class="fa-brands fa-facebook"></i> Facebook
             </button>
         </div>
 
         <div class="register-link">
-            Don't have an account? <a href="register.html">Create one now</a>
+            Don't have an account? <a href="register">Create one now</a>
         </div>
     </div>
 
 </div>
 
-<!-- ─── HELP MODAL ─── -->
-<div class="help-modal" id="helpModal" onclick="if(event.target===this) this.style.display='none'">
-    <div class="modal-content">
-        <button class="close-btn" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
-        <h3><i class="fa-regular fa-circle-question" style="color:#1e7b6b;"></i> How can we help?</h3>
-        <p>Choose from our support options below:</p>
-        <ul>
-            <li><i class="fa-regular fa-envelope" style="color:#1e7b6b; width:20px;"></i> support@psewholesale.com</li>
-            <li><i class="fa-regular fa-phone" style="color:#1e7b6b; width:20px;"></i> +1 (800) 555-PSEW</li>
-            <li><i class="fa-regular fa-clock" style="color:#1e7b6b; width:20px;"></i> Mon-Fri: 8AM - 8PM EST</li>
-        </ul>
-        <button class="help-btn" onclick="document.getElementById('helpModal').style.display='none'"><i class="fa-regular fa-thumbs-up"></i> Got it!</button>
-    </div>
-</div>
-
-<!-- ─── FOOTER ─── -->
+<!-- ============================================ -->
+<!-- FOOTER -->
+<!-- ============================================ -->
 <footer class="footer">
     <div class="container">
-        <div>
-            <h4>PSE Wholesale</h4>
-            <ul>
-                <li onclick="window.location.href='about.html'">About Us</li>
-                <li>Careers</li>
-                <li onclick="document.getElementById('helpModal').style.display='flex'">Contact</li>
-                <li>Blog</li>
-            </ul>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="about">About</a>
+                <a href="contact">Contact</a>
+                <a href="help-center">Help</a>
+                <a href="privacy">Privacy Policy</a>
+                <a href="terms">Terms &amp; Conditions</a>
+                <a href="become-seller">Become a Seller</a>
+            </div>
+            <div class="footer-social">
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
         </div>
-        <div>
-            <h4>Customer Service</h4>
-            <ul>
-                <li onclick="document.getElementById('helpModal').style.display='flex'">Help Center</li>
-                <li>Returns & Refunds</li>
-                <li>Shipping Policy</li>
-                <li onclick="window.location.href='track-order.html'">Track Order</li>
-            </ul>
-        </div>
-        <div>
-            <h4>B2B</h4>
-            <ul>
-                <li onclick="window.location.href='seller-dashboard.html'">Become a Seller</li>
-                <li>Wholesale Pricing</li>
-                <li>Bulk Orders</li>
-                <li>Supplier Program</li>
-            </ul>
-        </div>
-        <div>
-            <h4>Legal</h4>
-            <ul>
-                <li>Privacy Policy</li>
-                <li>Terms & Conditions</li>
-                <li>Cookie Policy</li>
-            </ul>
-        </div>
-        <div class="bottom">
-            &copy; 2026 PSE Wholesale Marketplace. All rights reserved.
+        <div class="footer-bottom">
+            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
         </div>
     </div>
 </footer>
 
-<!-- ─── MAIN JS ─── -->
+<!-- ============================================ -->
+<!-- TOAST NOTIFICATION -->
+<!-- ============================================ -->
+<div id="toast" class="toast"></div>
+
+<!-- ============================================ -->
+<!-- MAIN JAVASCRIPT -->
+<!-- ============================================ -->
 <script src="main.js"></script>
 
 <script>
+// ============================================
+// LOGIN PAGE - JAVASCRIPT
+// ============================================
+
+// ─── SET CURRENT YEAR ───
+document.getElementById('year').textContent = new Date().getFullYear();
+
 // ─── LOGIN FORM HANDLER ───
 document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    
+
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
-    
+
     if (!email || !password) {
         showToast('Please fill in all fields', 'error');
         return;
     }
-    
-    showToast('Signing in...', 'info');
-    
+
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in...';
+
     const result = await signIn(email, password);
-    
+
     if (result.success) {
         showToast('Welcome back!', 'success');
-        
+
         const user = getCurrentUser();
-        if (user.role === 'admin') {
-            setTimeout(() => window.location.href = 'admin-dashboard.html', 1000);
-        } else if (user.role === 'seller') {
-            setTimeout(() => window.location.href = 'seller-dashboard.html', 1000);
-        } else {
-            setTimeout(() => window.location.href = 'index.html', 1000);
-        }
+        setTimeout(() => {
+            if (user.role === 'admin') {
+                window.location.href = 'admin-dashboard';
+            } else if (user.role === 'seller') {
+                window.location.href = 'seller-dashboard';
+            } else {
+                window.location.href = 'home';
+            }
+        }, 1000);
     } else {
         showToast(result.error, 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
     }
 });
+
+// ─── RESET PASSWORD ───
+async function resetPassword() {
+    const email = document.getElementById('loginEmail').value.trim();
+    if (!email) {
+        showToast('Please enter your email address', 'error');
+        return;
+    }
+    const result = await resetPassword(email);
+}
 </script>
 
 </body>
