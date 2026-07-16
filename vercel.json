@@ -1,0 +1,65 @@
+{
+  "rewrites": [
+    { "source": "/home", "destination": "/index.html" },
+    { "source": "/products", "destination": "/products.html" },
+    { "source": "/product-detail", "destination": "/product-detail.html" },
+    { "source": "/cart", "destination": "/cart.html" },
+    { "source": "/checkout", "destination": "/checkout.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/register", "destination": "/register.html" },
+    { "source": "/account", "destination": "/account.html" },
+    { "source": "/admin-dashboard", "destination": "/admin-dashboard.html" },
+    { "source": "/seller-dashboard", "destination": "/seller-dashboard.html" },
+    { "source": "/about", "destination": "/about.html" },
+    { "source": "/contact", "destination": "/contact.html" },
+    { "source": "/help-center", "destination": "/help-center.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/track-order", "destination": "/track-order.html" },
+    { "source": "/become-seller", "destination": "/become-seller.html" },
+    { "source": "/order-success", "destination": "/order-success.html" },
+    { "source": "/wishlist", "destination": "/wishlist.html" },
+    { "source": "/blog", "destination": "/blog.html" },
+    { "source": "/faq", "destination": "/faq.html" },
+    { "source": "/returns", "destination": "/returns.html" },
+    { "source": "/shipping", "destination": "/shipping.html" },
+    { "source": "/cookie-policy", "destination": "/cookie-policy.html" },
+    { "source": "/wholesale-pricing", "destination": "/wholesale-pricing.html" },
+    { "source": "/bulk-orders", "destination": "/bulk-orders.html" },
+    { "source": "/supplier-program", "destination": "/supplier-program.html" }
+  ],
+  "redirects": [
+    { "source": "/index", "destination": "/home", "permanent": true },
+    { "source": "/index.html", "destination": "/home", "permanent": true }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/logo.jpg",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/style.css",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/main.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ],
+  "trailingSlash": false
+}
