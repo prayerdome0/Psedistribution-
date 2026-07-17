@@ -294,10 +294,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="track-order.html"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="seller-dashboard.html"><i class="fa-regular fa-store"></i> Sell</a>
-            <a href="login.html" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="register.html" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -329,12 +329,12 @@
                 <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="cart.html" class="icon-btn">
+            <a href="cart" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
             </a>
-            <a href="account.html" class="icon-btn" id="accountBtn">
+            <a href="account" class="icon-btn" id="accountBtn">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
@@ -348,11 +348,11 @@
 <nav class="nav-categories">
     <div class="container">
         <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products.html" class="nav-tab active"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about.html" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact.html" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center.html" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller.html" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="products" class="nav-tab active"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -473,12 +473,12 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about.html">About</a>
-                <a href="contact.html">Contact</a>
-                <a href="help-center.html">Help</a>
-                <a href="privacy.html">Privacy Policy</a>
-                <a href="terms.html">Terms &amp; Conditions</a>
-                <a href="become-seller.html">Become a Seller</a>
+                <a href="about">About</a>
+                <a href="contact">Contact</a>
+                <a href="help-center">Help</a>
+                <a href="privacy">Privacy Policy</a>
+                <a href="terms">Terms &amp; Conditions</a>
+                <a href="become-seller">Become a Seller</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -522,20 +522,16 @@ async function loadProducts() {
     const grid = document.getElementById('productGrid');
     
     try {
-        // Parse URL parameters
         const params = new URLSearchParams(window.location.search);
         const category = params.get('category');
         const search = params.get('search');
         
-        // Fetch products from Firebase
         allProducts = await fetchProducts();
         
-        // Filter by category if specified
         if (category && category !== 'all') {
             allProducts = allProducts.filter(p => p.category === category);
         }
         
-        // Filter by search if specified
         if (search) {
             const query = search.toLowerCase();
             allProducts = allProducts.filter(p => 
@@ -544,7 +540,6 @@ async function loadProducts() {
             );
         }
         
-        // Apply any URL filters
         if (category === 'deals' || category === 'flash') {
             allProducts = allProducts.filter(p => p.old_price && p.old_price > p.price);
         }
@@ -577,7 +572,6 @@ async function loadProducts() {
 
 // ─── APPLY FILTERS ───
 function applyFilters() {
-    // Get selected categories
     const categoryChecks = document.querySelectorAll('.filter-group input[type="checkbox"]');
     const selectedCategories = [];
     const selectedRatings = [];
@@ -596,45 +590,33 @@ function applyFilters() {
         }
     });
 
-    // Get price range
     const priceMin = parseFloat(document.getElementById('priceMin').value) || 0;
     const priceMax = parseFloat(document.getElementById('priceMax').value) || 9999;
-
-    // Get MOQ
     const moqRadio = document.querySelector('input[name="moq"]:checked');
     const moqValue = moqRadio ? parseInt(moqRadio.value) : 0;
-
-    // Get sort option
     const sort = document.getElementById('sortSelect').value;
 
-    // Apply filters
     let products = [...allProducts];
 
-    // Category filter
     if (selectedCategories.length > 0) {
         products = products.filter(p => selectedCategories.includes(p.category));
     }
 
-    // Price filter
     products = products.filter(p => p.price >= priceMin && p.price <= priceMax);
 
-    // MOQ filter
     if (moqValue && moqValue !== 'any') {
         products = products.filter(p => (p.moq || 0) >= moqValue);
     }
 
-    // Rating filter
     if (selectedRatings.length > 0) {
         const minRating = Math.min(...selectedRatings);
         products = products.filter(p => (p.rating || 0) >= minRating);
     }
 
-    // Type filter
     if (selectedTypes.length > 0) {
         products = products.filter(p => selectedTypes.includes(p.type));
     }
 
-    // Sort
     switch(sort) {
         case 'price-asc':
             products.sort((a,b) => (a.price || 0) - (b.price || 0));
@@ -679,12 +661,10 @@ function renderProductsPage(page) {
         return;
     }
 
-    // Use the renderProducts function from main.js with slug support
     renderProducts(pageProducts, 'productGrid');
     updatePagination(page);
     currentPage = page;
     
-    // Re-init scroll animations for new products
     setTimeout(() => {
         if (typeof initScrollAnimations === 'function') {
             initScrollAnimations();
@@ -732,106 +712,19 @@ function changePage(direction) {
     
     if (newPage !== currentPage && newPage >= 1 && newPage <= totalPages) {
         renderProductsPage(newPage);
-        // Scroll to top of product grid
         document.getElementById('productGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
 // ─── CLEAR ALL FILTERS ───
 function clearAllFilters() {
-    // Uncheck all checkboxes
     document.querySelectorAll('.filter-group input[type="checkbox"]').forEach(cb => cb.checked = false);
-    
-    // Reset radio buttons
     document.querySelector('input[name="moq"][value="any"]').checked = true;
-    
-    // Reset price range
     document.getElementById('priceMin').value = 0;
     document.getElementById('priceMax').value = 1000;
-    
-    // Reset sort
     document.getElementById('sortSelect').value = 'default';
-    
-    // Apply filters
     applyFilters();
 }
-
-// ─── SEARCH WITH FIREBASE ───
-async function searchProductsFirebase(event) {
-    const input = document.getElementById('searchInput');
-    const resultsDiv = document.getElementById('searchResults');
-    const query = input.value.trim();
-
-    if (event && event.key === 'Enter' && query) {
-        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
-        return;
-    }
-
-    if (query.length < 2) {
-        resultsDiv.classList.remove('show');
-        return;
-    }
-
-    try {
-        const snapshot = await db.collection('products')
-            .where('status', 'in', ['active', 'approved'])
-            .limit(5)
-            .get();
-
-        const products = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
-                (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
-                products.push({
-                    id: doc.id,
-                    ...data,
-                    image_url: data.image_url || data.images?.[0] || '',
-                    slug: data.slug || generateSlug(data.title)
-                });
-            }
-        });
-
-        if (products.length === 0) {
-            resultsDiv.innerHTML = `
-                <div style="padding:1rem; text-align:center; color:var(--text-light);">
-                    No products found for "${query}"
-                </div>
-            `;
-            resultsDiv.classList.add('show');
-            return;
-        }
-
-        resultsDiv.innerHTML = products.map(p => `
-            <div class="result-item" onclick="window.location.href='product/${p.slug || p.id}'">
-                <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
-                <div class="info">
-                    <div class="title">${p.title}</div>
-                    <div class="price">$${(p.price || 0).toFixed(2)}</div>
-                </div>
-            </div>
-        `).join('') + `
-            <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
-                <a href="products.html?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
-                    See all results for "${query}" →
-                </a>
-            </div>
-        `;
-
-        resultsDiv.classList.add('show');
-
-    } catch (error) {
-        console.error('Search error:', error);
-    }
-}
-
-// ─── CLOSE SEARCH RESULTS ───
-document.addEventListener('click', function(e) {
-    const searchBar = document.getElementById('searchBar');
-    if (!searchBar.contains(e.target)) {
-        document.getElementById('searchResults').classList.remove('show');
-    }
-});
 
 // ─── GENERATE SLUG (fallback) ───
 function generateSlug(title) {

@@ -347,10 +347,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="track-order.html"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="seller-dashboard.html"><i class="fa-regular fa-store"></i> Sell</a>
-            <a href="login.html" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="register.html" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -382,12 +382,12 @@
                 <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="cart.html" class="icon-btn">
+            <a href="cart" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
             </a>
-            <a href="account.html" class="icon-btn" id="accountBtn">
+            <a href="account" class="icon-btn" id="accountBtn">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
@@ -401,11 +401,11 @@
 <nav class="nav-categories">
     <div class="container">
         <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products.html" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about.html" class="nav-tab active"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact.html" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center.html" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller.html" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="products" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about" class="nav-tab active"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -425,7 +425,6 @@
         <!-- ─── PRESIDENT SECTION ─── -->
         <div class="president-section animate-on-scroll">
             <div class="photo">
-                <!-- Replace 'caden-gibson.jpg' with your actual image file -->
                 <img src="caden-gibson.png" alt="Caden Gibson - President" onerror="this.parentElement.innerHTML='<span class=\'placeholder\'><i class=\'fa-regular fa-user\'></i></span>'" />
             </div>
             <div class="info">
@@ -519,7 +518,7 @@
         <div class="quote-section animate-on-scroll" style="margin-top: 2rem;">
             <h2>Ready to <span>Partner With Us?</span></h2>
             <p>Join thousands of businesses that trust Pilot Sales Distribution for their wholesale needs.</p>
-            <a href="contact.html" class="btn-white"><i class="fa-regular fa-envelope"></i> Get in Touch</a>
+            <a href="contact" class="btn-white"><i class="fa-regular fa-envelope"></i> Get in Touch</a>
         </div>
 
     </div>
@@ -533,12 +532,12 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about.html">About</a>
-                <a href="contact.html">Contact</a>
-                <a href="help-center.html">Help</a>
-                <a href="privacy.html">Privacy Policy</a>
-                <a href="terms.html">Terms &amp; Conditions</a>
-                <a href="become-seller.html">Become a Seller</a>
+                <a href="about">About</a>
+                <a href="contact">Contact</a>
+                <a href="help-center">Help</a>
+                <a href="privacy">Privacy Policy</a>
+                <a href="terms">Terms &amp; Conditions</a>
+                <a href="become-seller">Become a Seller</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -571,81 +570,8 @@
 // ─── SET CURRENT YEAR ───
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// ─── SEARCH WITH FIREBASE ───
-async function searchProductsFirebase(event) {
-    const input = document.getElementById('searchInput');
-    const resultsDiv = document.getElementById('searchResults');
-    const query = input.value.trim();
-
-    if (event && event.key === 'Enter' && query) {
-        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
-        return;
-    }
-
-    if (query.length < 2) {
-        resultsDiv.classList.remove('show');
-        return;
-    }
-
-    try {
-        const snapshot = await db.collection('products')
-            .where('status', 'in', ['active', 'approved'])
-            .limit(5)
-            .get();
-
-        const products = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
-                (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
-                products.push({
-                    id: doc.id,
-                    ...data,
-                    image_url: data.image_url || data.images?.[0] || ''
-                });
-            }
-        });
-
-        if (products.length === 0) {
-            resultsDiv.innerHTML = `
-                <div style="padding:1rem; text-align:center; color:var(--text-light);">
-                    No products found for "${query}"
-                </div>
-            `;
-            resultsDiv.classList.add('show');
-            return;
-        }
-
-        resultsDiv.innerHTML = products.map(p => `
-            <div class="result-item" onclick="window.location.href='product-detail.html?id=${p.id}'">
-                <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
-                <div class="info">
-                    <div class="title">${p.title}</div>
-                    <div class="price">$${(p.price || 0).toFixed(2)}</div>
-                </div>
-            </div>
-        `).join('') + `
-            <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
-                <a href="products.html?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
-                    See all results for "${query}" →
-                </a>
-            </div>
-        `;
-
-        resultsDiv.classList.add('show');
-
-    } catch (error) {
-        console.error('Search error:', error);
-    }
-}
-
-// ─── CLOSE SEARCH RESULTS ───
-document.addEventListener('click', function(e) {
-    const searchBar = document.getElementById('searchBar');
-    if (!searchBar.contains(e.target)) {
-        document.getElementById('searchResults').classList.remove('show');
-    }
-});
+// ─── SEARCH FUNCTION IS HANDLED BY MAIN.JS ───
+// No need to redefine it here
 
 // ─── INIT ───
 document.addEventListener('DOMContentLoaded', function() {

@@ -20,14 +20,7 @@
     { "source": "/become-seller", "destination": "/become-seller.html" },
     { "source": "/order-success", "destination": "/order-success.html" },
     { "source": "/wishlist", "destination": "/wishlist.html" },
-    { "source": "/blog", "destination": "/blog.html" },
-    { "source": "/faq", "destination": "/faq.html" },
-    { "source": "/returns", "destination": "/returns.html" },
-    { "source": "/shipping", "destination": "/shipping.html" },
-    { "source": "/cookie-policy", "destination": "/cookie-policy.html" },
-    { "source": "/wholesale-pricing", "destination": "/wholesale-pricing.html" },
-    { "source": "/bulk-orders", "destination": "/bulk-orders.html" },
-    { "source": "/supplier-program", "destination": "/supplier-program.html" }
+    { "source": "/chat", "destination": "/chat.html" }
   ],
   "redirects": [
     { "source": "/index", "destination": "/home", "permanent": true },

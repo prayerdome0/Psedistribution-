@@ -341,7 +341,6 @@
             </div>
         </div>
         <div class="top-links" id="topLinks">
-            <!-- Auth links will be auto-updated by main.js -->
             <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
             <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
             <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
@@ -382,12 +381,10 @@
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
             </a>
-            <!-- Account button - auto-updates -->
             <a href="account" class="icon-btn" id="accountBtn">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
-            <!-- Admin badge - shows only for admin users -->
             <a href="admin-dashboard" class="icon-btn admin-badge" id="adminLink" style="display:none;">
                 <i class="fa-solid fa-gauge-high"></i>
                 <span>Admin</span>
@@ -408,7 +405,6 @@
         <a href="contact" class="nav-tab" id="navContact"><i class="fa-solid fa-envelope"></i> Contact</a>
         <a href="help-center" class="nav-tab" id="navHelp"><i class="fa-solid fa-circle-question"></i> Help</a>
         <a href="become-seller" class="nav-tab wholesale-nav" id="navSell"><i class="fa-regular fa-store"></i> Sell</a>
-        <!-- Admin nav - hidden by default, shown only for admin -->
         <a href="admin-dashboard" class="nav-tab" id="adminNavTab" style="display:none;">
             <i class="fa-solid fa-gauge-high"></i> Dashboard
             <span class="badge" id="adminNavBadge" style="background:#c0392b; color:#fff; font-size:0.6rem; padding:0.1rem 0.5rem; border-radius:30px; margin-left:0.3rem;">0</span>
@@ -666,274 +662,62 @@
     </div>
 
     <!-- ========================================== -->
-<!-- TRUSTED COMPANIES LOGOS - ENHANCED -->
-<!-- ========================================== -->
-<div class="trusted-section animate-on-scroll">
-    <div class="section-title">
-        <h2>Trusted By <span>Industry Leaders</span></h2>
-        <p>Join thousands of businesses that trust Pilot Sales Distribution</p>
-    </div>
-    
-    <div class="logo-carousel">
-        <div class="logo-track">
-            
-            <!-- Brand 1: Nike -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/nike" alt="Nike" loading="lazy" />
-                <span>Nike</span>
+    <!-- 9. TRUSTED COMPANIES LOGOS -->
+    <!-- ========================================== -->
+    <div class="trusted-section animate-on-scroll">
+        <div class="section-title">
+            <h2>Trusted By <span>Industry Leaders</span></h2>
+            <p>Join thousands of businesses that trust Pilot Sales Distribution</p>
+        </div>
+        
+        <div class="logo-carousel">
+            <div class="logo-track">
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/nike" alt="Nike" loading="lazy" /><span>Nike</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/apple" alt="Apple" loading="lazy" /><span>Apple</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/samsung" alt="Samsung" loading="lazy" /><span>Samsung</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/adidas" alt="Adidas" loading="lazy" /><span>Adidas</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/lg" alt="LG" loading="lazy" /><span>LG</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/google" alt="Google" loading="lazy" /><span>Google</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/intel" alt="Intel" loading="lazy" /><span>Intel</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/hp" alt="HP" loading="lazy" /><span>HP</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/dell" alt="Dell" loading="lazy" /><span>Dell</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/cisco" alt="Cisco" loading="lazy" /><span>Cisco</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/lenovo" alt="Lenovo" loading="lazy" /><span>Lenovo</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/huawei" alt="Huawei" loading="lazy" /><span>Huawei</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/xiaomi" alt="Xiaomi" loading="lazy" /><span>Xiaomi</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/nvidia" alt="NVIDIA" loading="lazy" /><span>NVIDIA</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/tesla" alt="Tesla" loading="lazy" /><span>Tesla</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/paypal" alt="PayPal" loading="lazy" /><span>PayPal</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/mastercard" alt="Mastercard" loading="lazy" /><span>Mastercard</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/visa" alt="Visa" loading="lazy" /><span>Visa</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/cocacola" alt="Coca-Cola" loading="lazy" /><span>Coca-Cola</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/toyota" alt="Toyota" loading="lazy" /><span>Toyota</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/bmw" alt="BMW" loading="lazy" /><span>BMW</span></div>
+                <!-- Duplicate for seamless loop -->
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/nike" alt="Nike" loading="lazy" /><span>Nike</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/apple" alt="Apple" loading="lazy" /><span>Apple</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/samsung" alt="Samsung" loading="lazy" /><span>Samsung</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/adidas" alt="Adidas" loading="lazy" /><span>Adidas</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/lg" alt="LG" loading="lazy" /><span>LG</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/google" alt="Google" loading="lazy" /><span>Google</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/intel" alt="Intel" loading="lazy" /><span>Intel</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/hp" alt="HP" loading="lazy" /><span>HP</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/dell" alt="Dell" loading="lazy" /><span>Dell</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/cisco" alt="Cisco" loading="lazy" /><span>Cisco</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/lenovo" alt="Lenovo" loading="lazy" /><span>Lenovo</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/huawei" alt="Huawei" loading="lazy" /><span>Huawei</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/xiaomi" alt="Xiaomi" loading="lazy" /><span>Xiaomi</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/nvidia" alt="NVIDIA" loading="lazy" /><span>NVIDIA</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/tesla" alt="Tesla" loading="lazy" /><span>Tesla</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/paypal" alt="PayPal" loading="lazy" /><span>PayPal</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/mastercard" alt="Mastercard" loading="lazy" /><span>Mastercard</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/visa" alt="Visa" loading="lazy" /><span>Visa</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/cocacola" alt="Coca-Cola" loading="lazy" /><span>Coca-Cola</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/toyota" alt="Toyota" loading="lazy" /><span>Toyota</span></div>
+                <div class="logo-item"><img src="https://cdn.simpleicons.org/bmw" alt="BMW" loading="lazy" /><span>BMW</span></div>
             </div>
-            
-            <!-- Brand 2: Apple -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/apple" alt="Apple" loading="lazy" />
-                <span>Apple</span>
-            </div>
-            
-            <!-- Brand 3: Samsung -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/samsung" alt="Samsung" loading="lazy" />
-                <span>Samsung</span>
-            </div>
-            
-            <!-- Brand 4: Adidas -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/adidas" alt="Adidas" loading="lazy" />
-                <span>Adidas</span>
-            </div>
-            
-            <!-- Brand 6: LG -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/lg" alt="LG" loading="lazy" />
-                <span>LG</span>
-            </div>
-            
-            <!-- Brand 8: Google -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/google" alt="Google" loading="lazy" />
-                <span>Google</span>
-            </div>
-            
-            <!-- Brand 10: Intel -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/intel" alt="Intel" loading="lazy" />
-                <span>Intel</span>
-            </div>
-            
-            <!-- Brand 11: HP -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/hp" alt="HP" loading="lazy" />
-                <span>HP</span>
-            </div>
-            
-            <!-- Brand 12: Dell -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/dell" alt="Dell" loading="lazy" />
-                <span>Dell</span>
-            </div>
-            
-            <!-- Brand 13: Cisco -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/cisco" alt="Cisco" loading="lazy" />
-                <span>Cisco</span>
-            </div>
-            
-            <!-- Brand 14: Lenovo -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/lenovo" alt="Lenovo" loading="lazy" />
-                <span>Lenovo</span>
-            </div>
-            
-            <!-- Brand 15: Huawei -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/huawei" alt="Huawei" loading="lazy" />
-                <span>Huawei</span>
-            </div>
-            
-            <!-- Brand 16: Xiaomi -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/xiaomi" alt="Xiaomi" loading="lazy" />
-                <span>Xiaomi</span>
-            </div>
-            
-            <!-- Brand 17: NVIDIA -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/nvidia" alt="NVIDIA" loading="lazy" />
-                <span>NVIDIA</span>
-            </div>
-            
-            <!-- Brand 18: Tesla -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/tesla" alt="Tesla" loading="lazy" />
-                <span>Tesla</span>
-            </div>
-            
-            <!-- Brand 19: PayPal -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/paypal" alt="PayPal" loading="lazy" />
-                <span>PayPal</span>
-            </div>
-            
-            <!-- Brand 20: Mastercard -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/mastercard" alt="Mastercard" loading="lazy" />
-                <span>Mastercard</span>
-            </div>
-            
-            <!-- Brand 21: Visa -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/visa" alt="Visa" loading="lazy" />
-                <span>Visa</span>
-            </div>
-            
-            <!-- Brand 22: Coca-Cola -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/cocacola" alt="Coca-Cola" loading="lazy" />
-                <span>Coca-Cola</span>
-            </div>
-            
-            <!-- Brand 24: Toyota -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/toyota" alt="Toyota" loading="lazy" />
-                <span>Toyota</span>
-            </div>
-            
-            <!-- Brand 25: BMW -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/bmw" alt="BMW" loading="lazy" />
-                <span>BMW</span>
-            </div>
-            
-            <!-- ======== DUPLICATE FOR SEAMLESS LOOP ======== -->
-            
-            <!-- Brand 1: Nike (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/nike" alt="Nike" loading="lazy" />
-                <span>Nike</span>
-            </div>
-            
-            <!-- Brand 2: Apple (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/apple" alt="Apple" loading="lazy" />
-                <span>Apple</span>
-            </div>
-            
-            <!-- Brand 3: Samsung (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/samsung" alt="Samsung" loading="lazy" />
-                <span>Samsung</span>
-            </div>
-            
-            <!-- Brand 4: Adidas (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/adidas" alt="Adidas" loading="lazy" />
-                <span>Adidas</span>
-            </div>
-            
-            <!-- Brand 6: LG (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/lg" alt="LG" loading="lazy" />
-                <span>LG</span>
-            </div>
-            
-            <!-- Brand 8: Google (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/google" alt="Google" loading="lazy" />
-                <span>Google</span>
-            </div>
-            
-            <!-- Brand 10: Intel (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/intel" alt="Intel" loading="lazy" />
-                <span>Intel</span>
-            </div>
-            
-            <!-- Brand 11: HP (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/hp" alt="HP" loading="lazy" />
-                <span>HP</span>
-            </div>
-            
-            <!-- Brand 12: Dell (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/dell" alt="Dell" loading="lazy" />
-                <span>Dell</span>
-            </div>
-            
-            <!-- Brand 13: Cisco (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/cisco" alt="Cisco" loading="lazy" />
-                <span>Cisco</span>
-            </div>
-            
-            <!-- Brand 14: Lenovo (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/lenovo" alt="Lenovo" loading="lazy" />
-                <span>Lenovo</span>
-            </div>
-            
-            <!-- Brand 15: Huawei (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/huawei" alt="Huawei" loading="lazy" />
-                <span>Huawei</span>
-            </div>
-            
-            <!-- Brand 16: Xiaomi (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/xiaomi" alt="Xiaomi" loading="lazy" />
-                <span>Xiaomi</span>
-            </div>
-            
-            <!-- Brand 17: NVIDIA (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/nvidia" alt="NVIDIA" loading="lazy" />
-                <span>NVIDIA</span>
-            </div>
-            
-            <!-- Brand 18: Tesla (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/tesla" alt="Tesla" loading="lazy" />
-                <span>Tesla</span>
-            </div>
-            
-            <!-- Brand 19: PayPal (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/paypal" alt="PayPal" loading="lazy" />
-                <span>PayPal</span>
-            </div>
-            
-            <!-- Brand 20: Mastercard (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/mastercard" alt="Mastercard" loading="lazy" />
-                <span>Mastercard</span>
-            </div>
-            
-            <!-- Brand 21: Visa (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/visa" alt="Visa" loading="lazy" />
-                <span>Visa</span>
-            </div>
-            
-            <!-- Brand 22: Coca-Cola (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/cocacola" alt="Coca-Cola" loading="lazy" />
-                <span>Coca-Cola</span>
-            </div>
-            
-            <!-- Brand 24: Toyota (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/toyota" alt="Toyota" loading="lazy" />
-                <span>Toyota</span>
-            </div>
-            
-            <!-- Brand 25: BMW (duplicate) -->
-            <div class="logo-item">
-                <img src="https://cdn.simpleicons.org/bmw" alt="BMW" loading="lazy" />
-                <span>BMW</span>
-            </div>
-            
         </div>
     </div>
-</div>
 
     <!-- ========================================== -->
     <!-- 10. NEWSLETTER SIGNUP -->
@@ -1004,82 +788,6 @@ function handleNewsletter(e) {
     }
 }
 
-// ─── SEARCH WITH FIREBASE ───
-async function searchProductsFirebase(event) {
-    const input = document.getElementById('searchInput');
-    const resultsDiv = document.getElementById('searchResults');
-    const query = input.value.trim();
-
-    if (event && event.key === 'Enter' && query) {
-        window.location.href = `products?search=${encodeURIComponent(query)}`;
-        return;
-    }
-
-    if (query.length < 2) {
-        resultsDiv.classList.remove('show');
-        return;
-    }
-
-    try {
-        const snapshot = await db.collection('products')
-            .where('status', 'in', ['active', 'approved'])
-            .limit(5)
-            .get();
-
-        const products = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
-                (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
-                products.push({
-                    id: doc.id,
-                    ...data,
-                    image_url: data.image_url || data.images?.[0] || ''
-                });
-            }
-        });
-
-        if (products.length === 0) {
-            resultsDiv.innerHTML = `
-                <div style="padding:1rem; text-align:center; color:var(--text-light);">
-                    No products found for "${query}"
-                </div>
-            `;
-            resultsDiv.classList.add('show');
-            return;
-        }
-
-        resultsDiv.innerHTML = products.map(p => `
-            <div class="result-item" onclick="window.location.href='product-detail?id=${p.id}'">
-                <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
-                <div class="info">
-                    <div class="title">${p.title}</div>
-                    <div class="price">$${(p.price || 0).toFixed(2)}</div>
-                </div>
-            </div>
-        `).join('') + `
-            <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
-                <a href="products?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
-                    See all results for "${query}" →
-                </a>
-            </div>
-        `;
-
-        resultsDiv.classList.add('show');
-
-    } catch (error) {
-        console.error('Search error:', error);
-    }
-}
-
-// ─── CLOSE SEARCH RESULTS ───
-document.addEventListener('click', function(e) {
-    const searchBar = document.getElementById('searchBar');
-    if (!searchBar.contains(e.target)) {
-        document.getElementById('searchResults').classList.remove('show');
-    }
-});
-
 // ─── LOAD PRODUCTS ───
 async function loadProducts() {
     const grid = document.getElementById('productGrid');
@@ -1096,7 +804,8 @@ async function loadProducts() {
             products.push({
                 id: doc.id,
                 ...data,
-                image_url: data.image_url || data.images?.[0] || ''
+                image_url: data.image_url || data.images?.[0] || '',
+                slug: data.slug || generateSlug(data.title)
             });
         });
 
@@ -1113,6 +822,7 @@ async function loadProducts() {
 
         grid.innerHTML = products.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
+            const slug = p.slug || generateSlug(p.title);
             const imageHtml = p.image_url ?
                 `<img src="${p.image_url}" alt="${p.title}" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />` :
                 `<i class="fa-solid fa-box"></i>`;
@@ -1121,10 +831,10 @@ async function loadProducts() {
                 <div class="product-card animate-on-scroll">
                     ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
                     ${discount > 0 ? `<span class="product-badge">-${discount}%</span>` : ''}
-                    <div class="product-image" onclick="window.location.href='product-detail?id=${p.id}'">
+                    <div class="product-image" onclick="window.location.href='/product/${slug}'">
                         ${imageHtml}
                     </div>
-                    <div class="product-title" onclick="window.location.href='product-detail?id=${p.id}'">${p.title}</div>
+                    <div class="product-title" onclick="window.location.href='/product/${slug}'">${p.title}</div>
                     <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
                     <div class="product-price">
                         $${(p.price || 0).toFixed(2)}
@@ -1142,7 +852,6 @@ async function loadProducts() {
             `;
         }).join('');
 
-        // Re-init scroll animations
         if (typeof initScrollAnimations === 'function') {
             initScrollAnimations();
         }
@@ -1190,11 +899,7 @@ function checkAdminStatus() {
     if (user && user.role === 'admin') {
         adminLink.style.display = 'flex';
         adminNavTab.style.display = 'inline-block';
-        
-        // Update admin badge count
         updateAdminBadge();
-        
-        // Listen for new messages/orders
         setupAdminListeners();
     } else {
         adminLink.style.display = 'none';
@@ -1220,7 +925,6 @@ async function updateAdminBadge() {
         document.getElementById('adminBadgeCount').textContent = total;
         document.getElementById('adminNavBadge').textContent = total;
         
-        // Show/hide badge based on count
         const badge = document.getElementById('adminBadgeCount');
         const navBadge = document.getElementById('adminNavBadge');
         badge.style.display = total > 0 ? 'inline' : 'none';
@@ -1235,20 +939,17 @@ async function updateAdminBadge() {
 
 // ─── SETUP ADMIN LISTENERS ───
 function setupAdminListeners() {
-    // Listen for new messages
     db.collection('messages')
         .where('status', '==', 'unread')
         .onSnapshot((snapshot) => {
             snapshot.docChanges().forEach(change => {
                 if (change.type === 'added') {
-                    const data = change.doc.data();
-                    // Update badge
                     updateAdminBadge();
-                    // Play notification sound if available
                     try {
                         const audio = new Audio('data:audio/wav;base64,UklGRnoAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoAAACBhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFg==');
                         audio.play().catch(e => {});
                     } catch(e) {}
+                    const data = change.doc.data();
                     showToast(`📩 New message from ${data.firstName || 'User'}`, 'info');
                 }
             });
@@ -1256,18 +957,17 @@ function setupAdminListeners() {
             console.error('Messages listener error:', error);
         });
 
-    // Listen for new orders
     db.collection('orders')
         .where('status', '==', 'pending')
         .onSnapshot((snapshot) => {
             snapshot.docChanges().forEach(change => {
                 if (change.type === 'added') {
-                    const data = change.doc.data();
                     updateAdminBadge();
                     try {
                         const audio = new Audio('data:audio/wav;base64,UklGRnoAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoAAACBhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFg==');
                         audio.play().catch(e => {});
                     } catch(e) {}
+                    const data = change.doc.data();
                     const customer = data.customer || {};
                     showToast(`📦 New order from ${customer.firstName || 'Guest'} - $${(data.totals?.total || 0).toFixed(2)}`, 'success');
                 }
@@ -1283,11 +983,7 @@ document.addEventListener('DOMContentLoaded', function() {
     startFlashTimer();
     updateCartCount();
     updateWishlistCount();
-    
-    // Check admin status after auth
     setTimeout(checkAdminStatus, 1000);
-    
-    // Listen for auth changes
     document.addEventListener('authChange', function() {
         checkAdminStatus();
     });
@@ -1296,6 +992,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ─── EXPOSE FUNCTIONS ───
 window.checkAdminStatus = checkAdminStatus;
 window.updateAdminBadge = updateAdminBadge;
+window.handleNewsletter = handleNewsletter;
 </script>
 
 </body>

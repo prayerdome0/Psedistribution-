@@ -1,7 +1,7 @@
 // ============================================
 // PILOT SALES DISTRIBUTION - MAIN JAVASCRIPT
 // Premium B2B Wholesale Marketplace v6.0
-// WITH FIREBASE + CLOUDINARY + WHATSAPP
+// WITH FIREBASE + CLOUDINARY + WHATSAPP + LIGHTBOX + CHAT
 // ============================================
 
 // ─── FIREBASE CONFIG ───
@@ -25,6 +25,10 @@ const CLOUDINARY_CONFIG = {
 const WHATSAPP_NUMBER = '+19099384682';
 const STORE_EMAIL = 'Pilot.wholesale@yahoo.com';
 
+// ─── LIGHTBOX STATE ───
+let lightboxImages = [];
+let currentLightboxIndex = 0;
+
 // ─── INITIALIZE FIREBASE ───
 function initFirebase() {
     if (typeof firebase === 'undefined') {
@@ -43,7 +47,6 @@ function initFirebase() {
     window.db = firebase.firestore();
     window.googleProvider = new firebase.auth.GoogleAuthProvider();
     
-    // Enable offline persistence
     window.db.enablePersistence().catch(function(err) {
         if (err.code == 'failed-precondition') {
             console.log('Multiple tabs open, persistence can only be enabled in one tab at a time.');
@@ -149,6 +152,61 @@ function uploadMultipleToCloudinary(files, folder = 'products') {
     });
 }
 
+// ─── GENERATE PRODUCT SLUG ───
+function generateSlug(title) {
+    if (!title) return '';
+    return title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .substring(0, 80);
+}
+
+// ─── GET PRODUCT BY SLUG ───
+async function getProductBySlug(slug) {
+    try {
+        const snapshot = await db.collection('products')
+            .where('slug', '==', slug)
+            .get();
+        
+        if (!snapshot.empty) {
+            return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+        }
+        return null;
+    } catch (error) {
+        console.error('Error getting product by slug:', error);
+        return null;
+    }
+}
+
+// ─── UPDATE PRODUCT SLUGS ───
+async function updateProductSlugs() {
+    try {
+        const snapshot = await db.collection('products').get();
+        const batch = db.batch();
+        let count = 0;
+        
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (!data.slug && data.title) {
+                const slug = generateSlug(data.title);
+                batch.update(doc.ref, { 
+                    slug: slug,
+                    updated_at: new Date().toISOString()
+                });
+                count++;
+            }
+        });
+        
+        if (count > 0) {
+            await batch.commit();
+            console.log(`✅ Updated ${count} products with slugs`);
+        }
+    } catch (error) {
+        console.error('Error updating product slugs:', error);
+    }
+}
+
 // ─── AUTH FUNCTIONS (Firebase) ───
 function signIn(email, password) {
     return new Promise((resolve) => {
@@ -199,6 +257,10 @@ function signUp(email, password, userData = {}) {
                     company: userData.company || '',
                     business_type: userData.businessType || '',
                     phone: userData.phone || '',
+                    whatsapp: userData.whatsapp || '',
+                    store_phone: userData.storePhone || '',
+                    store_email: userData.storeEmail || '',
+                    store_address: userData.storeAddress || '',
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
                     status: 'active'
@@ -361,6 +423,8 @@ function setupAuthListener() {
             localStorage.removeItem('pilot_user');
         }
         updateAuthUI();
+        // Dispatch custom event for admin status updates
+        document.dispatchEvent(new CustomEvent('authChange'));
     });
 }
 
@@ -415,7 +479,8 @@ function fetchProducts() {
                     products.push({ 
                         id: doc.id, 
                         ...data,
-                        image_url: imageUrl
+                        image_url: imageUrl,
+                        slug: data.slug || generateSlug(data.title)
                     });
                 });
                 resolve(products);
@@ -443,7 +508,8 @@ function fetchProductById(id) {
                     resolve({ 
                         id: doc.id, 
                         ...data,
-                        image_url: imageUrl
+                        image_url: imageUrl,
+                        slug: data.slug || generateSlug(data.title)
                     });
                 } else {
                     resolve(null);
@@ -458,13 +524,15 @@ function fetchProductById(id) {
 
 function addProduct(productData) {
     return new Promise((resolve, reject) => {
+        const slug = productData.slug || generateSlug(productData.title);
         db.collection('products').add({
             ...productData,
+            slug: slug,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         })
         .then((docRef) => {
-            resolve({ id: docRef.id, ...productData });
+            resolve({ id: docRef.id, ...productData, slug });
         })
         .catch((error) => {
             console.error('Error adding product:', error);
@@ -475,12 +543,14 @@ function addProduct(productData) {
 
 function updateProduct(id, productData) {
     return new Promise((resolve, reject) => {
+        const slug = productData.slug || generateSlug(productData.title);
         db.collection('products').doc(id).update({
             ...productData,
+            slug: slug,
             updated_at: new Date().toISOString()
         })
         .then(() => {
-            resolve({ id, ...productData });
+            resolve({ id, ...productData, slug });
         })
         .catch((error) => {
             console.error('Error updating product:', error);
@@ -507,7 +577,6 @@ function addToCart(productId, quantity = 1) {
     return new Promise(async (resolve) => {
         const user = getCurrentUser();
         if (!user) {
-            // Guest cart - save to localStorage
             let cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
             const existing = cart.find(item => item.product_id === productId);
             if (existing) {
@@ -523,6 +592,7 @@ function addToCart(productId, quantity = 1) {
                         image: product.image_url,
                         brand: product.brand || 'Pilot Distribution',
                         moq: product.moq || 1,
+                        slug: product.slug || generateSlug(product.title),
                         quantity: quantity
                     });
                 }
@@ -774,7 +844,6 @@ function saveOrder(orderData) {
     return new Promise(async (resolve) => {
         const user = getCurrentUser();
         if (!user) {
-            // Guest order - save to localStorage
             const orders = JSON.parse(localStorage.getItem('pilot_orders') || '[]');
             orders.push({
                 ...orderData,
@@ -844,7 +913,6 @@ function updateOrderStatus(orderId, status) {
 function sendWhatsAppQuote(orderData) {
     const phone = WHATSAPP_NUMBER;
     
-    // Build the message with table format
     let message = '📋 *NEW QUOTE REQUEST - Pilot Sales Distribution*%0A';
     message += `📄 *Quote #:* ${orderData.quoteNumber || 'QTE-' + Date.now().toString().slice(-8)}%0A`;
     message += `📅 *Date:* ${new Date().toLocaleString()}%0A%0A`;
@@ -897,11 +965,93 @@ function sendWhatsAppQuote(orderData) {
     message += `📧 ${STORE_EMAIL}%0A`;
     message += `📞 ${WHATSAPP_NUMBER}`;
     
-    // Open WhatsApp
     const whatsappUrl = `https://wa.me/${phone.replace('+', '')}?text=${message}`;
     window.open(whatsappUrl, '_blank');
     
     return true;
+}
+
+// ─── LIGHTBOX FUNCTIONS ───
+function openLightbox(images, index = 0) {
+    if (!images || images.length === 0) return;
+    
+    lightboxImages = images;
+    currentLightboxIndex = index;
+    
+    let overlay = document.getElementById('lightboxOverlay');
+    if (!overlay) {
+        createLightbox();
+        overlay = document.getElementById('lightboxOverlay');
+    }
+    
+    const image = document.getElementById('lightboxImage');
+    const counter = document.getElementById('lightboxCounter');
+    const dots = document.getElementById('lightboxDots');
+    
+    image.src = images[index];
+    counter.textContent = `${index + 1} / ${images.length}`;
+    
+    dots.innerHTML = images.map((_, i) => `
+        <span class="dot ${i === index ? 'active' : ''}" onclick="event.stopPropagation(); goToLightboxImage(${i})"></span>
+    `).join('');
+    
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    const overlay = document.getElementById('lightboxOverlay');
+    if (overlay) {
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+}
+
+function goToLightboxImage(index) {
+    if (index < 0 || index >= lightboxImages.length) return;
+    currentLightboxIndex = index;
+    
+    const image = document.getElementById('lightboxImage');
+    const counter = document.getElementById('lightboxCounter');
+    const dots = document.querySelectorAll('.lightbox-dots .dot');
+    
+    image.src = lightboxImages[index];
+    counter.textContent = `${index + 1} / ${lightboxImages.length}`;
+    
+    dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+    });
+}
+
+function changeLightboxImage(direction) {
+    const total = lightboxImages.length;
+    const newIndex = (currentLightboxIndex + direction + total) % total;
+    goToLightboxImage(newIndex);
+}
+
+function createLightbox() {
+    const overlay = document.createElement('div');
+    overlay.id = 'lightboxOverlay';
+    overlay.className = 'lightbox-overlay';
+    overlay.onclick = closeLightbox;
+    
+    overlay.innerHTML = `
+        <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+        <img class="lightbox-image" id="lightboxImage" src="" alt="Product Image" onclick="event.stopPropagation()" />
+        <button class="lightbox-nav prev" onclick="event.stopPropagation(); changeLightboxImage(-1)">❮</button>
+        <button class="lightbox-nav next" onclick="event.stopPropagation(); changeLightboxImage(1)">❯</button>
+        <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
+        <div class="lightbox-dots" id="lightboxDots"></div>
+    `;
+    
+    document.body.appendChild(overlay);
+    
+    document.addEventListener('keydown', function(e) {
+        if (!document.getElementById('lightboxOverlay').classList.contains('show')) return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') changeLightboxImage(-1);
+        if (e.key === 'ArrowRight') changeLightboxImage(1);
+    });
 }
 
 // ─── RENDER PRODUCTS ───
@@ -921,6 +1071,7 @@ function renderProducts(products, containerId = 'productGrid') {
 
     grid.innerHTML = products.map(p => {
         const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
+        const slug = p.slug || generateSlug(p.title);
         
         let imageUrl = '';
         if (p.image_url) {
@@ -940,10 +1091,10 @@ function renderProducts(products, containerId = 'productGrid') {
         <div class="product-card animate-on-scroll">
             ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
             ${discount > 0 ? `<span class="product-badge">-${discount}%</span>` : ''}
-            <div class="product-image" onclick="window.location.href='product-detail.html?id=${p.id}'">
+            <div class="product-image" onclick="window.location.href='/product/${slug}'">
                 ${imageHtml}
             </div>
-            <div class="product-title" onclick="window.location.href='product-detail.html?id=${p.id}'">${p.title || 'Product'}</div>
+            <div class="product-title" onclick="window.location.href='/product/${slug}'">${p.title || 'Product'}</div>
             <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
             <div class="product-price">
                 $${(p.price || 0).toFixed(2)}
@@ -971,14 +1122,12 @@ function initBanner() {
     
     if (slides.length === 0) return;
     
-    // Create dots
     if (dotsContainer) {
         dotsContainer.innerHTML = slides.map((_, i) => 
             `<span class="dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></span>`
         ).join('');
     }
     
-    // Start auto-slide
     startAutoSlide();
 }
 
@@ -1037,22 +1186,102 @@ function initScrollAnimations() {
     });
 }
 
+// ─── SEARCH WITH FIREBASE (UNIFIED - USES SLUG URLs) ───
+async function searchProductsFirebase(event) {
+    const input = document.getElementById('searchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    
+    // ─── NULL CHECK - Exit if search elements don't exist on this page ───
+    if (!input || !resultsDiv) {
+        return;
+    }
+    
+    const query = input.value.trim();
+
+    if (event && event.key === 'Enter' && query) {
+        window.location.href = `/products?search=${encodeURIComponent(query)}`;
+        return;
+    }
+
+    if (query.length < 2) {
+        resultsDiv.classList.remove('show');
+        return;
+    }
+
+    try {
+        const snapshot = await db.collection('products')
+            .where('status', 'in', ['active', 'approved'])
+            .limit(5)
+            .get();
+
+        const products = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
+                (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
+                products.push({
+                    id: doc.id,
+                    ...data,
+                    image_url: data.image_url || data.images?.[0] || '',
+                    slug: data.slug || generateSlug(data.title)
+                });
+            }
+        });
+
+        if (products.length === 0) {
+            resultsDiv.innerHTML = `
+                <div style="padding:1rem; text-align:center; color:var(--text-light);">
+                    No products found for "${query}"
+                </div>
+            `;
+            resultsDiv.classList.add('show');
+            return;
+        }
+
+        resultsDiv.innerHTML = products.map(p => `
+            <div class="result-item" onclick="window.location.href='/product/${p.slug}'">
+                <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
+                <div class="info">
+                    <div class="title">${p.title}</div>
+                    <div class="price">$${(p.price || 0).toFixed(2)}</div>
+                </div>
+            </div>
+        `).join('') + `
+            <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
+                <a href="/products?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
+                    See all results for "${query}" →
+                </a>
+            </div>
+        `;
+
+        resultsDiv.classList.add('show');
+
+    } catch (error) {
+        console.error('Search error:', error);
+    }
+}
+
+// ─── CLOSE SEARCH RESULTS ───
+document.addEventListener('click', function(e) {
+    const searchBar = document.getElementById('searchBar');
+    // ─── NULL CHECK - Exit if search bar doesn't exist ───
+    if (!searchBar) return;
+    
+    if (!searchBar.contains(e.target)) {
+        const results = document.getElementById('searchResults');
+        if (results) results.classList.remove('show');
+    }
+});
+
 // ─── INIT ───
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Firebase
     initFirebase();
-    
-    // Initialize banner
+    setTimeout(updateProductSlugs, 2000);
     initBanner();
-    
-    // Initialize scroll animations
     initScrollAnimations();
-    
-    // Update cart and wishlist counts
     loadCartCount();
     loadWishlistCount();
     
-    // Pause banner on hover
     document.querySelector('.banner-slider')?.addEventListener('mouseenter', stopAutoSlide);
     document.querySelector('.banner-slider')?.addEventListener('mouseleave', startAutoSlide);
     
@@ -1076,6 +1305,9 @@ window.protectAdmin = protectAdmin;
 window.protectSeller = protectSeller;
 window.fetchProducts = fetchProducts;
 window.fetchProductById = fetchProductById;
+window.getProductBySlug = getProductBySlug;
+window.generateSlug = generateSlug;
+window.updateProductSlugs = updateProductSlugs;
 window.addProduct = addProduct;
 window.updateProduct = updateProduct;
 window.deleteProduct = deleteProduct;
@@ -1093,7 +1325,12 @@ window.getOrders = getOrders;
 window.updateOrderStatus = updateOrderStatus;
 window.sendWhatsAppQuote = sendWhatsAppQuote;
 window.renderProducts = renderProducts;
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;
+window.goToLightboxImage = goToLightboxImage;
+window.changeLightboxImage = changeLightboxImage;
 window.goToSlide = goToSlide;
 window.nextSlide = nextSlide;
 window.prevSlide = prevSlide;
 window.initScrollAnimations = initScrollAnimations;
+window.searchProductsFirebase = searchProductsFirebase;

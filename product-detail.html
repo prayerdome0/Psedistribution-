@@ -279,6 +279,31 @@
             font-size: 0.95rem;
         }
 
+        /* ─── PRODUCT SPECIFICATIONS ─── */
+        .product-specs {
+            margin: 1.2rem 0;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        .product-specs table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .product-specs td {
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .product-specs tr:last-child td {
+            border-bottom: none;
+        }
+        .product-specs td:first-child {
+            background: var(--light);
+            font-weight: 600;
+            width: 40%;
+        }
+
         /* ─── SHARE BUTTON ─── */
         .share-section {
             display: flex;
@@ -541,6 +566,33 @@
             transform: translateY(-2px);
         }
 
+        /* ─── CHAT WITH SELLER BUTTON ─── */
+        .btn-chat-seller {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #25D366;
+            color: var(--white);
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 0.5rem;
+            width: 100%;
+            justify-content: center;
+        }
+        .btn-chat-seller:hover {
+            background: #1da851;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+        }
+        .btn-chat-seller i {
+            font-size: 1.1rem;
+        }
+
         /* ─── SELLER INFO ─── */
         .seller-info {
             background: var(--light);
@@ -586,6 +638,35 @@
         .seller-info .btn-contact-seller:hover {
             background: var(--primary);
             color: var(--white);
+        }
+
+        /* ─── SELLER CONTACT DETAILS ─── */
+        .seller-contact-details {
+            margin-top: 0.8rem;
+            padding: 0.8rem;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+        .seller-contact-details .contact-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.2rem 0;
+            color: var(--text);
+        }
+        .seller-contact-details .contact-row i {
+            color: var(--primary);
+            width: 20px;
+            text-align: center;
+        }
+        .seller-contact-details .contact-row a {
+            color: var(--primary);
+            font-weight: 500;
+        }
+        .seller-contact-details .contact-row a:hover {
+            text-decoration: underline;
         }
 
         /* ─── RELATED PRODUCTS ─── */
@@ -886,10 +967,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="track-order.html"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="seller-dashboard.html"><i class="fa-regular fa-store"></i> Sell</a>
-            <a href="login.html" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="register.html" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -920,12 +1001,12 @@
                 <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="cart.html" class="icon-btn">
+            <a href="cart" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
             </a>
-            <a href="account.html" class="icon-btn" id="accountBtn">
+            <a href="account" class="icon-btn" id="accountBtn">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
@@ -939,11 +1020,11 @@
 <nav class="nav-categories">
     <div class="container">
         <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products.html" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about.html" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact.html" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center.html" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller.html" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="products" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -956,10 +1037,12 @@
 
         <!-- ─── BREADCRUMB ─── -->
         <div class="breadcrumb">
-            <a href="home">Home</a>
+            <a href="/home">Home</a>
             <span class="separator">/</span>
-            <a href="products.html">Products</a>
+            <a href="/products">Products</a>
             <span class="separator">/</span>
+            <a href="/products?category=" id="breadcrumbCategory" style="display:none;"></a>
+            <span class="separator" id="breadcrumbSeparator" style="display:none;">/</span>
             <span id="breadcrumbProduct">Loading...</span>
         </div>
 
@@ -1005,6 +1088,19 @@
 
                 <div class="product-description" id="productDescription">
                     Loading product description...
+                </div>
+
+                <!-- ─── PRODUCT SPECIFICATIONS ─── -->
+                <div class="product-specs">
+                    <table>
+                        <tbody id="specsBody">
+                            <tr><td>Brand</td><td id="specBrand">Pilot Distribution</td></tr>
+                            <tr><td>Category</td><td id="specCategory">N/A</td></tr>
+                            <tr><td>MOQ</td><td id="specMoq">1 units</td></tr>
+                            <tr><td>Stock</td><td id="specStock">In Stock</td></tr>
+                            <tr><td>Condition</td><td>New</td></tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- ─── SHARE SECTION ─── -->
@@ -1090,8 +1186,26 @@
                         <span><i class="fa-regular fa-clock"></i> Responds in 2 hours</span>
                         <span><i class="fa-regular fa-flag"></i> 98% on-time delivery</span>
                     </div>
-                    <button class="btn-contact-seller" onclick="contactSeller()">
-                        <i class="fa-regular fa-comment"></i> Contact Seller
+
+                    <!-- ─── SELLER CONTACT DETAILS ─── -->
+                    <div class="seller-contact-details" id="sellerContactDetails">
+                        <div class="contact-row">
+                            <i class="fa-regular fa-envelope"></i>
+                            <span>Email: <a href="#" id="sellerContactEmail">seller@example.com</a></span>
+                        </div>
+                        <div class="contact-row">
+                            <i class="fa-brands fa-whatsapp" style="color:#25D366;"></i>
+                            <span>WhatsApp: <a href="#" id="sellerContactWhatsApp" target="_blank">+1 (555) 123-4567</a></span>
+                        </div>
+                        <div class="contact-row">
+                            <i class="fa-regular fa-phone"></i>
+                            <span>Phone: <a href="#" id="sellerContactPhone">+1 (555) 123-4567</a></span>
+                        </div>
+                    </div>
+
+                    <!-- ─── CHAT WITH SELLER BUTTON ─── -->
+                    <button class="btn-chat-seller" onclick="startChatWithSeller()">
+                        <i class="fa-regular fa-comment"></i> Chat with Seller
                     </button>
                 </div>
             </div>
@@ -1132,12 +1246,12 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about.html">About</a>
-                <a href="contact.html">Contact</a>
-                <a href="help-center.html">Help</a>
-                <a href="privacy.html">Privacy Policy</a>
-                <a href="terms.html">Terms &amp; Conditions</a>
-                <a href="become-seller.html">Become a Seller</a>
+                <a href="about">About</a>
+                <a href="contact">Contact</a>
+                <a href="help-center">Help</a>
+                <a href="privacy">Privacy Policy</a>
+                <a href="terms">Terms &amp; Conditions</a>
+                <a href="become-seller">Become a Seller</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -1179,130 +1293,97 @@ let currentProductSlug = '';
 // ─── SET CURRENT YEAR ───
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// ─── SEARCH WITH FIREBASE ───
-async function searchProductsFirebase(event) {
-    const input = document.getElementById('searchInput');
-    const resultsDiv = document.getElementById('searchResults');
-    const query = input.value.trim();
-
-    if (event && event.key === 'Enter' && query) {
-        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
-        return;
+// ─── GET PRODUCT IDENTIFIER ───
+function getProductIdentifier() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    
+    if (!id) {
+        const path = window.location.pathname;
+        const slugMatch = path.match(/\/product\/([^\/]+)/);
+        if (slugMatch) {
+            return { type: 'slug', value: slugMatch[1] };
+        }
     }
+    
+    return { type: 'id', value: id };
+}
 
-    if (query.length < 2) {
-        resultsDiv.classList.remove('show');
-        return;
-    }
-
+// ─── LOAD PRODUCT BY SLUG ───
+async function loadProductBySlug(slug) {
     try {
         const snapshot = await db.collection('products')
-            .where('status', 'in', ['active', 'approved'])
-            .limit(5)
+            .where('slug', '==', slug)
             .get();
-
-        const products = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
-                (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
-                products.push({
-                    id: doc.id,
-                    ...data,
-                    image_url: data.image_url || data.images?.[0] || ''
-                });
-            }
-        });
-
-        if (products.length === 0) {
-            resultsDiv.innerHTML = `
-                <div style="padding:1rem; text-align:center; color:var(--text-light);">
-                    No products found for "${query}"
-                </div>
-            `;
-            resultsDiv.classList.add('show');
-            return;
+        
+        if (!snapshot.empty) {
+            const doc = snapshot.docs[0];
+            return { id: doc.id, ...doc.data() };
         }
-
-        resultsDiv.innerHTML = products.map(p => `
-            <div class="result-item" onclick="window.location.href='product-detail.html?id=${p.id}'">
-                <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
-                <div class="info">
-                    <div class="title">${p.title}</div>
-                    <div class="price">$${(p.price || 0).toFixed(2)}</div>
-                </div>
-            </div>
-        `).join('') + `
-            <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
-                <a href="products.html?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
-                    See all results for "${query}" →
-                </a>
-            </div>
-        `;
-
-        resultsDiv.classList.add('show');
-
+        return null;
     } catch (error) {
-        console.error('Search error:', error);
+        console.error('Error loading product by slug:', error);
+        return null;
     }
 }
 
-// ─── CLOSE SEARCH RESULTS ───
-document.addEventListener('click', function(e) {
-    const searchBar = document.getElementById('searchBar');
-    if (!searchBar.contains(e.target)) {
-        document.getElementById('searchResults').classList.remove('show');
-    }
-});
-
 // ─── LOAD PRODUCT DETAIL ───
 async function loadProductDetail() {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
-
-    if (!id) {
+    const identifier = getProductIdentifier();
+    
+    let product = null;
+    
+    if (identifier.type === 'slug' && identifier.value) {
+        product = await loadProductBySlug(identifier.value);
+        if (!product) {
+            product = await fetchProductById(identifier.value);
+        }
+    } else if (identifier.value) {
+        product = await fetchProductById(identifier.value);
+    }
+    
+    if (!product) {
         showToast('Product not found', 'error');
         window.location.href = 'products.html';
         return;
     }
 
-    try {
-        const product = await fetchProductById(id);
-        if (!product) {
-            showToast('Product not found', 'error');
-            window.location.href = 'products.html';
-            return;
-        }
-
-        currentProduct = product;
-        currentProductId = id;
-        currentProductSlug = product.slug || generateSlug(product.title);
-        
-        productImages = [];
-        if (product.images && product.images.length > 0) {
-            productImages = product.images;
-        } else if (product.image_url) {
-            productImages = [product.image_url];
-        }
-        lightboxImages = productImages;
-
-        renderProduct(product);
-        renderThumbnails();
-        renderBulkPricing(product);
-        loadRelatedProducts(product);
-        updateWishlistStatus(id);
-
-    } catch (error) {
-        console.error('Error loading product:', error);
-        showToast('Failed to load product', 'error');
+    currentProduct = product;
+    currentProductId = product.id;
+    currentProductSlug = product.slug || generateSlug(product.title);
+    
+    productImages = [];
+    if (product.images && product.images.length > 0) {
+        productImages = product.images;
+    } else if (product.image_url) {
+        productImages = [product.image_url];
     }
+    lightboxImages = productImages;
+
+    renderProduct(product);
+    renderThumbnails();
+    renderBulkPricing(product);
+    loadRelatedProducts(product);
+    updateWishlistStatus(product.id);
+    loadSellerContact(product.supplier_id);
 }
 
 // ─── RENDER PRODUCT ───
 function renderProduct(product) {
     document.getElementById('breadcrumbProduct').textContent = product.title || 'Product';
+    
+    // Update breadcrumb with category
+    if (product.category) {
+        const categoryLink = document.getElementById('breadcrumbCategory');
+        const separator = document.getElementById('breadcrumbSeparator');
+        categoryLink.href = `/products?category=${encodeURIComponent(product.category)}`;
+        categoryLink.textContent = product.category.charAt(0).toUpperCase() + product.category.slice(1);
+        categoryLink.style.display = 'inline';
+        separator.style.display = 'inline';
+    }
+    
     document.getElementById('productTitle').textContent = product.title || 'Product';
-    document.getElementById('productBrand').innerHTML = `by <a href="products.html?brand=${encodeURIComponent(product.brand || '')}">${product.brand || 'Pilot Distribution'}</a>`;
+    document.getElementById('productBrand').innerHTML = `by <a href="/products?brand=${encodeURIComponent(product.brand || '')}">${product.brand || 'Pilot Distribution'}</a>`;
 
     const rating = product.rating || 4.0;
     const fullStars = Math.floor(rating);
@@ -1330,7 +1411,15 @@ function renderProduct(product) {
 
     document.getElementById('productDescription').textContent = product.description || 'Premium quality product. Perfect for bulk orders and wholesale buyers.';
 
-    document.getElementById('sellerName').textContent = `🏢 ${product.supplier_name || 'Pilot Sales Distribution'}`;
+    // Update specifications
+    document.getElementById('specBrand').textContent = product.brand || 'Pilot Distribution';
+    document.getElementById('specCategory').textContent = product.category ? product.category.charAt(0).toUpperCase() + product.category.slice(1) : 'N/A';
+    document.getElementById('specMoq').textContent = `${moq} units`;
+    document.getElementById('specStock').textContent = (product.stock && product.stock > 0) ? `${product.stock} units` : 'In Stock';
+
+    // Update seller info
+    const sellerName = product.supplier_name || 'Pilot Sales Distribution';
+    document.getElementById('sellerName').textContent = `🏢 ${sellerName}`;
     document.getElementById('sellerRating').textContent = product.rating || 4.8;
     document.getElementById('sellerReviews').textContent = product.reviews || 1234;
 
@@ -1338,6 +1427,119 @@ function renderProduct(product) {
         const mainImage = document.getElementById('mainImage');
         mainImage.innerHTML = `<img src="${productImages[0]}" alt="${product.title}" />`;
         currentImageIndex = 0;
+    }
+}
+
+// ─── LOAD SELLER CONTACT ───
+async function loadSellerContact(sellerId) {
+    if (!sellerId || sellerId === 'admin') {
+        // Default seller info for admin products
+        document.getElementById('sellerContactEmail').textContent = 'Pilot.wholesale@yahoo.com';
+        document.getElementById('sellerContactEmail').href = 'mailto:Pilot.wholesale@yahoo.com';
+        document.getElementById('sellerContactWhatsApp').textContent = '+1 (909) 938-4682';
+        document.getElementById('sellerContactWhatsApp').href = 'https://wa.me/19099384682';
+        document.getElementById('sellerContactPhone').textContent = '+1 (909) 938-4682';
+        document.getElementById('sellerContactPhone').href = 'tel:+19099384682';
+        return;
+    }
+
+    try {
+        const doc = await db.collection('users').doc(sellerId).get();
+        if (doc.exists) {
+            const data = doc.data();
+            const email = data.email || data.store_email || 'N/A';
+            const whatsapp = data.whatsapp || data.phone || '';
+            const phone = data.store_phone || data.phone || '';
+
+            document.getElementById('sellerContactEmail').textContent = email;
+            document.getElementById('sellerContactEmail').href = `mailto:${email}`;
+            
+            if (whatsapp) {
+                const cleanWhatsApp = whatsapp.replace(/\s/g, '').replace(/[^0-9+]/g, '');
+                document.getElementById('sellerContactWhatsApp').textContent = whatsapp;
+                document.getElementById('sellerContactWhatsApp').href = `https://wa.me/${cleanWhatsApp}`;
+                document.getElementById('sellerContactWhatsApp').style.display = 'inline';
+            } else {
+                document.getElementById('sellerContactWhatsApp').style.display = 'none';
+                document.getElementById('sellerContactWhatsApp').parentElement.style.display = 'none';
+            }
+
+            if (phone) {
+                document.getElementById('sellerContactPhone').textContent = phone;
+                document.getElementById('sellerContactPhone').href = `tel:${phone.replace(/\s/g, '')}`;
+                document.getElementById('sellerContactPhone').style.display = 'inline';
+            } else {
+                document.getElementById('sellerContactPhone').style.display = 'none';
+                document.getElementById('sellerContactPhone').parentElement.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('Error loading seller contact:', error);
+    }
+}
+
+// ─── START CHAT WITH SELLER ───
+async function startChatWithSeller() {
+    if (!currentProduct) {
+        showToast('Product not found', 'error');
+        return;
+    }
+
+    const user = getCurrentUser();
+    if (!user) {
+        showToast('Please login to chat with seller', 'error');
+        setTimeout(() => window.location.href = '/login', 1500);
+        return;
+    }
+
+    const sellerId = currentProduct.supplier_id || 'admin';
+    const sellerName = currentProduct.supplier_name || 'Seller';
+    const productId = currentProduct.id;
+    const productTitle = currentProduct.title;
+
+    // If seller is the current user
+    if (sellerId === user.id) {
+        showToast('You are the seller of this product', 'info');
+        return;
+    }
+
+    // Check if chat already exists
+    try {
+        const snapshot = await db.collection('chats')
+            .where('participants', 'array-contains', user.id)
+            .get();
+
+        let existingChat = null;
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.participants.includes(sellerId) && data.product_id === productId) {
+                existingChat = { id: doc.id, ...data };
+            }
+        });
+
+        if (existingChat) {
+            // Navigate to existing chat
+            window.location.href = `/chat?chatId=${existingChat.id}`;
+        } else {
+            // Create new chat
+            const chatRef = await db.collection('chats').add({
+                participants: [user.id, sellerId],
+                product_id: productId,
+                product_title: productTitle,
+                seller_name: sellerName,
+                buyer_name: user.full_name || 'Customer',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                last_message: 'Chat started about ' + productTitle
+            });
+
+            // Navigate to new chat
+            window.location.href = `/chat?chatId=${chatRef.id}`;
+        }
+
+    } catch (error) {
+        console.error('Error starting chat:', error);
+        showToast('Failed to start chat. Please try again.', 'error');
     }
 }
 
@@ -1404,7 +1606,6 @@ async function copyProductLink() {
             btn.classList.remove('copied');
         }, 3000);
     } catch (err) {
-        // Fallback
         const textarea = document.createElement('textarea');
         textarea.value = url;
         document.body.appendChild(textarea);
@@ -1655,23 +1856,10 @@ function requestQuote() {
     showToast('📤 Quote request sent via WhatsApp!', 'success');
 }
 
-// ─── CONTACT SELLER ───
+// ─── CONTACT SELLER (Legacy) ───
 function contactSeller() {
-    if (!currentProduct) {
-        showToast('Product not found', 'error');
-        return;
-    }
-
-    const product = currentProduct;
-    const message = `👋 *Hello!*%0A%0A` +
-        `I'm interested in your product:%0A` +
-        `*${product.title}*%0A` +
-        `Brand: ${product.brand || 'N/A'}%0A` +
-        `Price: $${(product.price || 0).toFixed(2)}%0A%0A` +
-        `Could you please provide more information?`;
-
-    window.open(`https://wa.me/19099384682?text=${encodeURIComponent(message)}`, '_blank');
-    showToast('📤 Message sent to seller!', 'success');
+    // Use the chat function instead
+    startChatWithSeller();
 }
 
 // ─── LOAD RELATED PRODUCTS ───
@@ -1696,8 +1884,9 @@ async function loadRelatedProducts(product) {
 
         grid.innerHTML = related.map(p => {
             const imageUrl = p.image_url || p.images?.[0] || '';
+            const slug = p.slug || generateSlug(p.title);
             return `
-                <div class="related-card" onclick="window.location.href='product-detail.html?id=${p.id}'">
+                <div class="related-card" onclick="window.location.href='/product/${slug}'">
                     <div class="related-image">
                         ${imageUrl ? `<img src="${imageUrl}" alt="${p.title}" />` : `<span class="placeholder"><i class="fa-solid fa-box"></i></span>`}
                     </div>
@@ -1720,6 +1909,83 @@ async function loadRelatedProducts(product) {
     }
 }
 
+// ─── SEARCH WITH FIREBASE ───
+async function searchProductsFirebase(event) {
+    const input = document.getElementById('searchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    const query = input.value.trim();
+
+    if (event && event.key === 'Enter' && query) {
+        window.location.href = `/products?search=${encodeURIComponent(query)}`;
+        return;
+    }
+
+    if (query.length < 2) {
+        resultsDiv.classList.remove('show');
+        return;
+    }
+
+    try {
+        const snapshot = await db.collection('products')
+            .where('status', 'in', ['active', 'approved'])
+            .limit(5)
+            .get();
+
+        const products = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
+                (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
+                products.push({
+                    id: doc.id,
+                    ...data,
+                    image_url: data.image_url || data.images?.[0] || '',
+                    slug: data.slug || generateSlug(data.title)
+                });
+            }
+        });
+
+        if (products.length === 0) {
+            resultsDiv.innerHTML = `
+                <div style="padding:1rem; text-align:center; color:var(--text-light);">
+                    No products found for "${query}"
+                </div>
+            `;
+            resultsDiv.classList.add('show');
+            return;
+        }
+
+        resultsDiv.innerHTML = products.map(p => `
+            <div class="result-item" onclick="window.location.href='/product/${p.slug}'">
+                <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
+                <div class="info">
+                    <div class="title">${p.title}</div>
+                    <div class="price">$${(p.price || 0).toFixed(2)}</div>
+                </div>
+            </div>
+        `).join('') + `
+            <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
+                <a href="/products?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
+                    See all results for "${query}" →
+                </a>
+            </div>
+        `;
+
+        resultsDiv.classList.add('show');
+
+    } catch (error) {
+        console.error('Search error:', error);
+    }
+}
+
+// ─── CLOSE SEARCH RESULTS ───
+document.addEventListener('click', function(e) {
+    const searchBar = document.getElementById('searchBar');
+    if (!searchBar.contains(e.target)) {
+        document.getElementById('searchResults').classList.remove('show');
+    }
+});
+
 // ─── KEYBOARD NAVIGATION ───
 document.addEventListener('keydown', function(e) {
     if (e.key === 'ArrowLeft') {
@@ -1736,6 +2002,9 @@ window.shareOnTwitter = shareOnTwitter;
 window.shareOnWhatsApp = shareOnWhatsApp;
 window.shareOnLinkedIn = shareOnLinkedIn;
 window.shareByEmail = shareByEmail;
+
+// ─── EXPOSE CHAT FUNCTION ───
+window.startChatWithSeller = startChatWithSeller;
 
 // ─── INIT ───
 document.addEventListener('DOMContentLoaded', function() {
