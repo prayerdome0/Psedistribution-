@@ -41,6 +41,23 @@
             margin: 1.5rem 0;
         }
 
+        .page-header {
+            text-align: center;
+            padding: 2rem 0 0.5rem;
+        }
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--secondary);
+        }
+        .page-header h1 span {
+            color: var(--primary);
+        }
+        .page-header p {
+            color: var(--text-light);
+            font-size: 1.05rem;
+        }
+
         /* ─── FILTERS SIDEBAR ─── */
         .filters-sidebar {
             background: var(--white);
@@ -204,11 +221,6 @@
             opacity: 0.4;
             cursor: not-allowed;
         }
-        .pagination a.disabled:hover {
-            background: var(--white);
-            color: var(--text);
-            border-color: var(--border-dark);
-        }
 
         /* ─── RESPONSIVE ─── */
         @media (max-width: 992px) {
@@ -243,11 +255,17 @@
             .sort-bar select {
                 width: 100%;
             }
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
         }
 
         @media (max-width: 480px) {
             .filters-sidebar {
                 grid-template-columns: 1fr;
+            }
+            .page-header h1 {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -661,6 +679,7 @@ function renderProductsPage(page) {
         return;
     }
 
+    // Use the renderProducts function from main.js with slug support
     renderProducts(pageProducts, 'productGrid');
     updatePagination(page);
     currentPage = page;
@@ -767,7 +786,8 @@ async function searchProductsFirebase(event) {
                 products.push({
                     id: doc.id,
                     ...data,
-                    image_url: data.image_url || data.images?.[0] || ''
+                    image_url: data.image_url || data.images?.[0] || '',
+                    slug: data.slug || generateSlug(data.title)
                 });
             }
         });
@@ -783,7 +803,7 @@ async function searchProductsFirebase(event) {
         }
 
         resultsDiv.innerHTML = products.map(p => `
-            <div class="result-item" onclick="window.location.href='product-detail.html?id=${p.id}'">
+            <div class="result-item" onclick="window.location.href='product/${p.slug || p.id}'">
                 <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
                 <div class="info">
                     <div class="title">${p.title}</div>
@@ -812,6 +832,15 @@ document.addEventListener('click', function(e) {
         document.getElementById('searchResults').classList.remove('show');
     }
 });
+
+// ─── GENERATE SLUG (fallback) ───
+function generateSlug(title) {
+    if (!title) return '';
+    return title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
 
 // ─── INIT ───
 document.addEventListener('DOMContentLoaded', function() {
