@@ -1,9 +1,10 @@
 {
   "rewrites": [
+    { "source": "/", "destination": "/index.html" },
     { "source": "/home", "destination": "/index.html" },
     { "source": "/products", "destination": "/products.html" },
+    { "source": "/products/:path*", "destination": "/products.html" },
     { "source": "/product/:slug", "destination": "/product-detail.html" },
-    { "source": "/product-detail", "destination": "/product-detail.html" },
     { "source": "/cart", "destination": "/cart.html" },
     { "source": "/checkout", "destination": "/checkout.html" },
     { "source": "/login", "destination": "/login.html" },
@@ -20,7 +21,8 @@
     { "source": "/become-seller", "destination": "/become-seller.html" },
     { "source": "/order-success", "destination": "/order-success.html" },
     { "source": "/wishlist", "destination": "/wishlist.html" },
-    { "source": "/chat", "destination": "/chat.html" }
+    { "source": "/chat", "destination": "/chat.html" },
+    { "source": "/chat/:path*", "destination": "/chat.html" }
   ],
   "redirects": [
     { "source": "/index", "destination": "/home", "permanent": true },
