@@ -33,7 +33,6 @@
     <link rel="stylesheet" href="style.css" />
 
     <style>
-        /* ─── CHECKOUT PAGE SPECIFIC STYLES ─── */
         .checkout-page {
             max-width: 1100px;
             margin: 2rem auto;
@@ -60,14 +59,12 @@
             margin-top: 0.3rem;
         }
 
-        /* ─── CHECKOUT LAYOUT ─── */
         .checkout-layout {
             display: grid;
             grid-template-columns: 1fr 380px;
             gap: 2rem;
         }
 
-        /* ─── CHECKOUT FORM ─── */
         .checkout-form {
             background: var(--white);
             border-radius: var(--radius);
@@ -138,7 +135,6 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(26, 123, 107, 0.1);
         }
-
         .checkout-form .form-group textarea {
             resize: vertical;
             min-height: 80px;
@@ -150,56 +146,28 @@
             gap: 1rem;
         }
 
-        /* ─── PAYMENT METHODS ─── */
-        .payment-methods {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.8rem;
+        /* ─── PAYMENT METHOD - WHATSAPP ONLY ─── */
+        .payment-method-single {
+            padding: 1.5rem;
+            background: var(--primary-light);
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--primary);
+            text-align: center;
             margin-top: 0.5rem;
         }
-        .payment-methods .method {
-            padding: 1rem;
-            border: 2px solid var(--border-dark);
-            border-radius: var(--radius-sm);
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            background: var(--white);
-        }
-        .payment-methods .method:hover {
-            border-color: var(--primary-light);
-        }
-        .payment-methods .method.active {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-        .payment-methods .method i {
-            font-size: 1.8rem;
+        .payment-method-single i {
+            font-size: 3rem;
+            color: #25D366;
             display: block;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.5rem;
         }
-        .payment-methods .method .method-name {
-            font-size: 0.75rem;
-            font-weight: 600;
+        .payment-method-single h3 {
+            font-size: 1.1rem;
             color: var(--secondary);
         }
-        .payment-methods .method.whatsapp i {
-            color: #25D366;
-        }
-        .payment-methods .method.bank i {
-            color: #2980b9;
-        }
-        .payment-methods .method.card i {
-            color: #e67e22;
-        }
-
-        /* ─── CARD DETAILS ─── */
-        #cardDetails {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: var(--light);
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
+        .payment-method-single p {
+            color: var(--text-light);
+            font-size: 0.9rem;
         }
 
         /* ─── ORDER SUMMARY SIDEBAR ─── */
@@ -336,7 +304,13 @@
             color: var(--primary);
         }
 
-        /* ─── RESPONSIVE ─── */
+        .order-summary .whatsapp-badge {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #25D366;
+        }
+
         @media (max-width: 992px) {
             .checkout-layout {
                 grid-template-columns: 1fr;
@@ -356,17 +330,11 @@
             .checkout-form .form-row {
                 grid-template-columns: 1fr;
             }
-            .payment-methods {
-                grid-template-columns: 1fr 1fr 1fr;
-            }
         }
 
         @media (max-width: 480px) {
             .checkout-form {
                 padding: 1rem;
-            }
-            .payment-methods {
-                grid-template-columns: 1fr;
             }
             .order-summary .order-item {
                 flex-wrap: wrap;
@@ -377,7 +345,7 @@
 <body>
 
 <!-- ============================================ -->
-<!-- TOP BAR WITH MOVING WORDS -->
+<!-- TOP BAR -->
 <!-- ============================================ -->
 <div class="top-bar">
     <div class="container">
@@ -398,10 +366,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="track-order.html"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="seller-dashboard.html"><i class="fa-regular fa-store"></i> Sell</a>
-            <a href="login.html" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="register.html" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -419,7 +387,6 @@
             </div>
         </a>
 
-        <!-- Search -->
         <div class="search-bar" id="searchBar">
             <input type="text" id="searchInput" placeholder="Search wholesale products..."
                    onkeyup="searchProductsFirebase(event)" autocomplete="off" />
@@ -433,12 +400,12 @@
                 <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="cart.html" class="icon-btn">
+            <a href="cart" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
             </a>
-            <a href="account.html" class="icon-btn" id="accountBtn">
+            <a href="account" class="icon-btn" id="accountBtn">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
@@ -452,11 +419,11 @@
 <nav class="nav-categories">
     <div class="container">
         <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products.html" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about.html" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact.html" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center.html" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller.html" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="products" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -467,16 +434,13 @@
 
     <div class="checkout-page">
 
-        <!-- ─── CHECKOUT HEADER ─── -->
         <div class="checkout-header animate-on-scroll">
             <h1>Secure <span>Checkout</span></h1>
             <p>Complete your wholesale order. We'll send a quote via WhatsApp.</p>
         </div>
 
-        <!-- ─── CHECKOUT LAYOUT ─── -->
         <div class="checkout-layout">
 
-            <!-- ─── CHECKOUT FORM ─── -->
             <div class="checkout-form animate-on-scroll">
 
                 <!-- Shipping Information -->
@@ -486,11 +450,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>First Name <span class="required">*</span></label>
-                            <input type="text" id="firstName" placeholder="John" required />
+                            <input type="text" id="firstName" placeholder="caden" required />
                         </div>
                         <div class="form-group">
                             <label>Last Name <span class="required">*</span></label>
-                            <input type="text" id="lastName" placeholder="Doe" required />
+                            <input type="text" id="lastName" placeholder="gibson" required />
                         </div>
                     </div>
 
@@ -553,43 +517,13 @@
                     </div>
                 </div>
 
-                <!-- Payment Method -->
+                <!-- Payment Method - WhatsApp ONLY -->
                 <div class="form-section">
                     <h2><span class="step">2</span> Payment Method</h2>
-
-                    <div class="payment-methods" id="paymentMethods">
-                        <div class="method whatsapp active" onclick="selectPayment(this)" data-method="whatsapp">
-                            <i class="fa-brands fa-whatsapp"></i>
-                            <span class="method-name">WhatsApp Quote</span>
-                        </div>
-                        <div class="method bank" onclick="selectPayment(this)" data-method="bank">
-                            <i class="fa-regular fa-building-columns"></i>
-                            <span class="method-name">Bank Transfer</span>
-                        </div>
-                        <div class="method card" onclick="selectPayment(this)" data-method="card">
-                            <i class="fa-regular fa-credit-card"></i>
-                            <span class="method-name">Credit Card</span>
-                        </div>
-                    </div>
-
-                    <div id="cardDetails" style="display:none; margin-top:1rem;">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Card Number</label>
-                                <input type="text" placeholder="4242 4242 4242 4242" />
-                            </div>
-                            <div class="form-group">
-                                <label>Expiry Date</label>
-                                <input type="text" placeholder="MM/YY" />
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>CVV</label>
-                            <input type="text" placeholder="123" style="max-width:120px;" />
-                        </div>
-                        <p style="font-size:0.75rem; color:var(--text-light); margin-top:0.5rem;">
-                            <i class="fa-solid fa-lock"></i> Your payment information is secure.
-                        </p>
+                    <div class="payment-method-single">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <h3>WhatsApp Quote</h3>
+                        <p>We'll send you a detailed quote via WhatsApp with order summary.</p>
                     </div>
                 </div>
 
@@ -642,6 +576,10 @@
                     <i class="fa-brands fa-whatsapp"></i> Send Quote via WhatsApp
                 </button>
 
+                <div class="whatsapp-badge">
+                    <i class="fa-regular fa-clock"></i> Response within 24 hours
+                </div>
+
                 <div class="secure-badge">
                     <i class="fa-solid fa-lock"></i> Your information is secure
                 </div>
@@ -660,12 +598,12 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about.html">About</a>
-                <a href="contact.html">Contact</a>
-                <a href="help-center.html">Help</a>
-                <a href="privacy.html">Privacy Policy</a>
-                <a href="terms.html">Terms &amp; Conditions</a>
-                <a href="become-seller.html">Become a Seller</a>
+                <a href="about">About</a>
+                <a href="contact">Contact</a>
+                <a href="help-center">Help</a>
+                <a href="privacy">Privacy Policy</a>
+                <a href="terms">Terms &amp; Conditions</a>
+                <a href="become-seller">Become a Seller</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -695,29 +633,10 @@
 // CHECKOUT PAGE - JAVASCRIPT
 // ============================================
 
-// ─── SET CURRENT YEAR ───
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// ─── STATE ───
-let selectedPayment = 'whatsapp';
 let cartItems = [];
-let couponDiscount = 0;
 
-// ─── SELECT PAYMENT ───
-function selectPayment(el) {
-    document.querySelectorAll('.payment-methods .method').forEach(m => m.classList.remove('active'));
-    el.classList.add('active');
-    selectedPayment = el.dataset.method;
-
-    const cardDetails = document.getElementById('cardDetails');
-    if (selectedPayment === 'card') {
-        cardDetails.style.display = 'block';
-    } else {
-        cardDetails.style.display = 'none';
-    }
-}
-
-// ─── LOAD CHECKOUT ───
 async function loadCheckout() {
     const container = document.getElementById('orderItems');
     const user = getCurrentUser();
@@ -753,7 +672,7 @@ async function loadCheckout() {
                 <div style="text-align:center; padding:1rem 0; color:var(--text-light);">
                     <i class="fa-regular fa-cart-shopping" style="font-size:2rem;"></i>
                     <p style="margin-top:0.5rem;">Your cart is empty</p>
-                    <a href="products.html" style="color:var(--primary); font-size:0.85rem;">Browse products</a>
+                    <a href="products" style="color:var(--primary); font-size:0.85rem;">Browse products</a>
                 </div>
             `;
             document.getElementById('placeOrderBtn').disabled = true;
@@ -793,7 +712,6 @@ async function loadCheckout() {
     }
 }
 
-// ─── UPDATE CHECKOUT SUMMARY ───
 function updateCheckoutSummary(items) {
     let subtotal = 0;
     let discount = 0;
@@ -807,7 +725,6 @@ function updateCheckoutSummary(items) {
         }
     });
 
-    // Check for coupon from cart
     if (localStorage.getItem('pilot_coupon') === 'applied') {
         discount += subtotal * 0.10;
     }
@@ -823,9 +740,7 @@ function updateCheckoutSummary(items) {
     document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
 }
 
-// ─── PLACE ORDER ───
 async function placeOrder() {
-    // Get form data
     const firstName = document.getElementById('firstName').value.trim();
     const lastName = document.getElementById('lastName').value.trim();
     const email = document.getElementById('email').value.trim();
@@ -837,23 +752,14 @@ async function placeOrder() {
     const country = document.getElementById('country').value;
     const notes = document.getElementById('notes').value.trim();
 
-    // Validate
     if (!firstName || !lastName || !email || !phone || !address || !city || !state || !zip) {
         showToast('Please fill in all required fields', 'error');
         return;
     }
 
-    // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         showToast('Please enter a valid email address', 'error');
-        return;
-    }
-
-    // Validate phone (basic)
-    const phoneRegex = /^[\d\s\-+()]{10,}$/;
-    if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
-        showToast('Please enter a valid phone number', 'error');
         return;
     }
 
@@ -862,7 +768,6 @@ async function placeOrder() {
         return;
     }
 
-    // Calculate totals
     let subtotal = 0;
     let discount = 0;
     cartItems.forEach(item => {
@@ -874,7 +779,6 @@ async function placeOrder() {
         }
     });
 
-    // Check for coupon
     if (localStorage.getItem('pilot_coupon') === 'applied') {
         discount += subtotal * 0.10;
     }
@@ -883,10 +787,8 @@ async function placeOrder() {
     const tax = (subtotal - discount) * 0.08;
     const total = subtotal - discount + shipping + tax;
 
-    // Generate quote number
     const quoteNumber = 'QTE-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 5).toUpperCase();
 
-    // Build order data
     const orderData = {
         quoteNumber: quoteNumber,
         date: new Date().toISOString(),
@@ -917,18 +819,16 @@ async function placeOrder() {
             tax: tax,
             total: total
         },
-        paymentMethod: selectedPayment,
+        paymentMethod: 'whatsapp',
         notes: notes,
         status: 'pending'
     };
 
-    // Disable button
     const btn = document.getElementById('placeOrderBtn');
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
 
     try {
-        // Save to Firebase
         const user = getCurrentUser();
         if (user) {
             await db.collection('orders').add({
@@ -939,29 +839,25 @@ async function placeOrder() {
                 updated_at: new Date().toISOString()
             });
         } else {
-            // Guest order - save to localStorage
             const orders = JSON.parse(localStorage.getItem('pilot_orders') || '[]');
             orders.push(orderData);
             localStorage.setItem('pilot_orders', JSON.stringify(orders));
         }
 
-        // ─── SEND WHATSAPP QUOTE WITH DETAILED ITEMS ───
-        sendDetailedWhatsAppQuote(orderData);
+        sendWhatsAppQuote(orderData);
 
-        // Clear cart
         if (user) {
             await clearCart();
         } else {
             localStorage.setItem('pilot_cart', '[]');
             localStorage.removeItem('pilot_coupon');
         }
-        updateCartCount();
+        loadCartCount();
 
         showToast('✅ Quote sent successfully! We\'ll confirm shortly.', 'success');
 
-        // Redirect to success page
         setTimeout(() => {
-            window.location.href = `order-success.html?quote=${quoteNumber}`;
+            window.location.href = `order-success?quote=${quoteNumber}`;
         }, 2000);
 
     } catch (error) {
@@ -972,67 +868,6 @@ async function placeOrder() {
     }
 }
 
-// ─── SEND DETAILED WHATSAPP QUOTE ───
-function sendDetailedWhatsAppQuote(orderData) {
-    const phone = '+19099384682';
-    
-    // Build the message
-    let message = '📋 *NEW QUOTE REQUEST - Pilot Sales Distribution*%0A';
-    message += `📄 *Quote #:* ${orderData.quoteNumber}%0A`;
-    message += `📅 *Date:* ${new Date().toLocaleString()}%0A%0A`;
-    
-    message += '*👤 Customer Details*%0A';
-    message += `Name: ${orderData.customer.firstName} ${orderData.customer.lastName}%0A`;
-    message += `Email: ${orderData.customer.email}%0A`;
-    message += `Phone: ${orderData.customer.phone}%0A`;
-    message += `Address: ${orderData.customer.address}, ${orderData.customer.city}, ${orderData.customer.state} ${orderData.customer.zip}%0A`;
-    if (orderData.notes) {
-        message += `Notes: ${orderData.notes}%0A`;
-    }
-    message += `%0A`;
-    
-    message += '*📦 Items Requested*%0A';
-    message += `┌─────────────────────────────────────┐%0A`;
-    message += `│ # │ Item           │ Qty │  Price  │%0A`;
-    message += `├─────────────────────────────────────┤%0A`;
-    
-    orderData.items.forEach((item, index) => {
-        const num = (index + 1).toString().padStart(2);
-        const title = item.title.substring(0, 14).padEnd(14);
-        const qty = item.quantity.toString().padStart(3);
-        const price = `$${item.price.toFixed(2)}`.padStart(7);
-        message += `│ ${num} │ ${title} │ ${qty} │ ${price} │%0A`;
-    });
-    
-    message += `└─────────────────────────────────────┘%0A%0A`;
-    
-    message += '*💰 Quote Summary*%0A';
-    message += `Subtotal: $${orderData.totals.subtotal.toFixed(2)}%0A`;
-    if (orderData.totals.discount > 0) {
-        message += `Discount: -$${orderData.totals.discount.toFixed(2)}%0A`;
-    }
-    message += `Shipping: ${orderData.totals.shipping === 0 ? 'FREE' : '$' + orderData.totals.shipping.toFixed(2)}%0A`;
-    message += `Tax (8%): $${orderData.totals.tax.toFixed(2)}%0A`;
-    message += `*TOTAL: $${orderData.totals.total.toFixed(2)}*%0A%0A`;
-    
-    message += `📌 *Payment Method:* ${orderData.paymentMethod.toUpperCase()}%0A%0A`;
-    message += `✅ *Next Steps:*%0A`;
-    message += `1. We will review your quote request%0A`;
-    message += `2. Confirm availability and pricing%0A`;
-    message += `3. Send you a formal invoice%0A`;
-    message += `4. Arrange delivery%0A%0A`;
-    
-    message += `🙏 *Thank you for choosing Pilot Sales Distribution!*%0A`;
-    message += `📧 Pilot.wholesale@yahoo.com%0A`;
-    message += `📞 +1 (909) 938-4682`;
-    
-    // Open WhatsApp
-    const whatsappUrl = `https://wa.me/${phone.replace('+', '')}?text=${message}`;
-    window.open(whatsappUrl, '_blank');
-    
-    return true;
-}
-
 // ─── SEARCH WITH FIREBASE ───
 async function searchProductsFirebase(event) {
     const input = document.getElementById('searchInput');
@@ -1040,7 +875,7 @@ async function searchProductsFirebase(event) {
     const query = input.value.trim();
 
     if (event && event.key === 'Enter' && query) {
-        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+        window.location.href = `products?search=${encodeURIComponent(query)}`;
         return;
     }
 
@@ -1063,7 +898,8 @@ async function searchProductsFirebase(event) {
                 products.push({
                     id: doc.id,
                     ...data,
-                    image_url: data.image_url || data.images?.[0] || ''
+                    image_url: data.image_url || data.images?.[0] || '',
+                    slug: data.slug || generateSlug(data.title)
                 });
             }
         });
@@ -1079,7 +915,7 @@ async function searchProductsFirebase(event) {
         }
 
         resultsDiv.innerHTML = products.map(p => `
-            <div class="result-item" onclick="window.location.href='product-detail.html?id=${p.id}'">
+            <div class="result-item" onclick="window.location.href='/product/${p.slug}'">
                 <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
                 <div class="info">
                     <div class="title">${p.title}</div>
@@ -1088,7 +924,7 @@ async function searchProductsFirebase(event) {
             </div>
         `).join('') + `
             <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
-                <a href="products.html?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
+                <a href="products?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
                     See all results for "${query}" →
                 </a>
             </div>
@@ -1115,6 +951,11 @@ document.addEventListener('DOMContentLoaded', function() {
     loadCartCount();
     loadWishlistCount();
 });
+
+// ─── EXPOSE FUNCTIONS ───
+window.loadCheckout = loadCheckout;
+window.placeOrder = placeOrder;
+window.searchProductsFirebase = searchProductsFirebase;
 </script>
 
 </body>

@@ -29,6 +29,10 @@ const STORE_EMAIL = 'Pilot.wholesale@yahoo.com';
 let lightboxImages = [];
 let currentLightboxIndex = 0;
 
+// ─── BANNER SLIDER STATE ───
+let currentSlide = 0;
+let slideInterval = null;
+
 // ─── INITIALIZE FIREBASE ───
 function initFirebase() {
     if (typeof firebase === 'undefined') {
@@ -77,7 +81,7 @@ function showToast(message, type = 'info') {
 }
 
 // ─── CLOUDINARY UPLOAD ───
-function uploadToCloudinary(file, folder = 'products') {
+function uploadToCloudinary(file, folder = 'PSE-products') {
     return new Promise((resolve, reject) => {
         const formData = new FormData();
         formData.append('file', file);
@@ -121,7 +125,7 @@ function uploadToCloudinary(file, folder = 'products') {
     });
 }
 
-function uploadMultipleToCloudinary(files, folder = 'products') {
+function uploadMultipleToCloudinary(files, folder = 'PSE-products') {
     return new Promise(async (resolve) => {
         const results = [];
         let uploadedCount = 0;
@@ -423,7 +427,6 @@ function setupAuthListener() {
             localStorage.removeItem('pilot_user');
         }
         updateAuthUI();
-        // Dispatch custom event for admin status updates
         document.dispatchEvent(new CustomEvent('authChange'));
     });
 }
@@ -433,12 +436,12 @@ function protectAdmin() {
     const user = getCurrentUser();
     if (!user) {
         showToast('Please login as admin', 'error');
-        setTimeout(() => window.location.href = 'login.html', 1500);
+        setTimeout(() => window.location.href = 'login', 1500);
         return false;
     }
     if (user.role !== 'admin') {
         showToast('Admin access required', 'error');
-        setTimeout(() => window.location.href = 'index.html', 1500);
+        setTimeout(() => window.location.href = 'home', 1500);
         return false;
     }
     return true;
@@ -448,12 +451,12 @@ function protectSeller() {
     const user = getCurrentUser();
     if (!user) {
         showToast('Please login as seller', 'error');
-        setTimeout(() => window.location.href = 'login.html', 1500);
+        setTimeout(() => window.location.href = 'login', 1500);
         return false;
     }
     if (user.role !== 'seller' && user.role !== 'admin') {
         showToast('Seller access required', 'error');
-        setTimeout(() => window.location.href = 'index.html', 1500);
+        setTimeout(() => window.location.href = 'home', 1500);
         return false;
     }
     return true;
@@ -676,6 +679,11 @@ function loadCartCount() {
     });
 }
 
+// Alias for backward compatibility
+function updateCartCount() {
+    return loadCartCount();
+}
+
 function getCartItems() {
     return new Promise(async (resolve) => {
         const user = getCurrentUser();
@@ -753,7 +761,7 @@ function toggleWishlist(productId) {
         const user = getCurrentUser();
         if (!user) {
             showToast('Please login first', 'error');
-            setTimeout(() => window.location.href = 'login.html', 1500);
+            setTimeout(() => window.location.href = 'login', 1500);
             resolve({ success: false });
             return;
         }
@@ -909,63 +917,66 @@ function updateOrderStatus(orderId, status) {
     });
 }
 
-// ─── SEND DETAILED WHATSAPP QUOTE ───
+// ─── SEND WHATSAPP QUOTE WITH TABLE FORMAT ───
 function sendWhatsAppQuote(orderData) {
     const phone = WHATSAPP_NUMBER;
     
-    let message = '📋 *NEW QUOTE REQUEST - Pilot Sales Distribution*%0A';
-    message += `📄 *Quote #:* ${orderData.quoteNumber || 'QTE-' + Date.now().toString().slice(-8)}%0A`;
-    message += `📅 *Date:* ${new Date().toLocaleString()}%0A%0A`;
-    
-    message += '*👤 Customer Details*%0A';
-    message += `Name: ${orderData.customer.firstName} ${orderData.customer.lastName}%0A`;
-    message += `Email: ${orderData.customer.email}%0A`;
-    message += `Phone: ${orderData.customer.phone || 'Not provided'}%0A`;
-    if (orderData.customer.company) {
-        message += `Company: ${orderData.customer.company}%0A`;
-    }
-    message += `Address: ${orderData.customer.address || 'N/A'}%0A%0A`;
-    
-    message += '*📦 Items Requested*%0A';
-    message += `┌─────────────────────────────────────┐%0A`;
-    message += `│ # │ Item           │ Qty │  Price  │%0A`;
-    message += `├─────────────────────────────────────┤%0A`;
-    
+    // Format items in table style
+    let itemsTable = '';
     orderData.items.forEach((item, index) => {
         const num = (index + 1).toString().padStart(2);
-        const title = (item.title || 'Product').substring(0, 14).padEnd(14);
-        const qty = (item.quantity || 1).toString().padStart(3);
-        const price = `$${((item.price || 0)).toFixed(2)}`.padStart(7);
-        message += `│ ${num} │ ${title} │ ${qty} │ ${price} │%0A`;
+        const qty = (item.quantity || 1).toString();
+        const title = item.title || 'Product';
+        const price = `$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}`;
+        itemsTable += `│ ${num} │ ${qty.padStart(3)} │ ${title.substring(0, 25).padEnd(25)} │ ${price.padStart(10)} │\n`;
     });
+
+    let message = '📋 *QUOTE REQUEST - Pilot Sales Distribution*\n';
+    message += `📄 *Quote #:* ${orderData.quoteNumber || 'QTE-' + Date.now().toString().slice(-8)}\n`;
+    message += `📅 *Date:* ${new Date().toLocaleString()}\n`;
+    message += '━'.repeat(50) + '\n\n';
     
-    message += `└─────────────────────────────────────┘%0A%0A`;
-    
-    message += '*💰 Quote Summary*%0A';
-    message += `Subtotal: $${(orderData.totals.subtotal || 0).toFixed(2)}%0A`;
-    if (orderData.totals.discount > 0) {
-        message += `Discount: -$${orderData.totals.discount.toFixed(2)}%0A`;
+    message += '*👤 Customer Details*\n';
+    message += `Name: ${orderData.customer.firstName} ${orderData.customer.lastName}\n`;
+    message += `Email: ${orderData.customer.email}\n`;
+    message += `Phone: ${orderData.customer.phone || 'Not provided'}\n`;
+    if (orderData.customer.company) {
+        message += `Company: ${orderData.customer.company}\n`;
     }
-    message += `Shipping: ${orderData.totals.shipping === 0 ? 'FREE' : '$' + orderData.totals.shipping.toFixed(2)}%0A`;
-    message += `Tax (8%): $${(orderData.totals.tax || 0).toFixed(2)}%0A`;
-    message += `*TOTAL: $${(orderData.totals.total || 0).toFixed(2)}*%0A%0A`;
+    message += `Address: ${orderData.customer.address || 'N/A'}\n\n`;
+    
+    message += '*📦 Order Items*\n';
+    message += '┌────┬─────────┬───────────────────────────┬────────────┐\n';
+    message += '│ #  │ Qty     │ Product Name              │ Amount     │\n';
+    message += '├────┼─────────┼───────────────────────────┼────────────┤\n';
+    message += itemsTable;
+    message += '└────┴─────────┴───────────────────────────┴────────────┘\n\n';
+    
+    message += '*💰 Summary*\n';
+    message += `Subtotal: $${(orderData.totals.subtotal || 0).toFixed(2)}\n`;
+    if (orderData.totals.discount > 0) {
+        message += `Discount: -$${orderData.totals.discount.toFixed(2)}\n`;
+    }
+    message += `Shipping: ${orderData.totals.shipping === 0 ? 'FREE' : '$' + orderData.totals.shipping.toFixed(2)}\n`;
+    message += `Tax (8%): $${(orderData.totals.tax || 0).toFixed(2)}\n`;
+    message += `*TOTAL: $${(orderData.totals.total || 0).toFixed(2)}*\n\n`;
     
     if (orderData.notes) {
-        message += `📝 *Notes:* ${orderData.notes}%0A%0A`;
+        message += `📝 *Notes:* ${orderData.notes}\n\n`;
     }
     
-    message += `📌 *Payment Method:* ${orderData.paymentMethod || 'To be confirmed'}%0A%0A`;
-    message += `✅ *Next Steps:*%0A`;
-    message += `1. We will review your quote request%0A`;
-    message += `2. Confirm availability and pricing%0A`;
-    message += `3. Send you a formal invoice%0A`;
-    message += `4. Arrange delivery%0A%0A`;
+    message += `📌 *Payment Method:* WhatsApp Quote\n\n`;
+    message += `✅ *Next Steps:*\n`;
+    message += `1. We will review your quote request\n`;
+    message += `2. Confirm availability and pricing\n`;
+    message += `3. Send you a formal invoice\n`;
+    message += `4. Arrange delivery\n\n`;
     
-    message += `🙏 *Thank you for choosing Pilot Sales Distribution!*%0A`;
-    message += `📧 ${STORE_EMAIL}%0A`;
+    message += `🙏 *Thank you for choosing Pilot Sales Distribution!*\n`;
+    message += `📧 ${STORE_EMAIL}\n`;
     message += `📞 ${WHATSAPP_NUMBER}`;
     
-    const whatsappUrl = `https://wa.me/${phone.replace('+', '')}?text=${message}`;
+    const whatsappUrl = `https://wa.me/${phone.replace('+', '')}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
     
     return true;
@@ -1038,8 +1049,6 @@ function createLightbox() {
     overlay.innerHTML = `
         <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
         <img class="lightbox-image" id="lightboxImage" src="" alt="Product Image" onclick="event.stopPropagation()" />
-        <button class="lightbox-nav prev" onclick="event.stopPropagation(); changeLightboxImage(-1)">❮</button>
-        <button class="lightbox-nav next" onclick="event.stopPropagation(); changeLightboxImage(1)">❯</button>
         <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
         <div class="lightbox-dots" id="lightboxDots"></div>
     `;
@@ -1113,27 +1122,40 @@ function renderProducts(products, containerId = 'productGrid') {
 }
 
 // ─── BANNER SLIDER ───
-let currentSlide = 0;
-let slideInterval;
-
 function initBanner() {
-    const slides = document.querySelectorAll('.banner-slider .slide');
+    const slider = document.querySelector('.banner-slider');
+    if (!slider) return;
+    
+    const slides = slider.querySelectorAll('.slide');
     const dotsContainer = document.getElementById('bannerDots');
     
-    if (slides.length === 0) return;
+    if (!slides || slides.length === 0) return;
+    
+    // Convert slides to array for map
+    const slidesArray = Array.from(slides);
     
     if (dotsContainer) {
-        dotsContainer.innerHTML = slides.map((_, i) => 
+        dotsContainer.innerHTML = slidesArray.map((_, i) => 
             `<span class="dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></span>`
         ).join('');
     }
+    
+    // Show first slide
+    slidesArray.forEach((slide, i) => {
+        slide.classList.toggle('active', i === 0);
+    });
     
     startAutoSlide();
 }
 
 function goToSlide(index) {
-    const slides = document.querySelectorAll('.banner-slider .slide');
+    const slider = document.querySelector('.banner-slider');
+    if (!slider) return;
+    
+    const slides = slider.querySelectorAll('.slide');
     const dots = document.querySelectorAll('.dot');
+    
+    if (!slides || slides.length === 0) return;
     
     slides.forEach((slide, i) => {
         slide.classList.toggle('active', i === index);
@@ -1145,13 +1167,23 @@ function goToSlide(index) {
 }
 
 function nextSlide() {
-    const slides = document.querySelectorAll('.banner-slider .slide');
+    const slider = document.querySelector('.banner-slider');
+    if (!slider) return;
+    
+    const slides = slider.querySelectorAll('.slide');
+    if (!slides || slides.length === 0) return;
+    
     const next = (currentSlide + 1) % slides.length;
     goToSlide(next);
 }
 
 function prevSlide() {
-    const slides = document.querySelectorAll('.banner-slider .slide');
+    const slider = document.querySelector('.banner-slider');
+    if (!slider) return;
+    
+    const slides = slider.querySelectorAll('.slide');
+    if (!slides || slides.length === 0) return;
+    
     const prev = (currentSlide - 1 + slides.length) % slides.length;
     goToSlide(prev);
 }
@@ -1186,12 +1218,11 @@ function initScrollAnimations() {
     });
 }
 
-// ─── SEARCH WITH FIREBASE (UNIFIED - USES SLUG URLs) ───
+// ─── SEARCH WITH FIREBASE ───
 async function searchProductsFirebase(event) {
     const input = document.getElementById('searchInput');
     const resultsDiv = document.getElementById('searchResults');
     
-    // ─── NULL CHECK - Exit if search elements don't exist on this page ───
     if (!input || !resultsDiv) {
         return;
     }
@@ -1261,10 +1292,120 @@ async function searchProductsFirebase(event) {
     }
 }
 
+// ─── GET REAL STATS FROM FIREBASE ───
+async function getRealStats() {
+    try {
+        // Get product count
+        const prodSnapshot = await db.collection('products')
+            .where('status', 'in', ['active', 'approved'])
+            .get();
+        const productCount = prodSnapshot.size;
+
+        // Get supplier count
+        const sellerSnapshot = await db.collection('users')
+            .where('role', '==', 'seller')
+            .where('status', '==', 'approved')
+            .get();
+        const supplierCount = sellerSnapshot.size;
+
+        // Get total orders
+        const orderSnapshot = await db.collection('orders').get();
+        const orderCount = orderSnapshot.size;
+
+        // Calculate satisfaction rate (if reviews exist)
+        let satisfactionRate = '99.7%';
+        try {
+            const reviewsSnapshot = await db.collection('reviews').get();
+            let totalReviews = 0;
+            let positiveReviews = 0;
+            reviewsSnapshot.forEach(doc => {
+                const data = doc.data();
+                totalReviews++;
+                if (data.rating && data.rating >= 4) {
+                    positiveReviews++;
+                }
+            });
+            if (totalReviews > 0) {
+                satisfactionRate = Math.round((positiveReviews / totalReviews) * 100) + '%';
+            }
+        } catch (e) {
+            console.log('No reviews found, using default');
+        }
+
+        return {
+            products: productCount,
+            suppliers: supplierCount,
+            orders: orderCount,
+            satisfaction: satisfactionRate
+        };
+    } catch (error) {
+        console.error('Error getting stats:', error);
+        return {
+            products: 0,
+            suppliers: 0,
+            orders: 0,
+            satisfaction: '99.7%'
+        };
+    }
+}
+
+// ─── SAVE NEWSLETTER TO FIREBASE ───
+async function saveNewsletter(email) {
+    try {
+        await db.collection('newsletter').add({
+            email: email,
+            subscribed_at: new Date().toISOString(),
+            status: 'active'
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error saving newsletter:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// ─── SAVE TESTIMONIAL TO FIREBASE ───
+async function saveTestimonial(data) {
+    try {
+        await db.collection('testimonials').add({
+            name: data.name || 'Anonymous',
+            company: data.company || '',
+            message: data.message,
+            rating: data.rating || 5,
+            approved: false, // Admin needs to approve
+            created_at: new Date().toISOString(),
+            user_id: data.userId || null
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error saving testimonial:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// ─── LOAD APPROVED TESTIMONIALS ───
+async function loadTestimonials() {
+    try {
+        const snapshot = await db.collection('testimonials')
+            .where('approved', '==', true)
+            .orderBy('created_at', 'desc')
+            .limit(6)
+            .get();
+
+        const testimonials = [];
+        snapshot.forEach(doc => {
+            testimonials.push({ id: doc.id, ...doc.data() });
+        });
+        return testimonials;
+    } catch (error) {
+        console.error('Error loading testimonials:', error);
+        return [];
+    }
+}
+
 // ─── CLOSE SEARCH RESULTS ───
 document.addEventListener('click', function(e) {
     const searchBar = document.getElementById('searchBar');
-    // ─── NULL CHECK - Exit if search bar doesn't exist ───
     if (!searchBar) return;
     
     if (!searchBar.contains(e.target)) {
@@ -1282,8 +1423,11 @@ document.addEventListener('DOMContentLoaded', function() {
     loadCartCount();
     loadWishlistCount();
     
-    document.querySelector('.banner-slider')?.addEventListener('mouseenter', stopAutoSlide);
-    document.querySelector('.banner-slider')?.addEventListener('mouseleave', startAutoSlide);
+    const slider = document.querySelector('.banner-slider');
+    if (slider) {
+        slider.addEventListener('mouseenter', stopAutoSlide);
+        slider.addEventListener('mouseleave', startAutoSlide);
+    }
     
     console.log('✅ Pilot Sales Distribution v6.0 initialized!');
 });
@@ -1313,6 +1457,7 @@ window.updateProduct = updateProduct;
 window.deleteProduct = deleteProduct;
 window.addToCart = addToCart;
 window.loadCartCount = loadCartCount;
+window.updateCartCount = updateCartCount;
 window.getCartItems = getCartItems;
 window.updateCartItem = updateCartItem;
 window.removeCartItem = removeCartItem;
@@ -1334,3 +1479,10 @@ window.nextSlide = nextSlide;
 window.prevSlide = prevSlide;
 window.initScrollAnimations = initScrollAnimations;
 window.searchProductsFirebase = searchProductsFirebase;
+window.getRealStats = getRealStats;
+window.saveNewsletter = saveNewsletter;
+window.saveTestimonial = saveTestimonial;
+window.loadTestimonials = loadTestimonials;
+window.initBanner = initBanner;
+window.startAutoSlide = startAutoSlide;
+window.stopAutoSlide = stopAutoSlide;

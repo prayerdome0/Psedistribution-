@@ -59,6 +59,101 @@
             margin-top: 0.2rem;
         }
 
+        /* ─── TESTIMONIAL FORM ─── */
+        .testimonial-form-section {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2rem;
+            border: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+        .testimonial-form-section h3 {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            margin-bottom: 0.3rem;
+        }
+        .testimonial-form-section p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        .testimonial-form-section .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .testimonial-form-section .form-group {
+            margin-bottom: 1rem;
+        }
+        .testimonial-form-section .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 0.3rem;
+        }
+        .testimonial-form-section .form-group input,
+        .testimonial-form-section .form-group textarea,
+        .testimonial-form-section .form-group select {
+            width: 100%;
+            padding: 0.7rem 0.8rem;
+            border: 1px solid var(--border-dark);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .testimonial-form-section .form-group input:focus,
+        .testimonial-form-section .form-group textarea:focus,
+        .testimonial-form-section .form-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 123, 107, 0.1);
+        }
+        .testimonial-form-section .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .testimonial-form-section .btn-submit-testimonial {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .testimonial-form-section .btn-submit-testimonial:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(26, 123, 107, 0.3);
+        }
+        .testimonial-form-section .btn-submit-testimonial:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .testimonial-form-section .rating-stars {
+            display: flex;
+            gap: 0.3rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .testimonial-form-section .rating-stars .star {
+            color: #dce3e9;
+            transition: var(--transition);
+        }
+        .testimonial-form-section .rating-stars .star.active {
+            color: #f1c40f;
+        }
+        .testimonial-form-section .rating-stars .star:hover {
+            transform: scale(1.1);
+        }
+
         /* ─── WHY CHOOSE US ─── */
         .why-section {
             margin: 3rem 0;
@@ -124,7 +219,9 @@
             font-size: 2.2rem;
             margin-bottom: 0.5rem;
         }
-        .quote-section h2 span { color: var(--accent); }
+        .quote-section h2 span {
+            color: var(--accent);
+        }
         .quote-section p {
             font-size: 1.1rem;
             opacity: 0.9;
@@ -150,8 +247,8 @@
             box-shadow: 0 8px 30px rgba(255,255,255,0.3);
         }
 
-        /* ─── TESTIMONIALS ─── */
-        .testimonials-section {
+        /* ─── TESTIMONIALS DISPLAY ─── */
+        .testimonials-display {
             margin: 3rem 0;
             padding: 4rem 2rem;
             background: linear-gradient(135deg, rgba(11, 42, 59, 0.92), rgba(26, 75, 94, 0.92)),
@@ -161,10 +258,13 @@
             border-radius: var(--radius);
             color: var(--white);
         }
-        .testimonials-section .section-title {
+        .testimonials-display .section-title {
             color: var(--white);
         }
-        .testimonials-section .section-title span { color: var(--accent); }
+        .testimonials-display .section-title span {
+            color: var(--accent);
+        }
+
         .testimonial-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -196,6 +296,109 @@
             opacity: 0.7;
         }
 
+        /* ─── TRUSTED COMPANIES LOGOS ─── */
+        .trusted-section {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 3rem 1.5rem;
+            margin: 3rem 0;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .trusted-section .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .trusted-section .section-title h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--secondary);
+        }
+        .trusted-section .section-title h2 span {
+            color: var(--primary);
+        }
+        .trusted-section .section-title p {
+            color: var(--text-light);
+            font-size: 1rem;
+            margin-top: 0.3rem;
+        }
+
+        .logo-carousel {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            padding: 1.5rem 0;
+        }
+        .logo-carousel::before,
+        .logo-carousel::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 80px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .logo-carousel::before {
+            left: 0;
+            background: linear-gradient(to right, var(--white), transparent);
+        }
+        .logo-carousel::after {
+            right: 0;
+            background: linear-gradient(to left, var(--white), transparent);
+        }
+
+        .logo-track {
+            display: flex;
+            animation: scrollLogos 35s linear infinite;
+            width: max-content;
+            gap: 2.5rem;
+            align-items: center;
+        }
+        .logo-track:hover {
+            animation-play-state: paused;
+        }
+
+        .logo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+            padding: 0.5rem 0.8rem;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+        .logo-item:hover {
+            opacity: 1;
+            transform: translateY(-4px);
+        }
+        .logo-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            transition: all 0.3s ease;
+        }
+        .logo-item:hover img {
+            transform: scale(1.1);
+        }
+        .logo-item span {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-top: 0.4rem;
+            transition: all 0.3s ease;
+        }
+        .logo-item:hover span {
+            color: var(--primary);
+        }
+
+        @keyframes scrollLogos {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
         /* ─── NEWSLETTER ─── */
         .newsletter-section {
             margin: 3rem 0;
@@ -212,11 +415,14 @@
             font-size: 2rem;
             margin-bottom: 0.5rem;
         }
-        .newsletter-section h2 span { color: var(--accent); }
+        .newsletter-section h2 span {
+            color: var(--accent);
+        }
         .newsletter-section p {
             opacity: 0.8;
             margin-bottom: 1.5rem;
         }
+
         .newsletter-form {
             display: flex;
             max-width: 500px;
@@ -249,33 +455,13 @@
             box-shadow: 0 8px 30px rgba(241, 196, 15, 0.3);
         }
 
-        /* ─── ADMIN NOTIFICATION BADGE ─── */
-        .admin-badge {
-            position: relative;
-        }
-        .admin-badge .badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #c0392b;
-            color: var(--white);
-            font-size: 0.55rem;
-            font-weight: 700;
-            border-radius: 50%;
-            padding: 0.1rem 0.45rem;
-            min-width: 18px;
-            text-align: center;
-            animation: badgePulse 1.5s infinite;
-        }
-        @keyframes badgePulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
         /* ─── RESPONSIVE ─── */
         @media (max-width: 992px) {
             .stats-section {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            .testimonial-form-section .form-row {
+                grid-template-columns: 1fr;
             }
         }
         @media (max-width: 768px) {
@@ -289,11 +475,28 @@
             .quote-section h2 {
                 font-size: 1.6rem;
             }
-            .testimonials-section {
+            .testimonials-display {
                 padding: 2rem 1rem;
             }
             .newsletter-section h2 {
                 font-size: 1.5rem;
+            }
+            .trusted-section {
+                padding: 2rem 0.5rem;
+            }
+            .trusted-section .section-title h2 {
+                font-size: 1.4rem;
+            }
+            .logo-item {
+                min-width: 70px;
+            }
+            .logo-item img {
+                width: 35px;
+                height: 35px;
+            }
+            .logo-carousel::before,
+            .logo-carousel::after {
+                width: 40px;
             }
         }
         @media (max-width: 480px) {
@@ -313,6 +516,17 @@
             }
             .testimonial-grid {
                 grid-template-columns: 1fr;
+            }
+            .logo-item {
+                min-width: 60px;
+                padding: 0.3rem 0.5rem;
+            }
+            .logo-item img {
+                width: 28px;
+                height: 28px;
+            }
+            .logo-item span {
+                font-size: 0.55rem;
             }
         }
     </style>
@@ -486,24 +700,24 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- 2. STATISTICS COUNTER -->
+    <!-- 2. STATISTICS COUNTER (REAL DATA) -->
     <!-- ========================================== -->
     <div class="stats-section animate-on-scroll">
         <div class="stat-item">
-            <div class="number" id="statProducts">12,000+</div>
+            <div class="number" id="statProducts">0</div>
             <div class="label">Products Available</div>
         </div>
         <div class="stat-item">
-            <div class="number" id="statSuppliers">580+</div>
+            <div class="number" id="statSuppliers">0</div>
             <div class="label">Verified Suppliers</div>
         </div>
         <div class="stat-item">
-            <div class="number" id="statSatisfaction">99.7%</div>
+            <div class="number" id="statSatisfaction">0%</div>
             <div class="label">Satisfaction Rate</div>
         </div>
         <div class="stat-item">
-            <div class="number" id="statDelivery">24/7</div>
-            <div class="label">Customer Support</div>
+            <div class="number" id="statOrders">0</div>
+            <div class="label">Orders Completed</div>
         </div>
     </div>
 
@@ -623,46 +837,62 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- 7. REQUEST A QUOTE SECTION -->
+    <!-- 7. TESTIMONIAL SUBMISSION FORM -->
     <!-- ========================================== -->
-    <div class="quote-section animate-on-scroll">
-        <h2>Need a <span>Custom Quote?</span></h2>
-        <p>Get competitive pricing for bulk orders. Our team will respond within 24 hours.</p>
-        <a href="contact" class="btn-white"><i class="fa-regular fa-file-lines"></i> Request a Quote</a>
+    <div class="testimonial-form-section animate-on-scroll">
+        <h3><i class="fa-regular fa-pen-to-square"></i> Share Your Experience</h3>
+        <p>Help other businesses make informed decisions. Submit your testimonial below.</p>
+        
+        <form id="testimonialForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" id="testimonialName" placeholder="caden gibson" />
+                </div>
+                <div class="form-group">
+                    <label>Company (Optional)</label>
+                    <input type="text" id="testimonialCompany" placeholder="Your company name" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Rating</label>
+                <div class="rating-stars" id="ratingStars">
+                    <span class="star" data-value="1" onclick="setRating(1)">★</span>
+                    <span class="star" data-value="2" onclick="setRating(2)">★</span>
+                    <span class="star" data-value="3" onclick="setRating(3)">★</span>
+                    <span class="star" data-value="4" onclick="setRating(4)">★</span>
+                    <span class="star" data-value="5" onclick="setRating(5)">★</span>
+                </div>
+                <input type="hidden" id="testimonialRating" value="5" />
+            </div>
+            <div class="form-group">
+                <label>Your Message</label>
+                <textarea id="testimonialMessage" placeholder="Share your experience with Pilot Sales Distribution..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit-testimonial" id="testimonialSubmitBtn">
+                <i class="fa-regular fa-paper-plane"></i> Submit Testimonial
+            </button>
+        </form>
     </div>
 
     <!-- ========================================== -->
-    <!-- 8. TESTIMONIALS -->
+    <!-- 8. TESTIMONIALS DISPLAY -->
     <!-- ========================================== -->
-    <div class="testimonials-section animate-on-scroll">
+    <div class="testimonials-display animate-on-scroll">
         <div class="section-title">
             <h2>What Our <span>Clients Say</span></h2>
-            <p>Trusted by businesses worldwide</p>
+            <p>Real reviews from real customers</p>
         </div>
-        <div class="testimonial-grid">
-            <div class="testimonial-card">
-                <div class="stars">★★★★★</div>
-                <p class="text">"Pilot Distribution has been a game-changer for our business. The quality and pricing are unmatched."</p>
-                <div class="author">Sarah Johnson</div>
-                <div class="company">CEO, TechWholesale</div>
-            </div>
-            <div class="testimonial-card">
-                <div class="stars">★★★★★</div>
-                <p class="text">"We've been using Pilot Distribution for 2 years now. Reliable suppliers and excellent customer service."</p>
-                <div class="author">Michael Chen</div>
-                <div class="company">Operations, Global Retail</div>
-            </div>
-            <div class="testimonial-card">
-                <div class="stars">★★★★★</div>
-                <p class="text">"The best wholesale marketplace I've used. Easy to navigate, great products, fast shipping."</p>
-                <div class="author">Emily Rodriguez</div>
-                <div class="company">Founder, EcoGoods</div>
+        <div class="testimonial-grid" id="testimonialGrid">
+            <div class="loading-spinner">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <p>Loading testimonials...</p>
             </div>
         </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- 9. TRUSTED COMPANIES LOGOS -->
+    <!-- 9. TRUSTED COMPANIES LOGOS (LOCAL FILES) -->
     <!-- ========================================== -->
     <div class="trusted-section animate-on-scroll">
         <div class="section-title">
@@ -672,60 +902,60 @@
         
         <div class="logo-carousel">
             <div class="logo-track">
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/nike" alt="Nike" loading="lazy" /><span>Nike</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/apple" alt="Apple" loading="lazy" /><span>Apple</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/samsung" alt="Samsung" loading="lazy" /><span>Samsung</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/adidas" alt="Adidas" loading="lazy" /><span>Adidas</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/lg" alt="LG" loading="lazy" /><span>LG</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/google" alt="Google" loading="lazy" /><span>Google</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/intel" alt="Intel" loading="lazy" /><span>Intel</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/hp" alt="HP" loading="lazy" /><span>HP</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/dell" alt="Dell" loading="lazy" /><span>Dell</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/cisco" alt="Cisco" loading="lazy" /><span>Cisco</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/lenovo" alt="Lenovo" loading="lazy" /><span>Lenovo</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/huawei" alt="Huawei" loading="lazy" /><span>Huawei</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/xiaomi" alt="Xiaomi" loading="lazy" /><span>Xiaomi</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/nvidia" alt="NVIDIA" loading="lazy" /><span>NVIDIA</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/tesla" alt="Tesla" loading="lazy" /><span>Tesla</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/paypal" alt="PayPal" loading="lazy" /><span>PayPal</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/mastercard" alt="Mastercard" loading="lazy" /><span>Mastercard</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/visa" alt="Visa" loading="lazy" /><span>Visa</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/cocacola" alt="Coca-Cola" loading="lazy" /><span>Coca-Cola</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/toyota" alt="Toyota" loading="lazy" /><span>Toyota</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/bmw" alt="BMW" loading="lazy" /><span>BMW</span></div>
+                <div class="logo-item"><img src="nike.png" alt="Nike" loading="lazy" /><span>Nike</span></div>
+                <div class="logo-item"><img src="apple.png" alt="Apple" loading="lazy" /><span>Apple</span></div>
+                <div class="logo-item"><img src="samsung.png" alt="Samsung" loading="lazy" /><span>Samsung</span></div>
+                <div class="logo-item"><img src="adidas.png" alt="Adidas" loading="lazy" /><span>Adidas</span></div>
+                <div class="logo-item"><img src="lg.png" alt="LG" loading="lazy" /><span>LG</span></div>
+                <div class="logo-item"><img src="google.png" alt="Google" loading="lazy" /><span>Google</span></div>
+                <div class="logo-item"><img src="intel.png" alt="Intel" loading="lazy" /><span>Intel</span></div>
+                <div class="logo-item"><img src="hp.png" alt="HP" loading="lazy" /><span>HP</span></div>
+                <div class="logo-item"><img src="dell.png" alt="Dell" loading="lazy" /><span>Dell</span></div>
+                <div class="logo-item"><img src="cisco.png" alt="Cisco" loading="lazy" /><span>Cisco</span></div>
+                <div class="logo-item"><img src="lenovo.png" alt="Lenovo" loading="lazy" /><span>Lenovo</span></div>
+                <div class="logo-item"><img src="huawei.png" alt="Huawei" loading="lazy" /><span>Huawei</span></div>
+                <div class="logo-item"><img src="xiaomi.png" alt="Xiaomi" loading="lazy" /><span>Xiaomi</span></div>
+                <div class="logo-item"><img src="nvidia.png" alt="NVIDIA" loading="lazy" /><span>NVIDIA</span></div>
+                <div class="logo-item"><img src="tesla.png" alt="Tesla" loading="lazy" /><span>Tesla</span></div>
+                <div class="logo-item"><img src="paypal.png" alt="PayPal" loading="lazy" /><span>PayPal</span></div>
+                <div class="logo-item"><img src="mastercard.png" alt="Mastercard" loading="lazy" /><span>Mastercard</span></div>
+                <div class="logo-item"><img src="visa.png" alt="Visa" loading="lazy" /><span>Visa</span></div>
+                <div class="logo-item"><img src="cocacola.png" alt="Coca-Cola" loading="lazy" /><span>Coca-Cola</span></div>
+                <div class="logo-item"><img src="toyota.png" alt="Toyota" loading="lazy" /><span>Toyota</span></div>
+                <div class="logo-item"><img src="bmw.png" alt="BMW" loading="lazy" /><span>BMW</span></div>
                 <!-- Duplicate for seamless loop -->
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/nike" alt="Nike" loading="lazy" /><span>Nike</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/apple" alt="Apple" loading="lazy" /><span>Apple</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/samsung" alt="Samsung" loading="lazy" /><span>Samsung</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/adidas" alt="Adidas" loading="lazy" /><span>Adidas</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/lg" alt="LG" loading="lazy" /><span>LG</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/google" alt="Google" loading="lazy" /><span>Google</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/intel" alt="Intel" loading="lazy" /><span>Intel</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/hp" alt="HP" loading="lazy" /><span>HP</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/dell" alt="Dell" loading="lazy" /><span>Dell</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/cisco" alt="Cisco" loading="lazy" /><span>Cisco</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/lenovo" alt="Lenovo" loading="lazy" /><span>Lenovo</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/huawei" alt="Huawei" loading="lazy" /><span>Huawei</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/xiaomi" alt="Xiaomi" loading="lazy" /><span>Xiaomi</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/nvidia" alt="NVIDIA" loading="lazy" /><span>NVIDIA</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/tesla" alt="Tesla" loading="lazy" /><span>Tesla</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/paypal" alt="PayPal" loading="lazy" /><span>PayPal</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/mastercard" alt="Mastercard" loading="lazy" /><span>Mastercard</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/visa" alt="Visa" loading="lazy" /><span>Visa</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/cocacola" alt="Coca-Cola" loading="lazy" /><span>Coca-Cola</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/toyota" alt="Toyota" loading="lazy" /><span>Toyota</span></div>
-                <div class="logo-item"><img src="https://cdn.simpleicons.org/bmw" alt="BMW" loading="lazy" /><span>BMW</span></div>
+                <div class="logo-item"><img src="nike.png" alt="Nike" loading="lazy" /><span>Nike</span></div>
+                <div class="logo-item"><img src="apple.png" alt="Apple" loading="lazy" /><span>Apple</span></div>
+                <div class="logo-item"><img src="samsung.png" alt="Samsung" loading="lazy" /><span>Samsung</span></div>
+                <div class="logo-item"><img src="adidas.png" alt="Adidas" loading="lazy" /><span>Adidas</span></div>
+                <div class="logo-item"><img src="lg.png" alt="LG" loading="lazy" /><span>LG</span></div>
+                <div class="logo-item"><img src="google.png" alt="Google" loading="lazy" /><span>Google</span></div>
+                <div class="logo-item"><img src="intel.png" alt="Intel" loading="lazy" /><span>Intel</span></div>
+                <div class="logo-item"><img src="hp.png" alt="HP" loading="lazy" /><span>HP</span></div>
+                <div class="logo-item"><img src="dell.png" alt="Dell" loading="lazy" /><span>Dell</span></div>
+                <div class="logo-item"><img src="cisco.png" alt="Cisco" loading="lazy" /><span>Cisco</span></div>
+                <div class="logo-item"><img src="lenovo.png" alt="Lenovo" loading="lazy" /><span>Lenovo</span></div>
+                <div class="logo-item"><img src="huawei.png" alt="Huawei" loading="lazy" /><span>Huawei</span></div>
+                <div class="logo-item"><img src="xiaomi.png" alt="Xiaomi" loading="lazy" /><span>Xiaomi</span></div>
+                <div class="logo-item"><img src="nvidia.png" alt="NVIDIA" loading="lazy" /><span>NVIDIA</span></div>
+                <div class="logo-item"><img src="tesla.png" alt="Tesla" loading="lazy" /><span>Tesla</span></div>
+                <div class="logo-item"><img src="paypal.png" alt="PayPal" loading="lazy" /><span>PayPal</span></div>
+                <div class="logo-item"><img src="mastercard.png" alt="Mastercard" loading="lazy" /><span>Mastercard</span></div>
+                <div class="logo-item"><img src="visa.png" alt="Visa" loading="lazy" /><span>Visa</span></div>
+                <div class="logo-item"><img src="cocacola.png" alt="Coca-Cola" loading="lazy" /><span>Coca-Cola</span></div>
+                <div class="logo-item"><img src="toyota.png" alt="Toyota" loading="lazy" /><span>Toyota</span></div>
+                <div class="logo-item"><img src="bmw.png" alt="BMW" loading="lazy" /><span>BMW</span></div>
             </div>
         </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- 10. NEWSLETTER SIGNUP -->
+    <!-- 10. NEWSLETTER SIGNUP (SAVES TO FIREBASE) -->
     <!-- ========================================== -->
     <div class="newsletter-section animate-on-scroll">
         <h2>Subscribe to Our <span>Newsletter</span></h2>
         <p>Get the latest deals, new arrivals, and exclusive offers delivered to your inbox.</p>
-        <form class="newsletter-form" onsubmit="handleNewsletter(event)">
+        <form class="newsletter-form" id="newsletterForm">
             <input type="email" id="newsletterEmail" placeholder="Enter your email address" required />
             <button type="submit"><i class="fa-regular fa-paper-plane"></i> Subscribe</button>
         </form>
@@ -772,21 +1002,117 @@
 
 <script>
 // ============================================
-// HOME PAGE - JAVASCRIPT
+// HOME PAGE - JAVASCRIPT (FIXED)
 // ============================================
 
 // ─── SET CURRENT YEAR ───
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// ─── NEWSLETTER HANDLER ───
-function handleNewsletter(e) {
+// ─── LOAD REAL STATS ───
+async function loadStats() {
+    const stats = await getRealStats();
+    document.getElementById('statProducts').textContent = stats.products.toLocaleString() + '+';
+    document.getElementById('statSuppliers').textContent = stats.suppliers.toLocaleString() + '+';
+    document.getElementById('statSatisfaction').textContent = stats.satisfaction;
+    document.getElementById('statOrders').textContent = stats.orders.toLocaleString();
+}
+
+// ─── LOAD TESTIMONIALS ───
+async function loadTestimonials() {
+    const grid = document.getElementById('testimonialGrid');
+    const testimonials = await window.loadTestimonials();
+    
+    if (testimonials.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:1rem; opacity:0.7;">
+                <p>No testimonials yet. Be the first to share your experience!</p>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = testimonials.map(t => {
+        const stars = '★'.repeat(Math.round(t.rating || 5)) + '☆'.repeat(5 - Math.round(t.rating || 5));
+        return `
+            <div class="testimonial-card">
+                <div class="stars">${stars}</div>
+                <p class="text">${t.message}</p>
+                <div class="author">${t.name || 'Anonymous'}</div>
+                ${t.company ? `<div class="company">${t.company}</div>` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+// ─── RATING STARS ───
+let selectedRating = 5;
+
+function setRating(value) {
+    selectedRating = value;
+    document.getElementById('testimonialRating').value = value;
+    document.querySelectorAll('.rating-stars .star').forEach((star, index) => {
+        star.classList.toggle('active', index < value);
+    });
+}
+
+// ─── TESTIMONIAL FORM ───
+document.getElementById('testimonialForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    const email = document.getElementById('newsletterEmail').value;
-    if (email) {
+    
+    const name = document.getElementById('testimonialName').value.trim() || 'Anonymous';
+    const company = document.getElementById('testimonialCompany').value.trim();
+    const message = document.getElementById('testimonialMessage').value.trim();
+    const rating = parseInt(document.getElementById('testimonialRating').value) || 5;
+    
+    if (!message) {
+        showToast('Please write a testimonial message', 'error');
+        return;
+    }
+    
+    const btn = document.getElementById('testimonialSubmitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+    
+    const user = getCurrentUser();
+    const result = await saveTestimonial({
+        name: name,
+        company: company,
+        message: message,
+        rating: rating,
+        userId: user ? user.id : null
+    });
+    
+    if (result.success) {
+        showToast('✅ Thank you! Your testimonial has been submitted for review.', 'success');
+        document.getElementById('testimonialForm').reset();
+        setRating(5);
+    } else {
+        showToast('❌ Failed to submit testimonial. Please try again.', 'error');
+    }
+    
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Submit Testimonial';
+});
+
+// ─── NEWSLETTER FORM ───
+document.getElementById('newsletterForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('newsletterEmail').value.trim();
+    
+    if (!email) {
+        showToast('Please enter your email address', 'error');
+        return;
+    }
+    
+    const result = await saveNewsletter(email);
+    
+    if (result.success) {
         showToast('✅ Subscribed successfully! Welcome to Pilot Distribution.', 'success');
         document.getElementById('newsletterEmail').value = '';
+    } else {
+        showToast('❌ Failed to subscribe. Please try again.', 'error');
     }
-}
+});
 
 // ─── LOAD PRODUCTS ───
 async function loadProducts() {
@@ -820,41 +1146,7 @@ async function loadProducts() {
             return;
         }
 
-        grid.innerHTML = products.map(p => {
-            const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
-            const slug = p.slug || generateSlug(p.title);
-            const imageHtml = p.image_url ?
-                `<img src="${p.image_url}" alt="${p.title}" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />` :
-                `<i class="fa-solid fa-box"></i>`;
-
-            return `
-                <div class="product-card animate-on-scroll">
-                    ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
-                    ${discount > 0 ? `<span class="product-badge">-${discount}%</span>` : ''}
-                    <div class="product-image" onclick="window.location.href='/product/${slug}'">
-                        ${imageHtml}
-                    </div>
-                    <div class="product-title" onclick="window.location.href='/product/${slug}'">${p.title}</div>
-                    <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
-                    <div class="product-price">
-                        $${(p.price || 0).toFixed(2)}
-                        ${p.old_price ? `<span class="old">$${p.old_price.toFixed(2)}</span>` : ''}
-                    </div>
-                    <div class="product-actions">
-                        <button class="btn-add" onclick="addToCart('${p.id}')" data-product-id="${p.id}">
-                            <i class="fa-solid fa-cart-plus"></i> Add
-                        </button>
-                        <button class="btn-wish" onclick="toggleWishlist('${p.id}')" data-wishlist-id="${p.id}">
-                            <i class="fa-regular fa-heart"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        if (typeof initScrollAnimations === 'function') {
-            initScrollAnimations();
-        }
+        renderProducts(products, 'productGrid');
 
     } catch (error) {
         console.error('Error loading products:', error);
@@ -945,10 +1237,6 @@ function setupAdminListeners() {
             snapshot.docChanges().forEach(change => {
                 if (change.type === 'added') {
                     updateAdminBadge();
-                    try {
-                        const audio = new Audio('data:audio/wav;base64,UklGRnoAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoAAACBhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFg==');
-                        audio.play().catch(e => {});
-                    } catch(e) {}
                     const data = change.doc.data();
                     showToast(`📩 New message from ${data.firstName || 'User'}`, 'info');
                 }
@@ -963,10 +1251,6 @@ function setupAdminListeners() {
             snapshot.docChanges().forEach(change => {
                 if (change.type === 'added') {
                     updateAdminBadge();
-                    try {
-                        const audio = new Audio('data:audio/wav;base64,UklGRnoAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoAAACBhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFg==');
-                        audio.play().catch(e => {});
-                    } catch(e) {}
                     const data = change.doc.data();
                     const customer = data.customer || {};
                     showToast(`📦 New order from ${customer.firstName || 'Guest'} - $${(data.totals?.total || 0).toFixed(2)}`, 'success');
@@ -981,8 +1265,10 @@ function setupAdminListeners() {
 document.addEventListener('DOMContentLoaded', function() {
     loadProducts();
     startFlashTimer();
-    updateCartCount();
-    updateWishlistCount();
+    loadStats();
+    loadTestimonials();
+    loadCartCount();      // ✅ FIXED: Was updateCartCount
+    loadWishlistCount();  // ✅ FIXED: Was updateWishlistCount
     setTimeout(checkAdminStatus, 1000);
     document.addEventListener('authChange', function() {
         checkAdminStatus();
@@ -992,7 +1278,10 @@ document.addEventListener('DOMContentLoaded', function() {
 // ─── EXPOSE FUNCTIONS ───
 window.checkAdminStatus = checkAdminStatus;
 window.updateAdminBadge = updateAdminBadge;
-window.handleNewsletter = handleNewsletter;
+window.setRating = setRating;
+window.loadTestimonials = loadTestimonials;
+window.loadStats = loadStats;
+window.loadProducts = loadProducts;
 </script>
 
 </body>

@@ -34,7 +34,7 @@
 
     <style>
         .auth-page {
-            max-width: 520px;
+            max-width: 560px;
             margin: 2rem auto;
             background: var(--white);
             border-radius: var(--radius);
@@ -79,12 +79,17 @@
             border-radius: var(--radius-sm);
             font-size: 0.9rem;
             transition: var(--transition);
+            font-family: inherit;
         }
         .auth-page .form-group input:focus,
         .auth-page .form-group select:focus {
             border-color: var(--primary);
             outline: none;
             box-shadow: 0 0 0 3px rgba(26, 123, 107, 0.1);
+        }
+        .auth-page .form-group select {
+            appearance: auto;
+            cursor: pointer;
         }
 
         .auth-page .form-row {
@@ -163,9 +168,6 @@
         }
         .auth-page .social-login button:hover {
             background: var(--light);
-        }
-        .auth-page .social-login button i {
-            color: #1877f2;
         }
 
         .auth-page .login-link {
@@ -251,6 +253,61 @@
             margin-top: 0.2rem;
         }
 
+        .phone-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .phone-group select {
+            width: auto;
+            flex-shrink: 0;
+            min-width: 160px;
+            max-width: 200px;
+            padding: 0.7rem 0.4rem;
+        }
+        .phone-group input {
+            flex: 1;
+        }
+
+        .code-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .code-group input {
+            flex: 1;
+        }
+        .code-group button {
+            flex-shrink: 0;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .code-group button:hover {
+            background: var(--primary-dark);
+        }
+        .code-group button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .timer-text {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 0.3rem;
+            text-align: right;
+        }
+        .timer-text span {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
         #sellerFields {
             display: none;
             animation: slideDown 0.3s ease;
@@ -258,6 +315,50 @@
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-method-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.2rem;
+            background: var(--light);
+            border-radius: var(--radius-sm);
+            padding: 0.3rem;
+            border: 1px solid var(--border);
+        }
+        .auth-method-toggle button {
+            flex: 1;
+            padding: 0.6rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-light);
+        }
+        .auth-method-toggle button.active {
+            background: var(--white);
+            color: var(--secondary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .auth-method-toggle button:hover:not(.active) {
+            color: var(--secondary);
+        }
+
+        .auth-method-content {
+            display: none;
+        }
+        .auth-method-content.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .field-note {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin-top: 0.2rem;
         }
 
         @media (max-width: 480px) {
@@ -272,6 +373,22 @@
                 flex-direction: column;
             }
             .role-selector {
+                flex-direction: column;
+            }
+            .phone-group {
+                flex-direction: column;
+            }
+            .phone-group select {
+                width: 100%;
+                max-width: 100%;
+            }
+            .code-group {
+                flex-direction: column;
+            }
+            .code-group button {
+                width: 100%;
+            }
+            .auth-method-toggle {
                 flex-direction: column;
             }
         }
@@ -361,35 +478,285 @@
         </div>
 
         <form id="registerForm">
+
+            <!-- ─── AUTH METHOD TOGGLE ─── -->
+            <div class="auth-method-toggle">
+                <button type="button" class="active" onclick="switchAuthMethod('email')" id="emailMethodBtn">
+                    <i class="fa-regular fa-envelope"></i> Email
+                </button>
+                <button type="button" onclick="switchAuthMethod('phone')" id="phoneMethodBtn">
+                    <i class="fa-regular fa-phone"></i> Phone
+                </button>
+            </div>
+
+            <!-- ─── RECAPTCHA CONTAINER ─── -->
+            <div id="recaptcha-container"></div>
+
+            <!-- ─── EMAIL AUTH METHOD ─── -->
+            <div class="auth-method-content active" id="emailAuth">
+                <div class="form-group">
+                    <label>Email Address <span class="required">*</span></label>
+                    <input type="email" id="regEmail" placeholder="you@example.com" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Password <span class="required">*</span></label>
+                    <input type="password" id="regPassword" placeholder="Min 6 characters" required minlength="6" />
+                    <div class="password-strength">
+                        <div class="bar" id="passwordStrengthBar"></div>
+                    </div>
+                    <div class="password-hint" id="passwordHint">Use 6+ characters with a mix of letters and numbers</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Password <span class="required">*</span></label>
+                    <input type="password" id="regConfirmPassword" placeholder="Confirm your password" required />
+                    <div id="passwordMatchHint" style="font-size:0.7rem; margin-top:0.2rem;"></div>
+                </div>
+            </div>
+
+            <!-- ─── PHONE AUTH METHOD ─── -->
+            <div class="auth-method-content" id="phoneAuth">
+                <div class="form-group">
+                    <label>Phone Number <span class="required">*</span></label>
+                    <div class="phone-group">
+                        <select id="phoneCountryCode">
+                            <!-- All Countries - Sorted by Country Name -->
+                            <option value="+93">🇦🇫 Afghanistan +93</option>
+                            <option value="+355">🇦🇱 Albania +355</option>
+                            <option value="+213">🇩🇿 Algeria +213</option>
+                            <option value="+376">🇦🇩 Andorra +376</option>
+                            <option value="+244">🇦🇴 Angola +244</option>
+                            <option value="+1">🇦🇬 Antigua & Barbuda +1</option>
+                            <option value="+54">🇦🇷 Argentina +54</option>
+                            <option value="+374">🇦🇲 Armenia +374</option>
+                            <option value="+61">🇦🇺 Australia +61</option>
+                            <option value="+43">🇦🇹 Austria +43</option>
+                            <option value="+994">🇦🇿 Azerbaijan +994</option>
+                            <option value="+1">🇧🇸 Bahamas +1</option>
+                            <option value="+973">🇧🇭 Bahrain +973</option>
+                            <option value="+880">🇧🇩 Bangladesh +880</option>
+                            <option value="+1">🇧🇧 Barbados +1</option>
+                            <option value="+375">🇧🇾 Belarus +375</option>
+                            <option value="+32">🇧🇪 Belgium +32</option>
+                            <option value="+501">🇧🇿 Belize +501</option>
+                            <option value="+229">🇧🇯 Benin +229</option>
+                            <option value="+975">🇧🇹 Bhutan +975</option>
+                            <option value="+591">🇧🇴 Bolivia +591</option>
+                            <option value="+387">🇧🇦 Bosnia & Herzegovina +387</option>
+                            <option value="+267">🇧🇼 Botswana +267</option>
+                            <option value="+55">🇧🇷 Brazil +55</option>
+                            <option value="+673">🇧🇳 Brunei +673</option>
+                            <option value="+359">🇧🇬 Bulgaria +359</option>
+                            <option value="+226">🇧🇫 Burkina Faso +226</option>
+                            <option value="+257">🇧🇮 Burundi +257</option>
+                            <option value="+855">🇰🇭 Cambodia +855</option>
+                            <option value="+237">🇨🇲 Cameroon +237</option>
+                            <option value="+1">🇨🇦 Canada +1</option>
+                            <option value="+238">🇨🇻 Cape Verde +238</option>
+                            <option value="+236">🇨🇫 Central African Republic +236</option>
+                            <option value="+235">🇹🇩 Chad +235</option>
+                            <option value="+56">🇨🇱 Chile +56</option>
+                            <option value="+86">🇨🇳 China +86</option>
+                            <option value="+57">🇨🇴 Colombia +57</option>
+                            <option value="+269">🇰🇲 Comoros +269</option>
+                            <option value="+242">🇨🇬 Congo +242</option>
+                            <option value="+243">🇨🇩 Congo (DRC) +243</option>
+                            <option value="+506">🇨🇷 Costa Rica +506</option>
+                            <option value="+385">🇭🇷 Croatia +385</option>
+                            <option value="+53">🇨🇺 Cuba +53</option>
+                            <option value="+357">🇨🇾 Cyprus +357</option>
+                            <option value="+420">🇨🇿 Czech Republic +420</option>
+                            <option value="+45">🇩🇰 Denmark +45</option>
+                            <option value="+253">🇩🇯 Djibouti +253</option>
+                            <option value="+1">🇩🇲 Dominica +1</option>
+                            <option value="+1">🇩🇴 Dominican Republic +1</option>
+                            <option value="+593">🇪🇨 Ecuador +593</option>
+                            <option value="+20">🇪🇬 Egypt +20</option>
+                            <option value="+503">🇸🇻 El Salvador +503</option>
+                            <option value="+240">🇬🇶 Equatorial Guinea +240</option>
+                            <option value="+291">🇪🇷 Eritrea +291</option>
+                            <option value="+372">🇪🇪 Estonia +372</option>
+                            <option value="+251">🇪🇹 Ethiopia +251</option>
+                            <option value="+679">🇫🇯 Fiji +679</option>
+                            <option value="+358">🇫🇮 Finland +358</option>
+                            <option value="+33">🇫🇷 France +33</option>
+                            <option value="+241">🇬🇦 Gabon +241</option>
+                            <option value="+220">🇬🇲 Gambia +220</option>
+                            <option value="+995">🇬🇪 Georgia +995</option>
+                            <option value="+49">🇩🇪 Germany +49</option>
+                            <option value="+233">🇬🇭 Ghana +233</option>
+                            <option value="+30">🇬🇷 Greece +30</option>
+                            <option value="+1">🇬🇩 Grenada +1</option>
+                            <option value="+502">🇬🇹 Guatemala +502</option>
+                            <option value="+224">🇬🇳 Guinea +224</option>
+                            <option value="+245">🇬🇼 Guinea-Bissau +245</option>
+                            <option value="+592">🇬🇾 Guyana +592</option>
+                            <option value="+509">🇭🇹 Haiti +509</option>
+                            <option value="+504">🇭🇳 Honduras +504</option>
+                            <option value="+36">🇭🇺 Hungary +36</option>
+                            <option value="+354">🇮🇸 Iceland +354</option>
+                            <option value="+91">🇮🇳 India +91</option>
+                            <option value="+62">🇮🇩 Indonesia +62</option>
+                            <option value="+98">🇮🇷 Iran +98</option>
+                            <option value="+964">🇮🇶 Iraq +964</option>
+                            <option value="+353">🇮🇪 Ireland +353</option>
+                            <option value="+972">🇮🇱 Israel +972</option>
+                            <option value="+39">🇮🇹 Italy +39</option>
+                            <option value="+1">🇯🇲 Jamaica +1</option>
+                            <option value="+81">🇯🇵 Japan +81</option>
+                            <option value="+962">🇯🇴 Jordan +962</option>
+                            <option value="+7">🇰🇿 Kazakhstan +7</option>
+                            <option value="+254">🇰🇪 Kenya +254</option>
+                            <option value="+686">🇰🇮 Kiribati +686</option>
+                            <option value="+383">🇽🇰 Kosovo +383</option>
+                            <option value="+965">🇰🇼 Kuwait +965</option>
+                            <option value="+996">🇰🇬 Kyrgyzstan +996</option>
+                            <option value="+856">🇱🇦 Laos +856</option>
+                            <option value="+371">🇱🇻 Latvia +371</option>
+                            <option value="+961">🇱🇧 Lebanon +961</option>
+                            <option value="+266">🇱🇸 Lesotho +266</option>
+                            <option value="+231">🇱🇷 Liberia +231</option>
+                            <option value="+218">🇱🇾 Libya +218</option>
+                            <option value="+423">🇱🇮 Liechtenstein +423</option>
+                            <option value="+370">🇱🇹 Lithuania +370</option>
+                            <option value="+352">🇱🇺 Luxembourg +352</option>
+                            <option value="+261">🇲🇬 Madagascar +261</option>
+                            <option value="+265">🇲🇼 Malawi +265</option>
+                            <option value="+60">🇲🇾 Malaysia +60</option>
+                            <option value="+960">🇲🇻 Maldives +960</option>
+                            <option value="+223">🇲🇱 Mali +223</option>
+                            <option value="+356">🇲🇹 Malta +356</option>
+                            <option value="+692">🇲🇭 Marshall Islands +692</option>
+                            <option value="+222">🇲🇷 Mauritania +222</option>
+                            <option value="+230">🇲🇺 Mauritius +230</option>
+                            <option value="+52">🇲🇽 Mexico +52</option>
+                            <option value="+691">🇫🇲 Micronesia +691</option>
+                            <option value="+373">🇲🇩 Moldova +373</option>
+                            <option value="+377">🇲🇨 Monaco +377</option>
+                            <option value="+976">🇲🇳 Mongolia +976</option>
+                            <option value="+382">🇲🇪 Montenegro +382</option>
+                            <option value="+212">🇲🇦 Morocco +212</option>
+                            <option value="+258">🇲🇿 Mozambique +258</option>
+                            <option value="+95">🇲🇲 Myanmar +95</option>
+                            <option value="+264">🇳🇦 Namibia +264</option>
+                            <option value="+674">🇳🇷 Nauru +674</option>
+                            <option value="+977">🇳🇵 Nepal +977</option>
+                            <option value="+31">🇳🇱 Netherlands +31</option>
+                            <option value="+64">🇳🇿 New Zealand +64</option>
+                            <option value="+505">🇳🇮 Nicaragua +505</option>
+                            <option value="+227">🇳🇪 Niger +227</option>
+                            <option value="+234">🇳🇬 Nigeria +234</option>
+                            <option value="+850">🇰🇵 North Korea +850</option>
+                            <option value="+389">🇲🇰 North Macedonia +389</option>
+                            <option value="+47">🇳🇴 Norway +47</option>
+                            <option value="+968">🇴🇲 Oman +968</option>
+                            <option value="+92">🇵🇰 Pakistan +92</option>
+                            <option value="+680">🇵🇼 Palau +680</option>
+                            <option value="+970">🇵🇸 Palestine +970</option>
+                            <option value="+507">🇵🇦 Panama +507</option>
+                            <option value="+675">🇵🇬 Papua New Guinea +675</option>
+                            <option value="+595">🇵🇾 Paraguay +595</option>
+                            <option value="+51">🇵🇪 Peru +51</option>
+                            <option value="+63">🇵🇭 Philippines +63</option>
+                            <option value="+48">🇵🇱 Poland +48</option>
+                            <option value="+351">🇵🇹 Portugal +351</option>
+                            <option value="+1">🇵🇷 Puerto Rico +1</option>
+                            <option value="+974">🇶🇦 Qatar +974</option>
+                            <option value="+40">🇷🇴 Romania +40</option>
+                            <option value="+7">🇷🇺 Russia +7</option>
+                            <option value="+250">🇷🇼 Rwanda +250</option>
+                            <option value="+1">🇰🇳 St Kitts & Nevis +1</option>
+                            <option value="+1">🇱🇨 St Lucia +1</option>
+                            <option value="+1">🇻🇨 St Vincent & Grenadines +1</option>
+                            <option value="+685">🇼🇸 Samoa +685</option>
+                            <option value="+378">🇸🇲 San Marino +378</option>
+                            <option value="+239">🇸🇹 Sao Tome & Principe +239</option>
+                            <option value="+966">🇸🇦 Saudi Arabia +966</option>
+                            <option value="+221">🇸🇳 Senegal +221</option>
+                            <option value="+381">🇷🇸 Serbia +381</option>
+                            <option value="+248">🇸🇨 Seychelles +248</option>
+                            <option value="+232">🇸🇱 Sierra Leone +232</option>
+                            <option value="+65">🇸🇬 Singapore +65</option>
+                            <option value="+421">🇸🇰 Slovakia +421</option>
+                            <option value="+386">🇸🇮 Slovenia +386</option>
+                            <option value="+677">🇸🇧 Solomon Islands +677</option>
+                            <option value="+252">🇸🇴 Somalia +252</option>
+                            <option value="+27">🇿🇦 South Africa +27</option>
+                            <option value="+82">🇰🇷 South Korea +82</option>
+                            <option value="+211">🇸🇸 South Sudan +211</option>
+                            <option value="+34">🇪🇸 Spain +34</option>
+                            <option value="+94">🇱🇰 Sri Lanka +94</option>
+                            <option value="+249">🇸🇩 Sudan +249</option>
+                            <option value="+597">🇸🇷 Suriname +597</option>
+                            <option value="+268">🇸🇿 Eswatini +268</option>
+                            <option value="+46">🇸🇪 Sweden +46</option>
+                            <option value="+41">🇨🇭 Switzerland +41</option>
+                            <option value="+963">🇸🇾 Syria +963</option>
+                            <option value="+886">🇹🇼 Taiwan +886</option>
+                            <option value="+992">🇹🇯 Tajikistan +992</option>
+                            <option value="+255">🇹🇿 Tanzania +255</option>
+                            <option value="+66">🇹🇭 Thailand +66</option>
+                            <option value="+670">🇹🇱 Timor-Leste +670</option>
+                            <option value="+228">🇹🇬 Togo +228</option>
+                            <option value="+676">🇹🇴 Tonga +676</option>
+                            <option value="+1">🇹🇹 Trinidad & Tobago +1</option>
+                            <option value="+216">🇹🇳 Tunisia +216</option>
+                            <option value="+90">🇹🇷 Turkey +90</option>
+                            <option value="+993">🇹🇲 Turkmenistan +993</option>
+                            <option value="+688">🇹🇻 Tuvalu +688</option>
+                            <option value="+256">🇺🇬 Uganda +256</option>
+                            <option value="+380">🇺🇦 Ukraine +380</option>
+                            <option value="+971">🇦🇪 United Arab Emirates +971</option>
+                            <option value="+44">🇬🇧 United Kingdom +44</option>
+                            <option value="+1">🇺🇸 United States +1</option>
+                            <option value="+598">🇺🇾 Uruguay +598</option>
+                            <option value="+998">🇺🇿 Uzbekistan +998</option>
+                            <option value="+678">🇻🇺 Vanuatu +678</option>
+                            <option value="+379">🇻🇦 Vatican City +379</option>
+                            <option value="+58">🇻🇪 Venezuela +58</option>
+                            <option value="+84">🇻🇳 Vietnam +84</option>
+                            <option value="+967">🇾🇪 Yemen +967</option>
+                            <option value="+260">🇿🇲 Zambia +260</option>
+                            <option value="+263">🇿🇼 Zimbabwe +263</option>
+                        </select>
+                        <input type="tel" id="regPhone" placeholder="555 555 5555" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Verification Code</label>
+                    <div class="code-group">
+                        <input type="text" id="regPhoneCode" placeholder="Enter 6-digit code" maxlength="6" />
+                        <button type="button" id="sendCodeBtn" onclick="sendPhoneCode()">
+                            <i class="fa-solid fa-message"></i> Send Code
+                        </button>
+                    </div>
+                    <div class="timer-text" id="timerText" style="display:none;">
+                        <span id="timerCount">60</span> seconds remaining
+                    </div>
+                    <div style="margin-top:0.3rem;">
+                        <button type="button" id="resendCodeBtn" onclick="resendPhoneCode()" style="background:none; border:none; color:var(--primary); font-weight:600; cursor:pointer; font-size:0.75rem;" disabled>
+                            <i class="fa-regular fa-rotate-right"></i> Resend Code
+                        </button>
+                    </div>
+                </div>
+
+                <div class="field-note">
+                    <i class="fa-regular fa-circle-info"></i> A verification code will be sent via SMS
+                </div>
+            </div>
+
+            <!-- ─── SHARED FIELDS ─── -->
             <div class="form-row">
                 <div class="form-group">
                     <label>First Name <span class="required">*</span></label>
-                    <input type="text" id="regFirstName" placeholder="Caden" required />
+                    <input type="text" id="regFirstName" placeholder="caden" required />
                 </div>
                 <div class="form-group">
                     <label>Last Name <span class="required">*</span></label>
-                    <input type="text" id="regLastName" placeholder="Gibson" required />
+                    <input type="text" id="regLastName" placeholder="gibson" required />
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label>Email Address <span class="required">*</span></label>
-                <input type="email" id="regEmail" placeholder="you@example.com" required />
-            </div>
-
-            <div class="form-group">
-                <label>Password <span class="required">*</span></label>
-                <input type="password" id="regPassword" placeholder="Min 6 characters" required minlength="6" />
-                <div class="password-strength">
-                    <div class="bar" id="passwordStrengthBar"></div>
-                </div>
-                <div class="password-hint" id="passwordHint">Use 6+ characters with a mix of letters and numbers</div>
-            </div>
-
-            <div class="form-group">
-                <label>Confirm Password <span class="required">*</span></label>
-                <input type="password" id="regConfirmPassword" placeholder="Confirm your password" required />
-                <div id="passwordMatchHint" style="font-size:0.7rem; margin-top:0.2rem;"></div>
             </div>
 
             <label style="font-size:0.85rem; font-weight:600; color:var(--secondary);">I want to register as:</label>
@@ -406,7 +773,7 @@
 
             <div id="sellerFields">
                 <div class="form-group">
-                    <label>Company Name</label>
+                    <label>Company Name <span class="required">*</span></label>
                     <input type="text" id="regCompany" placeholder="Your business name" />
                 </div>
                 <div class="form-group">
@@ -424,8 +791,8 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="tel" id="regPhone" placeholder="(555) 123-4567" />
+                    <label>WhatsApp Number (Optional)</label>
+                    <input type="tel" id="regWhatsApp" placeholder="+1 555 555 5555" />
                 </div>
             </div>
 
@@ -437,7 +804,7 @@
         <div class="divider"><span>or continue with</span></div>
 
         <div class="social-login">
-            <button onclick="signUpWithGoogle()">
+            <button onclick="signUpWithGoogle()" id="googleSignUpBtn">
                 <img src="https://www.google.com/favicon.ico" style="width:18px; height:18px;" alt="Google" />
                 Sign up with Google
             </button>
@@ -496,15 +863,22 @@
 
 <script>
 // ============================================
-// REGISTER PAGE - JAVASCRIPT
+// REGISTER PAGE - COMPLETE JAVASCRIPT
 // ============================================
 
 // ─── SET CURRENT YEAR ───
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// ─── ROLE SELECTOR ───
+// ─── STATE ───
 let selectedRole = 'buyer';
+let currentAuthMethod = 'email';
+let phoneConfirmationResult = null;
+let phoneTimerInterval = null;
+let phoneCountdown = 60;
+let phoneCodeSent = false;
+let phoneNumberFull = '';
 
+// ─── ROLE SELECTOR ───
 function selectRole(el) {
     document.querySelectorAll('.role-selector .role').forEach(r => r.classList.remove('active'));
     el.classList.add('active');
@@ -512,6 +886,17 @@ function selectRole(el) {
 
     const sellerFields = document.getElementById('sellerFields');
     sellerFields.style.display = selectedRole === 'seller' ? 'block' : 'none';
+}
+
+// ─── AUTH METHOD SWITCH ───
+function switchAuthMethod(method) {
+    currentAuthMethod = method;
+    
+    document.querySelectorAll('.auth-method-toggle button').forEach(b => b.classList.remove('active'));
+    document.getElementById(method + 'MethodBtn').classList.add('active');
+    
+    document.querySelectorAll('.auth-method-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(method + 'Auth').classList.add('active');
 }
 
 // ─── PASSWORD STRENGTH ───
@@ -568,55 +953,261 @@ document.getElementById('regConfirmPassword').addEventListener('input', function
     }
 });
 
+// ─── SEND PHONE VERIFICATION CODE ───
+async function sendPhoneCode() {
+    const countryCode = document.getElementById('phoneCountryCode').value;
+    const phoneNumber = document.getElementById('regPhone').value.trim();
+    
+    if (!phoneNumber) {
+        showToast('Please enter your phone number', 'error');
+        return;
+    }
+
+    phoneNumberFull = countryCode + phoneNumber.replace(/[\s\-()]/g, '');
+
+    if (phoneNumberFull.length < 10) {
+        showToast('Please enter a valid phone number', 'error');
+        return;
+    }
+
+    const btn = document.getElementById('sendCodeBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+
+    try {
+        const recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+            'recaptcha-container',
+            { size: 'invisible' }
+        );
+
+        const result = await firebase.auth().signInWithPhoneNumber(
+            phoneNumberFull,
+            recaptchaVerifier
+        );
+
+        phoneConfirmationResult = result;
+        phoneCodeSent = true;
+        
+        btn.innerHTML = '<i class="fa-regular fa-check"></i> Code Sent!';
+        
+        startPhoneTimer();
+        
+        showToast('✅ SMS sent! Enter the verification code.', 'success');
+
+    } catch (error) {
+        console.error('Phone verification error:', error);
+        let errorMessage = 'Failed to send verification code.';
+        
+        switch (error.code) {
+            case 'auth/invalid-phone-number':
+                errorMessage = 'Invalid phone number. Please check and try again.';
+                break;
+            case 'auth/too-many-requests':
+                errorMessage = 'Too many attempts. Please try again later.';
+                break;
+            case 'auth/captcha-check-failed':
+                errorMessage = 'Security check failed. Please refresh and try again.';
+                break;
+            default:
+                errorMessage = error.message || 'Failed to send verification code.';
+        }
+        
+        showToast('❌ ' + errorMessage, 'error');
+        btn.innerHTML = '<i class="fa-solid fa-message"></i> Send Code';
+        btn.disabled = false;
+    }
+}
+
+// ─── START PHONE TIMER ───
+function startPhoneTimer() {
+    phoneCountdown = 60;
+    const timerText = document.getElementById('timerText');
+    const timerCount = document.getElementById('timerCount');
+    const resendBtn = document.getElementById('resendCodeBtn');
+    
+    timerText.style.display = 'block';
+    resendBtn.disabled = true;
+    
+    if (phoneTimerInterval) {
+        clearInterval(phoneTimerInterval);
+    }
+    
+    phoneTimerInterval = setInterval(() => {
+        phoneCountdown--;
+        timerCount.textContent = phoneCountdown;
+        
+        if (phoneCountdown <= 0) {
+            clearInterval(phoneTimerInterval);
+            phoneTimerInterval = null;
+            timerText.style.display = 'none';
+            resendBtn.disabled = false;
+            document.getElementById('sendCodeBtn').disabled = false;
+            document.getElementById('sendCodeBtn').innerHTML = '<i class="fa-solid fa-message"></i> Send Code';
+        }
+    }, 1000);
+}
+
+// ─── RESEND PHONE CODE ───
+async function resendPhoneCode() {
+    await sendPhoneCode();
+}
+
+// ─── VERIFY PHONE CODE ───
+function verifyPhoneCode() {
+    return new Promise((resolve, reject) => {
+        const code = document.getElementById('regPhoneCode').value.trim();
+        
+        if (!code) {
+            reject({ error: 'Please enter the verification code' });
+            return;
+        }
+
+        if (code.length < 6) {
+            reject({ error: 'Please enter a 6-digit code' });
+            return;
+        }
+
+        if (!phoneConfirmationResult) {
+            reject({ error: 'Please request a new verification code' });
+            return;
+        }
+
+        phoneConfirmationResult.confirm(code)
+            .then((result) => {
+                resolve({ success: true, user: result.user });
+            })
+            .catch((error) => {
+                let errorMessage = 'Invalid verification code.';
+                if (error.code === 'auth/invalid-verification-code') {
+                    errorMessage = 'Invalid code. Please check and try again.';
+                } else if (error.code === 'auth/session-expired') {
+                    errorMessage = 'Code expired. Please request a new code.';
+                }
+                reject({ error: errorMessage });
+            });
+    });
+}
+
 // ─── REGISTER FORM HANDLER ───
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const firstName = document.getElementById('regFirstName').value.trim();
     const lastName = document.getElementById('regLastName').value.trim();
-    const email = document.getElementById('regEmail').value.trim();
-    const password = document.getElementById('regPassword').value;
-    const confirm = document.getElementById('regConfirmPassword').value;
     const company = document.getElementById('regCompany').value.trim();
     const businessType = document.getElementById('regBusinessType').value;
-    const phone = document.getElementById('regPhone').value.trim();
-
-    if (!firstName || !lastName || !email || !password) {
-        showToast('Please fill in all required fields', 'error');
-        return;
-    }
-
-    if (password !== confirm) {
-        showToast('Passwords do not match', 'error');
-        return;
-    }
-
-    if (password.length < 6) {
-        showToast('Password must be at least 6 characters', 'error');
-        return;
-    }
-
-    if (selectedRole === 'seller' && !company) {
-        showToast('Please enter your company name', 'error');
-        return;
-    }
+    const whatsapp = document.getElementById('regWhatsApp').value.trim();
 
     const btn = document.getElementById('registerBtn');
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account...';
 
-    const result = await signUp(email, password, {
-        full_name: `${firstName} ${lastName}`,
-        first_name: firstName,
-        last_name: lastName,
-        role: selectedRole,
-        company: company,
-        businessType: businessType,
-        phone: phone
-    });
+    try {
+        let user = null;
+        let email = '';
+        let phoneNumber = '';
 
-    if (result.success) {
-        showToast(`Welcome ${firstName}! Account created!`, 'success');
+        if (currentAuthMethod === 'email') {
+            email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirmPassword').value;
+
+            if (!email || !password) {
+                showToast('Please fill in all required fields', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-regular fa-user-plus"></i> Create Account';
+                return;
+            }
+
+            if (password !== confirm) {
+                showToast('Passwords do not match', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-regular fa-user-plus"></i> Create Account';
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-regular fa-user-plus"></i> Create Account';
+                return;
+            }
+
+            if (selectedRole === 'seller' && !company) {
+                showToast('Please enter your company name', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-regular fa-user-plus"></i> Create Account';
+                return;
+            }
+
+            const result = await signUp(email, password, {
+                full_name: `${firstName} ${lastName}`,
+                first_name: firstName,
+                last_name: lastName,
+                role: selectedRole,
+                company: company,
+                businessType: businessType,
+                phone: '',
+                whatsapp: whatsapp
+            });
+
+            if (!result.success) {
+                showToast(result.error, 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-regular fa-user-plus"></i> Create Account';
+                return;
+            }
+
+            user = result.user;
+
+        } else {
+            if (!phoneCodeSent) {
+                showToast('Please verify your phone number first', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-regular fa-user-plus"></i> Create Account';
+                return;
+            }
+
+            const verifyResult = await verifyPhoneCode();
+            if (!verifyResult.success) {
+                showToast(verifyResult.error, 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-regular fa-user-plus"></i> Create Account';
+                return;
+            }
+
+            user = verifyResult.user;
+            phoneNumber = user.phoneNumber || phoneNumberFull;
+
+            await db.collection('users').doc(user.uid).set({
+                full_name: `${firstName} ${lastName}`,
+                first_name: firstName,
+                last_name: lastName,
+                email: '',
+                phone: phoneNumber,
+                role: selectedRole,
+                company: company,
+                business_type: businessType,
+                whatsapp: whatsapp,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                status: 'active',
+                is_phone_verified: true
+            });
+        }
+
+        localStorage.setItem('pilot_user', JSON.stringify({
+            id: user.uid,
+            email: user.email || email || '',
+            phone: user.phoneNumber || phoneNumber || '',
+            full_name: `${firstName} ${lastName}`,
+            role: selectedRole,
+            avatar: user.photoURL || ''
+        }));
+
+        updateAuthUI();
+        showToast(`✅ Welcome ${firstName}! Account created!`, 'success');
+
         setTimeout(() => {
             if (selectedRole === 'seller') {
                 window.location.href = 'seller-dashboard';
@@ -624,8 +1215,10 @@ document.getElementById('registerForm').addEventListener('submit', async functio
                 window.location.href = 'home';
             }
         }, 1500);
-    } else {
-        showToast(result.error, 'error');
+
+    } catch (error) {
+        console.error('Registration error:', error);
+        showToast('❌ ' + (error.message || 'Registration failed. Please try again.'), 'error');
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-regular fa-user-plus"></i> Create Account';
     }
@@ -633,12 +1226,44 @@ document.getElementById('registerForm').addEventListener('submit', async functio
 
 // ─── GOOGLE SIGN UP ───
 async function signUpWithGoogle() {
-    const result = await signInWithGoogle();
-    if (result.success) {
-        showToast('Google sign up successful!', 'success');
-        setTimeout(() => window.location.href = 'home', 1000);
+    const btn = document.getElementById('googleSignUpBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
+    
+    try {
+        const result = await signInWithGoogle();
+        if (result.success) {
+            showToast('✅ Google sign up successful!', 'success');
+            setTimeout(() => window.location.href = 'home', 1500);
+        }
+    } catch (error) {
+        console.error('Google sign up error:', error);
+        showToast('❌ Failed to sign up with Google', 'error');
     }
+    
+    btn.disabled = false;
+    btn.innerHTML = '<img src="https://www.google.com/favicon.ico" style="width:18px; height:18px;" alt="Google" /> Sign up with Google';
 }
+
+// ─── ENTER KEY SUPPORT ───
+document.getElementById('regPhoneCode').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && this.value.length === 6) {
+        // The form submit will handle it
+    }
+});
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', function() {
+    loadCartCount();
+    loadWishlistCount();
+});
+
+// ─── EXPOSE FUNCTIONS ───
+window.selectRole = selectRole;
+window.switchAuthMethod = switchAuthMethod;
+window.sendPhoneCode = sendPhoneCode;
+window.resendPhoneCode = resendPhoneCode;
+window.signUpWithGoogle = signUpWithGoogle;
 </script>
 
 </body>

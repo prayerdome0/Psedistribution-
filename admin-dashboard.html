@@ -69,6 +69,10 @@
             margin-bottom: 0.2rem;
             font-size: 0.85rem;
             position: relative;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
         }
         .admin-sidebar .nav-item:hover {
             background: rgba(255,255,255,0.05);
@@ -119,6 +123,30 @@
         .admin-sidebar .logout-btn:hover {
             background: rgba(255,255,255,0.05);
             color: var(--white);
+        }
+
+        /* ─── BACK TO HOME BUTTON ─── */
+        .back-home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        .back-home-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        .back-home-btn i {
+            color: var(--accent);
         }
 
         .admin-content {
@@ -197,7 +225,40 @@
         .stat-card .stat-number.orange { color: #e67e22; }
         .stat-card .stat-number.red { color: #c0392b; }
 
-        /* ─── TABLE ─── */
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .quick-actions .action-btn {
+            background: var(--light);
+            border: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+        }
+        .quick-actions .action-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+        .quick-actions .action-btn i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .quick-actions .action-btn span {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            font-weight: 500;
+        }
+
         .table-container {
             overflow-x: auto;
         }
@@ -258,76 +319,7 @@
         .btn-action.approve { background: #d4edda; color: #155724; }
         .btn-action.reply { background: #cce5ff; color: #004085; }
         .btn-action.delete { background: #f8d7da; color: #721c24; }
-        .btn-action.make-admin { background: #cce5ff; color: #004085; }
-        .btn-action.suspend { background: #f8d7da; color: #721c24; }
 
-        /* ─── IMAGE UPLOAD ─── */
-        .image-upload-box {
-            border: 2px dashed var(--border-dark);
-            border-radius: var(--radius-sm);
-            padding: 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-bottom: 1rem;
-            background: var(--light);
-        }
-        .image-upload-box:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-        .image-upload-box i {
-            font-size: 2.5rem;
-            color: var(--primary);
-            opacity: 0.5;
-            margin-bottom: 0.5rem;
-        }
-        .image-upload-box p {
-            color: var(--text-light);
-            font-size: 0.85rem;
-        }
-        .image-upload-box .file-name {
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .image-preview {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-top: 0.5rem;
-        }
-        .image-preview .preview-item {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-        .image-preview .preview-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .image-preview .preview-item .remove-btn {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            background: #c0392b;
-            color: var(--white);
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 0.6rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* ─── MODAL ─── */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -354,16 +346,6 @@
             overflow-y: auto;
             animation: slideIn 0.3s ease;
         }
-        .modal-overlay .modal-box h3 {
-            font-size: 1.2rem;
-            color: var(--secondary);
-            margin-bottom: 1rem;
-        }
-        .modal-overlay .modal-box h3 i {
-            color: var(--primary);
-            margin-right: 0.5rem;
-        }
-
         .modal-overlay .modal-box .form-group {
             margin-bottom: 1rem;
         }
@@ -375,7 +357,6 @@
             margin-bottom: 0.3rem;
         }
         .modal-overlay .modal-box .form-group input,
-        .modal-overlay .modal-box .form-group select,
         .modal-overlay .modal-box .form-group textarea {
             width: 100%;
             padding: 0.7rem 0.8rem;
@@ -385,23 +366,10 @@
             font-family: inherit;
             transition: var(--transition);
         }
-        .modal-overlay .modal-box .form-group input:focus,
-        .modal-overlay .modal-box .form-group select:focus,
-        .modal-overlay .modal-box .form-group textarea:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(26, 123, 107, 0.1);
-        }
         .modal-overlay .modal-box .form-group textarea {
             resize: vertical;
             min-height: 80px;
         }
-        .modal-overlay .modal-box .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
         .modal-overlay .modal-box .btn-group {
             display: flex;
             gap: 0.5rem;
@@ -419,23 +387,12 @@
             background: var(--primary);
             color: var(--white);
         }
-        .modal-overlay .modal-box .btn-group .btn-submit:hover {
-            background: var(--primary-dark);
-        }
-        .modal-overlay .modal-box .btn-group .btn-submit:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
         .modal-overlay .modal-box .btn-group .btn-close {
             background: var(--light);
             color: var(--secondary);
             border: 1px solid var(--border);
         }
-        .modal-overlay .modal-box .btn-group .btn-close:hover {
-            background: var(--border);
-        }
 
-        /* ─── NOTIFICATION POPUP ─── */
         .notif-popup {
             position: fixed;
             top: 20px;
@@ -453,69 +410,10 @@
         .notif-popup.show {
             display: block;
         }
-        .notif-popup .notif-title {
-            font-weight: 700;
-            color: var(--secondary);
-            font-size: 0.9rem;
-        }
-        .notif-popup .notif-message {
-            color: var(--text);
-            font-size: 0.85rem;
-            margin-top: 0.2rem;
-        }
-        .notif-popup .notif-time {
-            color: var(--text-light);
-            font-size: 0.7rem;
-            margin-top: 0.3rem;
-        }
-        .notif-popup .notif-close {
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: var(--text-light);
-        }
 
         @keyframes slideInRight {
             from { transform: translateX(100px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
-        }
-
-        .quick-actions {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-        }
-        .quick-actions .action-btn {
-            background: var(--light);
-            border: 1px solid var(--border);
-            padding: 1rem 1.5rem;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: var(--transition);
-            flex: 1;
-            min-width: 150px;
-            text-align: center;
-        }
-        .quick-actions .action-btn:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-        }
-        .quick-actions .action-btn i {
-            font-size: 1.5rem;
-            color: var(--primary);
-            display: block;
-            margin-bottom: 0.3rem;
-        }
-        .quick-actions .action-btn span {
-            font-size: 0.85rem;
-            color: var(--secondary);
-            font-weight: 500;
         }
 
         @media (max-width: 992px) {
@@ -556,21 +454,8 @@
             .stat-card .stat-number {
                 font-size: 1.5rem;
             }
-            .table-container table {
-                font-size: 0.75rem;
-            }
-            .table-container th,
-            .table-container td {
-                padding: 0.3rem 0.5rem;
-            }
-            .modal-overlay .modal-box .form-row {
-                grid-template-columns: 1fr;
-            }
-            .notif-popup {
-                top: 10px;
-                right: 10px;
-                left: 10px;
-                max-width: none;
+            .quick-actions .action-btn {
+                min-width: 120px;
             }
         }
 
@@ -583,10 +468,6 @@
             }
             .modal-overlay .modal-box {
                 padding: 1.5rem;
-            }
-            .image-preview .preview-item {
-                width: 60px;
-                height: 60px;
             }
         }
     </style>
@@ -636,6 +517,10 @@
             </div>
         </a>
         <div class="header-actions">
+            <!-- BACK TO HOME BUTTON -->
+            <a href="home" class="back-home-btn">
+                <i class="fa-solid fa-arrow-left"></i> Back to Home
+            </a>
             <span style="color: var(--text-light); font-size: 0.85rem;">
                 <i class="fa-regular fa-user"></i> <span id="adminName">Admin</span>
             </span>
@@ -657,32 +542,32 @@
                 <div class="admin-name" id="adminEmail">admin@pilot.com</div>
             </div>
 
-            <div class="nav-item active" onclick="showTab('dashboard')">
+            <button class="nav-item active" onclick="showTab('dashboard')">
                 <i class="fa-regular fa-chart-simple"></i> Overview
-            </div>
-            <div class="nav-item" onclick="showTab('messages')">
+            </button>
+            <button class="nav-item" onclick="showTab('messages')">
                 <i class="fa-regular fa-envelope"></i> Messages
                 <span class="badge" id="messageBadge">0</span>
-            </div>
-            <div class="nav-item" onclick="showTab('orders')">
+            </button>
+            <button class="nav-item" onclick="showTab('orders')">
                 <i class="fa-regular fa-receipt"></i> Orders
                 <span class="badge orange" id="orderBadge">0</span>
-            </div>
-            <div class="nav-item" onclick="showTab('products')">
+            </button>
+            <button class="nav-item" onclick="showTab('products')">
                 <i class="fa-regular fa-box"></i> Products
                 <span class="badge green" id="productBadge">0</span>
-            </div>
-            <div class="nav-item" onclick="showTab('users')">
+            </button>
+            <button class="nav-item" onclick="showTab('users')">
                 <i class="fa-regular fa-users"></i> Users
                 <span class="badge" id="userBadge">0</span>
-            </div>
-            <div class="nav-item" onclick="showTab('sellers')">
+            </button>
+            <button class="nav-item" onclick="showTab('sellers')">
                 <i class="fa-regular fa-store"></i> Sellers
                 <span class="badge orange" id="sellerBadge">0</span>
-            </div>
-            <div class="nav-item" onclick="showTab('settings')">
+            </button>
+            <button class="nav-item" onclick="showTab('settings')">
                 <i class="fa-regular fa-gear"></i> Settings
-            </div>
+            </button>
 
             <div class="logout-btn" onclick="logoutAdmin()">
                 <i class="fa-regular fa-right-from-bracket"></i> Logout
@@ -943,7 +828,7 @@
 </div>
 
 <!-- ============================================ -->
-<!-- ADD PRODUCT MODAL - WITH IMAGE UPLOAD -->
+<!-- ADD PRODUCT MODAL -->
 <!-- ============================================ -->
 <div class="modal-overlay" id="addProductModal">
     <div class="modal-box">
@@ -996,13 +881,11 @@
                 </select>
             </div>
 
-            <!-- ─── IMAGE UPLOAD - DIRECT FILE UPLOAD (NO URL) ─── -->
             <div class="form-group">
-                <label>Product Images (Upload 5+ images)</label>
+                <label>Product Images</label>
                 <div class="image-upload-box" onclick="document.getElementById('productImages').click()">
                     <i class="fa-regular fa-cloud-upload"></i>
-                    <p>Click to upload images or drag and drop</p>
-                    <p style="font-size:0.7rem; color:var(--text-light);">JPG, PNG, WebP supported (Max 5MB each)</p>
+                    <p>Click to upload images</p>
                     <span class="file-name" id="imageFileName">No files selected</span>
                 </div>
                 <input type="file" id="productImages" accept="image/*" multiple style="display:none;" onchange="handleImagePreview(event)" />
@@ -1060,29 +943,14 @@
 <div id="toast" class="toast"></div>
 
 <!-- ============================================ -->
-<!-- AUDIO FOR NOTIFICATIONS -->
-<!-- ============================================ -->
-<audio id="notifSound" style="display:none;">
-    <source src="data:audio/wav;base64,UklGRnoAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoAAACBhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFg==" type="audio/wav">
-</audio>
-
-<!-- ============================================ -->
 <!-- MAIN JAVASCRIPT -->
 <!-- ============================================ -->
 <script src="main.js"></script>
 
 <script>
 // ============================================
-// ADMIN DASHBOARD - COMPLETE JAVASCRIPT
+// ADMIN DASHBOARD - JAVASCRIPT
 // ============================================
-
-// ─── STATE ───
-let currentMessageId = null;
-let editingProductId = null;
-let uploadedImageUrls = [];
-let notificationSound = null;
-let messageListener = null;
-let orderListener = null;
 
 // ─── PROTECT ADMIN PAGE ───
 if (!window.protectAdmin()) {
@@ -1123,42 +991,6 @@ function showTab(tab) {
     if (tab === 'sellers') loadSellers();
 }
 
-// ─── PLAY NOTIFICATION SOUND ───
-function playNotificationSound() {
-    try {
-        const audio = document.getElementById('notifSound');
-        if (audio) {
-            audio.currentTime = 0;
-            audio.play().catch(e => console.log('Audio play failed:', e));
-        }
-    } catch (e) {
-        console.log('Sound error:', e);
-    }
-}
-
-// ─── SHOW NOTIFICATION POPUP ───
-function showNotificationPopup(title, message) {
-    const popup = document.getElementById('notifPopup');
-    document.getElementById('notifTitle').textContent = title;
-    document.getElementById('notifMessage').textContent = message;
-    document.getElementById('notifTime').textContent = new Date().toLocaleTimeString();
-    
-    popup.classList.add('show');
-    
-    // Play sound
-    playNotificationSound();
-    
-    // Auto hide after 8 seconds
-    clearTimeout(popup._timeout);
-    popup._timeout = setTimeout(() => {
-        popup.classList.remove('show');
-    }, 8000);
-}
-
-function closeNotifPopup() {
-    document.getElementById('notifPopup').classList.remove('show');
-}
-
 // ─── IMAGE PREVIEW ───
 function handleImagePreview(event) {
     const files = event.target.files;
@@ -1166,7 +998,6 @@ function handleImagePreview(event) {
     const fileName = document.getElementById('imageFileName');
 
     preview.innerHTML = '';
-    uploadedImageUrls = [];
 
     if (files.length > 0) {
         fileName.textContent = `${files.length} file(s) selected`;
@@ -1222,7 +1053,7 @@ function removePreviewImage(index) {
     }
 }
 
-// ─── ADD PRODUCT WITH IMAGE UPLOAD ───
+// ─── ADD PRODUCT ───
 document.getElementById('addProductForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -1234,28 +1065,18 @@ document.getElementById('addProductForm').addEventListener('submit', async funct
         const files = document.getElementById('productImages').files;
         const imageUrls = [];
 
-        // Upload images to Cloudinary
         if (files.length > 0) {
             showToast(`📤 Uploading ${files.length} images...`, 'info');
             for (const file of files) {
                 try {
-                    const result = await window.uploadToCloudinary(file, 'products');
+                    const result = await window.uploadToCloudinary(file, 'PSE-products');
                     if (result) {
                         imageUrls.push(result.secure_url);
-                        console.log('✅ Uploaded:', result.secure_url);
                     }
                 } catch (err) {
                     console.error('Upload failed:', file.name, err);
-                    showToast(`Failed to upload ${file.name}`, 'error');
                 }
             }
-        }
-
-        if (imageUrls.length === 0 && files.length > 0) {
-            showToast('⚠️ No images were uploaded successfully. Please try again.', 'error');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = editingProductId ? '<i class="fa-regular fa-floppy-disk"></i> Update Product' : '<i class="fa-regular fa-plus"></i> Add Product';
-            return;
         }
 
         const productData = {
@@ -1278,14 +1099,12 @@ document.getElementById('addProductForm').addEventListener('submit', async funct
             updated_at: new Date().toISOString()
         };
 
-        console.log('📦 Product Data:', productData);
-
         if (editingProductId) {
             await db.collection('products').doc(editingProductId).update(productData);
-            showToast('✅ Product updated with ' + imageUrls.length + ' images!', 'success');
+            showToast('✅ Product updated!', 'success');
         } else {
             await db.collection('products').add(productData);
-            showToast('✅ Product added with ' + imageUrls.length + ' images!', 'success');
+            showToast('✅ Product added!', 'success');
         }
 
         closeAddProduct();
@@ -1301,7 +1120,9 @@ document.getElementById('addProductForm').addEventListener('submit', async funct
     }
 });
 
-// ─── OPEN ADD PRODUCT ───
+// ─── OPEN/CLOSE ADD PRODUCT ───
+let editingProductId = null;
+
 function openAddProduct(productId) {
     editingProductId = productId || null;
     document.getElementById('addProductModal').classList.add('show');
@@ -1347,6 +1168,8 @@ function closeAddProduct() {
 }
 
 // ─── LOAD MESSAGES ───
+let allMessages = [];
+
 async function loadMessages() {
     const tbody = document.getElementById('messageTableBody');
     try {
@@ -1366,12 +1189,7 @@ async function loadMessages() {
         document.getElementById('messageCount').textContent = `${unreadCount} unread`;
 
         if (allMessages.length === 0) {
-            tbody.innerHTML = `
-                <tr><td colspan="7" style="text-align:center; color:var(--text-light); padding:2rem;">
-                    <i class="fa-regular fa-envelope" style="font-size:2rem; color:var(--primary);"></i>
-                    <p style="margin-top:0.5rem;">No messages yet</p>
-                </td></tr>
-            `;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-light); padding:2rem;">No messages yet</td></tr>`;
             return;
         }
 
@@ -1380,17 +1198,11 @@ async function loadMessages() {
                 <td><strong>${m.firstName || ''} ${m.lastName || ''}</strong></td>
                 <td>${m.email || ''}</td>
                 <td>${m.subject || 'General'}</td>
-                <td>
-                    <div style="max-height:60px; overflow:hidden; position:relative; font-size:0.85rem; color:var(--text);">
-                        ${m.message || ''}
-                        ${(m.message || '').length > 80 ? '<span style="position:absolute; bottom:0; right:0; background:var(--white); padding-left:4px;">...</span>' : ''}
-                    </div>
-                </td>
+                <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.message || ''}</td>
                 <td><span class="status-badge ${m.status === 'unread' ? 'unread' : 'read'}">${m.status || 'unread'}</span></td>
                 <td>${m.created_at ? new Date(m.created_at).toLocaleDateString() : 'N/A'}</td>
                 <td>
                     <button class="btn-action view" onclick="viewMessage('${m.id}')"><i class="fa-regular fa-eye"></i></button>
-                    <button class="btn-action reply" onclick="replyMessage('${m.id}')"><i class="fa-regular fa-reply"></i></button>
                     ${m.status === 'unread' ? `<button class="btn-action approve" onclick="markAsRead('${m.id}')"><i class="fa-regular fa-circle-check"></i></button>` : ''}
                     <button class="btn-action delete" onclick="deleteMessage('${m.id}')"><i class="fa-regular fa-trash-can"></i></button>
                 </td>
@@ -1403,7 +1215,8 @@ async function loadMessages() {
     }
 }
 
-// ─── VIEW MESSAGE ───
+let currentMessageId = null;
+
 function viewMessage(id) {
     const message = allMessages.find(m => m.id === id);
     if (!message) return;
@@ -1416,48 +1229,8 @@ function viewMessage(id) {
 
     if (message.status === 'unread') {
         db.collection('messages').doc(id).update({ status: 'read' });
-        message.status = 'read';
         loadMessages();
         updateStats();
-    }
-}
-
-function replyMessage(id) {
-    viewMessage(id);
-    document.getElementById('modalResponse').focus();
-}
-
-async function sendReply() {
-    const response = document.getElementById('modalResponse').value.trim();
-    if (!response) {
-        showToast('Please enter a reply message', 'error');
-        return;
-    }
-
-    try {
-        const message = allMessages.find(m => m.id === currentMessageId);
-        if (message) {
-            await db.collection('replies').add({
-                message_id: currentMessageId,
-                reply: response,
-                sent_at: new Date().toISOString(),
-                to_email: message.email,
-                from_email: 'Pilot.wholesale@yahoo.com'
-            });
-
-            await db.collection('messages').doc(currentMessageId).update({
-                status: 'read',
-                replied: true,
-                replied_at: new Date().toISOString()
-            });
-
-            showToast('✅ Reply sent successfully!', 'success');
-            closeResponseModal();
-            loadMessages();
-        }
-    } catch (error) {
-        console.error('Error sending reply:', error);
-        showToast('❌ Failed to send reply', 'error');
     }
 }
 
@@ -1465,7 +1238,6 @@ async function markAsRead(id) {
     try {
         await db.collection('messages').doc(id).update({ status: 'read' });
         loadMessages();
-        updateStats();
         showToast('✅ Marked as read', 'success');
     } catch (error) {
         console.error('Error:', error);
@@ -1477,7 +1249,6 @@ async function deleteMessage(id) {
     try {
         await db.collection('messages').doc(id).delete();
         loadMessages();
-        updateStats();
         showToast('🗑️ Message deleted', 'info');
     } catch (error) {
         console.error('Error:', error);
@@ -1490,6 +1261,8 @@ function closeResponseModal() {
 }
 
 // ─── LOAD ORDERS ───
+let allOrders = [];
+
 async function loadOrders() {
     const tbody = document.getElementById('orderTableBody');
     try {
@@ -1506,12 +1279,7 @@ async function loadOrders() {
         document.getElementById('orderCount').textContent = `${allOrders.length} orders`;
 
         if (allOrders.length === 0) {
-            tbody.innerHTML = `
-                <tr><td colspan="7" style="text-align:center; color:var(--text-light); padding:2rem;">
-                    <i class="fa-regular fa-receipt" style="font-size:2rem; color:var(--primary);"></i>
-                    <p style="margin-top:0.5rem;">No orders yet</p>
-                </td></tr>
-            `;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-light); padding:2rem;">No orders yet</td></tr>`;
             return;
         }
 
@@ -1524,7 +1292,7 @@ async function loadOrders() {
                 <td><span class="status-badge ${o.status || 'pending'}">${o.status || 'Pending'}</span></td>
                 <td>${o.created_at ? new Date(o.created_at).toLocaleDateString() : 'N/A'}</td>
                 <td>
-                    <button class="btn-action view" onclick="viewOrder('${o.id}')"><i class="fa-regular fa-eye"></i></button>
+                    <button class="btn-action view" onclick="showToast('Order #${o.quoteNumber || 'N/A'} - $${(o.totals?.total || 0).toFixed(2)}', 'info')"><i class="fa-regular fa-eye"></i></button>
                     ${o.status !== 'processing' ? `<button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'processing')">Process</button>` : ''}
                     ${o.status !== 'shipped' ? `<button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'shipped')">Ship</button>` : ''}
                     ${o.status !== 'delivered' ? `<button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'delivered')">Deliver</button>` : ''}
@@ -1536,17 +1304,6 @@ async function loadOrders() {
         console.error('Error loading orders:', error);
         tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-light); padding:2rem;">Error loading orders</td></tr>`;
     }
-}
-
-function viewOrder(id) {
-    const order = allOrders.find(o => o.id === id);
-    if (!order) return;
-    
-    let itemsList = (order.items || []).map(item => 
-        `${item.quantity || 1}x ${item.title} - $${((item.price || 0) * (item.quantity || 1)).toFixed(2)}`
-    ).join('\n');
-    
-    showToast(`📋 Order ${order.quoteNumber || 'N/A'}\n${itemsList}`, 'info');
 }
 
 async function updateOrderStatus(id, status) {
@@ -1565,6 +1322,8 @@ async function updateOrderStatus(id, status) {
 }
 
 // ─── LOAD PRODUCTS ───
+let allProducts = [];
+
 async function loadProducts() {
     const tbody = document.getElementById('productTableBody');
     try {
@@ -1578,38 +1337,23 @@ async function loadProducts() {
         document.getElementById('productCount').textContent = `${allProducts.length} products`;
 
         if (allProducts.length === 0) {
-            tbody.innerHTML = `
-                <tr><td colspan="6" style="text-align:center; color:var(--text-light); padding:2rem;">
-                    <i class="fa-regular fa-box" style="font-size:2rem; color:var(--primary);"></i>
-                    <p style="margin-top:0.5rem;">No products yet</p>
-                </td></tr>
-            `;
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-light); padding:2rem;">No products yet</td></tr>`;
             return;
         }
 
-        tbody.innerHTML = allProducts.map(p => {
-            const imagePreview = p.image_url ? 
-                `<img src="${p.image_url}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;" />` : 
-                `<i class="fa-solid fa-box" style="font-size:1.2rem; color:var(--text-light);"></i>`;
-            return `
-                <tr>
-                    <td>
-                        <div style="display:flex; align-items:center; gap:0.5rem;">
-                            ${imagePreview}
-                            <strong>${p.title || 'Untitled'}</strong>
-                        </div>
-                    </td>
-                    <td>${p.brand || 'N/A'}</td>
-                    <td>$${(p.price || 0).toFixed(2)}</td>
-                    <td>${p.stock || 0}</td>
-                    <td><span class="status-badge ${p.status === 'active' ? 'active' : p.status === 'pending' ? 'pending' : 'inactive'}">${p.status || 'pending'}</span></td>
-                    <td>
-                        <button class="btn-action view" onclick="openAddProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
-                        <button class="btn-action delete" onclick="deleteProduct('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
+        tbody.innerHTML = allProducts.map(p => `
+            <tr>
+                <td><strong>${p.title || 'Untitled'}</strong></td>
+                <td>${p.brand || 'N/A'}</td>
+                <td>$${(p.price || 0).toFixed(2)}</td>
+                <td>${p.stock || 0}</td>
+                <td><span class="status-badge ${p.status === 'active' ? 'active' : 'inactive'}">${p.status || 'pending'}</span></td>
+                <td>
+                    <button class="btn-action view" onclick="openAddProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
+                    <button class="btn-action delete" onclick="deleteProduct('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
+                </td>
+            </tr>
+        `).join('');
 
     } catch (error) {
         console.error('Error loading products:', error);
@@ -1631,6 +1375,8 @@ async function deleteProduct(id) {
 }
 
 // ─── LOAD USERS ───
+let allUsers = [];
+
 async function loadUsers() {
     const tbody = document.getElementById('userTableBody');
     try {
@@ -1644,12 +1390,7 @@ async function loadUsers() {
         document.getElementById('userCount').textContent = `${allUsers.length} users`;
 
         if (allUsers.length === 0) {
-            tbody.innerHTML = `
-                <tr><td colspan="6" style="text-align:center; color:var(--text-light); padding:2rem;">
-                    <i class="fa-regular fa-users" style="font-size:2rem; color:var(--primary);"></i>
-                    <p style="margin-top:0.5rem;">No users yet</p>
-                </td></tr>
-            `;
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-light); padding:2rem;">No users yet</td></tr>`;
             return;
         }
 
@@ -1657,12 +1398,12 @@ async function loadUsers() {
             <tr>
                 <td>${u.full_name || u.email || 'N/A'}</td>
                 <td>${u.email || ''}</td>
-                <td><span class="status-badge ${u.role === 'admin' ? 'active' : u.role === 'seller' ? 'pending' : ''}">${u.role || 'buyer'}</span></td>
+                <td><span class="status-badge ${u.role === 'admin' ? 'active' : ''}">${u.role || 'buyer'}</span></td>
                 <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
                 <td><span class="status-badge ${u.status === 'active' ? 'active' : 'inactive'}">${u.status || 'active'}</span></td>
                 <td>
-                    ${u.role !== 'admin' ? `<button class="btn-action make-admin" onclick="makeAdmin('${u.id}')"><i class="fa-regular fa-user-plus"></i></button>` : ''}
-                    ${u.status === 'active' && u.role !== 'admin' ? `<button class="btn-action suspend" onclick="suspendUser('${u.id}')"><i class="fa-regular fa-ban"></i></button>` : ''}
+                    ${u.role !== 'admin' ? `<button class="btn-action approve" onclick="makeAdmin('${u.id}')"><i class="fa-regular fa-user-plus"></i></button>` : ''}
+                    ${u.status === 'active' && u.role !== 'admin' ? `<button class="btn-action delete" onclick="suspendUser('${u.id}')"><i class="fa-regular fa-ban"></i></button>` : ''}
                 </td>
             </tr>
         `).join('');
@@ -1704,6 +1445,8 @@ async function suspendUser(id) {
 }
 
 // ─── LOAD SELLERS ───
+let allSellers = [];
+
 async function loadSellers() {
     const tbody = document.getElementById('sellerTableBody');
     try {
@@ -1720,12 +1463,7 @@ async function loadSellers() {
         document.getElementById('sellerCount').textContent = `${allSellers.length} sellers`;
 
         if (allSellers.length === 0) {
-            tbody.innerHTML = `
-                <tr><td colspan="6" style="text-align:center; color:var(--text-light); padding:2rem;">
-                    <i class="fa-regular fa-store" style="font-size:2rem; color:var(--primary);"></i>
-                    <p style="margin-top:0.5rem;">No sellers yet</p>
-                </td></tr>
-            `;
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-light); padding:2rem;">No sellers yet</td></tr>`;
             return;
         }
 
@@ -1735,10 +1473,10 @@ async function loadSellers() {
                 <td>${s.full_name || ''}</td>
                 <td>${s.email || ''}</td>
                 <td>0</td>
-                <td><span class="status-badge ${s.status === 'approved' ? 'active' : s.status === 'suspended' ? 'inactive' : 'pending'}">${s.status || 'pending'}</span></td>
+                <td><span class="status-badge ${s.status === 'approved' ? 'active' : 'pending'}">${s.status || 'pending'}</span></td>
                 <td>
                     ${s.status !== 'approved' ? `<button class="btn-action approve" onclick="approveSeller('${s.id}')"><i class="fa-regular fa-circle-check"></i></button>` : ''}
-                    ${s.status === 'approved' ? `<button class="btn-action suspend" onclick="suspendSeller('${s.id}')"><i class="fa-regular fa-ban"></i></button>` : ''}
+                    ${s.status === 'approved' ? `<button class="btn-action delete" onclick="suspendSeller('${s.id}')"><i class="fa-regular fa-ban"></i></button>` : ''}
                 </td>
             </tr>
         `).join('');
@@ -1807,48 +1545,6 @@ async function updateStats() {
     }
 }
 
-// ─── REAL-TIME LISTENERS FOR NOTIFICATIONS ───
-function setupRealtimeListeners() {
-    // Messages listener
-    if (messageListener) messageListener();
-    messageListener = db.collection('messages')
-        .where('status', '==', 'unread')
-        .onSnapshot((snapshot) => {
-            snapshot.docChanges().forEach(change => {
-                if (change.type === 'added') {
-                    const data = change.doc.data();
-                    const title = `📩 New Message from ${data.firstName || 'User'}`;
-                    const message = `${data.subject || 'General'}: ${(data.message || '').substring(0, 60)}${(data.message || '').length > 60 ? '...' : ''}`;
-                    showNotificationPopup(title, message);
-                    loadMessages();
-                    updateStats();
-                }
-            });
-        }, (error) => {
-            console.error('Messages listener error:', error);
-        });
-
-    // Orders listener
-    if (orderListener) orderListener();
-    orderListener = db.collection('orders')
-        .where('status', '==', 'pending')
-        .onSnapshot((snapshot) => {
-            snapshot.docChanges().forEach(change => {
-                if (change.type === 'added') {
-                    const data = change.doc.data();
-                    const customer = data.customer || {};
-                    const title = `📦 New Order Received!`;
-                    const message = `Order #${data.quoteNumber || 'N/A'} from ${customer.firstName || 'Guest'} - $${(data.totals?.total || 0).toFixed(2)}`;
-                    showNotificationPopup(title, message);
-                    loadOrders();
-                    updateStats();
-                }
-            });
-        }, (error) => {
-            console.error('Orders listener error:', error);
-        });
-}
-
 // ─── SAVE SETTINGS ───
 function saveSettings() {
     const settings = {
@@ -1864,14 +1560,18 @@ function saveSettings() {
 // ─── LOGOUT ───
 function logoutAdmin() {
     if (confirm('Are you sure you want to logout?')) {
-        if (messageListener) messageListener();
-        if (orderListener) orderListener();
         window.signOutUser();
     }
 }
 
 // ─── INIT ───
 document.addEventListener('DOMContentLoaded', function() {
+    const user = getCurrentUser();
+    if (user) {
+        document.getElementById('adminName').textContent = user.full_name || 'Admin';
+        document.getElementById('adminEmail').textContent = user.email || 'admin@pilot.com';
+    }
+
     loadMessages();
     loadOrders();
     loadProducts();
@@ -1889,26 +1589,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     } catch (e) {}
 
-    const user = getCurrentUser();
-    if (user) {
-        document.getElementById('adminName').textContent = user.full_name || 'Admin';
-        document.getElementById('adminEmail').textContent = user.email || 'admin@pilot.com';
-    }
-
-    // Setup real-time listeners for notifications
-    setupRealtimeListeners();
-
-    // Auto-refresh every 30 seconds
-    setInterval(() => {
-        if (document.getElementById('tab-messages').classList.contains('active')) loadMessages();
-        if (document.getElementById('tab-orders').classList.contains('active')) loadOrders();
-        if (document.getElementById('tab-products').classList.contains('active')) loadProducts();
-        if (document.getElementById('tab-users').classList.contains('active')) loadUsers();
-        if (document.getElementById('tab-sellers').classList.contains('active')) loadSellers();
-        updateStats();
-    }, 30000);
-
-    console.log('✅ Admin Dashboard initialized with real-time notifications!');
+    console.log('✅ Admin Dashboard initialized!');
 });
 
 // ─── EXPOSE FUNCTIONS ───
@@ -1916,12 +1597,9 @@ window.showTab = showTab;
 window.openAddProduct = openAddProduct;
 window.closeAddProduct = closeAddProduct;
 window.viewMessage = viewMessage;
-window.replyMessage = replyMessage;
-window.sendReply = sendReply;
-window.closeResponseModal = closeResponseModal;
 window.markAsRead = markAsRead;
 window.deleteMessage = deleteMessage;
-window.viewOrder = viewOrder;
+window.closeResponseModal = closeResponseModal;
 window.updateOrderStatus = updateOrderStatus;
 window.deleteProduct = deleteProduct;
 window.makeAdmin = makeAdmin;
@@ -1932,8 +1610,6 @@ window.saveSettings = saveSettings;
 window.logoutAdmin = logoutAdmin;
 window.handleImagePreview = handleImagePreview;
 window.removePreviewImage = removePreviewImage;
-window.showNotificationPopup = showNotificationPopup;
-window.closeNotifPopup = closeNotifPopup;
 </script>
 
 </body>
