@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy Policy - Pilot Sales Distribution</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Privacy Policy for Pilot Sales Distribution - Learn how we collect, use, and protect your information." />
+    <meta name="keywords" content="privacy policy, data protection, GDPR, CCPA, Pilot Sales" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Privacy Policy - Pilot Sales Distribution" />
+    <meta property="og:description" content="Your privacy matters to us." />
+    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo-192.png" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        /* ─── POLICY PAGE SPECIFIC STYLES ─── */
+        .policy-page {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 3rem;
+            border: 1px solid var(--border);
+        }
+
+        .policy-page .policy-header {
+            text-align: center;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 2rem;
+        }
+        .policy-page .policy-header h1 {
+            font-size: 2.5rem;
+            color: var(--secondary);
+        }
+        .policy-page .policy-header h1 span {
+            color: var(--primary);
+        }
+        .policy-page .policy-header .last-updated {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+        }
+
+        .policy-page h2 {
+            font-size: 1.3rem;
+            color: var(--secondary);
+            margin: 2rem 0 0.5rem;
+        }
+        .policy-page h2 i {
+            color: var(--primary);
+            margin-right: 0.5rem;
+        }
+
+        .policy-page p {
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .policy-page ul {
+            padding-left: 1.5rem;
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        .policy-page ul li {
+            margin-bottom: 0.3rem;
+        }
+
+        .policy-page .highlight-box {
+            background: var(--primary-light);
+            padding: 1.5rem;
+            border-radius: var(--radius-sm);
+            border-left: 4px solid var(--primary);
+            margin: 1.5rem 0;
+        }
+        .policy-page .highlight-box strong {
+            color: var(--secondary);
+        }
+
+        .policy-page .contact-info {
+            background: var(--light);
+            border-radius: var(--radius-sm);
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .policy-page .contact-info .item {
+            text-align: center;
+        }
+        .policy-page .contact-info .item i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .policy-page .contact-info .item .label {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .policy-page .contact-info .item .value {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        @media (max-width: 768px) {
+            .policy-page {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            .policy-page .policy-header h1 {
+                font-size: 1.8rem;
+            }
+            .policy-page .contact-info {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .policy-page {
+                padding: 1rem;
+            }
+            .policy-page .policy-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- TOP BAR WITH MOVING WORDS -->
+<!-- ============================================ -->
+<div class="top-bar">
+    <div class="container">
+        <div class="moving-words">
+            <div class="words-track">
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+            </div>
+        </div>
+        <div class="top-links">
+            <a href="track-order.html"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard.html"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login.html" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register.html" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- HEADER -->
+<!-- ============================================ -->
+<header class="header">
+    <div class="container">
+        <a href="home" class="logo">
+            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+            <div class="brand-name">
+                <span class="main">Pilot <span>Distribution</span></span>
+                <span class="sub">wholesale Marketplace</span>
+            </div>
+        </a>
+
+        <!-- Search -->
+        <div class="search-bar" id="searchBar">
+            <input type="text" id="searchInput" placeholder="Search wholesale products..."
+                   onkeyup="searchProductsFirebase(event)" autocomplete="off" />
+            <button onclick="searchProductsFirebase()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+
+        <div class="header-actions">
+            <a href="#" class="icon-btn" onclick="toggleWishlist()">
+                <i class="fa-regular fa-heart"></i>
+                <span>Wishlist</span>
+                <span class="badge-count wishlist-count">0</span>
+            </a>
+            <a href="cart.html" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+            <a href="account.html" class="icon-btn" id="accountBtn">
+                <i class="fa-regular fa-user"></i>
+                <span id="accountLabel">Account</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ============================================ -->
+<!-- NAVIGATION TABS -->
+<!-- ============================================ -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products.html" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about.html" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact.html" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center.html" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller.html" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+    </div>
+</nav>
+
+<!-- ============================================ -->
+<!-- MAIN CONTENT -->
+<!-- ============================================ -->
+<div class="container">
+
+    <div class="policy-page">
+
+        <!-- ─── POLICY HEADER ─── -->
+        <div class="policy-header">
+            <h1>Privacy <span>Policy</span></h1>
+            <p class="last-updated"><i class="fa-regular fa-clock"></i> Last Updated: July 16, 2026</p>
+        </div>
+
+        <!-- ─── INTRODUCTION ─── -->
+        <div class="highlight-box">
+            <strong>📌 Quick Summary:</strong><br />
+            We respect your privacy and are committed to protecting your personal data. This policy explains how we collect, use, and safeguard your information when you use our platform.
+        </div>
+
+        <p>
+            Pilot Sales Distribution ("we", "our", "us") operates the pilotsalesdistribution.com website. 
+            This page informs you of our policies regarding the collection, use, and disclosure of personal data 
+            when you use our Service and the choices you have associated with that data.
+        </p>
+
+        <!-- ─── INFORMATION WE COLLECT ─── -->
+        <h2><i class="fa-regular fa-circle-info"></i> Information We Collect</h2>
+        <p>We collect several different types of information for various purposes to provide and improve our Service to you.</p>
+        <ul>
+            <li><strong>Personal Data:</strong> Email address, first name, last name, phone number, address, and payment information.</li>
+            <li><strong>Usage Data:</strong> Information about how you interact with our website, including pages visited, time spent, and links clicked.</li>
+            <li><strong>Device Data:</strong> Browser type, IP address, device type, and operating system.</li>
+            <li><strong>Cookies:</strong> Small data files stored on your device to enhance your experience.</li>
+        </ul>
+
+        <!-- ─── HOW WE USE DATA ─── -->
+        <h2><i class="fa-regular fa-gear"></i> How We Use Your Data</h2>
+        <ul>
+            <li><strong>To Provide Service:</strong> Process orders, manage accounts, and deliver products.</li>
+            <li><strong>To Communicate:</strong> Send order confirmations, updates, and promotional offers.</li>
+            <li><strong>To Improve:</strong> Analyze usage to enhance our website and services.</li>
+            <li><strong>To Secure:</strong> Protect against fraud and unauthorized access.</li>
+            <li><strong>To Comply:</strong> Meet legal and regulatory requirements.</li>
+        </ul>
+
+        <!-- ─── DATA SHARING ─── -->
+        <h2><i class="fa-regular fa-share"></i> Data Sharing & Disclosure</h2>
+        <ul>
+            <li><strong>Service Providers:</strong> We may share data with trusted third-party service providers (payment processors, shipping companies) to fulfill orders.</li>
+            <li><strong>Legal Compliance:</strong> We may disclose data if required by law or to protect our rights.</li>
+            <li><strong>Business Transfers:</strong> In the event of a merger, acquisition, or sale, data may be transferred.</li>
+        </ul>
+        <p>We do not sell or rent your personal data to third parties for marketing purposes.</p>
+
+        <!-- ─── DATA SECURITY ─── -->
+        <h2><i class="fa-regular fa-shield"></i> Data Security</h2>
+        <p>
+            We implement industry-standard security measures to protect your data, including SSL/TLS encryption, 
+            secure servers, and access controls. However, no method of transmission over the internet is 100% secure.
+        </p>
+
+        <!-- ─── COOKIES ─── -->
+        <h2><i class="fa-regular fa-cookie"></i> Cookies</h2>
+        <p>
+            We use cookies to enhance your browsing experience, remember preferences, and analyze site traffic. 
+            You can manage cookie preferences in your browser settings. Essential cookies are necessary for basic site functionality.
+        </p>
+
+        <!-- ─── YOUR RIGHTS ─── -->
+        <h2><i class="fa-regular fa-user-check"></i> Your Rights</h2>
+        <p>You have the right to:</p>
+        <ul>
+            <li>Access, update, or delete your personal data</li>
+            <li>Withdraw consent for data processing</li>
+            <li>Request data portability</li>
+            <li>Opt-out of marketing communications</li>
+        </ul>
+        <p>
+            To exercise these rights, please contact us using the information below.
+        </p>
+
+        <!-- ─── CHILDREN'S PRIVACY ─── -->
+        <h2><i class="fa-regular fa-child"></i> Children's Privacy</h2>
+        <p>
+            Our Service is not directed at children under 13. We do not knowingly collect personal data from children. 
+            If you believe we have collected data from a child, please contact us.
+        </p>
+
+        <!-- ─── CHANGES TO POLICY ─── -->
+        <h2><i class="fa-regular fa-pen"></i> Changes to This Policy</h2>
+        <p>
+            We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy 
+            on this page and updating the "Last Updated" date. We encourage you to review this policy periodically.
+        </p>
+
+        <!-- ─── CONTACT INFORMATION ─── -->
+        <h2><i class="fa-regular fa-envelope"></i> Contact Us</h2>
+        <p>
+            If you have any questions about this Privacy Policy, please contact us:
+        </p>
+
+        <div class="contact-info">
+            <div class="item">
+                <i class="fa-regular fa-envelope"></i>
+                <div class="label">Email</div>
+                <div class="value">support@pilotsalesdistribution.com</div>
+            </div>
+            <div class="item">
+                <i class="fa-regular fa-phone"></i>
+                <div class="label">Phone</div>
+                <div class="value">+1 (909) 938-4682</div>
+            </div>
+            <div class="item">
+                <i class="fa-regular fa-location-dot"></i>
+                <div class="label">Address</div>
+                <div class="value">Sacramento, CA, USA</div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- FOOTER -->
+<!-- ============================================ -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="help-center.html">Help</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms &amp; Conditions</a>
+                <a href="become-seller.html">Become a Seller</a>
+            </div>
+            <div class="footer-social">
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- ============================================ -->
+<!-- TOAST NOTIFICATION -->
+<!-- ============================================ -->
+<div id="toast" class="toast"></div>
+
+<!-- ============================================ -->
+<!-- MAIN JAVASCRIPT -->
+<!-- ============================================ -->
+<script src="main.js"></script>
+
+<script>
+// ============================================
+// PRIVACY PAGE - JAVASCRIPT
+// ============================================
+
+// ─── SET CURRENT YEAR ───
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ─── SEARCH WITH FIREBASE ───
+async function searchProductsFirebase(event) {
+    const input = document.getElementById('searchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    const query = input.value.trim();
+
+    if (event && event.key === 'Enter' && query) {
+        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+        return;
+    }
+
+    if (query.length < 2) {
+        resultsDiv.classList.remove('show');
+        return;
+    }
+
+    try {
+        const snapshot = await db.collection('products')
+            .where('status', 'in', ['active', 'approved'])
+            .limit(5)
+            .get();
+
+        const products = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
+                (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
+                products.push({
+                    id: doc.id,
+                    ...data,
+                    image_url: data.image_url || data.images?.[0] || ''
+                });
+            }
+        });
+
+        if (products.length === 0) {
+            resultsDiv.innerHTML = `
+                <div style="padding:1rem; text-align:center; color:var(--text-light);">
+                    No products found for "${query}"
+                </div>
+            `;
+            resultsDiv.classList.add('show');
+            return;
+        }
+
+        resultsDiv.innerHTML = products.map(p => `
+            <div class="result-item" onclick="window.location.href='product-detail.html?id=${p.id}'">
+                <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
+                <div class="info">
+                    <div class="title">${p.title}</div>
+                    <div class="price">$${(p.price || 0).toFixed(2)}</div>
+                </div>
+            </div>
+        `).join('') + `
+            <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
+                <a href="products.html?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
+                    See all results for "${query}" →
+                </a>
+            </div>
+        `;
+
+        resultsDiv.classList.add('show');
+
+    } catch (error) {
+        console.error('Search error:', error);
+    }
+}
+
+// ─── CLOSE SEARCH RESULTS ───
+document.addEventListener('click', function(e) {
+    const searchBar = document.getElementById('searchBar');
+    if (!searchBar.contains(e.target)) {
+        document.getElementById('searchResults').classList.remove('show');
+    }
+});
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', function() {
+    loadCartCount();
+    loadWishlistCount();
+});
+</script>
+
+</body>
+</html>

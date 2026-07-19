@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Track Order - Pilot Sales Distribution</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Track your wholesale order at Pilot Sales Distribution. Enter your order number to check status." />
+    <meta name="keywords" content="track order, order status, wholesale tracking, Pilot Sales" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Track Order - Pilot Sales Distribution" />
+    <meta property="og:description" content="Track your wholesale order." />
+    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo-192.png" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        /* ─── TRACK ORDER SPECIFIC STYLES ─── */
+        .track-page {
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        .track-header {
+            text-align: center;
+            padding: 2rem 0;
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+            border-radius: var(--radius);
+            color: var(--white);
+            margin-bottom: 2rem;
+        }
+        .track-header h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+        }
+        .track-header h1 span {
+            color: var(--accent);
+        }
+        .track-header p {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            margin-top: 0.3rem;
+        }
+
+        /* ─── SEARCH BOX ─── */
+        .track-search {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2rem;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+        .track-search .search-box {
+            display: flex;
+            gap: 0.8rem;
+        }
+        .track-search .search-box input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid var(--border-dark);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            transition: var(--transition);
+            outline: none;
+        }
+        .track-search .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 123, 107, 0.1);
+        }
+        .track-search .search-box button {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        .track-search .search-box button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(26, 123, 107, 0.3);
+        }
+        .track-search .search-box button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .track-search .help-text {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.8rem;
+            text-align: center;
+        }
+        .track-search .help-text i {
+            color: var(--primary);
+        }
+
+        /* ─── ORDER RESULT ─── */
+        .order-result {
+            display: none;
+            animation: slideUp 0.4s ease;
+        }
+        .order-result.show {
+            display: block;
+        }
+
+        .order-result .order-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .order-result .order-card .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 1rem;
+        }
+        .order-result .order-card .order-header .order-number {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+        .order-result .order-card .order-header .order-number i {
+            color: var(--primary);
+            margin-right: 0.3rem;
+        }
+        .order-result .order-card .order-header .order-status {
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0.3rem 1.2rem;
+            border-radius: 30px;
+            text-transform: capitalize;
+        }
+        .order-status.pending { background: #fff3cd; color: #856404; }
+        .order-status.processing { background: #cce5ff; color: #004085; }
+        .order-status.shipped { background: #cce5ff; color: #004085; }
+        .order-status.delivered { background: #d4edda; color: #155724; }
+        .order-status.cancelled { background: #f8d7da; color: #721c24; }
+
+        /* ─── ORDER DETAILS ─── */
+        .order-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        .order-details-grid .detail-item .label {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .order-details-grid .detail-item .value {
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 0.95rem;
+        }
+
+        /* ─── ORDER ITEMS ─── */
+        .order-items {
+            margin: 1rem 0;
+        }
+        .order-items .items-title {
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+        .order-items .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+        .order-items .item-row:last-child {
+            border-bottom: none;
+        }
+        .order-items .item-row .item-name {
+            color: var(--text);
+        }
+        .order-items .item-row .item-price {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        /* ─── ORDER TOTALS ─── */
+        .order-totals {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border);
+        }
+        .order-totals .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.2rem 0;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+        .order-totals .total-row .amount {
+            font-weight: 600;
+        }
+        .order-totals .total-row.grand-total {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--secondary);
+            border-top: 1px solid var(--border);
+            padding-top: 0.5rem;
+            margin-top: 0.3rem;
+        }
+        .order-totals .total-row.grand-total .amount {
+            color: var(--primary);
+        }
+
+        /* ─── TIMELINE ─── */
+        .order-timeline {
+            margin: 1.5rem 0;
+            position: relative;
+            padding-left: 2rem;
+        }
+        .order-timeline::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 4px;
+            bottom: 4px;
+            width: 2px;
+            background: var(--border-dark);
+        }
+        .timeline-step {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+        .timeline-step:last-child {
+            padding-bottom: 0;
+        }
+        .timeline-step .dot {
+            position: absolute;
+            left: -2rem;
+            top: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--border-dark);
+            border: 2px solid var(--white);
+            box-shadow: 0 0 0 2px var(--border-dark);
+            transition: var(--transition);
+        }
+        .timeline-step .dot.completed {
+            background: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        .timeline-step .dot.active {
+            background: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent);
+            animation: timelinePulse 1.5s infinite;
+        }
+        @keyframes timelinePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        .timeline-step .step-content .step-title {
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 0.95rem;
+        }
+        .timeline-step .step-content .step-title.completed {
+            color: var(--primary);
+        }
+        .timeline-step .step-content .step-title.active {
+            color: var(--accent);
+        }
+        .timeline-step .step-content .step-date {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 0.1rem;
+        }
+        .timeline-step .step-content .step-desc {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* ─── NOT FOUND ─── */
+        .not-found {
+            display: none;
+            text-align: center;
+            padding: 3rem 2rem;
+            background: var(--white);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+        .not-found.show {
+            display: block;
+        }
+        .not-found i {
+            font-size: 4rem;
+            color: var(--border-dark);
+            margin-bottom: 0.5rem;
+        }
+        .not-found h3 {
+            color: var(--secondary);
+            margin-bottom: 0.3rem;
+        }
+        .not-found p {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+        .not-found .btn-try-again {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.5rem 2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .not-found .btn-try-again:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* ─── LOADING ─── */
+        .track-loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+        }
+        .track-loading i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 768px) {
+            .track-header h1 {
+                font-size: 2rem;
+            }
+            .track-search .search-box {
+                flex-direction: column;
+            }
+            .track-search .search-box button {
+                width: 100%;
+                justify-content: center;
+            }
+            .order-details-grid {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+            .order-result .order-card {
+                padding: 1.2rem;
+            }
+            .order-result .order-card .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .order-timeline {
+                padding-left: 1.5rem;
+            }
+            .timeline-step .dot {
+                left: -1.5rem;
+                width: 14px;
+                height: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .track-header h1 {
+                font-size: 1.6rem;
+            }
+            .track-search {
+                padding: 1rem;
+            }
+            .order-result .order-card {
+                padding: 1rem;
+            }
+            .order-items .item-row {
+                font-size: 0.8rem;
+                flex-wrap: wrap;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- TOP BAR WITH MOVING WORDS -->
+<!-- ============================================ -->
+<div class="top-bar">
+    <div class="container">
+        <div class="moving-words">
+            <div class="words-track">
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+            </div>
+        </div>
+        <div class="top-links">
+            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- HEADER -->
+<!-- ============================================ -->
+<header class="header">
+    <div class="container">
+        <a href="home" class="logo">
+            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+            <div class="brand-name">
+                <span class="main">PSE <span>Distribution</span></span>
+                <span class="sub">wholesale</span>
+            </div>
+        </a>
+
+        <!-- Search -->
+        <div class="search-bar" id="searchBar">
+            <input type="text" id="searchInput" placeholder="Search wholesale products..."
+                   onkeyup="searchProductsFirebase(event)" autocomplete="off" />
+            <button onclick="searchProductsFirebase()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+
+        <div class="header-actions">
+            <a href="#" class="icon-btn" onclick="toggleWishlist()">
+                <i class="fa-regular fa-heart"></i>
+                <span>Wishlist</span>
+                <span class="badge-count wishlist-count">0</span>
+            </a>
+            <a href="cart" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+            <a href="account" class="icon-btn" id="accountBtn">
+                <i class="fa-regular fa-user"></i>
+                <span id="accountLabel">Account</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ============================================ -->
+<!-- NAVIGATION TABS -->
+<!-- ============================================ -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="home"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+    </div>
+</nav>
+
+<!-- ============================================ -->
+<!-- MAIN CONTENT -->
+<!-- ============================================ -->
+<div class="container">
+
+    <div class="track-page">
+
+        <!-- ─── TRACK HEADER ─── -->
+        <div class="track-header animate-on-scroll">
+            <h1>Track Your <span>Order</span></h1>
+            <p>Enter your order number to check the status</p>
+        </div>
+
+        <!-- ─── SEARCH BOX ─── -->
+        <div class="track-search animate-on-scroll">
+            <div class="search-box">
+                <input type="text" id="trackInput" placeholder="Enter order number (e.g., QTE-12345678-ABC)" />
+                <button onclick="trackOrder()" id="trackBtn">
+                    <i class="fa-solid fa-magnifying-glass"></i> Track Order
+                </button>
+            </div>
+            <div class="help-text">
+                <i class="fa-regular fa-circle-info"></i> Enter your order or quote number from your confirmation email
+            </div>
+        </div>
+
+        <!-- ─── LOADING ─── -->
+        <div class="track-loading" id="trackLoading" style="display:none;">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <p>Searching for your order...</p>
+        </div>
+
+        <!-- ─── NOT FOUND ─── -->
+        <div class="not-found" id="notFound">
+            <i class="fa-regular fa-circle-xmark"></i>
+            <h3>Order Not Found</h3>
+            <p>We couldn't find an order with that number. Please check and try again.</p>
+            <button class="btn-try-again" onclick="resetSearch()">
+                <i class="fa-regular fa-arrow-left"></i> Try Again
+            </button>
+        </div>
+
+        <!-- ─── ORDER RESULT ─── -->
+        <div class="order-result" id="orderResult">
+            <div id="orderContent"></div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- FOOTER -->
+<!-- ============================================ -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="about">About</a>
+                <a href="contact">Contact</a>
+                <a href="help-center">Help</a>
+                <a href="privacy">Privacy Policy</a>
+                <a href="terms">Terms &amp; Conditions</a>
+                <a href="become-seller">Become a Seller</a>
+            </div>
+            <div class="footer-social">
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- ============================================ -->
+<!-- TOAST NOTIFICATION -->
+<!-- ============================================ -->
+<div id="toast" class="toast"></div>
+
+<!-- ============================================ -->
+<!-- MAIN JAVASCRIPT -->
+<!-- ============================================ -->
+<script src="main.js"></script>
+
+<script>
+// ============================================
+// TRACK ORDER PAGE - JAVASCRIPT
+// ============================================
+
+// ─── SET CURRENT YEAR ───
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ─── SEARCH WITH FIREBASE ───
+async function searchProductsFirebase(event) {
+    const input = document.getElementById('searchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    const query = input.value.trim();
+
+    if (event && event.key === 'Enter' && query) {
+        window.location.href = `products?search=${encodeURIComponent(query)}`;
+        return;
+    }
+
+    if (query.length < 2) {
+        resultsDiv.classList.remove('show');
+        return;
+    }
+
+    try {
+        const snapshot = await db.collection('products')
+            .where('status', 'in', ['active', 'approved'])
+            .limit(5)
+            .get();
+
+        const products = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
+                (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
+                products.push({
+                    id: doc.id,
+                    ...data,
+                    image_url: data.image_url || data.images?.[0] || ''
+                });
+            }
+        });
+
+        if (products.length === 0) {
+            resultsDiv.innerHTML = `
+                <div style="padding:1rem; text-align:center; color:var(--text-light);">
+                    No products found for "${query}"
+                </div>
+            `;
+            resultsDiv.classList.add('show');
+            return;
+        }
+
+        resultsDiv.innerHTML = products.map(p => `
+            <div class="result-item" onclick="window.location.href='product-detail?id=${p.id}'">
+                <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
+                <div class="info">
+                    <div class="title">${p.title}</div>
+                    <div class="price">$${(p.price || 0).toFixed(2)}</div>
+                </div>
+            </div>
+        `).join('') + `
+            <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
+                <a href="products?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
+                    See all results for "${query}" →
+                </a>
+            </div>
+        `;
+
+        resultsDiv.classList.add('show');
+
+    } catch (error) {
+        console.error('Search error:', error);
+    }
+}
+
+// ─── CLOSE SEARCH RESULTS ───
+document.addEventListener('click', function(e) {
+    const searchBar = document.getElementById('searchBar');
+    if (!searchBar.contains(e.target)) {
+        document.getElementById('searchResults').classList.remove('show');
+    }
+});
+
+// ─── TRACK ORDER ───
+async function trackOrder() {
+    const input = document.getElementById('trackInput');
+    const orderNumber = input.value.trim().toUpperCase();
+    const btn = document.getElementById('trackBtn');
+    const loading = document.getElementById('trackLoading');
+    const resultDiv = document.getElementById('orderResult');
+    const notFoundDiv = document.getElementById('notFound');
+    const contentDiv = document.getElementById('orderContent');
+
+    // Reset previous results
+    resultDiv.classList.remove('show');
+    notFoundDiv.classList.remove('show');
+    loading.style.display = 'none';
+
+    if (!orderNumber) {
+        showToast('Please enter an order number', 'error');
+        input.focus();
+        return;
+    }
+
+    // Show loading
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Searching...';
+    loading.style.display = 'block';
+
+    try {
+        let order = null;
+        let isQuote = false;
+
+        // ─── SEARCH IN LOCALSTORAGE ───
+        const orders = JSON.parse(localStorage.getItem('pilot_orders') || '[]');
+        const quotes = JSON.parse(localStorage.getItem('pilot_quotes') || '[]');
+
+        order = orders.find(o => o.orderNumber === orderNumber);
+        if (!order) {
+            order = quotes.find(q => q.quoteNumber === orderNumber);
+            isQuote = true;
+        }
+
+        // ─── SEARCH IN FIRESTORE ───
+        if (!order) {
+            try {
+                const user = getCurrentUser();
+                if (user) {
+                    const snapshot = await db.collection('orders')
+                        .where('user_id', '==', user.id)
+                        .get();
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.orderNumber === orderNumber || data.quoteNumber === orderNumber) {
+                            order = { id: doc.id, ...data };
+                            isQuote = data.quoteNumber ? true : false;
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error searching Firestore:', error);
+            }
+        }
+
+        // ─── SHOW RESULT ───
+        if (order) {
+            renderOrder(order, isQuote);
+            resultDiv.classList.add('show');
+            showToast('✅ Order found!', 'success');
+        } else {
+            notFoundDiv.classList.add('show');
+        }
+
+    } catch (error) {
+        console.error('Error tracking order:', error);
+        showToast('❌ Failed to track order. Please try again.', 'error');
+    } finally {
+        loading.style.display = 'none';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Track Order';
+    }
+}
+
+// ─── RENDER ORDER ───
+function renderOrder(order, isQuote) {
+    const content = document.getElementById('orderContent');
+
+    // ─── ORDER STATUS STEPS ───
+    const statusSteps = [
+        { key: 'pending', label: 'Order Received', icon: 'fa-regular fa-receipt', desc: 'Your order has been received and is being processed.' },
+        { key: 'processing', label: 'Processing', icon: 'fa-regular fa-gear', desc: 'Your order is being prepared for shipping.' },
+        { key: 'shipped', label: 'Shipped', icon: 'fa-regular fa-truck', desc: 'Your order has been shipped and is on its way.' },
+        { key: 'delivered', label: 'Delivered', icon: 'fa-regular fa-circle-check', desc: 'Your order has been delivered successfully.' }
+    ];
+
+    const currentStatus = order.status || 'pending';
+    const currentIndex = statusSteps.findIndex(s => s.key === currentStatus);
+    const orderDate = new Date(order.created_at || order.date || Date.now());
+
+    // ─── ORDER ITEMS ───
+    const items = order.items || [];
+    const totals = order.totals || {};
+    const customer = order.customer || {};
+
+    // ─── TIMELINE ───
+    let timelineHtml = statusSteps.map((step, index) => {
+        let statusClass = '';
+        if (index < currentIndex) statusClass = 'completed';
+        else if (index === currentIndex) statusClass = 'active';
+
+        return `
+            <div class="timeline-step">
+                <div class="dot ${statusClass}"></div>
+                <div class="step-content">
+                    <div class="step-title ${statusClass}">
+                        <i class="${step.icon}"></i> ${step.label}
+                        ${index === currentIndex ? ' <span style="font-size:0.6rem; background:var(--accent); color:var(--secondary); padding:0.1rem 0.6rem; border-radius:30px;">Current</span>' : ''}
+                        ${index < currentIndex ? ' <span style="font-size:0.6rem; color:var(--primary);">✓</span>' : ''}
+                    </div>
+                    ${index <= currentIndex ? `<div class="step-desc">${step.desc}</div>` : ''}
+                    ${index <= currentIndex ? `<div class="step-date">${orderDate.toLocaleDateString()} ${index === currentIndex ? '- In progress' : '- Completed'}</div>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // ─── ITEMS LIST ───
+    let itemsHtml = items.map(item => `
+        <div class="item-row">
+            <span class="item-name">${item.quantity || 1}x ${item.title}</span>
+            <span class="item-price">$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</span>
+        </div>
+    `).join('');
+
+    // ─── TOTALS ───
+    const subtotal = totals.subtotal || 0;
+    const discount = totals.discount || 0;
+    const shipping = totals.shipping || 0;
+    const tax = totals.tax || 0;
+    const total = totals.total || 0;
+
+    // ─── BUILD HTML ───
+    content.innerHTML = `
+        <div class="order-card">
+            <!-- Header -->
+            <div class="order-header">
+                <div class="order-number">
+                    <i class="fa-regular fa-receipt"></i> ${isQuote ? 'Quote' : 'Order'} #${order.quoteNumber || order.orderNumber || 'N/A'}
+                </div>
+                <span class="order-status ${currentStatus}">${currentStatus}</span>
+            </div>
+
+            <!-- Order Details -->
+            <div class="order-details-grid">
+                <div class="detail-item">
+                    <div class="label">Date</div>
+                    <div class="value">${orderDate.toLocaleString()}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="label">Customer</div>
+                    <div class="value">${customer.firstName || ''} ${customer.lastName || ''}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="label">Email</div>
+                    <div class="value">${customer.email || 'N/A'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="label">Payment Method</div>
+                    <div class="value">${order.paymentMethod || 'WhatsApp Quote'}</div>
+                </div>
+                ${customer.address ? `
+                <div class="detail-item" style="grid-column:1/-1;">
+                    <div class="label">Shipping Address</div>
+                    <div class="value">${customer.address}, ${customer.city || ''} ${customer.state || ''} ${customer.zip || ''}</div>
+                </div>
+                ` : ''}
+            </div>
+
+            <!-- Items -->
+            <div class="order-items">
+                <div class="items-title"><i class="fa-regular fa-box"></i> Items (${items.length})</div>
+                ${itemsHtml}
+            </div>
+
+            <!-- Totals -->
+            <div class="order-totals">
+                <div class="total-row">
+                    <span>Subtotal</span>
+                    <span class="amount">$${subtotal.toFixed(2)}</span>
+                </div>
+                ${discount > 0 ? `
+                <div class="total-row" style="color:var(--primary);">
+                    <span>Discount</span>
+                    <span class="amount">-$${discount.toFixed(2)}</span>
+                </div>
+                ` : ''}
+                <div class="total-row">
+                    <span>Shipping</span>
+                    <span class="amount">${shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2)}</span>
+                </div>
+                <div class="total-row">
+                    <span>Tax (8%)</span>
+                    <span class="amount">$${tax.toFixed(2)}</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>Total</span>
+                    <span class="amount">$${total.toFixed(2)}</span>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            ${order.notes ? `
+            <div style="margin-top:1rem; padding:0.8rem; background:var(--light); border-radius:var(--radius-sm); border-left:3px solid var(--primary);">
+                <strong style="color:var(--secondary);">📝 Notes:</strong>
+                <span style="color:var(--text); font-size:0.9rem;">${order.notes}</span>
+            </div>
+            ` : ''}
+
+            <!-- Timeline -->
+            <div class="order-timeline">
+                ${timelineHtml}
+            </div>
+
+            <!-- Quote Note -->
+            ${isQuote ? `
+            <div style="margin-top:1rem; padding:1rem; background:#fff3cd; border-radius:var(--radius-sm); text-align:center;">
+                <p style="font-size:0.9rem; color:#856404;">
+                    <i class="fa-regular fa-file-lines"></i> This is a quote request. We'll get back to you shortly!
+                </p>
+            </div>
+            ` : ''}
+
+            <!-- Delivery Note -->
+            ${currentStatus !== 'delivered' && currentStatus !== 'cancelled' ? `
+            <div style="margin-top:1rem; padding:1rem; background:var(--light); border-radius:var(--radius-sm); text-align:center; border:1px solid var(--border);">
+                <p style="font-size:0.85rem; color:var(--text-light);">
+                    <i class="fa-regular fa-envelope"></i> We'll send you email updates when your order status changes.
+                </p>
+            </div>
+            ` : ''}
+
+            <!-- WhatsApp Contact -->
+            <div style="margin-top:1.5rem; text-align:center;">
+                <a href="https://wa.me/19099384682" target="_blank" style="display:inline-flex; align-items:center; gap:0.5rem; background:#25D366; color:var(--white); padding:0.5rem 1.5rem; border-radius:50px; font-weight:600; transition:var(--transition); text-decoration:none;">
+                    <i class="fa-brands fa-whatsapp"></i> Contact Support
+                </a>
+            </div>
+        </div>
+    `;
+}
+
+// ─── RESET SEARCH ───
+function resetSearch() {
+    document.getElementById('trackInput').value = '';
+    document.getElementById('notFound').classList.remove('show');
+    document.getElementById('orderResult').classList.remove('show');
+    document.getElementById('trackInput').focus();
+}
+
+// ─── ENTER KEY SUPPORT ───
+document.getElementById('trackInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        trackOrder();
+    }
+});
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', function() {
+    loadCartCount();
+    loadWishlistCount();
+
+    // Auto-track if URL has order parameter
+    const params = new URLSearchParams(window.location.search);
+    const orderParam = params.get('order');
+    if (orderParam) {
+        document.getElementById('trackInput').value = orderParam;
+        setTimeout(trackOrder, 500);
+    }
+});
+
+// ─── EXPOSE FUNCTIONS ───
+window.trackOrder = trackOrder;
+window.resetSearch = resetSearch;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pilot Sales Distribution - Wholesale Marketplace</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Pilot Sales Distribution - Premium wholesale marketplace for bulk products. 12,000+ products, 580+ verified suppliers." />
+    <meta name="keywords" content="wholesale, bulk products, distribution, b2b, suppliers" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Pilot Sales Distribution" />
+    <meta property="og:description" content="Premium wholesale marketplace for bulk products." />
+    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
+    <meta property="og:url" content="https://pilotsalesdistribution.com/" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo-192.png" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        /* ─── STATISTICS COUNTER ─── */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+            border-radius: var(--radius);
+            color: var(--white);
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-item .number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .stat-item .label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-top: 0.2rem;
+        }
+
+        /* ─── TESTIMONIAL FORM ─── */
+        .testimonial-form-section {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2rem;
+            border: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+        .testimonial-form-section h3 {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            margin-bottom: 0.3rem;
+        }
+        .testimonial-form-section p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        .testimonial-form-section .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .testimonial-form-section .form-group {
+            margin-bottom: 1rem;
+        }
+        .testimonial-form-section .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 0.3rem;
+        }
+        .testimonial-form-section .form-group input,
+        .testimonial-form-section .form-group textarea,
+        .testimonial-form-section .form-group select {
+            width: 100%;
+            padding: 0.7rem 0.8rem;
+            border: 1px solid var(--border-dark);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .testimonial-form-section .form-group input:focus,
+        .testimonial-form-section .form-group textarea:focus,
+        .testimonial-form-section .form-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 123, 107, 0.1);
+        }
+        .testimonial-form-section .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .testimonial-form-section .btn-submit-testimonial {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .testimonial-form-section .btn-submit-testimonial:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(26, 123, 107, 0.3);
+        }
+        .testimonial-form-section .btn-submit-testimonial:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .testimonial-form-section .rating-stars {
+            display: flex;
+            gap: 0.3rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .testimonial-form-section .rating-stars .star {
+            color: #dce3e9;
+            transition: var(--transition);
+        }
+        .testimonial-form-section .rating-stars .star.active {
+            color: #f1c40f;
+        }
+        .testimonial-form-section .rating-stars .star:hover {
+            transform: scale(1.1);
+        }
+
+        /* ─── WHY CHOOSE US ─── */
+        .why-section {
+            margin: 3rem 0;
+        }
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .why-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+        .why-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+        .why-card .why-image {
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            margin-bottom: 1rem;
+        }
+        .why-card .why-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        .why-card:hover .why-image img {
+            transform: scale(1.05);
+        }
+        .why-card h3 {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            margin-bottom: 0.3rem;
+        }
+        .why-card p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* ─── REQUEST QUOTE SECTION ─── */
+        .quote-section {
+            margin: 3rem 0;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(11, 42, 59, 0.92), rgba(26, 75, 94, 0.92)),
+                        url('https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--radius);
+            text-align: center;
+            color: var(--white);
+            position: relative;
+        }
+        .quote-section h2 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .quote-section h2 span {
+            color: var(--accent);
+        }
+        .quote-section p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+        }
+        .quote-section .btn-white {
+            background: var(--white);
+            color: var(--secondary);
+            padding: 0.8rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .quote-section .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255,255,255,0.3);
+        }
+
+        /* ─── TESTIMONIALS DISPLAY ─── */
+        .testimonials-display {
+            margin: 3rem 0;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(11, 42, 59, 0.92), rgba(26, 75, 94, 0.92)),
+                        url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--radius);
+            color: var(--white);
+        }
+        .testimonials-display .section-title {
+            color: var(--white);
+        }
+        .testimonials-display .section-title span {
+            color: var(--accent);
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .testimonial-card {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(8px);
+            padding: 1.5rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .testimonial-card .stars {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        .testimonial-card .text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 0.8rem;
+        }
+        .testimonial-card .author {
+            font-weight: 600;
+        }
+        .testimonial-card .company {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* ─── TRUSTED COMPANIES LOGOS ─── */
+        .trusted-section {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 3rem 1.5rem;
+            margin: 3rem 0;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .trusted-section .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .trusted-section .section-title h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--secondary);
+        }
+        .trusted-section .section-title h2 span {
+            color: var(--primary);
+        }
+        .trusted-section .section-title p {
+            color: var(--text-light);
+            font-size: 1rem;
+            margin-top: 0.3rem;
+        }
+
+        .logo-carousel {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            padding: 1.5rem 0;
+        }
+        .logo-carousel::before,
+        .logo-carousel::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 80px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .logo-carousel::before {
+            left: 0;
+            background: linear-gradient(to right, var(--white), transparent);
+        }
+        .logo-carousel::after {
+            right: 0;
+            background: linear-gradient(to left, var(--white), transparent);
+        }
+
+        .logo-track {
+            display: flex;
+            animation: scrollLogos 35s linear infinite;
+            width: max-content;
+            gap: 2.5rem;
+            align-items: center;
+        }
+        .logo-track:hover {
+            animation-play-state: paused;
+        }
+
+        .logo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+            padding: 0.5rem 0.8rem;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+        .logo-item:hover {
+            opacity: 1;
+            transform: translateY(-4px);
+        }
+        .logo-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            transition: all 0.3s ease;
+        }
+        .logo-item:hover img {
+            transform: scale(1.1);
+        }
+        .logo-item span {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-top: 0.4rem;
+            transition: all 0.3s ease;
+        }
+        .logo-item:hover span {
+            color: var(--primary);
+        }
+
+        @keyframes scrollLogos {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ─── NEWSLETTER ─── */
+        .newsletter-section {
+            margin: 3rem 0;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, rgba(11, 42, 59, 0.92), rgba(26, 75, 94, 0.92)),
+                        url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--radius);
+            text-align: center;
+            color: var(--white);
+        }
+        .newsletter-section h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .newsletter-section h2 span {
+            color: var(--accent);
+        }
+        .newsletter-section p {
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .newsletter-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .newsletter-form input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.8rem 1.2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .newsletter-form button {
+            background: var(--accent);
+            color: var(--secondary);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .newsletter-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(241, 196, 15, 0.3);
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 992px) {
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .testimonial-form-section .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .stats-section {
+                grid-template-columns: 1fr 1fr;
+                padding: 1.5rem;
+            }
+            .stat-item .number {
+                font-size: 1.8rem;
+            }
+            .quote-section h2 {
+                font-size: 1.6rem;
+            }
+            .testimonials-display {
+                padding: 2rem 1rem;
+            }
+            .newsletter-section h2 {
+                font-size: 1.5rem;
+            }
+            .trusted-section {
+                padding: 2rem 0.5rem;
+            }
+            .trusted-section .section-title h2 {
+                font-size: 1.4rem;
+            }
+            .logo-item {
+                min-width: 70px;
+            }
+            .logo-item img {
+                width: 35px;
+                height: 35px;
+            }
+            .logo-carousel::before,
+            .logo-carousel::after {
+                width: 40px;
+            }
+        }
+        @media (max-width: 480px) {
+            .stats-section {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            .stat-item .number {
+                font-size: 1.4rem;
+            }
+            .stat-item .label {
+                font-size: 0.7rem;
+            }
+            .why-grid {
+                grid-template-columns: 1fr;
+            }
+            .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+            .logo-item {
+                min-width: 60px;
+                padding: 0.3rem 0.5rem;
+            }
+            .logo-item img {
+                width: 28px;
+                height: 28px;
+            }
+            .logo-item span {
+                font-size: 0.55rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- TOP BAR WITH MOVING WORDS -->
+<!-- ============================================ -->
+<div class="top-bar">
+    <div class="container">
+        <div class="moving-words">
+            <div class="words-track">
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+            </div>
+        </div>
+        <div class="top-links" id="topLinks">
+            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- HEADER -->
+<!-- ============================================ -->
+<header class="header">
+    <div class="container">
+        <a href="home" class="logo">
+            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+            <div class="brand-name">
+                <span class="main">PSE <span>Distribution</span></span>
+                <span class="sub">wholesale</span>
+            </div>
+        </a>
+
+        <!-- Search -->
+        <div class="search-bar" id="searchBar">
+            <input type="text" id="searchInput" placeholder="Search wholesale products..."
+                   onkeyup="searchProductsFirebase(event)" autocomplete="off" />
+            <button onclick="searchProductsFirebase()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+
+        <div class="header-actions">
+            <a href="#" class="icon-btn" onclick="toggleWishlist()">
+                <i class="fa-regular fa-heart"></i>
+                <span>Wishlist</span>
+                <span class="badge-count wishlist-count">0</span>
+            </a>
+            <a href="cart" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+            <a href="account" class="icon-btn" id="accountBtn">
+                <i class="fa-regular fa-user"></i>
+                <span id="accountLabel">Account</span>
+            </a>
+            <a href="admin-dashboard" class="icon-btn admin-badge" id="adminLink" style="display:none;">
+                <i class="fa-solid fa-gauge-high"></i>
+                <span>Admin</span>
+                <span class="badge" id="adminBadgeCount">0</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ============================================ -->
+<!-- NAVIGATION TABS -->
+<!-- ============================================ -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="home" class="nav-tab active" id="navHome"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products" class="nav-tab" id="navProducts"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about" class="nav-tab" id="navAbout"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact" class="nav-tab" id="navContact"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center" class="nav-tab" id="navHelp"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller" class="nav-tab wholesale-nav" id="navSell"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="admin-dashboard" class="nav-tab" id="adminNavTab" style="display:none;">
+            <i class="fa-solid fa-gauge-high"></i> Dashboard
+            <span class="badge" id="adminNavBadge" style="background:#c0392b; color:#fff; font-size:0.6rem; padding:0.1rem 0.5rem; border-radius:30px; margin-left:0.3rem;">0</span>
+        </a>
+    </div>
+</nav>
+
+<!-- ============================================ -->
+<!-- MAIN CONTENT -->
+<!-- ============================================ -->
+<div class="container">
+
+    <!-- ========================================== -->
+    <!-- 1. HERO BANNER SLIDER -->
+    <!-- ========================================== -->
+    <div class="banner-slider" id="bannerSlider">
+
+        <div class="slide active" style="background: linear-gradient(135deg, #0b2a3b 0%, #1a4b5e 100%);">
+            <div class="content">
+                <span class="badge">🏪 Wholesale Marketplace</span>
+                <h2>Premium Products at <span>Wholesale Prices</span></h2>
+                <p>12,000+ products from 580+ verified suppliers. Quality guaranteed.</p>
+                <div class="buttons">
+                    <a href="products" class="btn-primary"><i class="fa-solid fa-cart-plus"></i> Shop Now</a>
+                    <a href="about" class="btn-outline-light">Learn More</a>
+                </div>
+            </div>
+            <div class="slide-image">
+                <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&h=800&q=80" alt="Wholesale Marketplace" loading="lazy" />
+            </div>
+        </div>
+
+        <div class="slide" style="background: linear-gradient(135deg, #1a7b6b 0%, #0f4f43 100%);">
+            <div class="content">
+                <span class="badge">🚚 Logistics &amp; Distribution</span>
+                <h2>Fast &amp; Reliable <span>Delivery</span></h2>
+                <p>Free shipping on orders over $250. Track your order in real-time.</p>
+                <div class="buttons">
+                    <a href="products" class="btn-primary"><i class="fa-solid fa-truck"></i> Browse Products</a>
+                    <a href="track-order" class="btn-outline-light">Track Order</a>
+                </div>
+            </div>
+            <div class="slide-image">
+                <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&h=800&q=80" alt="Logistics" loading="lazy" />
+            </div>
+        </div>
+
+        <div class="slide" style="background: linear-gradient(135deg, #2c3e50 0%, #1a2a3a 100%);">
+            <div class="content">
+                <span class="badge">🤝 Business Partnership</span>
+                <h2>Trusted <span>Suppliers</span></h2>
+                <p>Connect with verified suppliers worldwide. Quality products guaranteed.</p>
+                <div class="buttons">
+                    <a href="become-seller" class="btn-primary"><i class="fa-regular fa-store"></i> Become a Supplier</a>
+                    <a href="about" class="btn-outline-light">About Us</a>
+                </div>
+            </div>
+            <div class="slide-image">
+                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&h=800&q=80" alt="Business Partnership" loading="lazy" />
+            </div>
+        </div>
+
+        <div class="slide" style="background: linear-gradient(135deg, #1a4b5e 0%, #0b2a3b 100%);">
+            <div class="content">
+                <span class="badge">🌍 Global Supply Chain</span>
+                <h2>Worldwide <span>Distribution</span></h2>
+                <p>Electronics, Fashion, Grocery, Home &amp; more. All at wholesale prices.</p>
+                <div class="buttons">
+                    <a href="products" class="btn-primary"><i class="fa-regular fa-eye"></i> View All</a>
+                    <a href="#" class="btn-outline-light" onclick="document.getElementById('categories').scrollIntoView({behavior:'smooth'})">Categories</a>
+                </div>
+            </div>
+            <div class="slide-image">
+                <img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&h=800&q=80" alt="Global Supply Chain" loading="lazy" />
+            </div>
+        </div>
+
+        <div class="dots" id="bannerDots"></div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 2. STATISTICS COUNTER (REAL DATA) -->
+    <!-- ========================================== -->
+    <div class="stats-section animate-on-scroll">
+        <div class="stat-item">
+            <div class="number" id="statProducts">0</div>
+            <div class="label">Products Available</div>
+        </div>
+        <div class="stat-item">
+            <div class="number" id="statSuppliers">0</div>
+            <div class="label">Verified Suppliers</div>
+        </div>
+        <div class="stat-item">
+            <div class="number" id="statSatisfaction">0%</div>
+            <div class="label">Satisfaction Rate</div>
+        </div>
+        <div class="stat-item">
+            <div class="number" id="statOrders">0</div>
+            <div class="label">Orders Completed</div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 3. CATEGORIES WITH IMAGES -->
+    <!-- ========================================== -->
+    <div id="categories">
+        <div class="section-title animate-on-scroll">
+            <h2>Shop by <span>Category</span></h2>
+            <p>Find the products you need at wholesale prices</p>
+        </div>
+        <div class="category-grid">
+            <div class="category-item" onclick="window.location.href='products?category=electronics'">
+                <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=200&h=200&q=80" alt="Electronics" loading="lazy" />
+                <span>Electronics</span>
+            </div>
+            <div class="category-item" onclick="window.location.href='products?category=fashion'">
+                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=200&h=200&q=80" alt="Fashion" loading="lazy" />
+                <span>Fashion</span>
+            </div>
+            <div class="category-item" onclick="window.location.href='products?category=grocery'">
+                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=200&h=200&q=80" alt="Grocery" loading="lazy" />
+                <span>Grocery</span>
+            </div>
+            <div class="category-item" onclick="window.location.href='products?category=home'">
+                <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=200&h=200&q=80" alt="Home" loading="lazy" />
+                <span>Home</span>
+            </div>
+            <div class="category-item" onclick="window.location.href='products?category=beauty'">
+                <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=200&h=200&q=80" alt="Beauty" loading="lazy" />
+                <span>Beauty</span>
+            </div>
+            <div class="category-item" onclick="window.location.href='products?category=health'">
+                <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=200&h=200&q=80" alt="Health" loading="lazy" />
+                <span>Health</span>
+            </div>
+            <div class="category-item" onclick="window.location.href='products?category=sports'">
+                <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=200&h=200&q=80" alt="Sports" loading="lazy" />
+                <span>Sports</span>
+            </div>
+            <div class="category-item" onclick="window.location.href='products?category=automotive'">
+                <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=200&h=200&q=80" alt="Automotive" loading="lazy" />
+                <span>Automotive</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 4. WHY CHOOSE PILOT DISTRIBUTION -->
+    <!-- ========================================== -->
+    <div class="why-section animate-on-scroll">
+        <div class="section-title">
+            <h2>Why Choose <span>Pilot Distribution</span></h2>
+            <p>Your trusted partner for wholesale purchasing</p>
+        </div>
+        <div class="why-grid">
+            <div class="why-card">
+                <div class="why-image">
+                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&h=400&q=80" alt="Verified Suppliers" loading="lazy" />
+                </div>
+                <h3>Verified Suppliers</h3>
+                <p>All suppliers are vetted and verified for quality and reliability.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-image">
+                    <img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=600&h=400&q=80" alt="Secure Payments" loading="lazy" />
+                </div>
+                <h3>Secure Payments</h3>
+                <p>Your transactions are safe and protected with industry-standard security.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-image">
+                    <img src="https://images.unsplash.com/photo-1567789884554-0b844b597180?auto=format&fit=crop&w=600&h=400&q=80" alt="Quality Assurance" loading="lazy" />
+                </div>
+                <h3>Quality Assurance</h3>
+                <p>Every product meets our strict quality standards before listing.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-image">
+                    <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=600&h=400&q=80" alt="Fast Delivery" loading="lazy" />
+                </div>
+                <h3>Fast Delivery</h3>
+                <p>Free shipping on orders over $250. Quick and reliable delivery.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 5. FLASH DEALS -->
+    <!-- ========================================== -->
+    <div class="flash-deals animate-on-scroll" id="flashDeals">
+        <div class="left">
+            <h3><i class="fa-solid fa-bolt"></i> Flash Deals</h3>
+            <div class="flash-timer">
+                <span id="hours">06</span><span class="sep">:</span>
+                <span id="minutes">42</span><span class="sep">:</span>
+                <span id="seconds">18</span>
+            </div>
+        </div>
+        <a href="products?filter=flash" class="btn-primary" style="background:#f1c40f; color:#0b2a3b;">
+            View All <i class="fa-solid fa-arrow-right"></i>
+        </a>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 6. FEATURED PRODUCTS -->
+    <!-- ========================================== -->
+    <div class="section-title animate-on-scroll">
+        <h2>Featured <span>Products</span></h2>
+        <p>Top-rated products from verified suppliers</p>
+    </div>
+    <div class="product-grid" id="productGrid">
+        <div class="loading-spinner">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <p>Loading products...</p>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 7. TESTIMONIAL SUBMISSION FORM -->
+    <!-- ========================================== -->
+    <div class="testimonial-form-section animate-on-scroll">
+        <h3><i class="fa-regular fa-pen-to-square"></i> Share Your Experience</h3>
+        <p>Help other businesses make informed decisions. Submit your testimonial below.</p>
+        
+        <form id="testimonialForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" id="testimonialName" placeholder="caden gibson" />
+                </div>
+                <div class="form-group">
+                    <label>Company (Optional)</label>
+                    <input type="text" id="testimonialCompany" placeholder="Your company name" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Rating</label>
+                <div class="rating-stars" id="ratingStars">
+                    <span class="star" data-value="1" onclick="setRating(1)">★</span>
+                    <span class="star" data-value="2" onclick="setRating(2)">★</span>
+                    <span class="star" data-value="3" onclick="setRating(3)">★</span>
+                    <span class="star" data-value="4" onclick="setRating(4)">★</span>
+                    <span class="star" data-value="5" onclick="setRating(5)">★</span>
+                </div>
+                <input type="hidden" id="testimonialRating" value="5" />
+            </div>
+            <div class="form-group">
+                <label>Your Message</label>
+                <textarea id="testimonialMessage" placeholder="Share your experience with Pilot Sales Distribution..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit-testimonial" id="testimonialSubmitBtn">
+                <i class="fa-regular fa-paper-plane"></i> Submit Testimonial
+            </button>
+        </form>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 8. TESTIMONIALS DISPLAY -->
+    <!-- ========================================== -->
+    <div class="testimonials-display animate-on-scroll">
+        <div class="section-title">
+            <h2>What Our <span>Clients Say</span></h2>
+            <p>Real reviews from real customers</p>
+        </div>
+        <div class="testimonial-grid" id="testimonialGrid">
+            <div class="loading-spinner">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <p>Loading testimonials...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 9. TRUSTED COMPANIES LOGOS (LOCAL FILES) -->
+    <!-- ========================================== -->
+    <div class="trusted-section animate-on-scroll">
+        <div class="section-title">
+            <h2>Trusted By <span>Industry Leaders</span></h2>
+            <p>Join thousands of businesses that trust Pilot Sales Distribution</p>
+        </div>
+        
+        <div class="logo-carousel">
+            <div class="logo-track">
+                <div class="logo-item"><img src="nike.png" alt="Nike" loading="lazy" /><span>Nike</span></div>
+                <div class="logo-item"><img src="apple.png" alt="Apple" loading="lazy" /><span>Apple</span></div>
+                <div class="logo-item"><img src="samsung.png" alt="Samsung" loading="lazy" /><span>Samsung</span></div>
+                <div class="logo-item"><img src="adidas.png" alt="Adidas" loading="lazy" /><span>Adidas</span></div>
+                <div class="logo-item"><img src="lg.png" alt="LG" loading="lazy" /><span>LG</span></div>
+                <div class="logo-item"><img src="google.png" alt="Google" loading="lazy" /><span>Google</span></div>
+                <div class="logo-item"><img src="intel.png" alt="Intel" loading="lazy" /><span>Intel</span></div>
+                <div class="logo-item"><img src="hp.png" alt="HP" loading="lazy" /><span>HP</span></div>
+                <div class="logo-item"><img src="dell.png" alt="Dell" loading="lazy" /><span>Dell</span></div>
+                <div class="logo-item"><img src="cisco.png" alt="Cisco" loading="lazy" /><span>Cisco</span></div>
+                <div class="logo-item"><img src="lenovo.png" alt="Lenovo" loading="lazy" /><span>Lenovo</span></div>
+                <div class="logo-item"><img src="huawei.png" alt="Huawei" loading="lazy" /><span>Huawei</span></div>
+                <div class="logo-item"><img src="xiaomi.png" alt="Xiaomi" loading="lazy" /><span>Xiaomi</span></div>
+                <div class="logo-item"><img src="nvidia.png" alt="NVIDIA" loading="lazy" /><span>NVIDIA</span></div>
+                <div class="logo-item"><img src="tesla.png" alt="Tesla" loading="lazy" /><span>Tesla</span></div>
+                <div class="logo-item"><img src="paypal.png" alt="PayPal" loading="lazy" /><span>PayPal</span></div>
+                <div class="logo-item"><img src="mastercard.png" alt="Mastercard" loading="lazy" /><span>Mastercard</span></div>
+                <div class="logo-item"><img src="visa.png" alt="Visa" loading="lazy" /><span>Visa</span></div>
+                <div class="logo-item"><img src="cocacola.png" alt="Coca-Cola" loading="lazy" /><span>Coca-Cola</span></div>
+                <div class="logo-item"><img src="toyota.png" alt="Toyota" loading="lazy" /><span>Toyota</span></div>
+                <div class="logo-item"><img src="bmw.png" alt="BMW" loading="lazy" /><span>BMW</span></div>
+                <!-- Duplicate for seamless loop -->
+                <div class="logo-item"><img src="nike.png" alt="Nike" loading="lazy" /><span>Nike</span></div>
+                <div class="logo-item"><img src="apple.png" alt="Apple" loading="lazy" /><span>Apple</span></div>
+                <div class="logo-item"><img src="samsung.png" alt="Samsung" loading="lazy" /><span>Samsung</span></div>
+                <div class="logo-item"><img src="adidas.png" alt="Adidas" loading="lazy" /><span>Adidas</span></div>
+                <div class="logo-item"><img src="lg.png" alt="LG" loading="lazy" /><span>LG</span></div>
+                <div class="logo-item"><img src="google.png" alt="Google" loading="lazy" /><span>Google</span></div>
+                <div class="logo-item"><img src="intel.png" alt="Intel" loading="lazy" /><span>Intel</span></div>
+                <div class="logo-item"><img src="hp.png" alt="HP" loading="lazy" /><span>HP</span></div>
+                <div class="logo-item"><img src="dell.png" alt="Dell" loading="lazy" /><span>Dell</span></div>
+                <div class="logo-item"><img src="cisco.png" alt="Cisco" loading="lazy" /><span>Cisco</span></div>
+                <div class="logo-item"><img src="lenovo.png" alt="Lenovo" loading="lazy" /><span>Lenovo</span></div>
+                <div class="logo-item"><img src="huawei.png" alt="Huawei" loading="lazy" /><span>Huawei</span></div>
+                <div class="logo-item"><img src="xiaomi.png" alt="Xiaomi" loading="lazy" /><span>Xiaomi</span></div>
+                <div class="logo-item"><img src="nvidia.png" alt="NVIDIA" loading="lazy" /><span>NVIDIA</span></div>
+                <div class="logo-item"><img src="tesla.png" alt="Tesla" loading="lazy" /><span>Tesla</span></div>
+                <div class="logo-item"><img src="paypal.png" alt="PayPal" loading="lazy" /><span>PayPal</span></div>
+                <div class="logo-item"><img src="mastercard.png" alt="Mastercard" loading="lazy" /><span>Mastercard</span></div>
+                <div class="logo-item"><img src="visa.png" alt="Visa" loading="lazy" /><span>Visa</span></div>
+                <div class="logo-item"><img src="cocacola.png" alt="Coca-Cola" loading="lazy" /><span>Coca-Cola</span></div>
+                <div class="logo-item"><img src="toyota.png" alt="Toyota" loading="lazy" /><span>Toyota</span></div>
+                <div class="logo-item"><img src="bmw.png" alt="BMW" loading="lazy" /><span>BMW</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 10. NEWSLETTER SIGNUP (SAVES TO FIREBASE) -->
+    <!-- ========================================== -->
+    <div class="newsletter-section animate-on-scroll">
+        <h2>Subscribe to Our <span>Newsletter</span></h2>
+        <p>Get the latest deals, new arrivals, and exclusive offers delivered to your inbox.</p>
+        <form class="newsletter-form" id="newsletterForm">
+            <input type="email" id="newsletterEmail" placeholder="Enter your email address" required />
+            <button type="submit"><i class="fa-regular fa-paper-plane"></i> Subscribe</button>
+        </form>
+    </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- FOOTER -->
+<!-- ============================================ -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="about">About</a>
+                <a href="contact">Contact</a>
+                <a href="help-center">Help</a>
+                <a href="privacy">Privacy Policy</a>
+                <a href="terms">Terms &amp; Conditions</a>
+                <a href="become-seller">Become a Seller</a>
+            </div>
+            <div class="footer-social">
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- ============================================ -->
+<!-- TOAST NOTIFICATION -->
+<!-- ============================================ -->
+<div id="toast" class="toast"></div>
+
+<!-- ============================================ -->
+<!-- MAIN JAVASCRIPT -->
+<!-- ============================================ -->
+<script src="main.js"></script>
+
+<script>
+// ============================================
+// HOME PAGE - JAVASCRIPT (FIXED)
+// ============================================
+
+// ─── SET CURRENT YEAR ───
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ─── LOAD REAL STATS ───
+async function loadStats() {
+    const stats = await getRealStats();
+    document.getElementById('statProducts').textContent = stats.products.toLocaleString() + '+';
+    document.getElementById('statSuppliers').textContent = stats.suppliers.toLocaleString() + '+';
+    document.getElementById('statSatisfaction').textContent = stats.satisfaction;
+    document.getElementById('statOrders').textContent = stats.orders.toLocaleString();
+}
+
+// ─── LOAD TESTIMONIALS ───
+async function loadTestimonials() {
+    const grid = document.getElementById('testimonialGrid');
+    const testimonials = await window.loadTestimonials();
+    
+    if (testimonials.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:1rem; opacity:0.7;">
+                <p>No testimonials yet. Be the first to share your experience!</p>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = testimonials.map(t => {
+        const stars = '★'.repeat(Math.round(t.rating || 5)) + '☆'.repeat(5 - Math.round(t.rating || 5));
+        return `
+            <div class="testimonial-card">
+                <div class="stars">${stars}</div>
+                <p class="text">${t.message}</p>
+                <div class="author">${t.name || 'Anonymous'}</div>
+                ${t.company ? `<div class="company">${t.company}</div>` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+// ─── RATING STARS ───
+let selectedRating = 5;
+
+function setRating(value) {
+    selectedRating = value;
+    document.getElementById('testimonialRating').value = value;
+    document.querySelectorAll('.rating-stars .star').forEach((star, index) => {
+        star.classList.toggle('active', index < value);
+    });
+}
+
+// ─── TESTIMONIAL FORM ───
+document.getElementById('testimonialForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('testimonialName').value.trim() || 'Anonymous';
+    const company = document.getElementById('testimonialCompany').value.trim();
+    const message = document.getElementById('testimonialMessage').value.trim();
+    const rating = parseInt(document.getElementById('testimonialRating').value) || 5;
+    
+    if (!message) {
+        showToast('Please write a testimonial message', 'error');
+        return;
+    }
+    
+    const btn = document.getElementById('testimonialSubmitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+    
+    const user = getCurrentUser();
+    const result = await saveTestimonial({
+        name: name,
+        company: company,
+        message: message,
+        rating: rating,
+        userId: user ? user.id : null
+    });
+    
+    if (result.success) {
+        showToast('✅ Thank you! Your testimonial has been submitted for review.', 'success');
+        document.getElementById('testimonialForm').reset();
+        setRating(5);
+    } else {
+        showToast('❌ Failed to submit testimonial. Please try again.', 'error');
+    }
+    
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Submit Testimonial';
+});
+
+// ─── NEWSLETTER FORM ───
+document.getElementById('newsletterForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('newsletterEmail').value.trim();
+    
+    if (!email) {
+        showToast('Please enter your email address', 'error');
+        return;
+    }
+    
+    const result = await saveNewsletter(email);
+    
+    if (result.success) {
+        showToast('✅ Subscribed successfully! Welcome to Pilot Distribution.', 'success');
+        document.getElementById('newsletterEmail').value = '';
+    } else {
+        showToast('❌ Failed to subscribe. Please try again.', 'error');
+    }
+});
+
+// ─── LOAD PRODUCTS ───
+async function loadProducts() {
+    const grid = document.getElementById('productGrid');
+
+    try {
+        const snapshot = await db.collection('products')
+            .where('status', 'in', ['active', 'approved'])
+            .limit(8)
+            .get();
+
+        const products = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            products.push({
+                id: doc.id,
+                ...data,
+                image_url: data.image_url || data.images?.[0] || '',
+                slug: data.slug || generateSlug(data.title)
+            });
+        });
+
+        if (products.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);">
+                    <i class="fa-regular fa-box" style="font-size:2rem; color:var(--primary);"></i>
+                    <p style="margin-top:0.5rem;">No products available yet.</p>
+                    <p style="font-size:0.8rem;">Check back soon for new wholesale deals!</p>
+                </div>
+            `;
+            return;
+        }
+
+        renderProducts(products, 'productGrid');
+
+    } catch (error) {
+        console.error('Error loading products:', error);
+        grid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);">
+                <i class="fa-regular fa-circle-exclamation" style="font-size:2rem; color:#c0392b;"></i>
+                <p style="margin-top:0.5rem;">Failed to load products.</p>
+                <button onclick="loadProducts()" style="margin-top:1rem; background:var(--primary); color:#fff; border:none; padding:0.5rem 1.5rem; border-radius:30px; cursor:pointer;">
+                    Retry
+                </button>
+            </div>
+        `;
+    }
+}
+
+// ─── FLASH TIMER ───
+function startFlashTimer() {
+    let h = 6, m = 42, s = 18;
+    const hEl = document.getElementById('hours');
+    const mEl = document.getElementById('minutes');
+    const sEl = document.getElementById('seconds');
+
+    if (!hEl || !mEl || !sEl) return;
+
+    setInterval(() => {
+        s--;
+        if (s < 0) { s = 59; m--; }
+        if (m < 0) { m = 59; h--; }
+        if (h < 0) { h = 6; m = 42; s = 18; }
+        hEl.textContent = String(h).padStart(2, '0');
+        mEl.textContent = String(m).padStart(2, '0');
+        sEl.textContent = String(s).padStart(2, '0');
+    }, 1000);
+}
+
+// ─── ADMIN AUTO-DETECT ───
+function checkAdminStatus() {
+    const user = getCurrentUser();
+    const adminLink = document.getElementById('adminLink');
+    const adminNavTab = document.getElementById('adminNavTab');
+    
+    if (user && user.role === 'admin') {
+        adminLink.style.display = 'flex';
+        adminNavTab.style.display = 'inline-block';
+        updateAdminBadge();
+        setupAdminListeners();
+    } else {
+        adminLink.style.display = 'none';
+        adminNavTab.style.display = 'none';
+    }
+}
+
+// ─── UPDATE ADMIN BADGE ───
+async function updateAdminBadge() {
+    try {
+        const msgSnapshot = await db.collection('messages')
+            .where('status', '==', 'unread')
+            .get();
+        const unreadCount = msgSnapshot.size;
+
+        const orderSnapshot = await db.collection('orders')
+            .where('status', '==', 'pending')
+            .get();
+        const pendingCount = orderSnapshot.size;
+
+        const total = unreadCount + pendingCount;
+        
+        document.getElementById('adminBadgeCount').textContent = total;
+        document.getElementById('adminNavBadge').textContent = total;
+        
+        const badge = document.getElementById('adminBadgeCount');
+        const navBadge = document.getElementById('adminNavBadge');
+        badge.style.display = total > 0 ? 'inline' : 'none';
+        navBadge.style.display = total > 0 ? 'inline' : 'none';
+        
+        return total;
+    } catch (error) {
+        console.error('Error updating admin badge:', error);
+        return 0;
+    }
+}
+
+// ─── SETUP ADMIN LISTENERS ───
+function setupAdminListeners() {
+    db.collection('messages')
+        .where('status', '==', 'unread')
+        .onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach(change => {
+                if (change.type === 'added') {
+                    updateAdminBadge();
+                    const data = change.doc.data();
+                    showToast(`📩 New message from ${data.firstName || 'User'}`, 'info');
+                }
+            });
+        }, (error) => {
+            console.error('Messages listener error:', error);
+        });
+
+    db.collection('orders')
+        .where('status', '==', 'pending')
+        .onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach(change => {
+                if (change.type === 'added') {
+                    updateAdminBadge();
+                    const data = change.doc.data();
+                    const customer = data.customer || {};
+                    showToast(`📦 New order from ${customer.firstName || 'Guest'} - $${(data.totals?.total || 0).toFixed(2)}`, 'success');
+                }
+            });
+        }, (error) => {
+            console.error('Orders listener error:', error);
+        });
+}
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', function() {
+    loadProducts();
+    startFlashTimer();
+    loadStats();
+    loadTestimonials();
+    loadCartCount();      // ✅ FIXED: Was updateCartCount
+    loadWishlistCount();  // ✅ FIXED: Was updateWishlistCount
+    setTimeout(checkAdminStatus, 1000);
+    document.addEventListener('authChange', function() {
+        checkAdminStatus();
+    });
+});
+
+// ─── EXPOSE FUNCTIONS ───
+window.checkAdminStatus = checkAdminStatus;
+window.updateAdminBadge = updateAdminBadge;
+window.setRating = setRating;
+window.loadTestimonials = loadTestimonials;
+window.loadStats = loadStats;
+window.loadProducts = loadProducts;
+</script>
+
+</body>
+</html>

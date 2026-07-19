@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About - Pilot Sales Distribution</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Pilot Sales Distribution - Premium wholesale marketplace founded by Caden Gibson. 12,000+ products, 580+ verified suppliers." />
+    <meta name="keywords" content="wholesale, distribution, about, Caden Gibson, Pilot Sales" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="About - Pilot Sales Distribution" />
+    <meta property="og:description" content="Your trusted partner for wholesale distribution since 2020." />
+    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo-192.png" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        /* ─── ABOUT PAGE SPECIFIC STYLES ─── */
+        .about-page {
+            max-width: 1000px;
+            margin: 2rem auto;
+        }
+
+        .about-header {
+            text-align: center;
+            padding: 2rem 0;
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+            border-radius: var(--radius);
+            color: var(--white);
+            margin-bottom: 2rem;
+        }
+        .about-header h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+        }
+        .about-header h1 span {
+            color: var(--accent);
+        }
+        .about-header p {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            margin-top: 0.5rem;
+        }
+
+        /* ─── PRESIDENT SECTION ─── */
+        .president-section {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+        .president-section:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .president-section .photo {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            color: var(--white);
+            flex-shrink: 0;
+            overflow: hidden;
+            border: 4px solid var(--primary-light);
+            box-shadow: 0 10px 30px rgba(26, 123, 107, 0.2);
+        }
+        .president-section .photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .president-section .photo .placeholder {
+            font-size: 5rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .president-section .info h2 {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 0.2rem;
+        }
+        .president-section .info .title {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .president-section .info p {
+            color: var(--text-light);
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+        .president-section .info .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .president-section .info .social-links a {
+            color: var(--text-light);
+            transition: var(--transition);
+            font-size: 1.2rem;
+        }
+        .president-section .info .social-links a:hover {
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* ─── STATS ─── */
+        .about-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .about-stat {
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .about-stat:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+        .about-stat .number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .about-stat .label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.2rem;
+        }
+        .about-stat i {
+            font-size: 2rem;
+            color: var(--primary);
+            display: block;
+            margin-bottom: 0.5rem;
+            opacity: 0.3;
+        }
+
+        /* ─── VALUES ─── */
+        .values-section {
+            margin: 2rem 0;
+        }
+        .values-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+        .values-section h2 span {
+            color: var(--primary);
+        }
+        .values-section .subtitle {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+        .value-card {
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .value-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-light);
+        }
+        .value-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+        .value-card h3 {
+            font-size: 1rem;
+            color: var(--secondary);
+            margin-bottom: 0.3rem;
+        }
+        .value-card p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* ─── MISSION ─── */
+        .mission-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            align-items: center;
+        }
+        .mission-section .mission-content h2 {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+        .mission-section .mission-content h2 span {
+            color: var(--primary);
+        }
+        .mission-section .mission-content p {
+            color: var(--text-light);
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+        .mission-section .mission-image {
+            background: linear-gradient(135deg, var(--primary-light), var(--light));
+            border-radius: var(--radius-sm);
+            aspect-ratio: 16/10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+            color: var(--primary);
+            border: 1px solid var(--border);
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 992px) {
+            .president-section {
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem;
+            }
+            .president-section .info .social-links {
+                justify-content: center;
+            }
+            .mission-section {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .about-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .about-header h1 {
+                font-size: 2rem;
+            }
+            .about-stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+            .about-stat .number {
+                font-size: 2rem;
+            }
+            .president-section .photo {
+                width: 150px;
+                height: 150px;
+                font-size: 3.5rem;
+            }
+            .president-section .info h2 {
+                font-size: 1.5rem;
+            }
+            .values-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .mission-section {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .about-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            .values-grid {
+                grid-template-columns: 1fr;
+            }
+            .president-section {
+                padding: 1.5rem;
+            }
+            .president-section .photo {
+                width: 120px;
+                height: 120px;
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- TOP BAR WITH MOVING WORDS -->
+<!-- ============================================ -->
+<div class="top-bar">
+    <div class="container">
+        <div class="moving-words">
+            <div class="words-track">
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+            </div>
+        </div>
+        <div class="top-links">
+            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- HEADER -->
+<!-- ============================================ -->
+<header class="header">
+    <div class="container">
+        <a href="home" class="logo">
+            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+            <div class="brand-name">
+                <span class="main">PSE <span>Distribution</span></span>
+                <span class="sub">wholesale</span>
+            </div>
+        </a>
+
+        <!-- Search -->
+        <div class="search-bar" id="searchBar">
+            <input type="text" id="searchInput" placeholder="Search wholesale products..."
+                   onkeyup="searchProductsFirebase(event)" autocomplete="off" />
+            <button onclick="searchProductsFirebase()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+
+        <div class="header-actions">
+            <a href="#" class="icon-btn" onclick="toggleWishlist()">
+                <i class="fa-regular fa-heart"></i>
+                <span>Wishlist</span>
+                <span class="badge-count wishlist-count">0</span>
+            </a>
+            <a href="cart" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+            <a href="account" class="icon-btn" id="accountBtn">
+                <i class="fa-regular fa-user"></i>
+                <span id="accountLabel">Account</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ============================================ -->
+<!-- NAVIGATION TABS -->
+<!-- ============================================ -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about" class="nav-tab active"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+    </div>
+</nav>
+
+<!-- ============================================ -->
+<!-- MAIN CONTENT -->
+<!-- ============================================ -->
+<div class="container">
+
+    <div class="about-page">
+
+        <!-- ─── ABOUT HEADER ─── -->
+        <div class="about-header animate-on-scroll">
+            <h1>About <span>Pilot Sales Distribution</span></h1>
+            <p>Your trusted partner for wholesale distribution since 2020</p>
+        </div>
+
+        <!-- ─── PRESIDENT SECTION ─── -->
+        <div class="president-section animate-on-scroll">
+            <div class="photo">
+                <img src="caden-gibson.png" alt="Caden Gibson - President" onerror="this.parentElement.innerHTML='<span class=\'placeholder\'><i class=\'fa-regular fa-user\'></i></span>'" />
+            </div>
+            <div class="info">
+                <h2>Caden Gibson</h2>
+                <div class="title">President &amp; Founder</div>
+                <p>
+                    With over 10 years of experience in wholesale distribution and supply chain management, 
+                    Caden built Pilot Sales Distribution to connect businesses with quality products at competitive prices. 
+                    His vision is to create a seamless, transparent, and efficient marketplace where businesses of all sizes can thrive.
+                </p>
+                <div class="social-links">
+                    <a href="#" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                    <a href="#" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" title="Email"><i class="fa-regular fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── STATS ─── -->
+        <div class="about-stats animate-on-scroll">
+            <div class="about-stat">
+                <i class="fa-regular fa-box"></i>
+                <div class="number">12K+</div>
+                <div class="label">Products Available</div>
+            </div>
+            <div class="about-stat">
+                <i class="fa-regular fa-handshake"></i>
+                <div class="number">580+</div>
+                <div class="label">Verified Suppliers</div>
+            </div>
+            <div class="about-stat">
+                <i class="fa-regular fa-star"></i>
+                <div class="number">99.7%</div>
+                <div class="label">Satisfaction Rate</div>
+            </div>
+            <div class="about-stat">
+                <i class="fa-regular fa-clock"></i>
+                <div class="number">24/7</div>
+                <div class="label">Customer Support</div>
+            </div>
+        </div>
+
+        <!-- ─── MISSION SECTION ─── -->
+        <div class="mission-section animate-on-scroll">
+            <div class="mission-content">
+                <h2>Our <span>Mission</span></h2>
+                <p>
+                    At Pilot Sales Distribution, we believe in empowering businesses with access to 
+                    high-quality products at wholesale prices. We're committed to building a marketplace 
+                    built on trust, transparency, and efficiency — making wholesale purchasing as simple as retail.
+                </p>
+                <p style="margin-top: 1rem;">
+                    We connect buyers with verified suppliers, streamline logistics, and provide exceptional 
+                    customer service to ensure every transaction is seamless and successful.
+                </p>
+            </div>
+            <div class="mission-image">
+                <i class="fa-solid fa-handshake"></i>
+            </div>
+        </div>
+
+        <!-- ─── VALUES ─── -->
+        <div class="values-section animate-on-scroll">
+            <h2>Our <span>Values</span></h2>
+            <p class="subtitle">The principles that guide everything we do</p>
+            <div class="values-grid">
+                <div class="value-card">
+                    <i class="fa-regular fa-shield"></i>
+                    <h3>Trust &amp; Transparency</h3>
+                    <p>Verified suppliers, authentic products, and clear pricing with no hidden fees.</p>
+                </div>
+                <div class="value-card">
+                    <i class="fa-regular fa-bolt"></i>
+                    <h3>Speed &amp; Efficiency</h3>
+                    <p>Quick ordering, fast shipping, and streamlined logistics for bulk purchases.</p>
+                </div>
+                <div class="value-card">
+                    <i class="fa-regular fa-handshake"></i>
+                    <h3>Partnership</h3>
+                    <p>We grow with our customers and suppliers, building lasting business relationships.</p>
+                </div>
+                <div class="value-card">
+                    <i class="fa-regular fa-globe"></i>
+                    <h3>Global Reach</h3>
+                    <p>Serving businesses worldwide with international shipping and multi-currency support.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── CONTACT CTA ─── -->
+        <div class="quote-section animate-on-scroll" style="margin-top: 2rem;">
+            <h2>Ready to <span>Partner With Us?</span></h2>
+            <p>Join thousands of businesses that trust Pilot Sales Distribution for their wholesale needs.</p>
+            <a href="contact" class="btn-white"><i class="fa-regular fa-envelope"></i> Get in Touch</a>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- FOOTER -->
+<!-- ============================================ -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="about">About</a>
+                <a href="contact">Contact</a>
+                <a href="help-center">Help</a>
+                <a href="privacy">Privacy Policy</a>
+                <a href="terms">Terms &amp; Conditions</a>
+                <a href="become-seller">Become a Seller</a>
+            </div>
+            <div class="footer-social">
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- ============================================ -->
+<!-- TOAST NOTIFICATION -->
+<!-- ============================================ -->
+<div id="toast" class="toast"></div>
+
+<!-- ============================================ -->
+<!-- MAIN JAVASCRIPT -->
+<!-- ============================================ -->
+<script src="main.js"></script>
+
+<script>
+// ============================================
+// ABOUT PAGE - JAVASCRIPT
+// ============================================
+
+// ─── SET CURRENT YEAR ───
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ─── SEARCH FUNCTION IS HANDLED BY MAIN.JS ───
+// No need to redefine it here
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', function() {
+    loadCartCount();
+    loadWishlistCount();
+});
+</script>
+
+</body>
+</html>
