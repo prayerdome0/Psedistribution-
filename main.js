@@ -80,6 +80,16 @@ function showToast(message, type = 'info') {
     }, 3500);
 }
 
+// ─── GENERATE PRODUCT SLUG ───
+function generateSlug(title) {
+    if (!title) return '';
+    return title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .substring(0, 80);
+}
+
 // ─── CLOUDINARY UPLOAD ───
 function uploadToCloudinary(file, folder = 'PSE-products') {
     return new Promise((resolve, reject) => {
@@ -154,16 +164,6 @@ function uploadMultipleToCloudinary(files, folder = 'PSE-products') {
         
         resolve(results);
     });
-}
-
-// ─── GENERATE PRODUCT SLUG ───
-function generateSlug(title) {
-    if (!title) return '';
-    return title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '')
-        .substring(0, 80);
 }
 
 // ─── GET PRODUCT BY SLUG ───
@@ -466,25 +466,27 @@ function protectSeller() {
 function fetchProducts() {
     return new Promise((resolve) => {
         db.collection('products')
-            .where('status', 'in', ['active', 'approved'])
             .get()
             .then((snapshot) => {
                 const products = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    let imageUrl = data.image_url || '';
-                    if (!imageUrl && data.images && data.images.length > 0) {
-                        imageUrl = data.images[0];
+                    // Only include products with status 'active' or 'approved' or no status
+                    if (data.status === 'active' || data.status === 'approved' || !data.status) {
+                        let imageUrl = data.image_url || '';
+                        if (!imageUrl && data.images && data.images.length > 0) {
+                            imageUrl = data.images[0];
+                        }
+                        if (!imageUrl && data.cloudinary_images && data.cloudinary_images.length > 0) {
+                            imageUrl = data.cloudinary_images[0].secure_url;
+                        }
+                        products.push({ 
+                            id: doc.id, 
+                            ...data,
+                            image_url: imageUrl,
+                            slug: data.slug || generateSlug(data.title || 'product')
+                        });
                     }
-                    if (!imageUrl && data.cloudinary_images && data.cloudinary_images.length > 0) {
-                        imageUrl = data.cloudinary_images[0].secure_url;
-                    }
-                    products.push({ 
-                        id: doc.id, 
-                        ...data,
-                        image_url: imageUrl,
-                        slug: data.slug || generateSlug(data.title)
-                    });
                 });
                 resolve(products);
             })
@@ -497,6 +499,10 @@ function fetchProducts() {
 
 function fetchProductById(id) {
     return new Promise((resolve) => {
+        if (!id) {
+            resolve(null);
+            return;
+        }
         db.collection('products').doc(id).get()
             .then((doc) => {
                 if (doc.exists) {
@@ -512,7 +518,7 @@ function fetchProductById(id) {
                         id: doc.id, 
                         ...data,
                         image_url: imageUrl,
-                        slug: data.slug || generateSlug(data.title)
+                        slug: data.slug || generateSlug(data.title || 'product')
                     });
                 } else {
                     resolve(null);
@@ -527,7 +533,7 @@ function fetchProductById(id) {
 
 function addProduct(productData) {
     return new Promise((resolve, reject) => {
-        const slug = productData.slug || generateSlug(productData.title);
+        const slug = productData.slug || generateSlug(productData.title || 'product');
         db.collection('products').add({
             ...productData,
             slug: slug,
@@ -546,7 +552,7 @@ function addProduct(productData) {
 
 function updateProduct(id, productData) {
     return new Promise((resolve, reject) => {
-        const slug = productData.slug || generateSlug(productData.title);
+        const slug = productData.slug || generateSlug(productData.title || 'product');
         db.collection('products').doc(id).update({
             ...productData,
             slug: slug,
@@ -595,7 +601,7 @@ function addToCart(productId, quantity = 1) {
                         image: product.image_url,
                         brand: product.brand || 'Pilot Distribution',
                         moq: product.moq || 1,
-                        slug: product.slug || generateSlug(product.title),
+                        slug: product.slug || generateSlug(product.title || 'product'),
                         quantity: quantity
                     });
                 }
@@ -921,7 +927,6 @@ function updateOrderStatus(orderId, status) {
 function sendWhatsAppQuote(orderData) {
     const phone = WHATSAPP_NUMBER;
     
-    // Format items in table style
     let itemsTable = '';
     orderData.items.forEach((item, index) => {
         const num = (index + 1).toString().padStart(2);
@@ -1080,7 +1085,7 @@ function renderProducts(products, containerId = 'productGrid') {
 
     grid.innerHTML = products.map(p => {
         const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
-        const slug = p.slug || generateSlug(p.title);
+        const slug = p.slug || generateSlug(p.title || 'product');
         
         let imageUrl = '';
         if (p.image_url) {
@@ -1131,7 +1136,6 @@ function initBanner() {
     
     if (!slides || slides.length === 0) return;
     
-    // Convert slides to array for map
     const slidesArray = Array.from(slides);
     
     if (dotsContainer) {
@@ -1140,7 +1144,6 @@ function initBanner() {
         ).join('');
     }
     
-    // Show first slide
     slidesArray.forEach((slide, i) => {
         slide.classList.toggle('active', i === 0);
     });
@@ -1241,20 +1244,19 @@ async function searchProductsFirebase(event) {
 
     try {
         const snapshot = await db.collection('products')
-            .where('status', 'in', ['active', 'approved'])
             .limit(5)
             .get();
 
         const products = [];
         snapshot.forEach(doc => {
             const data = doc.data();
-            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
+            if (data.title && data.title.toLowerCase().includes(query.toLowerCase()) ||
                 (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
                 products.push({
                     id: doc.id,
                     ...data,
                     image_url: data.image_url || data.images?.[0] || '',
-                    slug: data.slug || generateSlug(data.title)
+                    slug: data.slug || generateSlug(data.title || 'product')
                 });
             }
         });
@@ -1295,24 +1297,24 @@ async function searchProductsFirebase(event) {
 // ─── GET REAL STATS FROM FIREBASE ───
 async function getRealStats() {
     try {
-        // Get product count
-        const prodSnapshot = await db.collection('products')
-            .where('status', 'in', ['active', 'approved'])
-            .get();
-        const productCount = prodSnapshot.size;
+        const prodSnapshot = await db.collection('products').get();
+        let productCount = 0;
+        prodSnapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.status === 'active' || data.status === 'approved' || !data.status) {
+                productCount++;
+            }
+        });
 
-        // Get supplier count
         const sellerSnapshot = await db.collection('users')
             .where('role', '==', 'seller')
             .where('status', '==', 'approved')
             .get();
         const supplierCount = sellerSnapshot.size;
 
-        // Get total orders
         const orderSnapshot = await db.collection('orders').get();
         const orderCount = orderSnapshot.size;
 
-        // Calculate satisfaction rate (if reviews exist)
         let satisfactionRate = '99.7%';
         try {
             const reviewsSnapshot = await db.collection('reviews').get();
@@ -1372,7 +1374,7 @@ async function saveTestimonial(data) {
             company: data.company || '',
             message: data.message,
             rating: data.rating || 5,
-            approved: false, // Admin needs to approve
+            approved: false,
             created_at: new Date().toISOString(),
             user_id: data.userId || null
         });
