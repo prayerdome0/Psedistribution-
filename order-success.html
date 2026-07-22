@@ -5,625 +5,165 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Order Success - Pilot Sales Distribution</title>
 
-    <!-- SEO Meta Tags -->
     <meta name="description" content="Your wholesale order has been received. Thank you for choosing Pilot Sales Distribution." />
     <meta name="keywords" content="order success, confirmation, wholesale, Pilot Sales" />
 
-    <!-- Open Graph -->
     <meta property="og:title" content="Order Success - Pilot Sales Distribution" />
     <meta property="og:description" content="Your order has been confirmed." />
     <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
 
-    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/logo-192.png" />
 
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-    <!-- Main Styles -->
     <link rel="stylesheet" href="style.css" />
-
-    <style>
-        /* ─── SUCCESS PAGE SPECIFIC STYLES ─── */
-        .success-page {
-            max-width: 700px;
-            margin: 2rem auto;
-        }
-
-        .success-card {
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 3rem 2rem;
-            border: 1px solid var(--border);
-            text-align: center;
-        }
-
-        .success-card .icon {
-            font-size: 4rem;
-            color: #27ae60;
-            margin-bottom: 1rem;
-            animation: successPop 0.6s ease;
-        }
-
-        @keyframes successPop {
-            0% { transform: scale(0); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        .success-card h2 {
-            font-size: 1.8rem;
-            color: var(--secondary);
-            margin-bottom: 0.5rem;
-        }
-        .success-card h2 span {
-            color: var(--primary);
-        }
-
-        .success-card .subtitle {
-            color: var(--text-light);
-            font-size: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .success-card .order-number-box {
-            background: var(--light);
-            border-radius: var(--radius-sm);
-            padding: 1rem;
-            border: 1px solid var(--border);
-            margin: 1.5rem 0;
-        }
-        .success-card .order-number-box .label {
-            font-size: 0.75rem;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .success-card .order-number-box .number {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--secondary);
-            margin-top: 0.2rem;
-        }
-
-        .success-card .order-details {
-            text-align: left;
-            background: var(--light);
-            border-radius: var(--radius-sm);
-            padding: 1rem;
-            margin: 1.5rem 0;
-            border: 1px solid var(--border);
-        }
-        .success-card .order-details .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.3rem 0;
-            font-size: 0.85rem;
-            border-bottom: 1px solid var(--border);
-        }
-        .success-card .order-details .detail-row:last-child {
-            border-bottom: none;
-        }
-        .success-card .order-details .detail-row .label {
-            color: var(--text-light);
-        }
-        .success-card .order-details .detail-row .value {
-            font-weight: 600;
-            color: var(--secondary);
-        }
-        .success-card .order-details .detail-row .value.total {
-            color: var(--primary);
-            font-size: 1.1rem;
-        }
-
-        .success-card .next-steps {
-            text-align: left;
-            background: var(--primary-light);
-            border-radius: var(--radius-sm);
-            padding: 1.2rem;
-            margin: 1.5rem 0;
-            border-left: 4px solid var(--primary);
-        }
-        .success-card .next-steps h4 {
-            color: var(--secondary);
-            font-size: 0.95rem;
-            margin-bottom: 0.5rem;
-        }
-        .success-card .next-steps ul {
-            list-style: none;
-            padding: 0;
-        }
-        .success-card .next-steps ul li {
-            padding: 0.3rem 0;
-            font-size: 0.85rem;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .success-card .next-steps ul li i {
-            color: var(--primary);
-            width: 20px;
-        }
-
-        .success-card .btn-group {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 1.5rem;
-        }
-        .success-card .btn-group a {
-            padding: 0.7rem 2rem;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .btn-primary-custom {
-            background: var(--primary);
-            color: var(--white);
-        }
-        .btn-primary-custom:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(26, 123, 107, 0.3);
-        }
-        .btn-outline-custom {
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-        .btn-outline-custom:hover {
-            background: var(--primary);
-            color: var(--white);
-            transform: translateY(-2px);
-        }
-
-        .success-card .whatsapp-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: #25D366;
-            color: var(--white);
-            padding: 0.7rem 2rem;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: var(--transition);
-            margin-top: 0.5rem;
-        }
-        .success-card .whatsapp-btn:hover {
-            background: #1da851;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
-        }
-
-        .success-card .secure-note {
-            margin-top: 1.5rem;
-            font-size: 0.8rem;
-            color: var(--text-light);
-        }
-        .success-card .secure-note i {
-            color: var(--primary);
-        }
-
-        /* ─── LOADING ─── */
-        .success-loading {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: var(--text-light);
-        }
-        .success-loading i {
-            font-size: 2.5rem;
-            color: var(--primary);
-        }
-        .success-loading p {
-            margin-top: 0.5rem;
-        }
-
-        /* ─── RESPONSIVE ─── */
-        @media (max-width: 768px) {
-            .success-card {
-                padding: 2rem 1.5rem;
-                margin: 1rem;
-            }
-            .success-card h2 {
-                font-size: 1.5rem;
-            }
-            .success-card .btn-group {
-                flex-direction: column;
-            }
-            .success-card .btn-group a {
-                width: 100%;
-                justify-content: center;
-            }
-            .success-card .whatsapp-btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .success-card {
-                padding: 1.5rem 1rem;
-            }
-            .success-card .order-number-box .number {
-                font-size: 1rem;
-            }
-            .success-card .order-details .detail-row {
-                font-size: 0.75rem;
-                flex-wrap: wrap;
-                gap: 0.2rem;
-            }
-        }
-    </style>
 </head>
 <body>
 
-<!-- ============================================ -->
-<!-- TOP BAR WITH MOVING WORDS -->
-<!-- ============================================ -->
 <div class="top-bar">
     <div class="container">
         <div class="moving-words">
             <div class="words-track">
-                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
-                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
-                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
-                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
-                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
-                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
-                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
-                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
-                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
-                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
-                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
-                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices</span>
             </div>
         </div>
         <div class="top-links">
-            <a href="track-order.html"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="seller-dashboard.html"><i class="fa-regular fa-store"></i> Sell</a>
-            <a href="login.html" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="register.html" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
         </div>
     </div>
 </div>
 
-<!-- ============================================ -->
-<!-- HEADER -->
-<!-- ============================================ -->
 <header class="header">
     <div class="container">
-        <a href="home" class="logo">
+        <a href="/" class="logo">
             <img src="logo.jpg" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
             </div>
         </a>
-
-        <!-- Search -->
-        <div class="search-bar" id="searchBar">
-            <input type="text" id="searchInput" placeholder="Search wholesale products..."
-                   onkeyup="searchProductsFirebase(event)" autocomplete="off" />
-            <button onclick="searchProductsFirebase()"><i class="fa-solid fa-magnifying-glass"></i></button>
-            <div class="search-results" id="searchResults"></div>
-        </div>
-
-        <div class="header-actions">
-            <a href="#" class="icon-btn" onclick="toggleWishlist()">
-                <i class="fa-regular fa-heart"></i>
-                <span>Wishlist</span>
-                <span class="badge-count wishlist-count">0</span>
-            </a>
-            <a href="cart.html" class="icon-btn">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span>Cart</span>
-                <span class="badge-count cart-count">0</span>
-            </a>
-            <a href="account.html" class="icon-btn" id="accountBtn">
-                <i class="fa-regular fa-user"></i>
-                <span id="accountLabel">Account</span>
-            </a>
-        </div>
     </div>
 </header>
 
-<!-- ============================================ -->
-<!-- NAVIGATION TABS -->
-<!-- ============================================ -->
-<nav class="nav-categories">
-    <div class="container">
-        <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products.html" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about.html" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact.html" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center.html" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller.html" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
-    </div>
-</nav>
+<div class="container" style="margin: 2rem auto; max-width: 700px;">
+    <div style="background: var(--white); border-radius: var(--radius); padding: 3rem 2rem; border: 1px solid var(--border); text-align: center;">
+        <div style="font-size: 4rem; color: #27ae60; margin-bottom: 1rem; animation: successPop 0.6s ease;"><i class="fa-solid fa-circle-check"></i></div>
+        
+        <h2 style="font-size: 1.8rem; color: var(--secondary); margin-bottom: 0.5rem;">
+            Order <span style="color: var(--primary);">Confirmed!</span>
+        </h2>
+        
+        <p style="color: var(--text-light); font-size: 1rem; margin-bottom: 1.5rem;">
+            Thank you for your order. We've received it and will process it shortly.
+        </p>
 
-<!-- ============================================ -->
-<!-- MAIN CONTENT -->
-<!-- ============================================ -->
-<div class="container">
+        <div style="background: var(--light); border-radius: var(--radius-sm); padding: 1rem; border: 1px solid var(--border); margin: 1.5rem 0;">
+            <div style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">Order Number</div>
+            <div id="orderNumber" style="font-size: 1.3rem; font-weight: 700; color: var(--secondary); margin-top: 0.2rem;">PSE-2026-######</div>
+        </div>
 
-    <div class="success-page">
-
-        <!-- ─── SUCCESS CARD ─── -->
-        <div class="success-card animate-on-scroll" id="successCard">
-            <div class="icon">
-                <i class="fa-regular fa-circle-check"></i>
+        <div style="background: var(--light); border-radius: var(--radius-sm); padding: 1rem; margin: 1.5rem 0; border: 1px solid var(--border); text-align: left;">
+            <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.85rem; border-bottom: 1px solid var(--border);">
+                <span style="color: var(--text-light);">Subtotal</span>
+                <span id="orderSubtotal" style="font-weight: 600; color: var(--secondary);">$0.00</span>
             </div>
-
-            <h2>Thank You for Your <span>Order!</span></h2>
-            <p class="subtitle">Your wholesale quote has been received and is being processed.</p>
-
-            <!-- Order Number -->
-            <div class="order-number-box">
-                <div class="label">📋 Order / Quote Number</div>
-                <div class="number" id="orderNumberDisplay">Loading...</div>
+            <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.85rem; border-bottom: 1px solid var(--border);">
+                <span style="color: var(--text-light);">Shipping</span>
+                <span id="orderShipping" style="font-weight: 600; color: var(--secondary);">Free</span>
             </div>
-
-            <!-- Order Details -->
-            <div class="order-details" id="orderDetails">
-                <div class="detail-row">
-                    <span class="label">Items</span>
-                    <span class="value" id="orderItemsCount">0</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Subtotal</span>
-                    <span class="value" id="orderSubtotal">$0.00</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Shipping</span>
-                    <span class="value" id="orderShipping">$0.00</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Tax</span>
-                    <span class="value" id="orderTax">$0.00</span>
-                </div>
-                <div class="detail-row" style="border-bottom: none; padding-top: 0.5rem; border-top: 2px solid var(--border); margin-top: 0.3rem;">
-                    <span class="label" style="font-weight: 700; color: var(--secondary);">Total</span>
-                    <span class="value total" id="orderTotal">$0.00</span>
-                </div>
-            </div>
-
-            <!-- Next Steps -->
-            <div class="next-steps">
-                <h4><i class="fa-regular fa-clock"></i> What Happens Next?</h4>
-                <ul>
-                    <li><i class="fa-regular fa-circle-check"></i> We'll review your quote within 24-48 hours</li>
-                    <li><i class="fa-regular fa-envelope"></i> You'll receive a confirmation email shortly</li>
-                    <li><i class="fa-regular fa-message"></i> Our team will contact you for any questions</li>
-                    <li><i class="fa-regular fa-truck"></i> Once confirmed, we'll arrange delivery</li>
-                </ul>
-            </div>
-
-            <!-- WhatsApp Contact -->
-            <a href="https://wa.me/19099384682" target="_blank" class="whatsapp-btn">
-                <i class="fa-brands fa-whatsapp"></i> Contact us on WhatsApp
-            </a>
-
-            <!-- Buttons -->
-            <div class="btn-group">
-                <a href="home" class="btn-primary-custom"><i class="fa-regular fa-house"></i> Continue Shopping</a>
-                <a href="track-order.html" class="btn-outline-custom"><i class="fa-regular fa-truck"></i> Track Order</a>
-            </div>
-
-            <div class="secure-note">
-                <i class="fa-solid fa-lock"></i> Your information is secure. We'll never share your data.
+            <div style="display: flex; justify-content: space-between; padding: 1rem 0; border-top: 2px solid var(--border);">
+                <span style="font-weight: 700; color: var(--secondary);">Total</span>
+                <span id="orderTotal" style="font-weight: 700; color: var(--primary); font-size: 1.1rem;">$0.00</span>
             </div>
         </div>
 
-    </div>
+        <div style="background: var(--primary-light); border-radius: var(--radius-sm); padding: 1.2rem; margin: 1.5rem 0; border-left: 4px solid var(--primary);">
+            <h4 style="color: var(--secondary); font-size: 0.95rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-check"></i> What's Next?</h4>
+            <ul style="list-style: none; padding: 0;">
+                <li style="padding: 0.3rem 0; font-size: 0.85rem; color: var(--text); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fa-solid fa-arrow-right" style="color: var(--primary); width: 20px;"></i>
+                    You'll receive a confirmation email shortly
+                </li>
+                <li style="padding: 0.3rem 0; font-size: 0.85rem; color: var(--text); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fa-solid fa-arrow-right" style="color: var(--primary); width: 20px;"></i>
+                    Your order will be processed within 24 hours
+                </li>
+                <li style="padding: 0.3rem 0; font-size: 0.85rem; color: var(--text); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fa-solid fa-arrow-right" style="color: var(--primary); width: 20px;"></i>
+                    You can track your shipment anytime
+                </li>
+            </ul>
+        </div>
 
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem;">
+            <a href="/track-order" style="display: inline-flex; align-items: center; gap: 0.5rem; background: var(--primary); color: #fff; padding: 0.7rem 2rem; border-radius: 50px; font-weight: 600; text-decoration: none; transition: var(--transition);" onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'"><i class="fa-solid fa-truck"></i> Track Order</a>
+            
+            <a href="/" style="display: inline-flex; align-items: center; gap: 0.5rem; background: transparent; color: var(--primary); border: 2px solid var(--primary); padding: 0.7rem 2rem; border-radius: 50px; font-weight: 600; text-decoration: none; transition: var(--transition);" onmouseover="this.style.background='var(--primary-light)'" onmouseout="this.style.background='transparent'"><i class="fa-solid fa-house"></i> Back to Home</a>
+        </div>
+
+        <div style="margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-light);">
+            Need help? <a href="/help-center" style="color: var(--primary); font-weight: 600;">Contact our support team</a>
+        </div>
+    </div>
 </div>
 
-<!-- ============================================ -->
-<!-- FOOTER -->
-<!-- ============================================ -->
 <footer class="footer">
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about.html">About</a>
-                <a href="contact.html">Contact</a>
-                <a href="help-center.html">Help</a>
-                <a href="privacy.html">Privacy Policy</a>
-                <a href="terms.html">Terms &amp; Conditions</a>
-                <a href="become-seller.html">Become a Seller</a>
-            </div>
-            <div class="footer-social">
-                <a href="#"><i class="fa-brands fa-facebook"></i></a>
-                <a href="#"><i class="fa-brands fa-twitter"></i></a>
-                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/help-center">Help</a>
+                <a href="/privacy">Privacy</a>
+                <a href="/terms">Terms</a>
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
+            &copy; <span id="year"></span> Pilot Sales Distribution. All rights reserved.
         </div>
     </div>
 </footer>
 
-<!-- ============================================ -->
-<!-- TOAST NOTIFICATION -->
-<!-- ============================================ -->
 <div id="toast" class="toast"></div>
 
-<!-- ============================================ -->
-<!-- MAIN JAVASCRIPT -->
-<!-- ============================================ -->
 <script src="main.js"></script>
-
 <script>
-// ============================================
-// ORDER SUCCESS PAGE - JAVASCRIPT
-// ============================================
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-// ─── SET CURRENT YEAR ───
-document.getElementById('year').textContent = new Date().getFullYear();
+    function generateOrderNumber() {
+        const num = Math.floor(Math.random() * 1000000);
+        return 'PSE-' + new Date().getFullYear() + '-' + String(num).padStart(6, '0');
+    }
 
-// ─── LOAD ORDER DETAILS ───
-async function loadOrderDetails() {
-    const params = new URLSearchParams(window.location.search);
-    const orderNumber = params.get('order') || params.get('quote') || 'N/A';
-
-    const numberDisplay = document.getElementById('orderNumberDisplay');
-    numberDisplay.textContent = orderNumber;
-
-    // Try to find order in localStorage or Firestore
-    let order = null;
-
-    // Check localStorage first
-    const orders = JSON.parse(localStorage.getItem('pilot_orders') || '[]');
-    order = orders.find(o => o.quoteNumber === orderNumber || o.orderNumber === orderNumber);
-
-    // If not found, try Firestore
-    if (!order) {
-        try {
-            const user = getCurrentUser();
-            if (user) {
-                const snapshot = await db.collection('orders')
-                    .where('user_id', '==', user.id)
-                    .get();
-
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.quoteNumber === orderNumber || data.orderNumber === orderNumber) {
-                        order = { id: doc.id, ...data };
-                    }
-                });
-            }
-        } catch (error) {
-            console.error('Error searching Firestore:', error);
+    document.addEventListener('DOMContentLoaded', function() {
+        const orderNumber = generateOrderNumber();
+        document.getElementById('orderNumber').textContent = orderNumber;
+        
+        const orderData = sessionStorage.getItem('lastOrder');
+        if (orderData) {
+            const order = JSON.parse(orderData);
+            document.getElementById('orderSubtotal').textContent = '$' + (order.subtotal || 0).toFixed(2);
+            document.getElementById('orderTotal').textContent = '$' + (order.total || 0).toFixed(2);
+            sessionStorage.removeItem('lastOrder');
         }
-    }
-
-    // If order found, display details
-    if (order) {
-        const items = order.items || [];
-        const totals = order.totals || {};
-
-        document.getElementById('orderItemsCount').textContent = items.length || 0;
-        document.getElementById('orderSubtotal').textContent = `$${(totals.subtotal || 0).toFixed(2)}`;
-        document.getElementById('orderShipping').textContent = totals.shipping === 0 ? 'FREE' : `$${(totals.shipping || 0).toFixed(2)}`;
-        document.getElementById('orderTax').textContent = `$${(totals.tax || 0).toFixed(2)}`;
-        document.getElementById('orderTotal').textContent = `$${(totals.total || 0).toFixed(2)}`;
-    } else {
-        // If order not found, show generic message
-        document.getElementById('orderItemsCount').textContent = '—';
-        document.getElementById('orderSubtotal').textContent = '—';
-        document.getElementById('orderShipping').textContent = '—';
-        document.getElementById('orderTax').textContent = '—';
-        document.getElementById('orderTotal').textContent = '—';
-
-        // Show a message
-        const details = document.getElementById('orderDetails');
-        details.innerHTML += `
-            <div style="text-align:center; padding:0.5rem 0; color:var(--text-light); font-size:0.85rem;">
-                <i class="fa-regular fa-envelope"></i> Order details sent to your email
-            </div>
-        `;
-    }
-}
-
-// ─── SEARCH WITH FIREBASE ───
-async function searchProductsFirebase(event) {
-    const input = document.getElementById('searchInput');
-    const resultsDiv = document.getElementById('searchResults');
-    const query = input.value.trim();
-
-    if (event && event.key === 'Enter' && query) {
-        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
-        return;
-    }
-
-    if (query.length < 2) {
-        resultsDiv.classList.remove('show');
-        return;
-    }
-
-    try {
-        const snapshot = await db.collection('products')
-            .where('status', 'in', ['active', 'approved'])
-            .limit(5)
-            .get();
-
-        const products = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            if (data.title.toLowerCase().includes(query.toLowerCase()) ||
-                (data.brand && data.brand.toLowerCase().includes(query.toLowerCase()))) {
-                products.push({
-                    id: doc.id,
-                    ...data,
-                    image_url: data.image_url || data.images?.[0] || ''
-                });
-            }
-        });
-
-        if (products.length === 0) {
-            resultsDiv.innerHTML = `
-                <div style="padding:1rem; text-align:center; color:var(--text-light);">
-                    No products found for "${query}"
-                </div>
-            `;
-            resultsDiv.classList.add('show');
-            return;
-        }
-
-        resultsDiv.innerHTML = products.map(p => `
-            <div class="result-item" onclick="window.location.href='product-detail.html?id=${p.id}'">
-                <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
-                <div class="info">
-                    <div class="title">${p.title}</div>
-                    <div class="price">$${(p.price || 0).toFixed(2)}</div>
-                </div>
-            </div>
-        `).join('') + `
-            <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
-                <a href="products.html?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
-                    See all results for "${query}" →
-                </a>
-            </div>
-        `;
-
-        resultsDiv.classList.add('show');
-
-    } catch (error) {
-        console.error('Search error:', error);
-    }
-}
-
-// ─── CLOSE SEARCH RESULTS ───
-document.addEventListener('click', function(e) {
-    const searchBar = document.getElementById('searchBar');
-    if (!searchBar.contains(e.target)) {
-        document.getElementById('searchResults').classList.remove('show');
-    }
-});
-
-// ─── INIT ───
-document.addEventListener('DOMContentLoaded', function() {
-    loadOrderDetails();
-    loadCartCount();
-    loadWishlistCount();
-});
+    });
 </script>
+
+<style>
+    @keyframes successPop {
+        0% { transform: scale(0); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+</style>
 
 </body>
 </html>
