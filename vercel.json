@@ -25,8 +25,9 @@
     { "source": "/chat/:path*", "destination": "/chat.html" }
   ],
   "redirects": [
-    { "source": "/index", "destination": "/home", "permanent": true },
-    { "source": "/index.html", "destination": "/home", "permanent": true }
+    { "source": "/order-sucess", "destination": "/order-success", "permanent": true },
+    { "source": "/index", "destination": "/", "permanent": true },
+    { "source": "/index.html", "destination": "/", "permanent": true }
   ],
   "trailingSlash": false
 }
