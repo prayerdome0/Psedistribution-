@@ -4,374 +4,507 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register - Pilot Sales Distribution</title>
-
-    <meta name="description" content="Create your Pilot Sales Distribution account. Join the premium wholesale marketplace." />
-    <meta name="keywords" content="register, sign up, wholesale account, Pilot Sales" />
-
-    <meta property="og:title" content="Register - Pilot Sales Distribution" />
-    <meta property="og:description" content="Create your wholesale account." />
-    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
-
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/logo-192.png" />
-
+    <meta name="description" content="Create your Pilot Sales Distribution account." />
+    
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-    <link rel="stylesheet" href="style.css" />
-
+    <link rel="stylesheet" href="style.css">
+    
     <style>
-        .auth-page {
-            max-width: 560px;
-            margin: 2rem auto;
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 2.5rem;
-            border: 1px solid var(--border);
-        }
-        .auth-page .auth-header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-        .auth-page .auth-header h2 {
-            font-size: 1.8rem;
-            color: var(--secondary);
-        }
-        .auth-page .auth-header h2 span {
-            color: var(--primary);
-        }
-        .auth-page .auth-header p {
-            color: var(--text-light);
-            font-size: 0.9rem;
-            margin-top: 0.3rem;
-        }
-
-        .auth-page .form-group {
-            margin-bottom: 1.2rem;
-        }
-        .auth-page .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--secondary);
-            margin-bottom: 0.3rem;
-        }
-        .auth-page .form-group label .required {
-            color: #c0392b;
-        }
-        .auth-page .form-group input,
-        .auth-page .form-group select {
-            width: 100%;
-            padding: 0.7rem 0.8rem;
-            border: 1px solid var(--border-dark);
-            border-radius: var(--radius-sm);
-            font-size: 0.9rem;
-            transition: var(--transition);
-            font-family: inherit;
-        }
-        .auth-page .form-group input:focus,
-        .auth-page .form-group select:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(26, 123, 107, 0.1);
-        }
-
-        .auth-page .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .auth-page .btn-register {
-            width: 100%;
-            background: var(--primary);
-            color: var(--white);
-            border: none;
-            padding: 0.8rem;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        .auth-page .btn-register:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(26, 123, 107, 0.3);
-        }
-        .auth-page .btn-register:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .auth-page .divider {
-            text-align: center;
-            margin: 1.5rem 0;
-            position: relative;
-        }
-        .auth-page .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: var(--border-dark);
-        }
-        .auth-page .divider span {
-            background: var(--white);
-            padding: 0 1rem;
-            position: relative;
-            color: var(--text-light);
-            font-size: 0.8rem;
-        }
-
-        .auth-page .social-login {
-            display: flex;
-            gap: 1rem;
-        }
-        .auth-page .social-login button {
-            flex: 1;
-            padding: 0.6rem;
-            border: 1px solid var(--border-dark);
-            border-radius: var(--radius-sm);
-            background: var(--white);
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 0.9rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        .auth-page .social-login button:hover {
-            background: var(--light);
-        }
-
-        .auth-page .login-link {
-            text-align: center;
-            margin-top: 1.2rem;
-            font-size: 0.9rem;
-            color: var(--text-light);
-        }
-        .auth-page .login-link a {
-            color: var(--primary);
-            font-weight: 600;
-            transition: var(--transition);
-        }
-        .auth-page .login-link a:hover {
-            text-decoration: underline;
-        }
-
-        .auth-page .terms {
-            font-size: 0.75rem;
-            color: var(--text-light);
-            text-align: center;
-            margin-top: 1rem;
-        }
-        .auth-page .terms a {
-            color: var(--primary);
-        }
-
-        .role-selector {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        .role-selector label {
-            flex: 1;
-            padding: 0.8rem;
-            border: 2px solid var(--border);
-            border-radius: var(--radius-sm);
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .role-selector label:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-        .role-selector input[type="radio"] {
-            display: none;
-        }
-        .role-selector input[type="radio"]:checked + label {
-            border-color: var(--primary);
-            background: var(--primary-light);
-            font-weight: 600;
-            color: var(--primary);
-        }
+        .auth-page { max-width: 560px; margin: 2rem auto; background: var(--white); border-radius: var(--radius); padding: 2.5rem; border: 1px solid var(--border); }
+        .auth-page .auth-header { text-align: center; margin-bottom: 1.5rem; }
+        .auth-page .auth-header h2 { font-size: 1.8rem; color: var(--secondary); }
+        .auth-page .auth-header h2 span { color: var(--primary); }
+        .auth-page .auth-header p { color: var(--text-light); font-size: 0.9rem; margin-top: 0.3rem; }
+        .auth-page .form-group { margin-bottom: 1.2rem; }
+        .auth-page .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--secondary); margin-bottom: 0.3rem; }
+        .auth-page .form-group label .required { color: #c0392b; }
+        .auth-page .form-group input { width: 100%; padding: 0.7rem 0.8rem; border: 1px solid var(--border-dark); border-radius: var(--radius-sm); font-size: 0.9rem; transition: var(--transition); }
+        .auth-page .form-group input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(26,123,107,0.1); }
+        .auth-page .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .auth-page .btn-register { width: 100%; background: var(--primary); color: var(--white); border: none; padding: 0.8rem; border-radius: 50px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .auth-page .btn-register:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(26,123,107,0.3); }
+        .auth-page .btn-register:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        .auth-page .divider { text-align: center; margin: 1.5rem 0; position: relative; }
+        .auth-page .divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border-dark); }
+        .auth-page .divider span { background: var(--white); padding: 0 1rem; position: relative; color: var(--text-light); font-size: 0.8rem; }
+        .auth-page .social-login { display: flex; gap: 1rem; }
+        .auth-page .social-login button { flex: 1; padding: 0.6rem; border: 1px solid var(--border-dark); border-radius: var(--radius-sm); background: var(--white); cursor: pointer; transition: var(--transition); font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .auth-page .social-login button:hover { background: var(--light); }
+        .auth-page .login-link { text-align: center; margin-top: 1.2rem; font-size: 0.9rem; color: var(--text-light); }
+        .auth-page .login-link a { color: var(--primary); font-weight: 600; transition: var(--transition); }
+        .auth-page .login-link a:hover { text-decoration: underline; }
+        .auth-page .terms { font-size: 0.75rem; color: var(--text-light); text-align: center; margin-top: 1rem; }
+        .auth-page .terms a { color: var(--primary); }
+        
+        .role-selector { display: flex; gap: 1rem; margin: 0.5rem 0 1rem; }
+        .role-selector .role { flex: 1; padding: 0.8rem; border: 2px solid var(--border-dark); border-radius: var(--radius-sm); text-align: center; cursor: pointer; transition: var(--transition); }
+        .role-selector .role:hover { border-color: var(--primary-light); }
+        .role-selector .role.active { border-color: var(--primary); background: var(--primary-light); }
+        .role-selector .role i { font-size: 1.2rem; display: block; margin-bottom: 0.2rem; color: var(--primary); }
+        .role-selector .role span { font-size: 0.8rem; font-weight: 600; color: var(--secondary); }
+        .password-strength { height: 4px; background: var(--border-dark); border-radius: 4px; margin-top: 0.3rem; overflow: hidden; }
+        .password-strength .bar { height: 100%; width: 0%; border-radius: 4px; transition: var(--transition); }
+        .password-strength .bar.weak { width: 25%; background: #c0392b; }
+        .password-strength .bar.medium { width: 50%; background: #e67e22; }
+        .password-strength .bar.strong { width: 75%; background: #f1c40f; }
+        .password-strength .bar.very-strong { width: 100%; background: #27ae60; }
+        .password-hint { font-size: 0.7rem; color: var(--text-light); margin-top: 0.2rem; }
+        #sellerFields { display: none; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 480px) { .auth-page { padding: 1.5rem; margin: 1rem; } .auth-page .form-row { grid-template-columns: 1fr; } .auth-page .social-login { flex-direction: column; } .role-selector { flex-direction: column; } }
     </style>
 </head>
 <body>
 
+<!-- TOP BAR -->
 <div class="top-bar">
     <div class="container">
         <div class="moving-words">
             <div class="words-track">
-                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution</span>
-                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices</span>
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
             </div>
         </div>
         <div class="top-links">
-            <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register" id="registerLink" style="display:none;"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
 
+<!-- HEADER -->
 <header class="header">
     <div class="container">
-        <a href="/" class="logo">
+        <a href="home" class="logo">
             <img src="logo.jpg" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
             </div>
         </a>
+        <div class="header-actions">
+            <a href="cart" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+            <a href="account" class="icon-btn" id="accountBtn">
+                <i class="fa-regular fa-user"></i>
+                <span id="accountLabel">Account</span>
+            </a>
+        </div>
     </div>
 </header>
 
+<!-- NAVIGATION -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="home"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
 <div class="container">
     <div class="auth-page">
         <div class="auth-header">
-            <h2>Create Your <span>Account</span></h2>
-            <p>Join our wholesale marketplace</p>
+            <h2>Create <span>Account</span></h2>
+            <p>Join Pilot Sales Distribution wholesale marketplace</p>
         </div>
 
-        <form id="registerForm" onsubmit="handleRegister(event)">
-            <div class="form-group">
-                <label>I am a: <span class="required">*</span></label>
-                <div class="role-selector">
-                    <input type="radio" id="buyer" name="role" value="buyer" checked />
-                    <label for="buyer"><i class="fa-solid fa-shopping-cart"></i> Buyer</label>
-                    
-                    <input type="radio" id="seller" name="role" value="seller" />
-                    <label for="seller"><i class="fa-solid fa-store"></i> Seller</label>
-                </div>
-            </div>
-
+        <form id="registerForm">
             <div class="form-row">
                 <div class="form-group">
-                    <label for="firstName">First Name <span class="required">*</span></label>
-                    <input type="text" id="firstName" placeholder="John" required />
+                    <label>First Name <span class="required">*</span></label>
+                    <input type="text" id="regFirstName" placeholder="caden" required />
                 </div>
                 <div class="form-group">
-                    <label for="lastName">Last Name <span class="required">*</span></label>
-                    <input type="text" id="lastName" placeholder="Doe" required />
+                    <label>Last Name <span class="required">*</span></label>
+                    <input type="text" id="regLastName" placeholder="gibson" required />
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="regEmail">Email Address <span class="required">*</span></label>
-                <input type="email" id="regEmail" placeholder="your@email.com" required />
+                <label>Email Address <span class="required">*</span></label>
+                <input type="email" id="regEmail" placeholder="you@example.com" required />
             </div>
 
             <div class="form-group">
-                <label for="company">Company Name <span class="required">*</span></label>
-                <input type="text" id="company" placeholder="Your Company" required />
+                <label>Password <span class="required">*</span></label>
+                <input type="password" id="regPassword" placeholder="Min 6 characters" required minlength="6" />
+                <div class="password-strength"><div class="bar" id="passwordStrengthBar"></div></div>
+                <div class="password-hint" id="passwordHint">Use 6+ characters with a mix of letters and numbers</div>
             </div>
 
             <div class="form-group">
-                <label for="phone">Phone Number <span class="required">*</span></label>
-                <input type="tel" id="phone" placeholder="+1 (555) 000-0000" required />
+                <label>Confirm Password <span class="required">*</span></label>
+                <input type="password" id="regConfirmPassword" placeholder="Confirm your password" required />
+                <div id="passwordMatchHint" style="font-size:0.7rem; margin-top:0.2rem;"></div>
             </div>
 
-            <div class="form-group">
-                <label for="regPassword">Password <span class="required">*</span></label>
-                <input type="password" id="regPassword" placeholder="••••••••" required />
+            <label style="font-size:0.85rem; font-weight:600; color:var(--secondary);">I want to register as:</label>
+            <div class="role-selector">
+                <div class="role active" onclick="selectRole(this)" data-role="buyer">
+                    <i class="fa-regular fa-user"></i>
+                    <span>Customer</span>
+                </div>
+                <div class="role" onclick="selectRole(this)" data-role="seller">
+                    <i class="fa-regular fa-store"></i>
+                    <span>Seller</span>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password <span class="required">*</span></label>
-                <input type="password" id="confirmPassword" placeholder="••••••••" required />
+            <div id="sellerFields">
+                <div class="form-group">
+                    <label>Company Name <span class="required">*</span></label>
+                    <input type="text" id="regCompany" placeholder="Your business name" />
+                </div>
+                <div class="form-group">
+                    <label>Business Type</label>
+                    <input type="text" id="regBusinessType" placeholder="Retail, Wholesale, Manufacturing, etc." />
+                </div>
             </div>
 
-            <button type="submit" class="btn-register">
-                <i class="fa-solid fa-user-plus"></i> Create Account
+            <button type="submit" class="btn-register" id="registerBtn">
+                <i class="fa-regular fa-user-plus"></i> Create Account
             </button>
         </form>
 
-        <div class="divider"><span>or register with</span></div>
+        <div class="divider"><span>or continue with</span></div>
 
         <div class="social-login">
-            <button onclick="signInWithGoogle()" type="button">
-                <i class="fa-brands fa-google"></i> Google
+            <button onclick="signUpWithGoogle()" id="googleSignUpBtn">
+                <img src="https://www.google.com/favicon.ico" style="width:18px; height:18px;" alt="Google" />
+                Sign up with Google
+            </button>
+            <button onclick="showToast('Facebook registration coming soon', 'info')">
+                <i class="fa-brands fa-facebook"></i> Facebook
             </button>
         </div>
 
         <div class="login-link">
-            Already have an account? <a href="/login">Login here →</a>
+            Already have an account? <a href="login">Sign in</a>
         </div>
 
         <div class="terms">
-            By registering, you agree to our <a href="/terms">Terms & Conditions</a> and <a href="/privacy">Privacy Policy</a>
+            By creating an account, you agree to our <a href="privacy">Privacy Policy</a> and <a href="terms">Terms of Service</a>
         </div>
     </div>
 </div>
 
+<!-- FOOTER -->
 <footer class="footer">
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="/about">About</a>
-                <a href="/contact">Contact</a>
-                <a href="/help-center">Help</a>
-                <a href="/privacy">Privacy</a>
-                <a href="/terms">Terms</a>
+                <a href="about">About</a>
+                <a href="contact">Contact</a>
+                <a href="help-center">Help</a>
+                <a href="privacy">Privacy Policy</a>
+                <a href="terms">Terms &amp; Conditions</a>
+                <a href="become-seller">Become a Seller</a>
+            </div>
+            <div class="footer-social">
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; <span id="year"></span> Pilot Sales Distribution. All rights reserved.
+            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
         </div>
     </div>
 </footer>
 
+<!-- TOAST -->
 <div id="toast" class="toast"></div>
 
-<script src="main.js"></script>
+<!-- JAVASCRIPT - FIXED -->
 <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+    // ─── FIREBASE CONFIG ───
+    const firebaseConfig = {
+        apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
+        authDomain: "pilot-sales-distribution.firebaseapp.com",
+        projectId: "pilot-sales-distribution",
+        storageBucket: "pilot-sales-distribution.firebasestorage.app",
+        messagingSenderId: "729127273727",
+        appId: "1:729127273727:web:402d67be8346257755f8ca"
+    };
 
-    async function handleRegister(event) {
-        event.preventDefault();
-        
+    let auth, db, googleProvider;
+    let selectedRole = 'buyer';
+
+    // ─── INITIALIZE ───
+    function initFirebase() {
+        if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            console.log('✅ Firebase initialized');
+        }
+        auth = firebase.auth();
+        db = firebase.firestore();
+        googleProvider = new firebase.auth.GoogleAuthProvider();
+        setupAuthListener();
+        loadCartCount();
+    }
+
+    // ─── AUTH LISTENER ───
+    function setupAuthListener() {
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const doc = await db.collection('users').doc(user.uid).get();
+                    const data = doc.exists ? doc.data() : {};
+                    localStorage.setItem('pilot_user', JSON.stringify({
+                        id: user.uid,
+                        email: user.email,
+                        full_name: data.full_name || user.displayName || '',
+                        role: data.role || 'buyer'
+                    }));
+                } catch (e) {}
+            } else {
+                localStorage.removeItem('pilot_user');
+            }
+            updateAuthUI();
+        });
+    }
+
+    // ─── GET USER ───
+    function getCurrentUser() {
+        try {
+            const user = localStorage.getItem('pilot_user');
+            return user ? JSON.parse(user) : null;
+        } catch (e) { return null; }
+    }
+
+    // ─── UPDATE UI ───
+    function updateAuthUI() {
+        const user = getCurrentUser();
+        const loginLink = document.getElementById('loginLink');
+        const registerLink = document.getElementById('registerLink');
+        const accountLabel = document.getElementById('accountLabel');
+        if (user) {
+            if (loginLink) loginLink.style.display = 'none';
+            if (registerLink) registerLink.style.display = 'none';
+            if (accountLabel) accountLabel.textContent = user.full_name || 'Account';
+        } else {
+            if (loginLink) loginLink.style.display = 'inline';
+            if (registerLink) registerLink.style.display = 'inline';
+            if (accountLabel) accountLabel.textContent = 'Account';
+        }
+    }
+
+    // ─── TOAST ───
+    function showToast(message, type = 'info') {
+        let toast = document.getElementById('toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.className = 'toast';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.className = 'toast ' + type + ' show';
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => {
+            toast.classList.remove('show');
+        }, 4000);
+    }
+
+    // ─── ROLE SELECTOR ───
+    window.selectRole = function(el) {
+        document.querySelectorAll('.role-selector .role').forEach(r => r.classList.remove('active'));
+        el.classList.add('active');
+        selectedRole = el.dataset.role;
+        const sellerFields = document.getElementById('sellerFields');
+        sellerFields.style.display = selectedRole === 'seller' ? 'block' : 'none';
+    };
+
+    // ─── PASSWORD STRENGTH ───
+    document.getElementById('regPassword').addEventListener('input', function() {
+        const password = this.value;
+        const bar = document.getElementById('passwordStrengthBar');
+        const hint = document.getElementById('passwordHint');
+        let strength = 0;
+        let level = '';
+        if (password.length >= 6) strength++;
+        if (password.length >= 10) strength++;
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+        if (/\d/.test(password)) strength++;
+        if (/[^a-zA-Z0-9]/.test(password)) strength++;
+        if (strength <= 1) { level = 'weak'; hint.textContent = 'Weak - Add more characters, numbers, and symbols'; hint.style.color = '#c0392b'; }
+        else if (strength === 2) { level = 'medium'; hint.textContent = 'Medium - Add uppercase letters and symbols'; hint.style.color = '#e67e22'; }
+        else if (strength === 3) { level = 'strong'; hint.textContent = 'Strong - Good password!'; hint.style.color = '#f1c40f'; }
+        else if (strength >= 4) { level = 'very-strong'; hint.textContent = 'Very Strong - Excellent password!'; hint.style.color = '#27ae60'; }
+        bar.className = 'bar ' + level;
+    });
+
+    // ─── PASSWORD MATCH ───
+    document.getElementById('regConfirmPassword').addEventListener('input', function() {
         const password = document.getElementById('regPassword').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        
-        if (password !== confirmPassword) {
+        const confirm = this.value;
+        const hint = document.getElementById('passwordMatchHint');
+        if (confirm.length === 0) { hint.textContent = ''; }
+        else if (password === confirm) { hint.textContent = '✅ Passwords match!'; hint.style.color = '#27ae60'; }
+        else { hint.textContent = '❌ Passwords do not match'; hint.style.color = '#c0392b'; }
+    });
+
+    // ─── REGISTER ───
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const firstName = document.getElementById('regFirstName').value.trim();
+        const lastName = document.getElementById('regLastName').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const confirm = document.getElementById('regConfirmPassword').value;
+        const company = document.getElementById('regCompany').value.trim();
+        const businessType = document.getElementById('regBusinessType').value.trim();
+
+        if (!firstName || !lastName || !email || !password) {
+            showToast('Please fill in all required fields', 'error');
+            return;
+        }
+        if (password !== confirm) {
             showToast('Passwords do not match', 'error');
             return;
         }
+        if (password.length < 6) {
+            showToast('Password must be at least 6 characters', 'error');
+            return;
+        }
+        if (selectedRole === 'seller' && !company) {
+            showToast('Please enter your company name', 'error');
+            return;
+        }
 
-        const email = document.getElementById('regEmail').value;
-        const userData = {
-            firstName: document.getElementById('firstName').value,
-            lastName: document.getElementById('lastName').value,
-            company: document.getElementById('company').value,
-            phone: document.getElementById('phone').value,
-            role: document.querySelector('input[name="role"]:checked').value,
-            createdAt: new Date()
-        };
+        const btn = document.getElementById('registerBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account...';
 
         try {
-            await signUp(email, password, userData);
-            showToast('Account created successfully!', 'success');
-            setTimeout(() => window.location.href = '/account', 1500);
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            await db.collection('users').doc(user.uid).set({
+                email: email,
+                full_name: `${firstName} ${lastName}`,
+                first_name: firstName,
+                last_name: lastName,
+                role: selectedRole,
+                company: company || '',
+                business_type: businessType || '',
+                created_at: new Date().toISOString(),
+                status: 'active',
+                verification_status: 'pending'
+            });
+            localStorage.setItem('pilot_user', JSON.stringify({
+                id: user.uid,
+                email: email,
+                full_name: `${firstName} ${lastName}`,
+                role: selectedRole
+            }));
+            updateAuthUI();
+            showToast(`✅ Welcome ${firstName}! Account created!`, 'success');
+            setTimeout(() => {
+                if (selectedRole === 'seller') { window.location.href = 'seller-dashboard'; }
+                else { window.location.href = 'home'; }
+            }, 1500);
         } catch (error) {
-            showToast(error.message, 'error');
+            let msg = error.message;
+            if (error.code === 'auth/email-already-in-use') msg = 'This email is already registered.';
+            if (error.code === 'auth/weak-password') msg = 'Password is too weak. Use 6+ characters.';
+            if (error.code === 'auth/invalid-email') msg = 'Please enter a valid email address.';
+            showToast('❌ ' + msg, 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-regular fa-user-plus"></i> Create Account';
+        }
+    });
+
+    // ─── GOOGLE SIGN UP ───
+    window.signUpWithGoogle = async function() {
+        const btn = document.getElementById('googleSignUpBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
+        try {
+            const result = await auth.signInWithPopup(googleProvider);
+            const user = result.user;
+            const doc = await db.collection('users').doc(user.uid).get();
+            if (!doc.exists) {
+                await db.collection('users').doc(user.uid).set({
+                    email: user.email,
+                    full_name: user.displayName || '',
+                    role: 'buyer',
+                    created_at: new Date().toISOString(),
+                    status: 'active'
+                });
+            }
+            const data = doc.exists ? doc.data() : {};
+            localStorage.setItem('pilot_user', JSON.stringify({
+                id: user.uid,
+                email: user.email,
+                full_name: data.full_name || user.displayName || '',
+                role: data.role || 'buyer'
+            }));
+            updateAuthUI();
+            showToast('✅ Google sign up successful!', 'success');
+            setTimeout(() => window.location.href = 'home', 1500);
+        } catch (error) {
+            showToast('❌ Failed to sign up with Google', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<img src="https://www.google.com/favicon.ico" style="width:18px; height:18px;" alt="Google" /> Sign up with Google';
+        }
+    };
+
+    // ─── LOAD CART COUNT ───
+    async function loadCartCount() {
+        try {
+            const user = getCurrentUser();
+            if (!user) {
+                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+                const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                document.querySelectorAll('.cart-count').forEach(el => {
+                    el.textContent = count;
+                    el.style.display = count > 0 ? 'inline' : 'none';
+                });
+                return;
+            }
+            const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
+            let count = 0;
+            snapshot.forEach(doc => { count += doc.data().quantity || 1; });
+            document.querySelectorAll('.cart-count').forEach(el => {
+                el.textContent = count;
+                el.style.display = count > 0 ? 'inline' : 'none';
+            });
+        } catch (error) {
+            document.querySelectorAll('.cart-count').forEach(el => el.textContent = '0');
         }
     }
-</script>
 
+    // ─── INIT ───
+    document.addEventListener('DOMContentLoaded', function() {
+        initFirebase();
+        document.getElementById('year').textContent = new Date().getFullYear();
+    });
+
+    // ─── EXPOSE ───
+    window.showToast = showToast;
+    window.getCurrentUser = getCurrentUser;
+</script>
 </body>
 </html>

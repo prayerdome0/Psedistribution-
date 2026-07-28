@@ -4,37 +4,251 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pilot Sales Distribution - Wholesale Marketplace</title>
-
+    
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Pilot Sales Distribution - Premium wholesale marketplace for bulk products. 12,000+ products, 580+ verified suppliers." />
+    <meta name="description" content="Pilot Sales Distribution - Premium wholesale marketplace. 12,000+ products from 580+ verified suppliers." />
     <meta name="keywords" content="wholesale, bulk products, distribution, b2b, suppliers" />
-
+    
     <!-- Open Graph -->
-    <meta property="og:title" content="Pilot Sales Distribution" />
-    <meta property="og:description" content="Premium wholesale marketplace for bulk products." />
+    <meta property="og:title" content="Pilot Sales Distribution - Premium Wholesale Marketplace" />
+    <meta property="og:description" content="Premium wholesale marketplace for bulk products. Save up to 40% with verified suppliers." />
     <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
     <meta property="og:url" content="https://pilotsalesdistribution.com/" />
-
+    
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/logo-192.png" />
-
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a7b6b">
+    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
+    
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-    <!-- Main Styles -->
-    <link rel="stylesheet" href="style.css" />
-
+    
     <style>
-        /* ─── STATISTICS COUNTER ─── */
+        /* ─── CSS VARIABLES ─── */
+        :root {
+            --primary: #1a7b6b;
+            --primary-dark: #0f4f43;
+            --primary-light: #e8f5f0;
+            --secondary: #0b2a3b;
+            --secondary-light: #1a4b5e;
+            --accent: #f1c40f;
+            --accent-hover: #e0b50e;
+            --dark: #0b1a2a;
+            --text: #2c5a6b;
+            --text-light: #6a889a;
+            --border: #e9edf2;
+            --border-dark: #dce3e9;
+            --light: #f0f4f8;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.06);
+            --shadow-hover: 0 20px 50px -10px rgba(0,20,30,0.12);
+            --radius: 1.5rem;
+            --radius-sm: 0.8rem;
+            --transition: 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--light); color: var(--dark); line-height: 1.6; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* ─── SCROLL ANIMATIONS ─── */
+        .animate-on-scroll { opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+
+        /* ─── TOP BAR ─── */
+        .top-bar {
+            background: var(--secondary);
+            color: #d4e2ed;
+            font-size: 0.75rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #1a4055;
+            overflow: hidden;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .top-bar .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+        .moving-words { flex: 1; overflow: hidden; white-space: nowrap; position: relative; }
+        .moving-words .words-track { display: inline-block; animation: scrollWords 30s linear infinite; }
+        .moving-words .words-track span { margin: 0 2rem; font-weight: 500; }
+        .moving-words .words-track span i { color: var(--accent); margin-right: 0.3rem; }
+        @keyframes scrollWords { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
+        .top-links { display: flex; gap: 1rem; flex-shrink: 0; }
+        .top-links a { color: #b4d0e0; transition: var(--transition); cursor: pointer; }
+        .top-links a:hover { color: var(--white); }
+        .top-links i { color: var(--accent); margin-right: 0.2rem; }
+
+        /* ─── HEADER ─── */
+        .header {
+            background: var(--white);
+            padding: 0.8rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 35px;
+            z-index: 100;
+        }
+        .header .container { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+        .logo { display: flex; align-items: center; gap: 0.8rem; text-decoration: none; flex-shrink: 0; }
+        .logo img { height: 45px; width: auto; border-radius: 8px; }
+        .logo .brand-name .main { font-size: 1.3rem; font-weight: 800; color: var(--secondary); }
+        .logo .brand-name .main span { color: var(--primary); }
+        .logo .brand-name .sub { font-size: 0.5rem; color: var(--text-light); font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
+
+        /* ─── SEARCH BAR ─── */
+        .search-bar {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            background: var(--light);
+            border-radius: 50px;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+        }
+        .search-bar:focus-within { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 4px rgba(26,123,107,0.08); }
+        .search-bar input { flex: 1; border: none; padding: 0.6rem 1rem; font-size: 0.9rem; background: transparent; outline: none; }
+        .search-bar button { background: var(--primary); border: none; color: var(--white); padding: 0 1.8rem; cursor: pointer; font-size: 1rem; transition: var(--transition); }
+        .search-bar button:hover { background: var(--primary-dark); }
+        .search-results {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-hover);
+            border: 1px solid var(--border);
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 200;
+        }
+        .search-results.show { display: block; }
+        .search-results .result-item { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 1rem; }
+        .search-results .result-item:hover { background: var(--primary-light); }
+        .search-results .result-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+        .search-results .result-item .info .title { font-weight: 600; font-size: 0.85rem; }
+        .search-results .result-item .info .price { color: var(--primary); font-weight: 700; font-size: 0.8rem; }
+
+        /* ─── HEADER ACTIONS ─── */
+        .header-actions { display: flex; align-items: center; gap: 1.2rem; font-size: 0.9rem; flex-wrap: wrap; }
+        .header-actions .icon-btn {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.6rem;
+            color: #1a3340;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.2rem 0.3rem;
+        }
+        .header-actions .icon-btn i { font-size: 1.3rem; margin-bottom: 2px; transition: var(--transition); }
+        .header-actions .icon-btn:hover { color: var(--primary); transform: translateY(-2px); }
+        .header-actions .icon-btn:hover i { transform: scale(1.1); }
+        .badge-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #c0392b;
+            color: var(--white);
+            font-size: 0.55rem;
+            font-weight: 700;
+            border-radius: 50%;
+            padding: 0.1rem 0.45rem;
+            min-width: 18px;
+            text-align: center;
+            animation: badgePop 0.3s ease;
+        }
+        @keyframes badgePop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+        /* ─── NAVIGATION TABS ─── */
+        .nav-categories {
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 0.4rem 0;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            position: sticky;
+            top: 75px;
+            z-index: 99;
+        }
+        .nav-categories::-webkit-scrollbar { height: 3px; }
+        .nav-categories::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #1a3340; }
+        .nav-tab { padding: 0.3rem 0; border-bottom: 3px solid transparent; transition: var(--transition); cursor: pointer; position: relative; flex-shrink: 0; }
+        .nav-tab::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 3px; background: var(--primary); transition: width 0.4s ease; }
+        .nav-tab:hover::after, .nav-tab.active::after { width: 100%; }
+        .nav-tab:hover { color: var(--secondary); }
+        .nav-tab.active { color: var(--primary); font-weight: 700; }
+        .wholesale-nav { color: var(--primary); font-weight: 700; }
+
+        /* ─── BANNER SLIDER ─── */
+        .banner-slider {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 1.5rem 0;
+            height: 450px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+        .banner-slider .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            padding: 3rem 4rem;
+            gap: 2rem;
+            transform: scale(1.02);
+        }
+        .banner-slider .slide.active { opacity: 1; transform: scale(1); }
+        .banner-slider .slide .content { z-index: 2; color: var(--white); }
+        .banner-slider .slide .content .badge { display: inline-block; background: rgba(255,255,255,0.15); padding: 0.3rem 1.2rem; border-radius: 30px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; backdrop-filter: blur(4px); }
+        .banner-slider .slide .content h2 { font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1.2; }
+        .banner-slider .slide .content h2 span { color: var(--accent); }
+        .banner-slider .slide .content p { font-size: 1.1rem; opacity: 0.9; margin-bottom: 1.5rem; max-width: 500px; }
+        .banner-slider .slide .content .buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .banner-slider .slide .slide-image { border-radius: 1rem; overflow: hidden; aspect-ratio: 16/10; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .banner-slider .slide .slide-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .banner-slider .slide.active .slide-image img { transform: scale(1.05); }
+        .banner-slider .dots { position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 0.8rem; z-index: 10; }
+        .banner-slider .dots .dot { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: 0.4s; border: 2px solid rgba(255,255,255,0.1); }
+        .banner-slider .dots .dot:hover { background: rgba(255,255,255,0.6); }
+        .banner-slider .dots .dot.active { background: var(--accent); transform: scale(1.2); border-color: var(--accent); }
+
+        /* ─── BUTTONS ─── */
+        .btn-primary { background: var(--accent); color: var(--secondary); padding: 0.7rem 2rem; border-radius: 50px; font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 25px rgba(241,196,15,0.3); }
+        .btn-outline-light { background: transparent; border: 2px solid rgba(255,255,255,0.4); color: var(--white); padding: 0.7rem 2rem; border-radius: 50px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-outline-light:hover { background: rgba(255,255,255,0.1); border-color: var(--white); transform: translateY(-2px); }
+
+        /* ─── STATS SECTION ─── */
         .stats-section {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -45,496 +259,196 @@
             border-radius: var(--radius);
             color: var(--white);
         }
-        .stat-item {
-            text-align: center;
-        }
-        .stat-item .number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--accent);
-        }
-        .stat-item .label {
-            font-size: 0.85rem;
-            opacity: 0.8;
-            margin-top: 0.2rem;
-        }
+        .stat-item { text-align: center; }
+        .stat-item .number { font-size: 2.5rem; font-weight: 800; color: var(--accent); }
+        .stat-item .label { font-size: 0.85rem; opacity: 0.8; margin-top: 0.2rem; }
 
-        /* ─── TESTIMONIAL FORM ─── */
-        .testimonial-form-section {
+        /* ─── SECTION TITLE ─── */
+        .section-title { font-size: 1.6rem; font-weight: 700; color: var(--secondary); margin: 2.5rem 0 1.2rem; }
+        .section-title span { color: var(--primary); }
+        .section-title p { font-size: 0.95rem; font-weight: 400; color: var(--text-light); margin-top: 0.3rem; }
+
+        /* ─── PRODUCT CARDS ─── */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .product-card {
             background: var(--white);
             border-radius: var(--radius);
-            padding: 2rem;
+            padding: 1rem;
             border: 1px solid var(--border);
-            margin: 2rem 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
         }
-        .testimonial-form-section h3 {
-            font-size: 1.2rem;
-            color: var(--secondary);
-            margin-bottom: 0.3rem;
+        .product-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: var(--shadow-hover); border-color: var(--primary-light); }
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #c0392b;
+            color: var(--white);
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+            text-transform: uppercase;
+            z-index: 2;
         }
-        .testimonial-form-section p {
-            color: var(--text-light);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
+        .product-badge.wholesale { background: var(--primary); }
+        .product-badge.flash { background: #e67e22; }
+        .verified-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #27ae60;
+            color: #fff;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 8px rgba(39,174,96,0.3);
+            z-index: 2;
         }
-        .testimonial-form-section .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-        .testimonial-form-section .form-group {
-            margin-bottom: 1rem;
-        }
-        .testimonial-form-section .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--secondary);
-            margin-bottom: 0.3rem;
-        }
-        .testimonial-form-section .form-group input,
-        .testimonial-form-section .form-group textarea,
-        .testimonial-form-section .form-group select {
-            width: 100%;
-            padding: 0.7rem 0.8rem;
-            border: 1px solid var(--border-dark);
+        .verified-badge i { font-size: 0.8rem; }
+        .product-card .product-image {
             border-radius: var(--radius-sm);
-            font-size: 0.9rem;
+            overflow: hidden;
+            aspect-ratio: 1/1;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.8rem;
+            cursor: pointer;
             transition: var(--transition);
-            font-family: inherit;
         }
-        .testimonial-form-section .form-group input:focus,
-        .testimonial-form-section .form-group textarea:focus,
-        .testimonial-form-section .form-group select:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(26, 123, 107, 0.1);
-        }
-        .testimonial-form-section .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        .testimonial-form-section .btn-submit-testimonial {
+        .product-card .product-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .product-card:hover .product-image img { transform: scale(1.08); }
+        .product-card .product-image .placeholder { font-size: 3rem; color: var(--text-light); }
+        .product-card .product-title { font-weight: 600; font-size: 0.95rem; color: var(--dark); margin-bottom: 0.2rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-card .product-brand { font-size: 0.7rem; color: var(--text-light); margin-bottom: 0.3rem; }
+        .product-card .product-price { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+        .product-card .product-price .old { font-size: 0.8rem; font-weight: 400; color: var(--text-light); text-decoration: line-through; margin-left: 0.4rem; }
+        .product-actions { display: flex; gap: 0.5rem; margin-top: 0.8rem; }
+        .product-actions .btn-add {
+            flex: 1;
             background: var(--primary);
             color: var(--white);
             border: none;
-            padding: 0.7rem 2rem;
+            padding: 0.5rem 0;
             border-radius: 50px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .testimonial-form-section .btn-submit-testimonial:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(26, 123, 107, 0.3);
-        }
-        .testimonial-form-section .btn-submit-testimonial:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .testimonial-form-section .rating-stars {
-            display: flex;
-            gap: 0.3rem;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        .testimonial-form-section .rating-stars .star {
-            color: #dce3e9;
-            transition: var(--transition);
-        }
-        .testimonial-form-section .rating-stars .star.active {
-            color: #f1c40f;
-        }
-        .testimonial-form-section .rating-stars .star:hover {
-            transform: scale(1.1);
-        }
-
-        /* ─── WHY CHOOSE US ─── */
-        .why-section {
-            margin: 3rem 0;
-        }
-        .why-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-        .why-card {
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-            text-align: center;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            overflow: hidden;
-        }
-        .why-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-hover);
-        }
-        .why-card .why-image {
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            aspect-ratio: 16/9;
-            margin-bottom: 1rem;
-        }
-        .why-card .why-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.6s ease;
-        }
-        .why-card:hover .why-image img {
-            transform: scale(1.05);
-        }
-        .why-card h3 {
-            font-size: 1.1rem;
-            color: var(--secondary);
-            margin-bottom: 0.3rem;
-        }
-        .why-card p {
-            font-size: 0.9rem;
-            color: var(--text-light);
-        }
-
-        /* ─── REQUEST QUOTE SECTION ─── */
-        .quote-section {
-            margin: 3rem 0;
-            padding: 4rem 2rem;
-            background: linear-gradient(135deg, rgba(11, 42, 59, 0.92), rgba(26, 75, 94, 0.92)),
-                        url('https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            border-radius: var(--radius);
-            text-align: center;
-            color: var(--white);
-            position: relative;
-        }
-        .quote-section h2 {
-            font-size: 2.2rem;
-            margin-bottom: 0.5rem;
-        }
-        .quote-section h2 span {
-            color: var(--accent);
-        }
-        .quote-section p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto 1.5rem;
-        }
-        .quote-section .btn-white {
-            background: var(--white);
-            color: var(--secondary);
-            padding: 0.8rem 2.5rem;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1rem;
-            border: none;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .quote-section .btn-white:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(255,255,255,0.3);
-        }
-
-        /* ─── TESTIMONIALS DISPLAY ─── */
-        .testimonials-display {
-            margin: 3rem 0;
-            padding: 4rem 2rem;
-            background: linear-gradient(135deg, rgba(11, 42, 59, 0.92), rgba(26, 75, 94, 0.92)),
-                        url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            border-radius: var(--radius);
-            color: var(--white);
-        }
-        .testimonials-display .section-title {
-            color: var(--white);
-        }
-        .testimonials-display .section-title span {
-            color: var(--accent);
-        }
-
-        .testimonial-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-        .testimonial-card {
-            background: rgba(255,255,255,0.08);
-            backdrop-filter: blur(8px);
-            padding: 1.5rem;
-            border-radius: var(--radius-sm);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .testimonial-card .stars {
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-        }
-        .testimonial-card .text {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            opacity: 0.9;
-            margin-bottom: 0.8rem;
-        }
-        .testimonial-card .author {
             font-weight: 600;
-        }
-        .testimonial-card .company {
             font-size: 0.8rem;
-            opacity: 0.7;
+            cursor: pointer;
+            transition: var(--transition);
         }
-
-        /* ─── TRUSTED COMPANIES LOGOS ─── */
-        .trusted-section {
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 3rem 1.5rem;
-            margin: 3rem 0;
-            border: 1px solid var(--border);
-            position: relative;
-            overflow: hidden;
-        }
-        .trusted-section .section-title {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .trusted-section .section-title h2 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--secondary);
-        }
-        .trusted-section .section-title h2 span {
-            color: var(--primary);
-        }
-        .trusted-section .section-title p {
-            color: var(--text-light);
-            font-size: 1rem;
-            margin-top: 0.3rem;
-        }
-
-        .logo-carousel {
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            padding: 1.5rem 0;
-        }
-        .logo-carousel::before,
-        .logo-carousel::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 80px;
-            z-index: 2;
-            pointer-events: none;
-        }
-        .logo-carousel::before {
-            left: 0;
-            background: linear-gradient(to right, var(--white), transparent);
-        }
-        .logo-carousel::after {
-            right: 0;
-            background: linear-gradient(to left, var(--white), transparent);
-        }
-
-        .logo-track {
-            display: flex;
-            animation: scrollLogos 35s linear infinite;
-            width: max-content;
-            gap: 2.5rem;
-            align-items: center;
-        }
-        .logo-track:hover {
-            animation-play-state: paused;
-        }
-
-        .logo-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-width: 100px;
-            padding: 0.5rem 0.8rem;
-            transition: all 0.3s ease;
-            opacity: 0.7;
-        }
-        .logo-item:hover {
-            opacity: 1;
-            transform: translateY(-4px);
-        }
-        .logo-item img {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-            transition: all 0.3s ease;
-        }
-        .logo-item:hover img {
-            transform: scale(1.1);
-        }
-        .logo-item span {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-light);
-            margin-top: 0.4rem;
-            transition: all 0.3s ease;
-        }
-        .logo-item:hover span {
-            color: var(--primary);
-        }
-
-        @keyframes scrollLogos {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        /* ─── NEWSLETTER ─── */
-        .newsletter-section {
-            margin: 3rem 0;
-            padding: 3rem 2rem;
-            background: linear-gradient(135deg, rgba(11, 42, 59, 0.92), rgba(26, 75, 94, 0.92)),
-                        url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            border-radius: var(--radius);
-            text-align: center;
-            color: var(--white);
-        }
-        .newsletter-section h2 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-        .newsletter-section h2 span {
-            color: var(--accent);
-        }
-        .newsletter-section p {
-            opacity: 0.8;
-            margin-bottom: 1.5rem;
-        }
-
-        .newsletter-form {
-            display: flex;
-            max-width: 500px;
-            margin: 0 auto;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .newsletter-form input {
-            flex: 1;
-            min-width: 200px;
-            padding: 0.8rem 1.2rem;
-            border: none;
+        .product-actions .btn-add:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .product-actions .btn-add:disabled { opacity: 0.6; cursor: not-allowed; }
+        .product-actions .btn-wish {
+            background: transparent;
+            border: 1px solid var(--border-dark);
             border-radius: 50px;
-            font-size: 0.95rem;
-            outline: none;
+            padding: 0.4rem 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-light);
         }
-        .newsletter-form button {
-            background: var(--accent);
-            color: var(--secondary);
-            border: none;
+        .product-actions .btn-wish:hover { border-color: var(--primary); color: var(--primary); }
+        .product-actions .btn-wish.liked { border-color: #e74c3c; color: #e74c3c; }
+
+        /* ─── LOADING SPINNER ─── */
+        .loading-spinner { grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-light); }
+        .loading-spinner i { font-size: 2.5rem; color: var(--primary); }
+        .loading-spinner p { margin-top: 0.5rem; }
+
+        /* ─── TOAST ─── */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--secondary);
+            color: var(--white);
             padding: 0.8rem 2rem;
             border-radius: 50px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
+            font-size: 0.9rem;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 90%;
+            text-align: center;
         }
-        .newsletter-form button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(241, 196, 15, 0.3);
+        .toast.show { display: block; }
+        .toast.success { background: var(--primary); }
+        .toast.error { background: #c0392b; }
+        .toast.info { background: #2980b9; }
+
+        /* ─── FOOTER ─── */
+        .footer {
+            background: var(--secondary);
+            color: #b4d0e0;
+            padding: 2rem 0 1rem;
+            margin-top: 3rem;
         }
+        .footer .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
+        .footer .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .footer .footer-links a { color: #b4d0e0; font-size: 0.85rem; transition: var(--transition); }
+        .footer .footer-links a:hover { color: var(--white); }
+        .footer .footer-bottom { border-top: 1px solid #1a4055; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
+        .footer .footer-bottom strong { color: var(--white); }
+        .footer .footer-social { display: flex; gap: 1rem; }
+        .footer .footer-social a { color: #b4d0e0; transition: var(--transition); font-size: 1.1rem; }
+        .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
 
         /* ─── RESPONSIVE ─── */
         @media (max-width: 992px) {
-            .stats-section {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .testimonial-form-section .form-row {
-                grid-template-columns: 1fr;
-            }
+            .banner-slider { height: 400px; }
+            .banner-slider .slide { grid-template-columns: 1fr; padding: 2rem; text-align: center; }
+            .banner-slider .slide .content p { margin: 0 auto 1.5rem; }
+            .banner-slider .slide .content .buttons { justify-content: center; }
+            .banner-slider .slide .slide-image { display: none; }
+            .banner-slider .slide .content h2 { font-size: 2.2rem; }
+            .stats-section { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 768px) {
-            .stats-section {
-                grid-template-columns: 1fr 1fr;
-                padding: 1.5rem;
-            }
-            .stat-item .number {
-                font-size: 1.8rem;
-            }
-            .quote-section h2 {
-                font-size: 1.6rem;
-            }
-            .testimonials-display {
-                padding: 2rem 1rem;
-            }
-            .newsletter-section h2 {
-                font-size: 1.5rem;
-            }
-            .trusted-section {
-                padding: 2rem 0.5rem;
-            }
-            .trusted-section .section-title h2 {
-                font-size: 1.4rem;
-            }
-            .logo-item {
-                min-width: 70px;
-            }
-            .logo-item img {
-                width: 35px;
-                height: 35px;
-            }
-            .logo-carousel::before,
-            .logo-carousel::after {
-                width: 40px;
-            }
+            .top-bar .container { flex-direction: column; gap: 0.3rem; align-items: stretch; text-align: center; }
+            .top-links { justify-content: center; }
+            .header .container { gap: 0.8rem; }
+            .search-bar { min-width: 100%; order: 10; }
+            .banner-slider { height: 320px; }
+            .banner-slider .slide .content h2 { font-size: 1.6rem; }
+            .banner-slider .slide .content p { font-size: 0.9rem; }
+            .banner-slider .slide { padding: 1.5rem; }
+            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+            .header-actions .icon-btn span { display: none; }
+            .stats-section { grid-template-columns: 1fr 1fr; padding: 1.5rem; }
+            .stat-item .number { font-size: 1.8rem; }
+            .footer .footer-content { flex-direction: column; text-align: center; }
+            .footer .footer-links { justify-content: center; gap: 1rem; }
         }
         @media (max-width: 480px) {
-            .stats-section {
-                grid-template-columns: 1fr 1fr;
-                gap: 1rem;
-                padding: 1rem;
-            }
-            .stat-item .number {
-                font-size: 1.4rem;
-            }
-            .stat-item .label {
-                font-size: 0.7rem;
-            }
-            .why-grid {
-                grid-template-columns: 1fr;
-            }
-            .testimonial-grid {
-                grid-template-columns: 1fr;
-            }
-            .logo-item {
-                min-width: 60px;
-                padding: 0.3rem 0.5rem;
-            }
-            .logo-item img {
-                width: 28px;
-                height: 28px;
-            }
-            .logo-item span {
-                font-size: 0.55rem;
-            }
+            .product-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .product-card { padding: 0.6rem; }
+            .product-card .product-title { font-size: 0.8rem; }
+            .product-card .product-price { font-size: 1rem; }
+            .stats-section { grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; }
+            .stat-item .number { font-size: 1.4rem; }
+            .stat-item .label { font-size: 0.7rem; }
+            .top-bar .moving-words .words-track span { font-size: 0.65rem; }
         }
     </style>
 </head>
 <body>
 
 <!-- ============================================ -->
-<!-- TOP BAR WITH MOVING WORDS -->
+<!-- TOP BAR -->
 <!-- ============================================ -->
 <div class="top-bar">
     <div class="container">
@@ -554,7 +468,7 @@
                 <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
             </div>
         </div>
-        <div class="top-links" id="topLinks">
+        <div class="top-links">
             <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
             <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
             <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
@@ -571,16 +485,14 @@
         <a href="home" class="logo">
             <img src="logo.jpg" alt="Pilot Sales Distribution" />
             <div class="brand-name">
-                <span class="main">PSE <span>Distribution</span></span>
-                <span class="sub">wholesale</span>
+                <span class="main">Pilot <span>Distribution</span></span>
+                <span class="sub">wholesale Marketplace</span>
             </div>
         </a>
 
-        <!-- Search -->
         <div class="search-bar" id="searchBar">
-            <input type="text" id="searchInput" placeholder="Search wholesale products..."
-                   onkeyup="searchProductsFirebase(event)" autocomplete="off" />
-            <button onclick="searchProductsFirebase()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <input type="text" id="searchInput" placeholder="Search wholesale products..." onkeyup="handleSearch(event)" autocomplete="off" />
+            <button onclick="handleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
             <div class="search-results" id="searchResults"></div>
         </div>
 
@@ -599,11 +511,6 @@
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
-            <a href="admin-dashboard" class="icon-btn admin-badge" id="adminLink" style="display:none;">
-                <i class="fa-solid fa-gauge-high"></i>
-                <span>Admin</span>
-                <span class="badge" id="adminBadgeCount">0</span>
-            </a>
         </div>
     </div>
 </header>
@@ -613,16 +520,13 @@
 <!-- ============================================ -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="home" class="nav-tab active" id="navHome"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products" class="nav-tab" id="navProducts"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about" class="nav-tab" id="navAbout"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact" class="nav-tab" id="navContact"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center" class="nav-tab" id="navHelp"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller" class="nav-tab wholesale-nav" id="navSell"><i class="fa-regular fa-store"></i> Sell</a>
-        <a href="admin-dashboard" class="nav-tab" id="adminNavTab" style="display:none;">
-            <i class="fa-solid fa-gauge-high"></i> Dashboard
-            <span class="badge" id="adminNavBadge" style="background:#c0392b; color:#fff; font-size:0.6rem; padding:0.1rem 0.5rem; border-radius:30px; margin-left:0.3rem;">0</span>
-        </a>
+        <a href="home" class="nav-tab active"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="rfq" class="nav-tab"><i class="fa-regular fa-file-lines"></i> RFQ</a>
+        <a href="about" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -635,7 +539,6 @@
     <!-- 1. HERO BANNER SLIDER -->
     <!-- ========================================== -->
     <div class="banner-slider" id="bannerSlider">
-
         <div class="slide active" style="background: linear-gradient(135deg, #0b2a3b 0%, #1a4b5e 100%);">
             <div class="content">
                 <span class="badge">🏪 Wholesale Marketplace</span>
@@ -650,11 +553,10 @@
                 <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&h=800&q=80" alt="Wholesale Marketplace" loading="lazy" />
             </div>
         </div>
-
         <div class="slide" style="background: linear-gradient(135deg, #1a7b6b 0%, #0f4f43 100%);">
             <div class="content">
-                <span class="badge">🚚 Logistics &amp; Distribution</span>
-                <h2>Fast &amp; Reliable <span>Delivery</span></h2>
+                <span class="badge">🚚 Logistics & Distribution</span>
+                <h2>Fast & Reliable <span>Delivery</span></h2>
                 <p>Free shipping on orders over $250. Track your order in real-time.</p>
                 <div class="buttons">
                     <a href="products" class="btn-primary"><i class="fa-solid fa-truck"></i> Browse Products</a>
@@ -665,7 +567,6 @@
                 <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&h=800&q=80" alt="Logistics" loading="lazy" />
             </div>
         </div>
-
         <div class="slide" style="background: linear-gradient(135deg, #2c3e50 0%, #1a2a3a 100%);">
             <div class="content">
                 <span class="badge">🤝 Business Partnership</span>
@@ -680,285 +581,74 @@
                 <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&h=800&q=80" alt="Business Partnership" loading="lazy" />
             </div>
         </div>
-
-        <div class="slide" style="background: linear-gradient(135deg, #1a4b5e 0%, #0b2a3b 100%);">
-            <div class="content">
-                <span class="badge">🌍 Global Supply Chain</span>
-                <h2>Worldwide <span>Distribution</span></h2>
-                <p>Electronics, Fashion, Grocery, Home &amp; more. All at wholesale prices.</p>
-                <div class="buttons">
-                    <a href="products" class="btn-primary"><i class="fa-regular fa-eye"></i> View All</a>
-                    <a href="#" class="btn-outline-light" onclick="document.getElementById('categories').scrollIntoView({behavior:'smooth'})">Categories</a>
-                </div>
-            </div>
-            <div class="slide-image">
-                <img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&h=800&q=80" alt="Global Supply Chain" loading="lazy" />
-            </div>
-        </div>
-
         <div class="dots" id="bannerDots"></div>
     </div>
 
     <!-- ========================================== -->
-    <!-- 2. STATISTICS COUNTER (REAL DATA) -->
+    <!-- 2. STATISTICS -->
     <!-- ========================================== -->
     <div class="stats-section animate-on-scroll">
         <div class="stat-item">
-            <div class="number" id="statProducts">0</div>
+            <div class="number" id="statProducts">0+</div>
             <div class="label">Products Available</div>
         </div>
         <div class="stat-item">
-            <div class="number" id="statSuppliers">0</div>
+            <div class="number" id="statSuppliers">580+</div>
             <div class="label">Verified Suppliers</div>
         </div>
         <div class="stat-item">
-            <div class="number" id="statSatisfaction">0%</div>
+            <div class="number" id="statSatisfaction">99.7%</div>
             <div class="label">Satisfaction Rate</div>
         </div>
         <div class="stat-item">
-            <div class="number" id="statOrders">0</div>
+            <div class="number" id="statOrders">1,234+</div>
             <div class="label">Orders Completed</div>
         </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- 3. CATEGORIES WITH IMAGES -->
-    <!-- ========================================== -->
-    <div id="categories">
-        <div class="section-title animate-on-scroll">
-            <h2>Shop by <span>Category</span></h2>
-            <p>Find the products you need at wholesale prices</p>
-        </div>
-        <div class="category-grid">
-            <div class="category-item" onclick="window.location.href='products?category=electronics'">
-                <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=200&h=200&q=80" alt="Electronics" loading="lazy" />
-                <span>Electronics</span>
-            </div>
-            <div class="category-item" onclick="window.location.href='products?category=fashion'">
-                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=200&h=200&q=80" alt="Fashion" loading="lazy" />
-                <span>Fashion</span>
-            </div>
-            <div class="category-item" onclick="window.location.href='products?category=grocery'">
-                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=200&h=200&q=80" alt="Grocery" loading="lazy" />
-                <span>Grocery</span>
-            </div>
-            <div class="category-item" onclick="window.location.href='products?category=home'">
-                <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=200&h=200&q=80" alt="Home" loading="lazy" />
-                <span>Home</span>
-            </div>
-            <div class="category-item" onclick="window.location.href='products?category=beauty'">
-                <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=200&h=200&q=80" alt="Beauty" loading="lazy" />
-                <span>Beauty</span>
-            </div>
-            <div class="category-item" onclick="window.location.href='products?category=health'">
-                <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=200&h=200&q=80" alt="Health" loading="lazy" />
-                <span>Health</span>
-            </div>
-            <div class="category-item" onclick="window.location.href='products?category=sports'">
-                <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=200&h=200&q=80" alt="Sports" loading="lazy" />
-                <span>Sports</span>
-            </div>
-            <div class="category-item" onclick="window.location.href='products?category=automotive'">
-                <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=200&h=200&q=80" alt="Automotive" loading="lazy" />
-                <span>Automotive</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- 4. WHY CHOOSE PILOT DISTRIBUTION -->
-    <!-- ========================================== -->
-    <div class="why-section animate-on-scroll">
-        <div class="section-title">
-            <h2>Why Choose <span>Pilot Distribution</span></h2>
-            <p>Your trusted partner for wholesale purchasing</p>
-        </div>
-        <div class="why-grid">
-            <div class="why-card">
-                <div class="why-image">
-                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&h=400&q=80" alt="Verified Suppliers" loading="lazy" />
-                </div>
-                <h3>Verified Suppliers</h3>
-                <p>All suppliers are vetted and verified for quality and reliability.</p>
-            </div>
-            <div class="why-card">
-                <div class="why-image">
-                    <img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=600&h=400&q=80" alt="Secure Payments" loading="lazy" />
-                </div>
-                <h3>Secure Payments</h3>
-                <p>Your transactions are safe and protected with industry-standard security.</p>
-            </div>
-            <div class="why-card">
-                <div class="why-image">
-                    <img src="https://images.unsplash.com/photo-1567789884554-0b844b597180?auto=format&fit=crop&w=600&h=400&q=80" alt="Quality Assurance" loading="lazy" />
-                </div>
-                <h3>Quality Assurance</h3>
-                <p>Every product meets our strict quality standards before listing.</p>
-            </div>
-            <div class="why-card">
-                <div class="why-image">
-                    <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=600&h=400&q=80" alt="Fast Delivery" loading="lazy" />
-                </div>
-                <h3>Fast Delivery</h3>
-                <p>Free shipping on orders over $250. Quick and reliable delivery.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- 5. FLASH DEALS -->
-    <!-- ========================================== -->
-    <div class="flash-deals animate-on-scroll" id="flashDeals">
-        <div class="left">
-            <h3><i class="fa-solid fa-bolt"></i> Flash Deals</h3>
-            <div class="flash-timer">
-                <span id="hours">06</span><span class="sep">:</span>
-                <span id="minutes">42</span><span class="sep">:</span>
-                <span id="seconds">18</span>
-            </div>
-        </div>
-        <a href="products?filter=flash" class="btn-primary" style="background:#f1c40f; color:#0b2a3b;">
-            View All <i class="fa-solid fa-arrow-right"></i>
-        </a>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- 6. FEATURED PRODUCTS -->
+    <!-- 3. FEATURED PRODUCTS -->
     <!-- ========================================== -->
     <div class="section-title animate-on-scroll">
         <h2>Featured <span>Products</span></h2>
         <p>Top-rated products from verified suppliers</p>
     </div>
     <div class="product-grid" id="productGrid">
-        <div class="loading-spinner">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            <p>Loading products...</p>
-        </div>
+        <!-- Products loaded by JavaScript -->
     </div>
 
     <!-- ========================================== -->
-    <!-- 7. TESTIMONIAL SUBMISSION FORM -->
+    <!-- 4. SHOP BY CATEGORY -->
     <!-- ========================================== -->
-    <div class="testimonial-form-section animate-on-scroll">
-        <h3><i class="fa-regular fa-pen-to-square"></i> Share Your Experience</h3>
-        <p>Help other businesses make informed decisions. Submit your testimonial below.</p>
-        
-        <form id="testimonialForm">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Your Name</label>
-                    <input type="text" id="testimonialName" placeholder="caden gibson" />
-                </div>
-                <div class="form-group">
-                    <label>Company (Optional)</label>
-                    <input type="text" id="testimonialCompany" placeholder="Your company name" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Rating</label>
-                <div class="rating-stars" id="ratingStars">
-                    <span class="star" data-value="1" onclick="setRating(1)">★</span>
-                    <span class="star" data-value="2" onclick="setRating(2)">★</span>
-                    <span class="star" data-value="3" onclick="setRating(3)">★</span>
-                    <span class="star" data-value="4" onclick="setRating(4)">★</span>
-                    <span class="star" data-value="5" onclick="setRating(5)">★</span>
-                </div>
-                <input type="hidden" id="testimonialRating" value="5" />
-            </div>
-            <div class="form-group">
-                <label>Your Message</label>
-                <textarea id="testimonialMessage" placeholder="Share your experience with Pilot Sales Distribution..." required></textarea>
-            </div>
-            <button type="submit" class="btn-submit-testimonial" id="testimonialSubmitBtn">
-                <i class="fa-regular fa-paper-plane"></i> Submit Testimonial
-            </button>
-        </form>
+    <div class="section-title animate-on-scroll" style="margin-top: 3rem;">
+        <h2>Shop by <span>Category</span></h2>
+        <p>Find the products you need at wholesale prices</p>
     </div>
-
-    <!-- ========================================== -->
-    <!-- 8. TESTIMONIALS DISPLAY -->
-    <!-- ========================================== -->
-    <div class="testimonials-display animate-on-scroll">
-        <div class="section-title">
-            <h2>What Our <span>Clients Say</span></h2>
-            <p>Real reviews from real customers</p>
+    <div class="category-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1rem;margin:1.5rem 0;">
+        <div class="category-item" onclick="window.location.href='products?category=electronics'" style="background:var(--white);border-radius:var(--radius-sm);padding:1rem 0.5rem;text-align:center;border:1px solid var(--border);transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);cursor:pointer;">
+            <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=200&h=200&q=80" alt="Electronics" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin:0 auto 0.5rem;border:3px solid var(--border);" />
+            <span style="font-size:0.75rem;font-weight:600;color:var(--dark);display:block;">Electronics</span>
         </div>
-        <div class="testimonial-grid" id="testimonialGrid">
-            <div class="loading-spinner">
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                <p>Loading testimonials...</p>
-            </div>
+        <div class="category-item" onclick="window.location.href='products?category=fashion'" style="background:var(--white);border-radius:var(--radius-sm);padding:1rem 0.5rem;text-align:center;border:1px solid var(--border);transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);cursor:pointer;">
+            <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=200&h=200&q=80" alt="Fashion" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin:0 auto 0.5rem;border:3px solid var(--border);" />
+            <span style="font-size:0.75rem;font-weight:600;color:var(--dark);display:block;">Fashion</span>
         </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- 9. TRUSTED COMPANIES LOGOS (LOCAL FILES) -->
-    <!-- ========================================== -->
-    <div class="trusted-section animate-on-scroll">
-        <div class="section-title">
-            <h2>Trusted By <span>Industry Leaders</span></h2>
-            <p>Join thousands of businesses that trust Pilot Sales Distribution</p>
+        <div class="category-item" onclick="window.location.href='products?category=home'" style="background:var(--white);border-radius:var(--radius-sm);padding:1rem 0.5rem;text-align:center;border:1px solid var(--border);transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);cursor:pointer;">
+            <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=200&h=200&q=80" alt="Home" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin:0 auto 0.5rem;border:3px solid var(--border);" />
+            <span style="font-size:0.75rem;font-weight:600;color:var(--dark);display:block;">Home</span>
         </div>
-        
-        <div class="logo-carousel">
-            <div class="logo-track">
-                <div class="logo-item"><img src="nike.png" alt="Nike" loading="lazy" /><span>Nike</span></div>
-                <div class="logo-item"><img src="apple.png" alt="Apple" loading="lazy" /><span>Apple</span></div>
-                <div class="logo-item"><img src="samsung.png" alt="Samsung" loading="lazy" /><span>Samsung</span></div>
-                <div class="logo-item"><img src="adidas.png" alt="Adidas" loading="lazy" /><span>Adidas</span></div>
-                <div class="logo-item"><img src="lg.png" alt="LG" loading="lazy" /><span>LG</span></div>
-                <div class="logo-item"><img src="google.png" alt="Google" loading="lazy" /><span>Google</span></div>
-                <div class="logo-item"><img src="intel.png" alt="Intel" loading="lazy" /><span>Intel</span></div>
-                <div class="logo-item"><img src="hp.png" alt="HP" loading="lazy" /><span>HP</span></div>
-                <div class="logo-item"><img src="dell.png" alt="Dell" loading="lazy" /><span>Dell</span></div>
-                <div class="logo-item"><img src="cisco.png" alt="Cisco" loading="lazy" /><span>Cisco</span></div>
-                <div class="logo-item"><img src="lenovo.png" alt="Lenovo" loading="lazy" /><span>Lenovo</span></div>
-                <div class="logo-item"><img src="huawei.png" alt="Huawei" loading="lazy" /><span>Huawei</span></div>
-                <div class="logo-item"><img src="xiaomi.png" alt="Xiaomi" loading="lazy" /><span>Xiaomi</span></div>
-                <div class="logo-item"><img src="nvidia.png" alt="NVIDIA" loading="lazy" /><span>NVIDIA</span></div>
-                <div class="logo-item"><img src="tesla.png" alt="Tesla" loading="lazy" /><span>Tesla</span></div>
-                <div class="logo-item"><img src="paypal.png" alt="PayPal" loading="lazy" /><span>PayPal</span></div>
-                <div class="logo-item"><img src="mastercard.png" alt="Mastercard" loading="lazy" /><span>Mastercard</span></div>
-                <div class="logo-item"><img src="visa.png" alt="Visa" loading="lazy" /><span>Visa</span></div>
-                <div class="logo-item"><img src="cocacola.png" alt="Coca-Cola" loading="lazy" /><span>Coca-Cola</span></div>
-                <div class="logo-item"><img src="toyota.png" alt="Toyota" loading="lazy" /><span>Toyota</span></div>
-                <div class="logo-item"><img src="bmw.png" alt="BMW" loading="lazy" /><span>BMW</span></div>
-                <!-- Duplicate for seamless loop -->
-                <div class="logo-item"><img src="nike.png" alt="Nike" loading="lazy" /><span>Nike</span></div>
-                <div class="logo-item"><img src="apple.png" alt="Apple" loading="lazy" /><span>Apple</span></div>
-                <div class="logo-item"><img src="samsung.png" alt="Samsung" loading="lazy" /><span>Samsung</span></div>
-                <div class="logo-item"><img src="adidas.png" alt="Adidas" loading="lazy" /><span>Adidas</span></div>
-                <div class="logo-item"><img src="lg.png" alt="LG" loading="lazy" /><span>LG</span></div>
-                <div class="logo-item"><img src="google.png" alt="Google" loading="lazy" /><span>Google</span></div>
-                <div class="logo-item"><img src="intel.png" alt="Intel" loading="lazy" /><span>Intel</span></div>
-                <div class="logo-item"><img src="hp.png" alt="HP" loading="lazy" /><span>HP</span></div>
-                <div class="logo-item"><img src="dell.png" alt="Dell" loading="lazy" /><span>Dell</span></div>
-                <div class="logo-item"><img src="cisco.png" alt="Cisco" loading="lazy" /><span>Cisco</span></div>
-                <div class="logo-item"><img src="lenovo.png" alt="Lenovo" loading="lazy" /><span>Lenovo</span></div>
-                <div class="logo-item"><img src="huawei.png" alt="Huawei" loading="lazy" /><span>Huawei</span></div>
-                <div class="logo-item"><img src="xiaomi.png" alt="Xiaomi" loading="lazy" /><span>Xiaomi</span></div>
-                <div class="logo-item"><img src="nvidia.png" alt="NVIDIA" loading="lazy" /><span>NVIDIA</span></div>
-                <div class="logo-item"><img src="tesla.png" alt="Tesla" loading="lazy" /><span>Tesla</span></div>
-                <div class="logo-item"><img src="paypal.png" alt="PayPal" loading="lazy" /><span>PayPal</span></div>
-                <div class="logo-item"><img src="mastercard.png" alt="Mastercard" loading="lazy" /><span>Mastercard</span></div>
-                <div class="logo-item"><img src="visa.png" alt="Visa" loading="lazy" /><span>Visa</span></div>
-                <div class="logo-item"><img src="cocacola.png" alt="Coca-Cola" loading="lazy" /><span>Coca-Cola</span></div>
-                <div class="logo-item"><img src="toyota.png" alt="Toyota" loading="lazy" /><span>Toyota</span></div>
-                <div class="logo-item"><img src="bmw.png" alt="BMW" loading="lazy" /><span>BMW</span></div>
-            </div>
+        <div class="category-item" onclick="window.location.href='products?category=beauty'" style="background:var(--white);border-radius:var(--radius-sm);padding:1rem 0.5rem;text-align:center;border:1px solid var(--border);transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);cursor:pointer;">
+            <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=200&h=200&q=80" alt="Beauty" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin:0 auto 0.5rem;border:3px solid var(--border);" />
+            <span style="font-size:0.75rem;font-weight:600;color:var(--dark);display:block;">Beauty</span>
         </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- 10. NEWSLETTER SIGNUP (SAVES TO FIREBASE) -->
-    <!-- ========================================== -->
-    <div class="newsletter-section animate-on-scroll">
-        <h2>Subscribe to Our <span>Newsletter</span></h2>
-        <p>Get the latest deals, new arrivals, and exclusive offers delivered to your inbox.</p>
-        <form class="newsletter-form" id="newsletterForm">
-            <input type="email" id="newsletterEmail" placeholder="Enter your email address" required />
-            <button type="submit"><i class="fa-regular fa-paper-plane"></i> Subscribe</button>
-        </form>
+        <div class="category-item" onclick="window.location.href='products?category=sports'" style="background:var(--white);border-radius:var(--radius-sm);padding:1rem 0.5rem;text-align:center;border:1px solid var(--border);transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);cursor:pointer;">
+            <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=200&h=200&q=80" alt="Sports" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin:0 auto 0.5rem;border:3px solid var(--border);" />
+            <span style="font-size:0.75rem;font-weight:600;color:var(--dark);display:block;">Sports</span>
+        </div>
+        <div class="category-item" onclick="window.location.href='products?category=automotive'" style="background:var(--white);border-radius:var(--radius-sm);padding:1rem 0.5rem;text-align:center;border:1px solid var(--border);transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);cursor:pointer;">
+            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=200&h=200&q=80" alt="Automotive" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin:0 auto 0.5rem;border:3px solid var(--border);" />
+            <span style="font-size:0.75rem;font-weight:600;color:var(--dark);display:block;">Automotive</span>
+        </div>
     </div>
 
 </div>
@@ -991,297 +681,503 @@
 </footer>
 
 <!-- ============================================ -->
-<!-- TOAST NOTIFICATION -->
+<!-- TOAST -->
 <!-- ============================================ -->
 <div id="toast" class="toast"></div>
 
 <!-- ============================================ -->
-<!-- MAIN JAVASCRIPT -->
+<!-- JAVASCRIPT -->
 <!-- ============================================ -->
-<script src="main.js"></script>
-
 <script>
-// ============================================
-// HOME PAGE - JAVASCRIPT (FIXED)
-// ============================================
+    // ─── FIREBASE CONFIG ───
+    const firebaseConfig = {
+        apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
+        authDomain: "pilot-sales-distribution.firebaseapp.com",
+        projectId: "pilot-sales-distribution",
+        storageBucket: "pilot-sales-distribution.firebasestorage.app",
+        messagingSenderId: "729127273727",
+        appId: "1:729127273727:web:402d67be8346257755f8ca"
+    };
 
-// ─── SET CURRENT YEAR ───
-document.getElementById('year').textContent = new Date().getFullYear();
+    // ─── FALLBACK PRODUCTS (If database is empty) ───
+    const FALLBACK_PRODUCTS = [
+        { id: '1', title: 'Premium Wireless Headphones', brand: 'Sony', price: 89.99, old_price: 129.99, image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&h=300&q=80', moq: 10, supplier_verified: true },
+        { id: '2', title: 'Smartphone 5G 128GB', brand: 'Samsung', price: 499.99, old_price: 599.99, image_url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&h=300&q=80', moq: 5, supplier_verified: true },
+        { id: '3', title: 'Organic Cotton T-Shirt', brand: 'Nike', price: 24.99, old_price: 34.99, image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=300&h=300&q=80', moq: 20, supplier_verified: false },
+        { id: '4', title: 'Professional Kitchen Knife Set', brand: 'Zwilling', price: 149.99, old_price: 199.99, image_url: 'https://images.unsplash.com/photo-1593618998160-e3408e6769a1?auto=format&fit=crop&w=300&h=300&q=80', moq: 6, supplier_verified: true },
+        { id: '5', title: 'LED Desk Lamp', brand: 'Philips', price: 39.99, old_price: 59.99, image_url: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=300&h=300&q=80', moq: 15, supplier_verified: true },
+        { id: '6', title: 'Fitness Tracker Watch', brand: 'Garmin', price: 129.99, old_price: 169.99, image_url: 'https://images.unsplash.com/photo-1576243345690-4e4b79b63288?auto=format&fit=crop&w=300&h=300&q=80', moq: 10, supplier_verified: true },
+        { id: '7', title: 'Leather Wallet', brand: 'Coach', price: 49.99, old_price: 69.99, image_url: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=300&h=300&q=80', moq: 12, supplier_verified: false },
+        { id: '8', title: 'Wireless Charging Pad', brand: 'Anker', price: 29.99, old_price: 39.99, image_url: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?auto=format&fit=crop&w=300&h=300&q=80', moq: 25, supplier_verified: true }
+    ];
 
-// ─── LOAD REAL STATS ───
-async function loadStats() {
-    const stats = await getRealStats();
-    document.getElementById('statProducts').textContent = stats.products.toLocaleString() + '+';
-    document.getElementById('statSuppliers').textContent = stats.suppliers.toLocaleString() + '+';
-    document.getElementById('statSatisfaction').textContent = stats.satisfaction;
-    document.getElementById('statOrders').textContent = stats.orders.toLocaleString();
-}
-
-// ─── LOAD TESTIMONIALS ───
-async function loadTestimonials() {
-    const grid = document.getElementById('testimonialGrid');
-    const testimonials = await window.loadTestimonials();
-    
-    if (testimonials.length === 0) {
-        grid.innerHTML = `
-            <div style="grid-column:1/-1; text-align:center; padding:1rem; opacity:0.7;">
-                <p>No testimonials yet. Be the first to share your experience!</p>
-            </div>
-        `;
-        return;
+    // ─── INITIALIZE ───
+    function initFirebase() {
+        if (typeof firebase === 'undefined') {
+            setTimeout(initFirebase, 500);
+            return;
+        }
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            console.log('✅ Firebase initialized');
+        }
+        window.db = firebase.firestore();
+        window.auth = firebase.auth();
+        setupAuthListener();
+        loadProducts();
+        loadStats();
+        loadCartCount();
+        loadWishlistCount();
     }
 
-    grid.innerHTML = testimonials.map(t => {
-        const stars = '★'.repeat(Math.round(t.rating || 5)) + '☆'.repeat(5 - Math.round(t.rating || 5));
-        return `
-            <div class="testimonial-card">
-                <div class="stars">${stars}</div>
-                <p class="text">${t.message}</p>
-                <div class="author">${t.name || 'Anonymous'}</div>
-                ${t.company ? `<div class="company">${t.company}</div>` : ''}
-            </div>
-        `;
-    }).join('');
-}
-
-// ─── RATING STARS ───
-let selectedRating = 5;
-
-function setRating(value) {
-    selectedRating = value;
-    document.getElementById('testimonialRating').value = value;
-    document.querySelectorAll('.rating-stars .star').forEach((star, index) => {
-        star.classList.toggle('active', index < value);
-    });
-}
-
-// ─── TESTIMONIAL FORM ───
-document.getElementById('testimonialForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const name = document.getElementById('testimonialName').value.trim() || 'Anonymous';
-    const company = document.getElementById('testimonialCompany').value.trim();
-    const message = document.getElementById('testimonialMessage').value.trim();
-    const rating = parseInt(document.getElementById('testimonialRating').value) || 5;
-    
-    if (!message) {
-        showToast('Please write a testimonial message', 'error');
-        return;
-    }
-    
-    const btn = document.getElementById('testimonialSubmitBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
-    
-    const user = getCurrentUser();
-    const result = await saveTestimonial({
-        name: name,
-        company: company,
-        message: message,
-        rating: rating,
-        userId: user ? user.id : null
-    });
-    
-    if (result.success) {
-        showToast('✅ Thank you! Your testimonial has been submitted for review.', 'success');
-        document.getElementById('testimonialForm').reset();
-        setRating(5);
-    } else {
-        showToast('❌ Failed to submit testimonial. Please try again.', 'error');
-    }
-    
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Submit Testimonial';
-});
-
-// ─── NEWSLETTER FORM ───
-document.getElementById('newsletterForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const email = document.getElementById('newsletterEmail').value.trim();
-    
-    if (!email) {
-        showToast('Please enter your email address', 'error');
-        return;
-    }
-    
-    const result = await saveNewsletter(email);
-    
-    if (result.success) {
-        showToast('✅ Subscribed successfully! Welcome to Pilot Distribution.', 'success');
-        document.getElementById('newsletterEmail').value = '';
-    } else {
-        showToast('❌ Failed to subscribe. Please try again.', 'error');
-    }
-});
-
-// ─── LOAD PRODUCTS ───
-async function loadProducts() {
-    const grid = document.getElementById('productGrid');
-
-    try {
-        const snapshot = await db.collection('products')
-            .where('status', 'in', ['active', 'approved'])
-            .limit(8)
-            .get();
-
-        const products = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            products.push({
-                id: doc.id,
-                ...data,
-                image_url: data.image_url || data.images?.[0] || '',
-                slug: data.slug || generateSlug(data.title)
-            });
+    // ─── AUTH LISTENER ───
+    function setupAuthListener() {
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                db.collection('users').doc(user.uid).get().then((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        localStorage.setItem('pilot_user', JSON.stringify({
+                            id: user.uid,
+                            email: user.email,
+                            full_name: data.full_name || user.displayName || '',
+                            role: data.role || 'buyer'
+                        }));
+                    }
+                });
+            } else {
+                localStorage.removeItem('pilot_user');
+            }
+            updateAuthUI();
         });
+    }
 
-        if (products.length === 0) {
+    // ─── GET USER ───
+    function getCurrentUser() {
+        const user = localStorage.getItem('pilot_user');
+        return user ? JSON.parse(user) : null;
+    }
+
+    // ─── UPDATE AUTH UI ───
+    function updateAuthUI() {
+        const user = getCurrentUser();
+        const loginLink = document.getElementById('loginLink');
+        const registerLink = document.getElementById('registerLink');
+        const accountLabel = document.getElementById('accountLabel');
+        
+        if (user) {
+            if (loginLink) loginLink.style.display = 'none';
+            if (registerLink) registerLink.style.display = 'none';
+            if (accountLabel) accountLabel.textContent = user.full_name || 'Account';
+        } else {
+            if (loginLink) loginLink.style.display = 'inline';
+            if (registerLink) registerLink.style.display = 'inline';
+            if (accountLabel) accountLabel.textContent = 'Account';
+        }
+    }
+
+    // ─── TOAST ───
+    function showToast(message, type = 'info') {
+        let toast = document.getElementById('toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.className = 'toast';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.className = 'toast ' + type + ' show';
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => {
+            toast.classList.remove('show');
+        }, 4000);
+    }
+
+    // ─── GENERATE SLUG ───
+    function generateSlug(title) {
+        if (!title) return '';
+        return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
+    }
+
+    // ─── ADD TO CART ───
+    async function addToCart(productId) {
+        const user = getCurrentUser();
+        if (!user) {
+            showToast('Please login first', 'error');
+            setTimeout(() => window.location.href = 'login', 1500);
+            return;
+        }
+
+        const btn = document.querySelector(`.btn-add[data-product-id="${productId}"]`);
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        }
+
+        try {
+            const snapshot = await db.collection('cart')
+                .where('user_id', '==', user.id)
+                .where('product_id', '==', productId)
+                .get();
+
+            if (!snapshot.empty) {
+                const docRef = snapshot.docs[0].ref;
+                const currentQty = snapshot.docs[0].data().quantity || 1;
+                await docRef.update({
+                    quantity: currentQty + 1,
+                    updated_at: new Date().toISOString()
+                });
+            } else {
+                await db.collection('cart').add({
+                    user_id: user.id,
+                    product_id: productId,
+                    quantity: 1,
+                    created_at: new Date().toISOString()
+                });
+            }
+
+            showToast('✅ Added to cart!', 'success');
+            loadCartCount();
+        } catch (error) {
+            showToast('❌ Failed to add to cart', 'error');
+        }
+
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add';
+        }
+    }
+
+    // ─── TOGGLE WISHLIST ───
+    async function toggleWishlist(productId) {
+        const user = getCurrentUser();
+        if (!user) {
+            showToast('Please login first', 'error');
+            setTimeout(() => window.location.href = 'login', 1500);
+            return;
+        }
+
+        const btn = document.querySelector(`.btn-wish[data-wishlist-id="${productId}"]`);
+        
+        try {
+            const snapshot = await db.collection('wishlist')
+                .where('user_id', '==', user.id)
+                .where('product_id', '==', productId)
+                .get();
+
+            if (!snapshot.empty) {
+                await snapshot.docs[0].ref.delete();
+                showToast('Removed from wishlist', 'info');
+                if (btn) btn.classList.remove('liked');
+            } else {
+                await db.collection('wishlist').add({
+                    user_id: user.id,
+                    product_id: productId,
+                    created_at: new Date().toISOString()
+                });
+                showToast('✅ Added to wishlist!', 'success');
+                if (btn) btn.classList.add('liked');
+            }
+            loadWishlistCount();
+        } catch (error) {
+            showToast('❌ Failed to update wishlist', 'error');
+        }
+    }
+
+    // ─── LOAD CART COUNT ───
+    async function loadCartCount() {
+        const user = getCurrentUser();
+        if (!user) {
+            document.querySelectorAll('.cart-count').forEach(el => el.textContent = '0');
+            return;
+        }
+
+        try {
+            const snapshot = await db.collection('cart')
+                .where('user_id', '==', user.id)
+                .get();
+            let count = 0;
+            snapshot.forEach(doc => { count += doc.data().quantity || 1; });
+            document.querySelectorAll('.cart-count').forEach(el => {
+                el.textContent = count;
+                el.style.display = count > 0 ? 'inline' : 'none';
+            });
+        } catch (error) {
+            document.querySelectorAll('.cart-count').forEach(el => el.textContent = '0');
+        }
+    }
+
+    // ─── LOAD WISHLIST COUNT ───
+    async function loadWishlistCount() {
+        const user = getCurrentUser();
+        if (!user) {
+            document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
+            return;
+        }
+
+        try {
+            const snapshot = await db.collection('wishlist')
+                .where('user_id', '==', user.id)
+                .get();
+            const count = snapshot.size;
+            document.querySelectorAll('.wishlist-count').forEach(el => {
+                el.textContent = count;
+            });
+        } catch (error) {
+            document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
+        }
+    }
+
+    // ─── LOAD STATS ───
+    async function loadStats() {
+        try {
+            const prodSnapshot = await db.collection('products').get();
+            document.getElementById('statProducts').textContent = prodSnapshot.size.toLocaleString() + '+';
+
+            const sellerSnapshot = await db.collection('users')
+                .where('role', '==', 'seller')
+                .where('status', '==', 'approved')
+                .get();
+            document.getElementById('statSuppliers').textContent = sellerSnapshot.size.toLocaleString() + '+';
+
+            const orderSnapshot = await db.collection('orders').get();
+            document.getElementById('statOrders').textContent = orderSnapshot.size.toLocaleString() + '+';
+        } catch (error) {
+            console.log('Stats loaded with defaults');
+        }
+    }
+
+    // ─── BANNER SLIDER ───
+    let currentSlide = 0;
+    let slideInterval = null;
+
+    function initBanner() {
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.getElementById('bannerDots');
+        if (!slides || slides.length === 0) return;
+        
+        dots.innerHTML = Array.from(slides).map((_, i) => 
+            `<span class="dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></span>`
+        ).join('');
+        
+        slideInterval = setInterval(() => {
+            const next = (currentSlide + 1) % slides.length;
+            goToSlide(next);
+        }, 5000);
+    }
+
+    function goToSlide(index) {
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+        slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+        currentSlide = index;
+    }
+
+    // ─── LOAD PRODUCTS ───
+    async function loadProducts() {
+        const grid = document.getElementById('productGrid');
+
+        try {
+            if (typeof db === 'undefined' || !db) {
+                // Use fallback products if Firebase not ready
+                renderProducts(FALLBACK_PRODUCTS);
+                return;
+            }
+
+            const snapshot = await db.collection('products')
+                .where('status', 'in', ['active', 'approved'])
+                .limit(8)
+                .get();
+
+            const products = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                products.push({
+                    id: doc.id,
+                    ...data,
+                    image_url: data.image_url || data.images?.[0] || '',
+                    slug: data.slug || generateSlug(data.title || 'product')
+                });
+            });
+
+            // Use fallback if no products in database
+            if (products.length === 0) {
+                renderProducts(FALLBACK_PRODUCTS);
+                return;
+            }
+
+            renderProducts(products);
+
+        } catch (error) {
+            console.error('Error loading products:', error);
+            // Use fallback on error
+            renderProducts(FALLBACK_PRODUCTS);
+        }
+    }
+
+    // ─── RENDER PRODUCTS ───
+    function renderProducts(products) {
+        const grid = document.getElementById('productGrid');
+        
+        if (!products || products.length === 0) {
             grid.innerHTML = `
-                <div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);">
-                    <i class="fa-regular fa-box" style="font-size:2rem; color:var(--primary);"></i>
-                    <p style="margin-top:0.5rem;">No products available yet.</p>
-                    <p style="font-size:0.8rem;">Check back soon for new wholesale deals!</p>
+                <div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-light);">
+                    <i class="fa-regular fa-box" style="font-size:3rem; color:var(--primary);"></i>
+                    <p style="margin-top:1rem; font-size:1.1rem;">No products available yet.</p>
+                    <p style="font-size:0.9rem;">Check back soon for new wholesale deals!</p>
                 </div>
             `;
             return;
         }
 
-        renderProducts(products, 'productGrid');
+        grid.innerHTML = products.map(p => {
+            const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
+            const slug = p.slug || generateSlug(p.title || 'product');
+            const imageUrl = p.image_url || 'https://via.placeholder.com/300x300?text=No+Image';
+            
+            return `
+                <div class="product-card animate-on-scroll">
+                    ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
+                    ${discount > 0 ? `<span class="product-badge flash">-${discount}%</span>` : ''}
+                    ${p.supplier_verified ? `<span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>` : ''}
+                    <div class="product-image" onclick="window.location.href='/product/${slug}'">
+                        <img src="${imageUrl}" alt="${p.title}" loading="lazy" 
+                             onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fa-solid fa-box\\'></i></span>'" />
+                    </div>
+                    <div class="product-title">${p.title || 'Product'}</div>
+                    <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
+                    <div class="product-price">
+                        $${(p.price || 0).toFixed(2)}
+                        ${p.old_price ? `<span class="old">$${p.old_price.toFixed(2)}</span>` : ''}
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn-add" data-product-id="${p.id}" onclick="addToCart('${p.id}')">
+                            <i class="fa-solid fa-cart-plus"></i> Add
+                        </button>
+                        <button class="btn-wish" data-wishlist-id="${p.id}" onclick="toggleWishlist('${p.id}')">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
 
-    } catch (error) {
-        console.error('Error loading products:', error);
-        grid.innerHTML = `
-            <div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);">
-                <i class="fa-regular fa-circle-exclamation" style="font-size:2rem; color:#c0392b;"></i>
-                <p style="margin-top:0.5rem;">Failed to load products.</p>
-                <button onclick="loadProducts()" style="margin-top:1rem; background:var(--primary); color:#fff; border:none; padding:0.5rem 1.5rem; border-radius:30px; cursor:pointer;">
-                    Retry
-                </button>
-            </div>
-        `;
+        // Trigger scroll animations
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            observer.observe(el);
+        });
     }
-}
 
-// ─── FLASH TIMER ───
-function startFlashTimer() {
-    let h = 6, m = 42, s = 18;
-    const hEl = document.getElementById('hours');
-    const mEl = document.getElementById('minutes');
-    const sEl = document.getElementById('seconds');
+    // ─── SEARCH HANDLER ───
+    async function handleSearch(event) {
+        const input = document.getElementById('searchInput');
+        const query = input.value.trim();
 
-    if (!hEl || !mEl || !sEl) return;
+        if (event && event.key === 'Enter' && query) {
+            window.location.href = `/products?search=${encodeURIComponent(query)}`;
+            return;
+        }
 
-    setInterval(() => {
-        s--;
-        if (s < 0) { s = 59; m--; }
-        if (m < 0) { m = 59; h--; }
-        if (h < 0) { h = 6; m = 42; s = 18; }
-        hEl.textContent = String(h).padStart(2, '0');
-        mEl.textContent = String(m).padStart(2, '0');
-        sEl.textContent = String(s).padStart(2, '0');
-    }, 1000);
-}
+        if (query.length < 2) {
+            document.getElementById('searchResults').classList.remove('show');
+            return;
+        }
 
-// ─── ADMIN AUTO-DETECT ───
-function checkAdminStatus() {
-    const user = getCurrentUser();
-    const adminLink = document.getElementById('adminLink');
-    const adminNavTab = document.getElementById('adminNavTab');
-    
-    if (user && user.role === 'admin') {
-        adminLink.style.display = 'flex';
-        adminNavTab.style.display = 'inline-block';
-        updateAdminBadge();
-        setupAdminListeners();
-    } else {
-        adminLink.style.display = 'none';
-        adminNavTab.style.display = 'none';
-    }
-}
+        try {
+            const snapshot = await db.collection('products')
+                .where('status', 'in', ['active', 'approved'])
+                .limit(5)
+                .get();
 
-// ─── UPDATE ADMIN BADGE ───
-async function updateAdminBadge() {
-    try {
-        const msgSnapshot = await db.collection('messages')
-            .where('status', '==', 'unread')
-            .get();
-        const unreadCount = msgSnapshot.size;
-
-        const orderSnapshot = await db.collection('orders')
-            .where('status', '==', 'pending')
-            .get();
-        const pendingCount = orderSnapshot.size;
-
-        const total = unreadCount + pendingCount;
-        
-        document.getElementById('adminBadgeCount').textContent = total;
-        document.getElementById('adminNavBadge').textContent = total;
-        
-        const badge = document.getElementById('adminBadgeCount');
-        const navBadge = document.getElementById('adminNavBadge');
-        badge.style.display = total > 0 ? 'inline' : 'none';
-        navBadge.style.display = total > 0 ? 'inline' : 'none';
-        
-        return total;
-    } catch (error) {
-        console.error('Error updating admin badge:', error);
-        return 0;
-    }
-}
-
-// ─── SETUP ADMIN LISTENERS ───
-function setupAdminListeners() {
-    db.collection('messages')
-        .where('status', '==', 'unread')
-        .onSnapshot((snapshot) => {
-            snapshot.docChanges().forEach(change => {
-                if (change.type === 'added') {
-                    updateAdminBadge();
-                    const data = change.doc.data();
-                    showToast(`📩 New message from ${data.firstName || 'User'}`, 'info');
+            const products = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.title && data.title.toLowerCase().includes(query.toLowerCase())) {
+                    products.push({
+                        id: doc.id,
+                        title: data.title,
+                        price: data.price,
+                        image_url: data.image_url || data.images?.[0] || '',
+                        slug: data.slug || generateSlug(data.title)
+                    });
                 }
             });
-        }, (error) => {
-            console.error('Messages listener error:', error);
-        });
 
-    db.collection('orders')
-        .where('status', '==', 'pending')
-        .onSnapshot((snapshot) => {
-            snapshot.docChanges().forEach(change => {
-                if (change.type === 'added') {
-                    updateAdminBadge();
-                    const data = change.doc.data();
-                    const customer = data.customer || {};
-                    showToast(`📦 New order from ${customer.firstName || 'Guest'} - $${(data.totals?.total || 0).toFixed(2)}`, 'success');
-                }
-            });
-        }, (error) => {
-            console.error('Orders listener error:', error);
-        });
-}
+            const resultsDiv = document.getElementById('searchResults');
+            if (products.length === 0) {
+                resultsDiv.innerHTML = `<div style="padding:1rem; text-align:center; color:var(--text-light);">No products found for "${query}"</div>`;
+                resultsDiv.classList.add('show');
+                return;
+            }
 
-// ─── INIT ───
-document.addEventListener('DOMContentLoaded', function() {
-    loadProducts();
-    startFlashTimer();
-    loadStats();
-    loadTestimonials();
-    loadCartCount();      // ✅ FIXED: Was updateCartCount
-    loadWishlistCount();  // ✅ FIXED: Was updateWishlistCount
-    setTimeout(checkAdminStatus, 1000);
-    document.addEventListener('authChange', function() {
-        checkAdminStatus();
+            resultsDiv.innerHTML = products.map(p => `
+                <div class="result-item" onclick="window.location.href='/product/${p.slug}'">
+                    <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
+                    <div class="info">
+                        <div class="title">${p.title}</div>
+                        <div class="price">$${(p.price || 0).toFixed(2)}</div>
+                    </div>
+                </div>
+            `).join('');
+            resultsDiv.classList.add('show');
+
+        } catch (error) {
+            console.error('Search error:', error);
+        }
+    }
+
+    // ─── CLOSE SEARCH ───
+    document.addEventListener('click', function(e) {
+        const searchBar = document.getElementById('searchBar');
+        if (!searchBar || !searchBar.contains(e.target)) {
+            document.getElementById('searchResults').classList.remove('show');
+        }
     });
-});
 
-// ─── EXPOSE FUNCTIONS ───
-window.checkAdminStatus = checkAdminStatus;
-window.updateAdminBadge = updateAdminBadge;
-window.setRating = setRating;
-window.loadTestimonials = loadTestimonials;
-window.loadStats = loadStats;
-window.loadProducts = loadProducts;
+    // ─── TOGGLE WISHLIST PAGE ───
+    function toggleWishlist() {
+        const user = getCurrentUser();
+        if (!user) {
+            showToast('Please login to view wishlist', 'error');
+            setTimeout(() => window.location.href = 'login', 1500);
+            return;
+        }
+        window.location.href = 'wishlist';
+    }
+
+    // ─── INIT ───
+    document.addEventListener('DOMContentLoaded', function() {
+        initFirebase();
+        initBanner();
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+    });
+
+    // ─── EXPOSE GLOBALS ───
+    window.addToCart = addToCart;
+    window.toggleWishlist = toggleWishlist;
+    window.loadProducts = loadProducts;
+    window.goToSlide = goToSlide;
+    window.handleSearch = handleSearch;
+    window.showToast = showToast;
+    window.getCurrentUser = getCurrentUser;
 </script>
 
 </body>
