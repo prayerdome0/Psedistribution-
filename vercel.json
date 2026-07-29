@@ -18,16 +18,34 @@
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
     { "source": "/track-order", "destination": "/track-order.html" },
+    { "source": "/track-order/:path*", "destination": "/track-order.html" },
     { "source": "/become-seller", "destination": "/become-seller.html" },
     { "source": "/order-success", "destination": "/order-success.html" },
+    { "source": "/order-success/:path*", "destination": "/order-success.html" },
     { "source": "/wishlist", "destination": "/wishlist.html" },
     { "source": "/chat", "destination": "/chat.html" },
-    { "source": "/chat/:path*", "destination": "/chat.html" }
+    { "source": "/chat/:path*", "destination": "/chat.html" },
+    { "source": "/rfq", "destination": "/rfq.html" },
+    { "source": "/rfq/:path*", "destination": "/rfq.html" },
+    { "source": "/supplier-verification", "destination": "/supplier-verification.html" },
+    { "source": "/buyer-dashboard", "destination": "/buyer-dashboard.html" },
+    { "source": "/api/ai-search", "destination": "/api/ai-search.js" }
   ],
   "redirects": [
-    { "source": "/order-sucess", "destination": "/order-success", "permanent": true },
-    { "source": "/index", "destination": "/", "permanent": true },
-    { "source": "/index.html", "destination": "/", "permanent": true }
+    { "source": "/index", "destination": "/home", "permanent": true },
+    { "source": "/index.html", "destination": "/home", "permanent": true }
   ],
-  "trailingSlash": false
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "geolocation=(), microphone=(), camera=()" }
+      ]
+    }
+  ]
 }
