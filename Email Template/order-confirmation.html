@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - Pilot Sales Distribution</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="https://pilotsalesdistribution.com/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://pilotsalesdistribution.com/favicon-32x32.png">
+</head>
+<body style="margin:0;padding:0;background:#f4f7f9;font-family:'Segoe UI',Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f7f9;padding:20px 0;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.05);max-width:600px;">
+                    <!-- HEADER -->
+                    <tr>
+                        <td style="padding:25px 40px 15px;text-align:center;border-bottom:2px solid #1a7b6b;">
+                            <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" width="160" style="display:block;margin:0 auto;max-width:100%;height:auto;">
+                            <h2 style="color:#0b2a3b;margin:10px 0 0;font-size:22px;">✅ Order Confirmed!</h2>
+                        </td>
+                    </tr>
+                    
+                    <!-- ORDER DETAILS -->
+                    <tr>
+                        <td style="padding:30px 40px;">
+                            <h3 style="color:#0b2a3b;margin:0 0 5px;">Thank you for your order!</h3>
+                            <p style="color:#2c5a6b;font-size:14px;margin:0 0 20px;">Order #%ORDER_NUMBER%</p>
+                            
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafb;border-radius:8px;border:1px solid #e9edf2;">
+                                <tr>
+                                    <td style="padding:15px;">
+                                        <p style="font-size:13px;color:#2c5a6b;margin:0 0 8px;">
+                                            <strong>Order Date:</strong> %ORDER_DATE%
+                                        </p>
+                                        <p style="font-size:13px;color:#2c5a6b;margin:0 0 8px;">
+                                            <strong>Items:</strong> %ITEM_COUNT%
+                                        </p>
+                                        <p style="font-size:13px;color:#2c5a6b;margin:0 0 8px;">
+                                            <strong>Total:</strong> $%TOTAL_AMOUNT%
+                                        </p>
+                                        <p style="font-size:13px;color:#2c5a6b;margin:0;">
+                                            <strong>Delivery:</strong> %DELIVERY_ESTIMATE%
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="https://pilotsalesdistribution.com/track-order?order=%ORDER_NUMBER%" style="background:#1a7b6b;color:#ffffff;padding:12px 40px;text-decoration:none;border-radius:50px;font-weight:600;display:inline-block;">
+                                            📦 Track Your Order
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="color:#2c5a6b;font-size:14px;line-height:1.7;margin:0;">
+                                Questions? <a href="https://wa.me/19099384682" style="color:#1a7b6b;text-decoration:none;">Chat with us on WhatsApp</a>
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- FOOTER -->
+                    <tr>
+                        <td style="padding:20px 40px;background:#0b2a3b;border-radius:0 0 12px 12px;text-align:center;">
+                            <p style="color:#b4d0e0;font-size:12px;margin:0;">
+                                &copy; 2026 Pilot Sales Distribution &bull; 
+                                <a href="https://pilotsalesdistribution.com" style="color:#b4d0e0;text-decoration:none;">Visit our store</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
