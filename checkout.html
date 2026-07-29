@@ -687,8 +687,9 @@
         appId: "1:729127273727:web:402d67be8346257755f8ca"
     };
 
+    // ─── UPDATED: Use support email ───
     const WHATSAPP_NUMBER = '+19099384682';
-    const STORE_EMAIL = 'Pilot.wholesale@yahoo.com';
+    const STORE_EMAIL = 'support@pilotsalesdistribution.com';
 
     let auth, db;
     let cartItems = [];
@@ -1149,6 +1150,7 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
 📧 ${STORE_EMAIL}
 📞 ${WHATSAPP_NUMBER}`;
 
+        // Open email client with pre-filled data
         window.location.href = `mailto:${STORE_EMAIL}?subject=Quote Request ${orderData.quoteNumber}&body=${encodeURIComponent(body)}`;
         return true;
     }
@@ -1251,10 +1253,16 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
             }
 
             // Try WhatsApp first
+            let whatsappSuccess = false;
             try {
                 sendWhatsAppQuote(orderData);
+                whatsappSuccess = true;
             } catch (whatsappError) {
                 console.log('WhatsApp failed, using email fallback');
+            }
+
+            // If WhatsApp didn't work, try email
+            if (!whatsappSuccess) {
                 sendEmailQuote(orderData);
             }
 

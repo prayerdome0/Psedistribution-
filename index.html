@@ -37,7 +37,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
     <style>
-        /* ─── CSS VARIABLES ─── */
         :root {
             --primary: #1a7b6b;
             --primary-dark: #0f4f43;
@@ -68,11 +67,9 @@
 
         .container { max-width: 1300px; margin: 0 auto; padding: 0 1.5rem; }
 
-        /* ─── SCROLL ANIMATIONS ─── */
         .animate-on-scroll { opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease, transform 0.6s ease; }
         .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
 
-        /* ─── TOP BAR ─── */
         .top-bar {
             background: var(--secondary);
             color: #d4e2ed;
@@ -95,7 +92,6 @@
         .top-links a:hover { color: var(--white); }
         .top-links i { color: var(--accent); margin-right: 0.2rem; }
 
-        /* ─── HEADER ─── */
         .header {
             background: var(--white);
             padding: 0.8rem 0;
@@ -111,7 +107,6 @@
         .logo .brand-name .main span { color: var(--primary); }
         .logo .brand-name .sub { font-size: 0.5rem; color: var(--text-light); font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
 
-        /* ─── SEARCH BAR ─── */
         .search-bar {
             flex: 1;
             min-width: 200px;
@@ -148,7 +143,6 @@
         .search-results .result-item .info .title { font-weight: 600; font-size: 0.85rem; }
         .search-results .result-item .info .price { color: var(--primary); font-weight: 700; font-size: 0.8rem; }
 
-        /* ─── HEADER ACTIONS ─── */
         .header-actions { display: flex; align-items: center; gap: 1.2rem; font-size: 0.9rem; flex-wrap: wrap; }
         .header-actions .icon-btn {
             position: relative;
@@ -180,7 +174,6 @@
         }
         @keyframes badgePop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
-        /* ─── NAVIGATION TABS ─── */
         .nav-categories {
             background: var(--white);
             border-top: 1px solid var(--border);
@@ -203,7 +196,6 @@
         .nav-tab.active { color: var(--primary); font-weight: 700; }
         .wholesale-nav { color: var(--primary); font-weight: 700; }
 
-        /* ─── BANNER SLIDER ─── */
         .banner-slider {
             position: relative;
             border-radius: var(--radius);
@@ -242,13 +234,11 @@
         .banner-slider .dots .dot:hover { background: rgba(255,255,255,0.6); }
         .banner-slider .dots .dot.active { background: var(--accent); transform: scale(1.2); border-color: var(--accent); }
 
-        /* ─── BUTTONS ─── */
         .btn-primary { background: var(--accent); color: var(--secondary); padding: 0.7rem 2rem; border-radius: 50px; font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; }
         .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 25px rgba(241,196,15,0.3); }
         .btn-outline-light { background: transparent; border: 2px solid rgba(255,255,255,0.4); color: var(--white); padding: 0.7rem 2rem; border-radius: 50px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; }
         .btn-outline-light:hover { background: rgba(255,255,255,0.1); border-color: var(--white); transform: translateY(-2px); }
 
-        /* ─── STATS SECTION WITH COUNTING ANIMATION ─── */
         .stats-section {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -309,12 +299,10 @@
             margin-bottom: 0.3rem;
         }
 
-        /* ─── SECTION TITLE ─── */
         .section-title { font-size: 1.6rem; font-weight: 700; color: var(--secondary); margin: 2.5rem 0 1.2rem; }
         .section-title span { color: var(--primary); }
         .section-title p { font-size: 0.95rem; font-weight: 400; color: var(--text-light); margin-top: 0.3rem; }
 
-        /* ─── PRODUCT CARDS ─── */
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -409,12 +397,10 @@
         .product-actions .btn-wish:hover { border-color: var(--primary); color: var(--primary); }
         .product-actions .btn-wish.liked { border-color: #e74c3c; color: #e74c3c; }
 
-        /* ─── LOADING SPINNER ─── */
         .loading-spinner { grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-light); }
         .loading-spinner i { font-size: 2.5rem; color: var(--primary); }
         .loading-spinner p { margin-top: 0.5rem; }
 
-        /* ─── CATEGORY GRID ─── */
         .category-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -446,7 +432,6 @@
         .category-item:hover img { border-color: var(--primary); }
         .category-item span { font-size: 0.75rem; font-weight: 600; color: var(--dark); display: block; }
 
-        /* ─── TRUSTED SECTION ─── */
         .trusted-section {
             background: var(--white);
             border-radius: var(--radius);
@@ -509,7 +494,6 @@
             100% { transform: translateX(-50%); }
         }
 
-        /* ─── TOAST ─── */
         .toast {
             position: fixed;
             bottom: 80px;
@@ -531,7 +515,6 @@
         .toast.error { background: #c0392b; }
         .toast.info { background: #2980b9; }
 
-        /* ─── FOOTER ─── */
         .footer {
             background: var(--secondary);
             color: #b4d0e0;
@@ -548,7 +531,6 @@
         .footer .footer-social a { color: #b4d0e0; transition: var(--transition); font-size: 1.1rem; }
         .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
 
-        /* ─── RESPONSIVE ─── */
         @media (max-width: 992px) {
             .banner-slider { height: 400px; }
             .banner-slider .slide { grid-template-columns: 1fr; padding: 2rem; text-align: center; }
@@ -606,9 +588,7 @@
 </head>
 <body>
 
-<!-- ============================================ -->
 <!-- TOP BAR -->
-<!-- ============================================ -->
 <div class="top-bar">
     <div class="container">
         <div class="moving-words">
@@ -636,9 +616,7 @@
     </div>
 </div>
 
-<!-- ============================================ -->
 <!-- HEADER -->
-<!-- ============================================ -->
 <header class="header">
     <div class="container">
         <a href="home" class="logo">
@@ -674,9 +652,7 @@
     </div>
 </header>
 
-<!-- ============================================ -->
 <!-- NAVIGATION TABS -->
-<!-- ============================================ -->
 <nav class="nav-categories">
     <div class="container">
         <a href="home" class="nav-tab active"><i class="fa-solid fa-house"></i> Home</a>
@@ -689,14 +665,10 @@
     </div>
 </nav>
 
-<!-- ============================================ -->
 <!-- MAIN CONTENT -->
-<!-- ============================================ -->
 <div class="container">
 
-    <!-- ========================================== -->
     <!-- 1. HERO BANNER SLIDER -->
-    <!-- ========================================== -->
     <div class="banner-slider" id="bannerSlider">
         <div class="slide active" style="background: linear-gradient(135deg, #0b2a3b 0%, #1a4b5e 100%);">
             <div class="content">
@@ -743,9 +715,7 @@
         <div class="dots" id="bannerDots"></div>
     </div>
 
-    <!-- ========================================== -->
     <!-- 2. STATISTICS WITH COUNTING ANIMATION -->
-    <!-- ========================================== -->
     <div class="stats-section animate-on-scroll">
         <div class="stat-item">
             <div class="icon"><i class="fa-regular fa-box"></i></div>
@@ -769,9 +739,7 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
     <!-- 3. FEATURED PRODUCTS -->
-    <!-- ========================================== -->
     <div class="section-title animate-on-scroll">
         <h2>Featured <span>Products</span></h2>
         <p>Top-rated products from verified suppliers</p>
@@ -780,9 +748,7 @@
         <!-- Products loaded by JavaScript -->
     </div>
 
-    <!-- ========================================== -->
     <!-- 4. SHOP BY CATEGORY -->
-    <!-- ========================================== -->
     <div class="section-title animate-on-scroll" style="margin-top: 3rem;">
         <h2>Shop by <span>Category</span></h2>
         <p>Find the products you need at wholesale prices</p>
@@ -814,9 +780,7 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
     <!-- 5. TRUSTED COMPANIES -->
-    <!-- ========================================== -->
     <div class="trusted-section animate-on-scroll">
         <div class="section-title">
             <h2>Trusted by <span>Leading Companies</span></h2>
@@ -824,16 +788,14 @@
         </div>
         <div class="logo-carousel">
             <div class="logo-track" id="logoTrack">
-                <!-- Logos will be populated by JavaScript -->
+                <!-- Logos populated by JavaScript -->
             </div>
         </div>
     </div>
 
 </div>
 
-<!-- ============================================ -->
 <!-- FOOTER -->
-<!-- ============================================ -->
 <footer class="footer">
     <div class="container">
         <div class="footer-content">
@@ -858,16 +820,11 @@
     </div>
 </footer>
 
-<!-- ============================================ -->
 <!-- TOAST -->
-<!-- ============================================ -->
 <div id="toast" class="toast"></div>
 
-<!-- ============================================ -->
 <!-- JAVASCRIPT -->
-<!-- ============================================ -->
 <script>
-    // ─── FIREBASE CONFIG ───
     const firebaseConfig = {
         apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
         authDomain: "pilot-sales-distribution.firebaseapp.com",
@@ -877,7 +834,6 @@
         appId: "1:729127273727:web:402d67be8346257755f8ca"
     };
 
-    // ─── FALLBACK PRODUCTS ───
     const FALLBACK_PRODUCTS = [
         { id: '1', title: 'Premium Wireless Headphones', brand: 'Sony', price: 89.99, old_price: 129.99, image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&h=300&q=80', moq: 10, supplier_verified: true },
         { id: '2', title: 'Smartphone 5G 128GB', brand: 'Samsung', price: 499.99, old_price: 599.99, image_url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&h=300&q=80', moq: 5, supplier_verified: true },
@@ -902,16 +858,12 @@
         { name: 'Costco', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Costco_logo.svg/120px-Costco_logo.svg.png' }
     ];
 
-    // ─── INITIALIZE ───
+    let currentSlide = 0;
+    let slideInterval = null;
+
     function initFirebase() {
-        if (typeof firebase === 'undefined') {
-            setTimeout(initFirebase, 500);
-            return;
-        }
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-            console.log('✅ Firebase initialized');
-        }
+        if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         window.db = firebase.firestore();
         window.auth = firebase.auth();
         setupAuthListener();
@@ -922,7 +874,6 @@
         renderLogos();
     }
 
-    // ─── AUTH LISTENER ───
     function setupAuthListener() {
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
@@ -944,13 +895,11 @@
         });
     }
 
-    // ─── GET USER ───
     function getCurrentUser() {
         const user = localStorage.getItem('pilot_user');
         return user ? JSON.parse(user) : null;
     }
 
-    // ─── UPDATE AUTH UI ───
     function updateAuthUI() {
         const user = getCurrentUser();
         const loginLink = document.getElementById('loginLink');
@@ -968,7 +917,6 @@
         }
     }
 
-    // ─── TOAST ───
     function showToast(message, type = 'info') {
         let toast = document.getElementById('toast');
         if (!toast) {
@@ -980,19 +928,15 @@
         toast.textContent = message;
         toast.className = 'toast ' + type + ' show';
         clearTimeout(toast._timeout);
-        toast._timeout = setTimeout(() => {
-            toast.classList.remove('show');
-        }, 4000);
+        toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
     }
 
-    // ─── GENERATE SLUG ───
     function generateSlug(title) {
         if (!title) return '';
         return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
     }
 
-    // ─── COUNTING ANIMATION ───
-    function animateCounter(element, target, duration = 2000, suffix = '') {
+    function animateCounter(element, target, duration = 2000) {
         const start = 0;
         const startTime = performance.now();
         const isDecimal = target % 1 !== 0;
@@ -1000,7 +944,6 @@
         function updateCounter(currentTime) {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            // Ease out cubic
             const eased = 1 - Math.pow(1 - progress, 3);
             const currentValue = start + (target - start) * eased;
             
@@ -1023,7 +966,6 @@
         requestAnimationFrame(updateCounter);
     }
 
-    // ─── LOAD STATS WITH COUNTING ───
     async function loadStats() {
         try {
             let productCount = 12000;
@@ -1053,46 +995,31 @@
                 console.log('Using fallback stats');
             }
 
-            // Get all counter elements
             const productCounter = document.querySelector('#statProducts .count');
             const supplierCounter = document.querySelector('#statSuppliers .count');
             const satisfactionCounter = document.querySelector('#statSatisfaction .count');
             const orderCounter = document.querySelector('#statOrders .count');
 
-            // Animate each counter when visible
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const el = entry.target;
-                        const target = parseInt(el.dataset.target);
+                        const target = parseFloat(el.dataset.target);
                         if (!isNaN(target)) {
-                            animateCounter(el, target, 2500, el.parentElement?.querySelector('.suffix')?.textContent || '');
+                            animateCounter(el, target, 2500);
                         }
                         observer.unobserve(el);
                     }
                 });
             }, { threshold: 0.3 });
 
-            if (productCounter) {
-                productCounter.dataset.target = productCount;
-                observer.observe(productCounter);
-            }
-            if (supplierCounter) {
-                supplierCounter.dataset.target = supplierCount;
-                observer.observe(supplierCounter);
-            }
-            if (satisfactionCounter) {
-                satisfactionCounter.dataset.target = 99.7;
-                observer.observe(satisfactionCounter);
-            }
-            if (orderCounter) {
-                orderCounter.dataset.target = orderCount;
-                observer.observe(orderCounter);
-            }
+            if (productCounter) { productCounter.dataset.target = productCount; observer.observe(productCounter); }
+            if (supplierCounter) { supplierCounter.dataset.target = supplierCount; observer.observe(supplierCounter); }
+            if (satisfactionCounter) { satisfactionCounter.dataset.target = 99.7; observer.observe(satisfactionCounter); }
+            if (orderCounter) { orderCounter.dataset.target = orderCount; observer.observe(orderCounter); }
 
         } catch (error) {
             console.error('Error loading stats:', error);
-            // Set fallback values
             document.querySelectorAll('.count').forEach(el => {
                 const target = el.dataset.target;
                 if (target) el.textContent = target;
@@ -1100,12 +1027,9 @@
         }
     }
 
-    // ─── RENDER LOGOS ───
     function renderLogos() {
         const track = document.getElementById('logoTrack');
         if (!track) return;
-        
-        // Double the logos for seamless scrolling
         const allLogos = [...COMPANY_LOGOS, ...COMPANY_LOGOS];
         track.innerHTML = allLogos.map(logo => `
             <div class="logo-item">
@@ -1115,7 +1039,6 @@
         `).join('');
     }
 
-    // ─── ADD TO CART ───
     async function addToCart(productId) {
         const user = getCurrentUser();
         if (!user) {
@@ -1125,10 +1048,7 @@
         }
 
         const btn = document.querySelector(`.btn-add[data-product-id="${productId}"]`);
-        if (btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-        }
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; }
 
         try {
             const snapshot = await db.collection('cart')
@@ -1139,10 +1059,7 @@
             if (!snapshot.empty) {
                 const docRef = snapshot.docs[0].ref;
                 const currentQty = snapshot.docs[0].data().quantity || 1;
-                await docRef.update({
-                    quantity: currentQty + 1,
-                    updated_at: new Date().toISOString()
-                });
+                await docRef.update({ quantity: currentQty + 1, updated_at: new Date().toISOString() });
             } else {
                 await db.collection('cart').add({
                     user_id: user.id,
@@ -1158,13 +1075,9 @@
             showToast('❌ Failed to add to cart', 'error');
         }
 
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add';
-        }
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add'; }
     }
 
-    // ─── TOGGLE WISHLIST ───
     async function toggleWishlist(productId) {
         const user = getCurrentUser();
         if (!user) {
@@ -1200,7 +1113,6 @@
         }
     }
 
-    // ─── LOAD CART COUNT ───
     async function loadCartCount() {
         const user = getCurrentUser();
         if (!user) {
@@ -1209,9 +1121,7 @@
         }
 
         try {
-            const snapshot = await db.collection('cart')
-                .where('user_id', '==', user.id)
-                .get();
+            const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
             let count = 0;
             snapshot.forEach(doc => { count += doc.data().quantity || 1; });
             document.querySelectorAll('.cart-count').forEach(el => {
@@ -1223,7 +1133,6 @@
         }
     }
 
-    // ─── LOAD WISHLIST COUNT ───
     async function loadWishlistCount() {
         const user = getCurrentUser();
         if (!user) {
@@ -1232,21 +1141,13 @@
         }
 
         try {
-            const snapshot = await db.collection('wishlist')
-                .where('user_id', '==', user.id)
-                .get();
+            const snapshot = await db.collection('wishlist').where('user_id', '==', user.id).get();
             const count = snapshot.size;
-            document.querySelectorAll('.wishlist-count').forEach(el => {
-                el.textContent = count;
-            });
+            document.querySelectorAll('.wishlist-count').forEach(el => { el.textContent = count; });
         } catch (error) {
             document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
         }
     }
-
-    // ─── BANNER SLIDER ───
-    let currentSlide = 0;
-    let slideInterval = null;
 
     function initBanner() {
         const slides = document.querySelectorAll('.slide');
@@ -1271,7 +1172,6 @@
         currentSlide = index;
     }
 
-    // ─── LOAD PRODUCTS ───
     async function loadProducts() {
         const grid = document.getElementById('productGrid');
 
@@ -1316,18 +1216,15 @@
         }
     }
 
-    // ─── RENDER PRODUCTS ───
     function renderProducts(products) {
         const grid = document.getElementById('productGrid');
         
         if (!products || products.length === 0) {
-            grid.innerHTML = `
-                <div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-light);">
-                    <i class="fa-regular fa-box" style="font-size:3rem; color:var(--primary);"></i>
-                    <p style="margin-top:1rem; font-size:1.1rem;">No products available yet.</p>
-                    <p style="font-size:0.9rem;">Check back soon for new wholesale deals!</p>
-                </div>
-            `;
+            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-light);">
+                <i class="fa-regular fa-box" style="font-size:3rem; color:var(--primary);"></i>
+                <p style="margin-top:1rem; font-size:1.1rem;">No products available yet.</p>
+                <p style="font-size:0.9rem;">Check back soon for new wholesale deals!</p>
+            </div>`;
             return;
         }
 
@@ -1336,47 +1233,31 @@
             const slug = p.slug || generateSlug(p.title || 'product');
             const imageUrl = p.image_url || 'https://via.placeholder.com/300x300?text=No+Image';
             
-            return `
-                <div class="product-card animate-on-scroll">
-                    ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
-                    ${discount > 0 ? `<span class="product-badge flash">-${discount}%</span>` : ''}
-                    ${p.supplier_verified ? `<span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>` : ''}
-                    <div class="product-image" onclick="window.location.href='/product/${slug}'">
-                        <img src="${imageUrl}" alt="${p.title}" loading="lazy" 
-                             onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fa-solid fa-box\\'></i></span>'" />
-                    </div>
-                    <div class="product-title">${p.title || 'Product'}</div>
-                    <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
-                    <div class="product-price">
-                        $${(p.price || 0).toFixed(2)}
-                        ${p.old_price ? `<span class="old">$${p.old_price.toFixed(2)}</span>` : ''}
-                    </div>
-                    <div class="product-actions">
-                        <button class="btn-add" data-product-id="${p.id}" onclick="addToCart('${p.id}')">
-                            <i class="fa-solid fa-cart-plus"></i> Add
-                        </button>
-                        <button class="btn-wish" data-wishlist-id="${p.id}" onclick="toggleWishlist('${p.id}')">
-                            <i class="fa-regular fa-heart"></i>
-                        </button>
-                    </div>
+            return `<div class="product-card animate-on-scroll">
+                ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
+                ${discount > 0 ? `<span class="product-badge flash">-${discount}%</span>` : ''}
+                ${p.supplier_verified ? `<span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>` : ''}
+                <div class="product-image" onclick="window.location.href='/product/${slug}'">
+                    <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fa-solid fa-box\\'></i></span>'" />
                 </div>
-            `;
+                <div class="product-title">${p.title || 'Product'}</div>
+                <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
+                <div class="product-price">$${(p.price || 0).toFixed(2)}${p.old_price ? ` <span class="old">$${p.old_price.toFixed(2)}</span>` : ''}</div>
+                <div class="product-actions">
+                    <button class="btn-add" data-product-id="${p.id}" onclick="addToCart('${p.id}')"><i class="fa-solid fa-cart-plus"></i> Add</button>
+                    <button class="btn-wish" data-wishlist-id="${p.id}" onclick="toggleWishlist('${p.id}')"><i class="fa-regular fa-heart"></i></button>
+                </div>
+            </div>`;
         }).join('');
 
-        // Trigger scroll animations
         document.querySelectorAll('.animate-on-scroll').forEach(el => {
             const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
             }, { threshold: 0.1 });
             observer.observe(el);
         });
     }
 
-    // ─── SEARCH HANDLER ───
     async function handleSearch(event) {
         const input = document.getElementById('searchInput');
         const query = input.value.trim();
@@ -1426,7 +1307,14 @@
                         <div class="price">$${(p.price || 0).toFixed(2)}</div>
                     </div>
                 </div>
-            `).join('');
+            `).join('') + `
+                <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
+                    <a href="/products?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
+                        See all results for "${query}" →
+                    </a>
+                </div>
+            `;
+
             resultsDiv.classList.add('show');
 
         } catch (error) {
@@ -1434,7 +1322,6 @@
         }
     }
 
-    // ─── CLOSE SEARCH ───
     document.addEventListener('click', function(e) {
         const searchBar = document.getElementById('searchBar');
         if (!searchBar || !searchBar.contains(e.target)) {
@@ -1442,7 +1329,6 @@
         }
     });
 
-    // ─── TOGGLE WISHLIST PAGE ───
     function toggleWishlist() {
         const user = getCurrentUser();
         if (!user) {
@@ -1453,13 +1339,11 @@
         window.location.href = 'wishlist';
     }
 
-    // ─── INIT ───
     document.addEventListener('DOMContentLoaded', function() {
         initFirebase();
         initBanner();
         document.getElementById('year').textContent = new Date().getFullYear();
 
-        // Scroll animations for initial elements
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -1470,7 +1354,6 @@
         document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
     });
 
-    // ─── EXPOSE GLOBALS ───
     window.addToCart = addToCart;
     window.toggleWishlist = toggleWishlist;
     window.loadProducts = loadProducts;
@@ -1479,6 +1362,5 @@
     window.showToast = showToast;
     window.getCurrentUser = getCurrentUser;
 </script>
-
 </body>
 </html>

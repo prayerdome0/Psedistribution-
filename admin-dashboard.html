@@ -536,7 +536,7 @@
             <span style="color: var(--text-light); font-size: 0.7rem;" id="liveTime"></span>
         </div>
     </div>
-</div>
+</header>
 
 <!-- MAIN CONTENT -->
 <div class="container">
@@ -883,6 +883,11 @@
                     <option value="health">Health</option>
                     <option value="sports">Sports</option>
                     <option value="automotive">Automotive</option>
+                    <option value="baby">Baby</option>
+                    <option value="office">Office</option>
+                    <option value="industrial">Industrial</option>
+                    <option value="books">Books</option>
+                    <option value="pets">Pets</option>
                 </select>
             </div>
             <div class="form-group">
@@ -980,9 +985,13 @@
         uploadPreset: 'pse_products'
     };
 
+    // ─── UPDATED: Use support email ───
+    const SUPPORT_EMAIL = 'support@pilotsalesdistribution.com';
+
     let auth, db;
     let currentMessageId = null;
     let editingProductId = null;
+    let allMessages = [];
 
     // ─── INIT ───
     function initFirebase() {
@@ -996,7 +1005,7 @@
                 db.collection('users').doc(user.uid).get().then((doc) => {
                     if (doc.exists && doc.data().role === 'admin') {
                         document.getElementById('adminName').textContent = doc.data().full_name || 'Admin';
-                        document.getElementById('adminEmail').textContent = user.email || 'admin@pilotsalesdistribution.com';
+                        document.getElementById('adminEmail').textContent = user.email || SUPPORT_EMAIL;
                         loadAllData();
                         startRealTimeListeners();
                     } else {
@@ -1122,19 +1131,19 @@
         const tbody = document.getElementById('messageTableBody');
         try {
             const snapshot = await db.collection('messages').orderBy('created_at', 'desc').get();
-            const messages = [];
-            snapshot.forEach(doc => messages.push({ id: doc.id, ...doc.data() }));
+            allMessages = [];
+            snapshot.forEach(doc => allMessages.push({ id: doc.id, ...doc.data() }));
 
-            const unread = messages.filter(m => m.status === 'unread');
+            const unread = allMessages.filter(m => m.status === 'unread');
             document.getElementById('messageBadge').textContent = unread.length;
             document.getElementById('messageCount').textContent = `${unread.length} unread`;
 
-            if (messages.length === 0) {
+            if (allMessages.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-light); padding:1rem;">No messages</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = messages.slice(0, 10).map(m => `
+            tbody.innerHTML = allMessages.slice(0, 10).map(m => `
                 <tr>
                     <td><strong>${m.firstName || ''} ${m.lastName || ''}</strong></td>
                     <td>${m.subject || 'General'}</td>
@@ -1152,7 +1161,7 @@
     }
 
     function openReplyModal(messageId) {
-        const message = allMessages?.find(m => m.id === messageId);
+        const message = allMessages.find(m => m.id === messageId);
         if (!message) return;
         currentMessageId = messageId;
         document.getElementById('replyTo').value = message.email || '';
@@ -1592,8 +1601,6 @@
     }
 
     // ─── REAL-TIME LISTENERS ───
-    let allMessages = [];
-
     function startRealTimeListeners() {
         db.collection('messages').where('status', '==', 'unread').onSnapshot((snapshot) => {
             snapshot.docChanges().forEach(change => {
@@ -1627,7 +1634,8 @@
             const settings = JSON.parse(localStorage.getItem('pilot_admin_settings'));
             if (settings) {
                 document.getElementById('settingsStoreName').value = settings.storeName || 'Pilot Sales Distribution';
-                document.getElementById('settingsAdminEmail').value = settings.adminEmail || 'Pilot.wholesale@yahoo.com';
+                // ─── UPDATED: Use support email ───
+                document.getElementById('settingsAdminEmail').value = settings.adminEmail || SUPPORT_EMAIL;
             }
         } catch (e) {}
 
