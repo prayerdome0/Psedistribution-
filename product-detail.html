@@ -4,18 +4,181 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Product Detail - Pilot Sales Distribution</title>
-    <meta name="description" content="View product details at Pilot Sales Distribution." />
+    <meta name="description" content="View 3D product details at Pilot Sales Distribution." />
     
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    
+    <!-- ─── MODEL-VIEWER 3D ─── -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <link rel="stylesheet" href="style.css">
     
     <style>
+        /* ─── CSS VARIABLES ─── */
+        :root {
+            --primary: #1a7b6b;
+            --primary-dark: #0f4f43;
+            --primary-light: #e8f5f0;
+            --secondary: #0b2a3b;
+            --secondary-light: #1a4b5e;
+            --accent: #f1c40f;
+            --accent-hover: #e0b50e;
+            --dark: #0b1a2a;
+            --text: #2c5a6b;
+            --text-light: #6a889a;
+            --border: #e9edf2;
+            --border-dark: #dce3e9;
+            --light: #f0f4f8;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.06);
+            --shadow-hover: 0 20px 50px -10px rgba(0,20,30,0.12);
+            --radius: 1.5rem;
+            --radius-sm: 0.8rem;
+            --transition: 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--light); color: var(--dark); line-height: 1.6; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* ─── TOP BAR ─── */
+        .top-bar {
+            background: var(--secondary);
+            color: #d4e2ed;
+            font-size: 0.75rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #1a4055;
+            overflow: hidden;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .top-bar .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+        .moving-words { flex: 1; overflow: hidden; white-space: nowrap; position: relative; }
+        .moving-words .words-track { display: inline-block; animation: scrollWords 30s linear infinite; }
+        .moving-words .words-track span { margin: 0 2rem; font-weight: 500; }
+        .moving-words .words-track span i { color: var(--accent); margin-right: 0.3rem; }
+        @keyframes scrollWords { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
+        .top-links { display: flex; gap: 1rem; flex-shrink: 0; }
+        .top-links a { color: #b4d0e0; transition: var(--transition); cursor: pointer; }
+        .top-links a:hover { color: var(--white); }
+        .top-links i { color: var(--accent); margin-right: 0.2rem; }
+
+        /* ─── HEADER ─── */
+        .header {
+            background: var(--white);
+            padding: 0.8rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 35px;
+            z-index: 100;
+        }
+        .header .container { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+        .logo { display: flex; align-items: center; gap: 0.8rem; text-decoration: none; flex-shrink: 0; }
+        .logo img { height: 45px; width: auto; border-radius: 8px; }
+        .logo .brand-name .main { font-size: 1.3rem; font-weight: 800; color: var(--secondary); }
+        .logo .brand-name .main span { color: var(--primary); }
+        .logo .brand-name .sub { font-size: 0.5rem; color: var(--text-light); font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
+
+        .search-bar {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            background: var(--light);
+            border-radius: 50px;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+        }
+        .search-bar:focus-within { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 4px rgba(26,123,107,0.08); }
+        .search-bar input { flex: 1; border: none; padding: 0.6rem 1rem; font-size: 0.9rem; background: transparent; outline: none; }
+        .search-bar button { background: var(--primary); border: none; color: var(--white); padding: 0 1.8rem; cursor: pointer; font-size: 1rem; transition: var(--transition); }
+        .search-bar button:hover { background: var(--primary-dark); }
+        .search-results {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-hover);
+            border: 1px solid var(--border);
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 200;
+        }
+        .search-results.show { display: block; }
+        .search-results .result-item { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 1rem; }
+        .search-results .result-item:hover { background: var(--primary-light); }
+        .search-results .result-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+        .search-results .result-item .info .title { font-weight: 600; font-size: 0.85rem; }
+        .search-results .result-item .info .price { color: var(--primary); font-weight: 700; font-size: 0.8rem; }
+
+        .header-actions { display: flex; align-items: center; gap: 1.2rem; font-size: 0.9rem; flex-wrap: wrap; }
+        .header-actions .icon-btn {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.6rem;
+            color: #1a3340;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.2rem 0.3rem;
+        }
+        .header-actions .icon-btn i { font-size: 1.3rem; margin-bottom: 2px; transition: var(--transition); }
+        .header-actions .icon-btn:hover { color: var(--primary); transform: translateY(-2px); }
+        .header-actions .icon-btn:hover i { transform: scale(1.1); }
+        .badge-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #c0392b;
+            color: var(--white);
+            font-size: 0.55rem;
+            font-weight: 700;
+            border-radius: 50%;
+            padding: 0.1rem 0.45rem;
+            min-width: 18px;
+            text-align: center;
+            animation: badgePop 0.3s ease;
+        }
+        @keyframes badgePop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+        .nav-categories {
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 0.4rem 0;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            position: sticky;
+            top: 75px;
+            z-index: 99;
+        }
+        .nav-categories::-webkit-scrollbar { height: 3px; }
+        .nav-categories::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #1a3340; }
+        .nav-tab { padding: 0.3rem 0; border-bottom: 3px solid transparent; transition: var(--transition); cursor: pointer; position: relative; flex-shrink: 0; }
+        .nav-tab::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 3px; background: var(--primary); transition: width 0.4s ease; }
+        .nav-tab:hover::after, .nav-tab.active::after { width: 100%; }
+        .nav-tab:hover { color: var(--secondary); }
+        .nav-tab.active { color: var(--primary); font-weight: 700; }
+        .wholesale-nav { color: var(--primary); font-weight: 700; }
+
+        /* ─── PRODUCT DETAIL PAGE ─── */
         .product-detail-page { max-width: 1200px; margin: 2rem auto; }
         .breadcrumb { font-size: 0.85rem; color: var(--text-light); margin-bottom: 1.5rem; padding: 0.5rem 0; }
         .breadcrumb a { color: var(--primary); transition: var(--transition); }
@@ -31,7 +194,113 @@
             padding: 2.5rem;
             border: 1px solid var(--border);
         }
-        
+
+        /* ─── 3D MODEL VIEWER ─── */
+        .model-viewer-container {
+            width: 100%;
+            height: 450px;
+            background: var(--light);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+        model-viewer {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f5f7f4, #e8f0ea);
+        }
+        model-viewer::part(default-progress-bar) {
+            background: var(--primary);
+        }
+        .viewer-controls {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.8rem;
+            z-index: 10;
+            background: rgba(0,0,0,0.5);
+            padding: 6px 12px;
+            border-radius: 30px;
+            backdrop-filter: blur(8px);
+        }
+        .viewer-controls button {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 20px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .viewer-controls button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .viewer-controls button i {
+            font-size: 0.9rem;
+        }
+        .viewer-controls .active {
+            background: var(--primary);
+            color: #fff;
+        }
+        .viewer-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            backdrop-filter: blur(4px);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .viewer-badge i {
+            color: var(--accent);
+        }
+
+        /* ─── VIEW SWITCHER ─── */
+        .view-switcher {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+        .view-switcher button {
+            padding: 0.4rem 1.2rem;
+            border: 2px solid var(--border);
+            border-radius: 30px;
+            background: var(--white);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            color: var(--text-light);
+        }
+        .view-switcher button:hover {
+            border-color: var(--primary-light);
+            color: var(--secondary);
+        }
+        .view-switcher button.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: var(--white);
+        }
+        .view-switcher button i {
+            margin-right: 0.3rem;
+        }
+
+        /* ─── 2D IMAGE GALLERY ─── */
         .product-gallery .main-image-container {
             background: var(--light);
             border-radius: var(--radius-sm);
@@ -43,6 +312,10 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            display: none;
+        }
+        .product-gallery .main-image-container.active {
+            display: flex;
         }
         .product-gallery .main-image-container img {
             width: 100%;
@@ -75,7 +348,7 @@
         .product-gallery .main-image-container:hover .zoom-icon {
             opacity: 1;
         }
-        
+
         .thumbnail-grid {
             display: flex;
             gap: 0.8rem;
@@ -100,7 +373,8 @@
         .thumbnail-grid .thumb:hover { border-color: var(--primary-light); }
         .thumbnail-grid .thumb.active { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(26,123,107,0.2); }
         .thumbnail-grid .thumb img { width: 100%; height: 100%; object-fit: cover; }
-        
+
+        /* ─── PRODUCT INFO ─── */
         .product-info .product-title { font-size: 1.8rem; font-weight: 800; color: var(--secondary); margin-bottom: 0.3rem; }
         .product-info .product-brand { font-size: 0.9rem; color: var(--text-light); margin-bottom: 0.5rem; }
         .product-info .product-brand a { color: var(--primary); font-weight: 600; }
@@ -110,14 +384,14 @@
         .product-info .product-price .discount-badge { background: #c0392b; color: var(--white); font-size: 0.8rem; font-weight: 700; padding: 0.15rem 0.8rem; border-radius: 30px; }
         .product-info .product-moq { background: var(--primary-light); padding: 0.5rem 1rem; border-radius: var(--radius-sm); font-size: 0.9rem; color: var(--primary); display: inline-block; margin: 0.5rem 0; }
         .product-info .product-description { color: var(--text); line-height: 1.8; margin: 0.8rem 0 1.2rem; font-size: 0.95rem; }
-        
+
         .quantity-section { display: flex; align-items: center; gap: 1rem; margin: 1.2rem 0; flex-wrap: wrap; }
         .quantity-section label { font-weight: 600; color: var(--secondary); font-size: 0.9rem; }
         .quantity-section .qty-control { display: flex; align-items: center; border: 1px solid var(--border-dark); border-radius: var(--radius-sm); overflow: hidden; }
         .quantity-section .qty-control button { width: 40px; height: 40px; border: none; background: var(--light); cursor: pointer; font-size: 1.2rem; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
         .quantity-section .qty-control button:hover { background: var(--primary); color: var(--white); }
         .quantity-section .qty-control input { width: 60px; height: 40px; border: none; border-left: 1px solid var(--border-dark); border-right: 1px solid var(--border-dark); text-align: center; font-size: 1rem; font-weight: 600; outline: none; }
-        
+
         .action-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; margin: 0.8rem 0; }
         .action-buttons .btn-add-cart { flex: 1; background: var(--primary); color: var(--white); border: none; padding: 0.8rem 2rem; border-radius: 50px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-width: 150px; }
         .action-buttons .btn-add-cart:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(26,123,107,0.3); }
@@ -126,26 +400,26 @@
         .action-buttons .btn-wishlist { background: transparent; border: 2px solid var(--border-dark); border-radius: 50px; padding: 0.8rem 1.2rem; cursor: pointer; transition: var(--transition); color: var(--text-light); font-size: 1.1rem; display: inline-flex; align-items: center; justify-content: center; min-width: 60px; }
         .action-buttons .btn-wishlist:hover { border-color: var(--primary); color: var(--primary); }
         .action-buttons .btn-wishlist.liked { border-color: #e74c3c; color: #e74c3c; }
-        
+
         .btn-rfq { display: inline-flex; align-items: center; gap: 0.5rem; background: transparent; border: 2px solid var(--secondary); color: var(--secondary); padding: 0.6rem 1.8rem; border-radius: 50px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: var(--transition); margin-top: 0.5rem; }
         .btn-rfq:hover { background: var(--secondary); color: var(--white); transform: translateY(-2px); }
-        
+
         .btn-chat-seller { display: inline-flex; align-items: center; gap: 0.5rem; background: #25D366; color: var(--white); border: none; padding: 0.7rem 1.8rem; border-radius: 50px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: var(--transition); margin-top: 0.5rem; width: 100%; justify-content: center; }
         .btn-chat-seller:hover { background: #1da851; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37,211,102,0.3); }
-        
+
         .seller-info { background: var(--light); border-radius: var(--radius-sm); padding: 1.2rem 1.5rem; margin: 1.2rem 0; border: 1px solid var(--border); }
         .seller-info h4 { font-size: 0.9rem; color: var(--secondary); margin-bottom: 0.3rem; }
         .seller-info .seller-name { font-weight: 600; color: var(--primary); font-size: 1rem; }
         .seller-info .seller-stats { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.3rem; font-size: 0.8rem; color: var(--text-light); }
         .seller-info .seller-stats i { margin-right: 0.3rem; color: var(--primary); }
-        
+
         .bulk-pricing { margin: 1.5rem 0; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
         .bulk-pricing table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         .bulk-pricing th { background: var(--light); padding: 0.6rem 1rem; text-align: left; font-weight: 600; color: var(--secondary); border-bottom: 2px solid var(--border); }
         .bulk-pricing td { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); color: var(--text); }
         .bulk-pricing td:last-child { font-weight: 700; color: var(--primary); }
         .bulk-pricing .best-value { background: var(--primary-light); }
-        
+
         .related-section { margin-top: 3rem; }
         .related-section h3 { font-size: 1.4rem; color: var(--secondary); margin-bottom: 1.2rem; }
         .related-section h3 span { color: var(--primary); }
@@ -158,7 +432,7 @@
         .related-card .related-title { font-weight: 600; font-size: 0.85rem; color: var(--secondary); margin-bottom: 0.2rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .related-card .related-price { font-weight: 700; color: var(--primary); font-size: 0.95rem; }
 
-        /* ─── LIGHTBOX OVERLAY ─── */
+        /* ─── LIGHTBOX ─── */
         .lightbox-overlay {
             display: none;
             position: fixed;
@@ -173,110 +447,24 @@
             padding: 20px;
             animation: lightboxFadeIn 0.3s ease;
         }
-        .lightbox-overlay.show {
-            display: flex;
-        }
-        @keyframes lightboxFadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .lightbox-overlay .lightbox-image {
-            max-width: 90%;
-            max-height: 85vh;
-            object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
-            cursor: default;
-            transition: transform 0.3s ease;
-        }
-        .lightbox-overlay .lightbox-close {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: #fff;
-            font-size: 3rem;
-            font-weight: 300;
-            cursor: pointer;
-            transition: 0.3s;
-            background: none;
-            border: none;
-            z-index: 10;
-            font-family: 'Inter', sans-serif;
-        }
-        .lightbox-overlay .lightbox-close:hover {
-            transform: rotate(90deg);
-            color: var(--primary);
-        }
-        .lightbox-overlay .lightbox-counter {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255,255,255,0.6);
-            font-size: 0.9rem;
-            background: rgba(0,0,0,0.5);
-            padding: 4px 16px;
-            border-radius: 30px;
-            font-family: 'Inter', sans-serif;
-        }
-        .lightbox-overlay .lightbox-dots {
-            position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-        }
-        .lightbox-overlay .lightbox-dots .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .lightbox-overlay .lightbox-dots .dot.active {
-            background: var(--primary);
-            transform: scale(1.2);
-        }
-        .lightbox-overlay .lightbox-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(255,255,255,0.5);
-            font-size: 3rem;
-            cursor: pointer;
-            transition: 0.3s;
-            background: none;
-            border: none;
-            padding: 20px;
-            z-index: 10;
-        }
-        .lightbox-overlay .lightbox-nav:hover {
-            color: #fff;
-        }
+        .lightbox-overlay.show { display: flex; }
+        @keyframes lightboxFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .lightbox-overlay .lightbox-image { max-width: 90%; max-height: 85vh; object-fit: contain; border-radius: 8px; box-shadow: 0 30px 80px rgba(0,0,0,0.5); cursor: default; transition: transform 0.3s ease; }
+        .lightbox-overlay .lightbox-close { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 3rem; font-weight: 300; cursor: pointer; transition: 0.3s; background: none; border: none; z-index: 10; font-family: 'Inter', sans-serif; }
+        .lightbox-overlay .lightbox-close:hover { transform: rotate(90deg); color: var(--primary); }
+        .lightbox-overlay .lightbox-counter { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-size: 0.9rem; background: rgba(0,0,0,0.5); padding: 4px 16px; border-radius: 30px; font-family: 'Inter', sans-serif; }
+        .lightbox-overlay .lightbox-dots { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
+        .lightbox-overlay .lightbox-dots .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: 0.3s; }
+        .lightbox-overlay .lightbox-dots .dot.active { background: var(--primary); transform: scale(1.2); }
+        .lightbox-overlay .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.5); font-size: 3rem; cursor: pointer; transition: 0.3s; background: none; border: none; padding: 20px; z-index: 10; }
+        .lightbox-overlay .lightbox-nav:hover { color: #fff; }
         .lightbox-overlay .lightbox-nav.prev { left: 20px; }
         .lightbox-overlay .lightbox-nav.next { right: 20px; }
 
-        .swipe-indicator {
-            text-align: center;
-            font-size: 0.7rem;
-            color: var(--text-light);
-            margin-top: 0.5rem;
-            opacity: 0.6;
-        }
-        .swipe-indicator i {
-            display: inline-block;
-            animation: swipeMove 1.5s infinite;
-        }
-        @keyframes swipeMove {
-            0%, 100% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-        }
-
+        /* ─── RESPONSIVE ─── */
         @media (max-width: 992px) {
             .product-detail-layout { grid-template-columns: 1fr; padding: 1.5rem; }
-            .product-gallery .main-image-container { aspect-ratio: 4/3; }
+            .model-viewer-container { height: 350px; }
         }
         @media (max-width: 768px) {
             .product-detail-layout { padding: 1rem; }
@@ -287,11 +475,9 @@
             .action-buttons .btn-buy-now { width: 100%; }
             .thumbnail-grid .thumb { width: 60px; height: 60px; }
             .related-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
-            .lightbox-overlay .lightbox-close { top: 15px; right: 20px; font-size: 2.5rem; }
-            .lightbox-overlay .lightbox-image { max-width: 95%; max-height: 80vh; }
-            .lightbox-overlay .lightbox-nav { font-size: 2rem; padding: 10px; }
-            .lightbox-overlay .lightbox-nav.prev { left: 10px; }
-            .lightbox-overlay .lightbox-nav.next { right: 10px; }
+            .model-viewer-container { height: 280px; }
+            .viewer-controls { padding: 4px 10px; }
+            .viewer-controls button { font-size: 0.65rem; padding: 2px 8px; }
         }
         @media (max-width: 480px) {
             .product-detail-layout { padding: 0.8rem; }
@@ -299,9 +485,50 @@
             .quantity-section { flex-direction: column; align-items: stretch; }
             .quantity-section .qty-control { width: fit-content; margin: 0 auto; }
             .related-grid { grid-template-columns: 1fr 1fr; }
-            .lightbox-overlay .lightbox-dots { bottom: 60px; }
-            .lightbox-overlay .lightbox-counter { bottom: 20px; font-size: 0.75rem; }
+            .model-viewer-container { height: 220px; }
+            .viewer-controls { flex-wrap: wrap; justify-content: center; width: 90%; }
         }
+
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--secondary);
+            color: var(--white);
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 90%;
+            text-align: center;
+        }
+        .toast.show { display: block; }
+        .toast.success { background: var(--primary); }
+        .toast.error { background: #c0392b; }
+        .toast.info { background: #2980b9; }
+
+        .loading-spinner { grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-light); }
+        .loading-spinner i { font-size: 2.5rem; color: var(--primary); }
+        .loading-spinner p { margin-top: 0.5rem; }
+
+        .footer {
+            background: var(--secondary);
+            color: #b4d0e0;
+            padding: 2rem 0 1rem;
+            margin-top: 3rem;
+        }
+        .footer .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
+        .footer .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .footer .footer-links a { color: #b4d0e0; font-size: 0.85rem; transition: var(--transition); }
+        .footer .footer-links a:hover { color: var(--white); }
+        .footer .footer-bottom { border-top: 1px solid #1a4055; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
+        .footer .footer-bottom strong { color: var(--white); }
+        .footer .footer-social { display: flex; gap: 1rem; }
+        .footer .footer-social a { color: #b4d0e0; transition: var(--transition); font-size: 1.1rem; }
+        .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
     </style>
 </head>
 <body>
@@ -386,19 +613,64 @@
         </div>
 
         <div class="product-detail-layout" id="productDetail">
-            <!-- Gallery -->
-            <div class="product-gallery">
-                <div class="main-image-container" id="mainImageContainer" onclick="openLightbox()">
-                    <span class="placeholder" id="mainImagePlaceholder"><i class="fa-solid fa-box"></i></span>
-                    <div class="zoom-icon"><i class="fa-solid fa-expand"></i> Click to zoom</div>
+            
+            <!-- ─── GALLERY ─── -->
+            <div class="product-gallery" id="productGallery">
+                
+                <!-- View Switcher -->
+                <div class="view-switcher" id="viewSwitcher">
+                    <button class="active" onclick="switchView('3d')" id="view3dBtn">
+                        <i class="fa-solid fa-cube"></i> 3D View
+                    </button>
+                    <button onclick="switchView('2d')" id="view2dBtn">
+                        <i class="fa-solid fa-image"></i> 2D View
+                    </button>
                 </div>
-                <div class="thumbnail-grid" id="thumbnailGrid"></div>
-                <div class="swipe-indicator">
-                    <i class="fa-solid fa-arrow-left"></i> Swipe to browse images <i class="fa-solid fa-arrow-right"></i>
+
+                <!-- 3D Model Viewer -->
+                <div class="model-viewer-container" id="modelViewerContainer">
+                    <model-viewer 
+                        id="modelViewer"
+                        src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
+                        alt="3D Product"
+                        ar
+                        ar-modes="webxr scene-viewer quick-look"
+                        camera-controls
+                        auto-rotate
+                        rotation-per-second="15deg"
+                        exposure="1"
+                        shadow-intensity="0.6"
+                        style="width:100%; height:100%;"
+                        poster="https://via.placeholder.com/600x600?text=Loading+3D...">
+                    </model-viewer>
+                    <span class="viewer-badge"><i class="fa-solid fa-cube"></i> 3D Interactive</span>
+                    <div class="viewer-controls">
+                        <button onclick="toggleAutoRotate()" id="rotateBtn" class="active">
+                            <i class="fa-solid fa-rotate-right"></i> Auto
+                        </button>
+                        <button onclick="resetView()">
+                            <i class="fa-solid fa-arrows-rotate"></i> Reset
+                        </button>
+                        <button onclick="toggleAR()">
+                            <i class="fa-solid fa-vr-cardboard"></i> AR
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2D Image Gallery -->
+                <div id="imageGallery">
+                    <div class="main-image-container active" id="mainImageContainer" onclick="openLightbox()">
+                        <span class="placeholder" id="mainImagePlaceholder"><i class="fa-solid fa-box"></i></span>
+                        <div class="zoom-icon"><i class="fa-solid fa-expand"></i> Click to zoom</div>
+                    </div>
+                    <div class="thumbnail-grid" id="thumbnailGrid"></div>
+                    <div class="swipe-indicator">
+                        <i class="fa-solid fa-arrow-left"></i> Swipe to browse images <i class="fa-solid fa-arrow-right"></i>
+                    </div>
                 </div>
             </div>
 
-            <!-- Info -->
+            <!-- ─── INFO ─── -->
             <div class="product-info">
                 <div class="product-title" id="productTitle">Loading...</div>
                 <div class="product-brand" id="productBrand">by <a href="#">Brand</a></div>
@@ -415,7 +687,6 @@
 
                 <div class="product-description" id="productDescription">Loading product description...</div>
 
-                <!-- Bulk Pricing -->
                 <div class="bulk-pricing" id="bulkPricing">
                     <table>
                         <thead><tr><th>Quantity</th><th>Price per unit</th><th>Savings</th></tr></thead>
@@ -423,7 +694,6 @@
                     </table>
                 </div>
 
-                <!-- Quantity -->
                 <div class="quantity-section">
                     <label for="qtyInput">Quantity:</label>
                     <div class="qty-control">
@@ -433,7 +703,6 @@
                     </div>
                 </div>
 
-                <!-- Actions -->
                 <div class="action-buttons">
                     <button class="btn-add-cart" onclick="addToCartFromDetail()" id="addToCartBtn">
                         <i class="fa-solid fa-cart-plus"></i> Add to Cart
@@ -446,17 +715,14 @@
                     </button>
                 </div>
 
-                <!-- RFQ -->
                 <button class="btn-rfq" onclick="requestQuote()">
                     <i class="fa-regular fa-file-lines"></i> Request a Quotation (RFQ)
                 </button>
 
-                <!-- Chat -->
                 <button class="btn-chat-seller" onclick="startChatWithSeller()">
                     <i class="fa-regular fa-comment"></i> Chat with Seller
                 </button>
 
-                <!-- Seller Info -->
                 <div class="seller-info">
                     <h4>Seller Information</h4>
                     <div class="seller-name" id="sellerName"><i class="fa-regular fa-building"></i> Pilot Sales Distribution</div>
@@ -469,7 +735,6 @@
             </div>
         </div>
 
-        <!-- Related Products -->
         <div class="related-section">
             <h3>You May Also <span>Like</span></h3>
             <div class="related-grid" id="relatedGrid">
@@ -482,9 +747,7 @@
     </div>
 </div>
 
-<!-- ============================================ -->
-<!-- LIGHTBOX OVERLAY -->
-<!-- ============================================ -->
+<!-- LIGHTBOX -->
 <div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox()">
     <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
     <button class="lightbox-nav prev" onclick="event.stopPropagation(); changeLightboxImage(-1)">&#10094;</button>
@@ -539,6 +802,8 @@
     let productImages = [];
     let currentImageIndex = 0;
     let lightboxImages = [];
+    let modelViewer = null;
+    let is3DView = true;
 
     // ─── INIT ───
     function initFirebase() {
@@ -610,10 +875,62 @@
         return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
     }
 
-    // ─── LIGHTBOX FUNCTIONS ───
+    // ─── VIEW SWITCHER ───
+    function switchView(view) {
+        is3DView = (view === '3d');
+        const modelContainer = document.getElementById('modelViewerContainer');
+        const imageGallery = document.getElementById('imageGallery');
+        const btn3d = document.getElementById('view3dBtn');
+        const btn2d = document.getElementById('view2dBtn');
+
+        if (is3DView) {
+            modelContainer.style.display = 'block';
+            imageGallery.style.display = 'none';
+            btn3d.classList.add('active');
+            btn2d.classList.remove('active');
+            // Initialize model viewer if not already
+            if (!modelViewer) {
+                modelViewer = document.getElementById('modelViewer');
+            }
+        } else {
+            modelContainer.style.display = 'none';
+            imageGallery.style.display = 'block';
+            btn2d.classList.add('active');
+            btn3d.classList.remove('active');
+            // Update thumbnails
+            renderThumbnails();
+        }
+    }
+
+    // ─── 3D CONTROLS ───
+    function toggleAutoRotate() {
+        if (!modelViewer) return;
+        const btn = document.getElementById('rotateBtn');
+        modelViewer.autoRotate = !modelViewer.autoRotate;
+        btn.classList.toggle('active');
+        showToast(modelViewer.autoRotate ? 'Auto-rotate ON' : 'Auto-rotate OFF', 'info');
+    }
+
+    function resetView() {
+        if (!modelViewer) return;
+        modelViewer.cameraOrbit = '0deg 90deg 2m';
+        modelViewer.autoRotate = true;
+        document.getElementById('rotateBtn').classList.add('active');
+        showToast('View reset', 'info');
+    }
+
+    function toggleAR() {
+        if (!modelViewer) return;
+        if (modelViewer.canActivateAR) {
+            modelViewer.activateAR();
+        } else {
+            showToast('AR not supported on this device', 'error');
+        }
+    }
+
+    // ─── LIGHTBOX ───
     function openLightbox() {
         if (lightboxImages.length === 0) return;
-        
         const overlay = document.getElementById('lightboxOverlay');
         const image = document.getElementById('lightboxImage');
         const counter = document.getElementById('lightboxCounter');
@@ -621,11 +938,9 @@
         
         image.src = lightboxImages[currentImageIndex];
         counter.textContent = `${currentImageIndex + 1} / ${lightboxImages.length}`;
-        
         dots.innerHTML = lightboxImages.map((_, i) => `
             <span class="dot ${i === currentImageIndex ? 'active' : ''}" onclick="event.stopPropagation(); goToLightboxImage(${i})"></span>
         `).join('');
-        
         overlay.classList.add('show');
         document.body.style.overflow = 'hidden';
     }
@@ -638,17 +953,12 @@
     function goToLightboxImage(index) {
         if (index < 0 || index >= lightboxImages.length) return;
         currentImageIndex = index;
-        
         const image = document.getElementById('lightboxImage');
         const counter = document.getElementById('lightboxCounter');
         const dots = document.querySelectorAll('.lightbox-dots .dot');
-        
         image.src = lightboxImages[index];
         counter.textContent = `${index + 1} / ${lightboxImages.length}`;
-        
-        dots.forEach((dot, i) => {
-            dot.classList.toggle('active', i === index);
-        });
+        dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); });
     }
 
     function changeLightboxImage(direction) {
@@ -657,44 +967,12 @@
         goToLightboxImage(newIndex);
     }
 
-    // ─── KEYBOARD SUPPORT ───
     document.addEventListener('keydown', function(e) {
         if (!document.getElementById('lightboxOverlay').classList.contains('show')) return;
         if (e.key === 'Escape') closeLightbox();
         if (e.key === 'ArrowLeft') changeLightboxImage(-1);
         if (e.key === 'ArrowRight') changeLightboxImage(1);
     });
-
-    // ─── SWIPE SUPPORT ───
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const gallery = document.getElementById('productGallery');
-        if (gallery) {
-            gallery.addEventListener('touchstart', function(e) {
-                touchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
-            
-            gallery.addEventListener('touchend', function(e) {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
-            }, { passive: true });
-        }
-    });
-
-    function handleSwipe() {
-        const threshold = 50;
-        const diff = touchStartX - touchEndX;
-        
-        if (Math.abs(diff) > threshold) {
-            if (diff > 0 && currentImageIndex < productImages.length - 1) {
-                goToImage(currentImageIndex + 1);
-            } else if (diff < 0 && currentImageIndex > 0) {
-                goToImage(currentImageIndex - 1);
-            }
-        }
-    }
 
     // ─── GET PRODUCT ───
     function getProductIdentifier() {
@@ -754,11 +1032,26 @@
         else if (product.image_url) productImages = [product.image_url];
         lightboxImages = productImages;
 
+        // Update 3D model if available
+        if (product.model_url) {
+            const viewer = document.getElementById('modelViewer');
+            if (viewer) {
+                viewer.src = product.model_url;
+            }
+        }
+
         renderProduct(product);
         renderThumbnails();
         renderBulkPricing(product);
         loadRelatedProducts(product);
         updateWishlistStatus(product.id);
+        
+        // Default to 3D view if available, else 2D
+        if (product.model_url) {
+            switchView('3d');
+        } else {
+            switchView('2d');
+        }
     }
 
     function renderProduct(product) {
@@ -1101,6 +1394,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         initFirebase();
         document.getElementById('year').textContent = new Date().getFullYear();
+        modelViewer = document.getElementById('modelViewer');
     });
 
     // ─── EXPOSE FUNCTIONS ───
@@ -1118,6 +1412,10 @@
     window.closeLightbox = closeLightbox;
     window.goToLightboxImage = goToLightboxImage;
     window.changeLightboxImage = changeLightboxImage;
+    window.switchView = switchView;
+    window.toggleAutoRotate = toggleAutoRotate;
+    window.resetView = resetView;
+    window.toggleAR = toggleAR;
 </script>
 </body>
 </html>
