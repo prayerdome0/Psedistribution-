@@ -42,7 +42,7 @@
         ul { list-style: none; }
         img { max-width: 100%; display: block; }
 
-        .container { max-width: 1300px; margin: 0 auto; padding: 0 1rem; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem; }
 
         .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.5s ease, transform 0.5s ease; }
         .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
@@ -96,15 +96,52 @@
             cursor: pointer;
             transition: var(--transition);
             padding: 0.2rem 0.5rem;
+            background: none;
+            border: none;
         }
-        .header-actions .icon-btn i { font-size: 1rem; transition: var(--transition); }
         .header-actions .icon-btn:hover { color: var(--primary); }
+        .header-actions .icon-btn i { font-size: 1rem; transition: var(--transition); }
+
+        .header-actions .admin-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .header-actions .notification-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+        .header-actions .notification-bell:hover { color: var(--primary); }
+        .header-actions .notification-bell .badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #c0392b;
+            color: var(--white);
+            font-size: 0.5rem;
+            font-weight: 700;
+            border-radius: 50%;
+            padding: 0.05rem 0.4rem;
+            min-width: 16px;
+            text-align: center;
+        }
 
         /* ─── ADMIN LAYOUT ─── */
         .admin-wrapper {
             display: grid;
-            grid-template-columns: 200px 1fr;
-            gap: 1.2rem;
+            grid-template-columns: 220px 1fr;
+            gap: 1.5rem;
             margin: 1rem 0;
             min-height: 500px;
         }
@@ -131,12 +168,12 @@
             display: flex;
             align-items: center;
             gap: 0.6rem;
-            padding: 0.4rem 0.6rem;
+            padding: 0.5rem 0.7rem;
             border-radius: 6px;
             color: #b4d0e0;
             cursor: pointer;
             transition: var(--transition);
-            margin-bottom: 0.15rem;
+            margin-bottom: 0.1rem;
             font-size: 0.75rem;
             border: none;
             background: none;
@@ -145,7 +182,7 @@
         }
         .admin-sidebar .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--white); }
         .admin-sidebar .nav-item.active { background: rgba(255,255,255,0.1); color: var(--white); font-weight: 600; }
-        .admin-sidebar .nav-item i { width: 16px; text-align: center; font-size: 0.8rem; }
+        .admin-sidebar .nav-item i { width: 18px; text-align: center; font-size: 0.9rem; }
         .admin-sidebar .nav-item .badge {
             margin-left: auto;
             background: #c0392b;
@@ -153,13 +190,14 @@
             font-size: 0.5rem;
             padding: 0.05rem 0.4rem;
             border-radius: 30px;
-            min-width: 16px;
+            min-width: 18px;
             text-align: center;
         }
         .admin-sidebar .nav-item .badge.orange { background: #e67e22; }
         .admin-sidebar .nav-item .badge.green { background: var(--primary); }
         .admin-sidebar .nav-item .badge.purple { background: #8e44ad; }
         .admin-sidebar .nav-item .badge.blue { background: #2980b9; }
+        .admin-sidebar .nav-item .badge.gold { background: #f39c12; }
 
         .admin-sidebar .logout-btn {
             margin-top: 0.8rem;
@@ -171,18 +209,24 @@
             display: flex;
             align-items: center;
             gap: 0.6rem;
-            padding: 0.4rem 0.6rem;
+            padding: 0.5rem 0.7rem;
             border-radius: 6px;
             font-size: 0.75rem;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
         }
         .admin-sidebar .logout-btn:hover { background: rgba(255,255,255,0.05); color: var(--white); }
 
+        /* ─── ADMIN CONTENT ─── */
         .admin-content {
             background: var(--white);
             border-radius: var(--radius);
-            padding: 1.2rem;
+            padding: 1.5rem;
             border: 1px solid var(--border);
             overflow: hidden;
+            min-height: 600px;
         }
         .admin-content .page-header {
             display: flex;
@@ -192,26 +236,27 @@
             gap: 0.5rem;
             padding-bottom: 0.8rem;
             border-bottom: 1px solid var(--border);
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
         }
-        .admin-content .page-header h2 { font-size: 1.1rem; color: var(--secondary); }
+        .admin-content .page-header h2 { font-size: 1.2rem; color: var(--secondary); }
         .admin-content .page-header h2 i { color: var(--primary); margin-right: 0.4rem; }
         .admin-content .page-header .time { font-size: 0.7rem; color: var(--text-light); }
 
-        .tab-content { display: none; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ─── COMPACT STATS CARDS ─── */
+        /* ─── STATS CARDS ─── */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 0.8rem;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
         }
         .stat-card {
             background: var(--light);
             border-radius: var(--radius-sm);
-            padding: 0.8rem 1rem;
+            padding: 1rem;
             border: 1px solid var(--border);
             transition: var(--transition);
             cursor: pointer;
@@ -219,15 +264,16 @@
             align-items: center;
             gap: 0.8rem;
         }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
-        .stat-card .stat-icon { font-size: 1.3rem; color: var(--primary); opacity: 0.5; flex-shrink: 0; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+        .stat-card .stat-icon { font-size: 1.5rem; color: var(--primary); opacity: 0.5; flex-shrink: 0; }
         .stat-card .stat-info { flex: 1; min-width: 0; }
-        .stat-card .stat-number { font-size: 1.3rem; font-weight: 800; color: var(--secondary); line-height: 1.2; }
+        .stat-card .stat-number { font-size: 1.4rem; font-weight: 800; color: var(--secondary); line-height: 1.2; }
         .stat-card .stat-number.green { color: var(--primary); }
         .stat-card .stat-number.blue { color: #2980b9; }
         .stat-card .stat-number.orange { color: #e67e22; }
         .stat-card .stat-number.red { color: #c0392b; }
         .stat-card .stat-number.purple { color: #8e44ad; }
+        .stat-card .stat-number.gold { color: #f39c12; }
         .stat-card .stat-label { font-size: 0.65rem; color: var(--text-light); }
 
         .quick-actions {
@@ -239,7 +285,7 @@
         .quick-actions .action-btn {
             background: var(--light);
             border: 1px solid var(--border);
-            padding: 0.6rem 1rem;
+            padding: 0.5rem 1rem;
             border-radius: var(--radius-sm);
             cursor: pointer;
             transition: var(--transition);
@@ -253,16 +299,16 @@
         .quick-actions .action-btn:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
         .quick-actions .action-btn i { font-size: 1rem; color: var(--primary); }
 
-        /* ─── COMPACT TABLES ─── */
+        /* ─── TABLES ─── */
         .table-container { overflow-x: auto; }
-        .table-container table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-        .table-container th { background: var(--light); padding: 0.4rem 0.6rem; text-align: left; font-weight: 600; color: var(--secondary); white-space: nowrap; border-bottom: 2px solid var(--border); }
-        .table-container td { padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .table-container table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+        .table-container th { background: var(--light); padding: 0.5rem 0.7rem; text-align: left; font-weight: 600; color: var(--secondary); white-space: nowrap; border-bottom: 2px solid var(--border); }
+        .table-container td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
         .table-container tr:hover td { background: #fafcfc; }
 
         .status-badge {
             display: inline-block;
-            padding: 0.05rem 0.5rem;
+            padding: 0.1rem 0.6rem;
             border-radius: 30px;
             font-size: 0.6rem;
             font-weight: 600;
@@ -274,13 +320,18 @@
         .status-badge.active { background: #d4edda; color: #155724; }
         .status-badge.inactive { background: #f8d7da; color: #721c24; }
         .status-badge.suspended { background: #f8d7da; color: #721c24; }
+        .status-badge.processing { background: #cce5ff; color: #004085; }
+        .status-badge.shipped { background: #cce5ff; color: #004085; }
+        .status-badge.delivered { background: #d4edda; color: #155724; }
+        .status-badge.reviewing { background: #cce5ff; color: #004085; }
+        .status-badge.quoted { background: #d4edda; color: #155724; }
 
         .btn-action {
-            padding: 0.1rem 0.4rem;
+            padding: 0.15rem 0.5rem;
             border: none;
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             transition: var(--transition);
             margin: 0.05rem;
         }
@@ -294,6 +345,8 @@
         .btn-action.email { background: #cce5ff; color: #004085; }
         .btn-action.reset { background: #fff3cd; color: #856404; }
         .btn-action.edit { background: #cce5ff; color: #004085; }
+        .btn-action.ship { background: #cce5ff; color: #004085; }
+        .btn-action.process { background: #cce5ff; color: #004085; }
 
         /* ─── MODAL ─── */
         .modal-overlay {
@@ -313,13 +366,14 @@
         .modal-overlay .modal-box {
             background: var(--white);
             border-radius: var(--radius);
-            padding: 1.5rem;
-            max-width: 550px;
+            padding: 1.8rem;
+            max-width: 600px;
             width: 92%;
             max-height: 90vh;
             overflow-y: auto;
             animation: slideIn 0.3s ease;
         }
+        @keyframes slideIn { from { transform: translateY(-30px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
         .modal-overlay .modal-box h3 { font-size: 1.1rem; color: var(--secondary); margin-bottom: 0.8rem; }
         .modal-overlay .modal-box h3 i { color: var(--primary); margin-right: 0.4rem; }
         .modal-overlay .modal-box .form-group { margin-bottom: 0.8rem; }
@@ -328,10 +382,10 @@
         .modal-overlay .modal-box .form-group select,
         .modal-overlay .modal-box .form-group textarea {
             width: 100%;
-            padding: 0.5rem 0.6rem;
+            padding: 0.5rem 0.7rem;
             border: 1px solid var(--border-dark);
             border-radius: var(--radius-sm);
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-family: inherit;
             transition: var(--transition);
         }
@@ -342,30 +396,30 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(26,123,107,0.1);
         }
-        .modal-overlay .modal-box .form-group textarea { resize: vertical; min-height: 60px; }
+        .modal-overlay .modal-box .form-group textarea { resize: vertical; min-height: 80px; }
         .modal-overlay .modal-box .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
-        .modal-overlay .modal-box .btn-group { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .modal-overlay .modal-box .btn-group { display: flex; gap: 0.5rem; margin-top: 1.2rem; flex-wrap: wrap; }
         .modal-overlay .modal-box .btn-group button {
-            padding: 0.4rem 1.2rem;
+            padding: 0.5rem 1.5rem;
             border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             border: none;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
         }
         .modal-overlay .modal-box .btn-group .btn-submit { background: var(--primary); color: var(--white); }
         .modal-overlay .modal-box .btn-group .btn-submit:hover { background: var(--primary-dark); }
         .modal-overlay .modal-box .btn-group .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+        .modal-overlay .modal-box .btn-group .btn-submit.danger { background: #c0392b; }
+        .modal-overlay .modal-box .btn-group .btn-submit.danger:hover { background: #a93226; }
         .modal-overlay .modal-box .btn-group .btn-close { background: var(--light); color: var(--secondary); border: 1px solid var(--border); }
-
-        @keyframes slideIn { from { transform: translateY(-20px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
 
         .btn-add-product {
             background: var(--primary);
             color: var(--white);
             border: none;
-            padding: 0.4rem 1rem;
+            padding: 0.4rem 1.2rem;
             border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
@@ -424,6 +478,97 @@
             justify-content: center;
         }
 
+        /* ─── MESSAGE PREVIEW ─── */
+        .message-preview {
+            background: var(--light);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border: 1px solid var(--border);
+        }
+        .message-preview .msg-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-bottom: 0.3rem;
+        }
+        .message-preview .msg-header .sender { font-weight: 600; color: var(--secondary); }
+        .message-preview .msg-header .date { font-size: 0.65rem; color: var(--text-light); }
+        .message-preview .msg-body { font-size: 0.85rem; color: var(--text); }
+        .message-preview .msg-body .msg-preview-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* ─── ORDER TIMELINE ─── */
+        .order-timeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            position: relative;
+            margin: 0.5rem 0;
+        }
+        .order-timeline::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: var(--border-dark);
+            z-index: 0;
+        }
+        .timeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            gap: 0.3rem;
+        }
+        .timeline-step .step-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--border-dark);
+            border: 3px solid var(--white);
+            box-shadow: 0 0 0 2px var(--border-dark);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.5rem;
+            color: var(--white);
+        }
+        .timeline-step .step-dot.completed {
+            background: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        .timeline-step .step-dot.active {
+            background: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        .timeline-step .step-dot .fa-check { color: var(--white); }
+        .timeline-step .step-label {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-align: center;
+            max-width: 70px;
+        }
+        .timeline-step .step-label.completed { color: var(--primary); }
+        .timeline-step .step-label.active { color: var(--accent); }
+
         .footer {
             background: var(--secondary);
             color: #b4d0e0;
@@ -447,9 +592,9 @@
             transform: translateX(-50%);
             background: var(--secondary);
             color: var(--white);
-            padding: 0.5rem 1.5rem;
+            padding: 0.6rem 1.8rem;
             border-radius: 50px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             z-index: 9999;
             display: none;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
@@ -460,6 +605,22 @@
         .toast.success { background: var(--primary); }
         .toast.error { background: #c0392b; }
         .toast.info { background: #2980b9; }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+        }
+        .loading-spinner i { font-size: 1.5rem; color: var(--primary); }
+        .loading-spinner p { margin-top: 0.3rem; font-size: 0.85rem; }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+        }
+        .empty-state i { font-size: 2.5rem; color: var(--border-dark); margin-bottom: 0.5rem; }
+        .empty-state p { font-size: 0.9rem; }
 
         @media (max-width: 992px) {
             .admin-wrapper { grid-template-columns: 1fr; }
@@ -473,15 +634,17 @@
             .admin-sidebar .sidebar-header { grid-column: 1 / -1; }
             .admin-sidebar .logout-btn { grid-column: 1 / -1; margin-top: 0.3rem; padding-top: 0.3rem; }
             .stats-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+            .order-timeline { flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+            .order-timeline::before { display: none; }
         }
         @media (max-width: 768px) {
-            .admin-content { padding: 0.8rem; }
+            .admin-content { padding: 1rem; }
             .admin-sidebar { grid-template-columns: 1fr 1fr; }
             .stats-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
             .stat-card { padding: 0.6rem 0.8rem; }
             .stat-card .stat-number { font-size: 1.1rem; }
             .table-container table { font-size: 0.65rem; }
-            .table-container th, .table-container td { padding: 0.2rem 0.4rem; }
+            .table-container th, .table-container td { padding: 0.3rem 0.4rem; }
             .modal-overlay .modal-box .form-row { grid-template-columns: 1fr; }
             .top-bar .container { flex-direction: column; gap: 0.2rem; align-items: stretch; text-align: center; }
             .top-links { justify-content: center; }
@@ -510,6 +673,7 @@
                 <span><i class="fa-solid fa-gem"></i> Full Control Panel</span>
                 <span><i class="fa-solid fa-handshake"></i> Manage Everything</span>
                 <span><i class="fa-solid fa-box"></i> Monitor in Real-Time</span>
+                <span><i class="fa-solid fa-users"></i> ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}</span>
             </div>
         </div>
         <div class="top-links">
@@ -530,9 +694,14 @@
             </div>
         </a>
         <div class="header-actions">
+            <span class="notification-bell" onclick="showTab('messages')">
+                <i class="fa-regular fa-bell"></i>
+                <span class="badge" id="notificationBadge">0</span>
+            </span>
             <span style="color: var(--text-light); font-size: 0.75rem;">
                 <i class="fa-regular fa-user"></i> <span id="adminName">Admin</span>
             </span>
+            <div class="admin-avatar" id="adminAvatar">A</div>
             <span style="color: var(--text-light); font-size: 0.7rem;" id="liveTime"></span>
         </div>
     </div>
@@ -576,13 +745,17 @@
                 <i class="fa-regular fa-store"></i> Sellers
                 <span class="badge orange" id="sellerBadge">0</span>
             </button>
+            <button class="nav-item" onclick="showTab('analytics')">
+                <i class="fa-regular fa-chart-line"></i> Analytics
+                <span class="badge gold">NEW</span>
+            </button>
             <button class="nav-item" onclick="showTab('settings')">
                 <i class="fa-regular fa-gear"></i> Settings
             </button>
 
-            <div class="logout-btn" onclick="logoutAdmin()">
+            <button class="logout-btn" onclick="logoutAdmin()">
                 <i class="fa-regular fa-right-from-bracket"></i> Logout
-            </div>
+            </button>
         </aside>
 
         <!-- CONTENT -->
@@ -591,23 +764,23 @@
             <!-- DASHBOARD -->
             <div class="tab-content active" id="tab-dashboard">
                 <div class="page-header">
-                    <h2><i class="fa-regular fa-chart-simple"></i> Dashboard</h2>
+                    <h2><i class="fa-regular fa-chart-simple"></i> Dashboard Overview</h2>
                     <span class="time" id="currentTime"></span>
                 </div>
 
-                <div class="stats-grid">
+                <div class="stats-grid" id="statsGrid">
                     <div class="stat-card" onclick="showTab('customers')">
                         <div class="stat-icon"><i class="fa-regular fa-users"></i></div>
                         <div class="stat-info">
                             <div class="stat-number blue" id="statCustomers">0</div>
-                            <div class="stat-label">Customers</div>
+                            <div class="stat-label">Total Customers</div>
                         </div>
                     </div>
                     <div class="stat-card" onclick="showTab('messages')">
                         <div class="stat-icon"><i class="fa-regular fa-envelope"></i></div>
                         <div class="stat-info">
                             <div class="stat-number red" id="statMessages">0</div>
-                            <div class="stat-label">Unread</div>
+                            <div class="stat-label">Unread Messages</div>
                         </div>
                     </div>
                     <div class="stat-card" onclick="showTab('orders')">
@@ -628,28 +801,28 @@
                         <div class="stat-icon"><i class="fa-regular fa-box"></i></div>
                         <div class="stat-info">
                             <div class="stat-number green" id="statProducts">0</div>
-                            <div class="stat-label">Products</div>
+                            <div class="stat-label">Total Products</div>
                         </div>
                     </div>
                     <div class="stat-card" onclick="showTab('sellers')">
                         <div class="stat-icon"><i class="fa-regular fa-store"></i></div>
                         <div class="stat-info">
                             <div class="stat-number blue" id="statSellers">0</div>
-                            <div class="stat-label">Sellers</div>
+                            <div class="stat-label">Active Sellers</div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fa-regular fa-dollar-sign"></i></div>
                         <div class="stat-info">
                             <div class="stat-number green" id="statRevenue">$0</div>
-                            <div class="stat-label">Revenue</div>
+                            <div class="stat-label">Total Revenue</div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fa-regular fa-clock"></i></div>
                         <div class="stat-info">
-                            <div class="stat-number blue">24/7</div>
-                            <div class="stat-label">Support</div>
+                            <div class="stat-number gold" id="statOrdersToday">0</div>
+                            <div class="stat-label">Orders Today</div>
                         </div>
                     </div>
                 </div>
@@ -668,6 +841,9 @@
                     <div class="action-btn" onclick="showTab('customers')">
                         <i class="fa-regular fa-users"></i> Customers
                     </div>
+                    <div class="action-btn" onclick="showTab('analytics')">
+                        <i class="fa-regular fa-chart-line"></i> Analytics
+                    </div>
                 </div>
             </div>
 
@@ -685,11 +861,12 @@
                                 <th>Email</th>
                                 <th>Role</th>
                                 <th>Status</th>
+                                <th>Joined</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="customerTableBody">
-                            <tr><td colspan="5" style="text-align:center; color:var(--text-light); padding:1rem;"><i class="fa-regular fa-spinner fa-spin"></i> Loading...</td></tr>
+                            <tr><td colspan="6"><div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading customers...</p></div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -701,20 +878,8 @@
                     <h2><i class="fa-regular fa-envelope"></i> Messages</h2>
                     <span class="time" id="messageCount">0 unread</span>
                 </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>From</th>
-                                <th>Subject</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="messageTableBody">
-                            <tr><td colspan="4" style="text-align:center; color:var(--text-light); padding:1rem;"><i class="fa-regular fa-spinner fa-spin"></i> Loading...</td></tr>
-                        </tbody>
-                    </table>
+                <div id="messageList">
+                    <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading messages...</p></div>
                 </div>
             </div>
 
@@ -724,21 +889,8 @@
                     <h2><i class="fa-regular fa-receipt"></i> Orders</h2>
                     <span class="time" id="orderCount">0 orders</span>
                 </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Customer</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="orderTableBody">
-                            <tr><td colspan="5" style="text-align:center; color:var(--text-light); padding:1rem;"><i class="fa-regular fa-spinner fa-spin"></i> Loading...</td></tr>
-                        </tbody>
-                    </table>
+                <div id="orderList">
+                    <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading orders...</p></div>
                 </div>
             </div>
 
@@ -748,7 +900,7 @@
                     <h2><i class="fa-regular fa-box"></i> Products</h2>
                     <span class="time" id="productCount">0 products</span>
                     <button class="btn-add-product" onclick="openAddProduct()">
-                        <i class="fa-regular fa-plus"></i> Add
+                        <i class="fa-regular fa-plus"></i> Add Product
                     </button>
                 </div>
                 <div class="table-container">
@@ -757,12 +909,13 @@
                             <tr>
                                 <th>Product</th>
                                 <th>Price</th>
+                                <th>Stock</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="productTableBody">
-                            <tr><td colspan="4" style="text-align:center; color:var(--text-light); padding:1rem;"><i class="fa-regular fa-spinner fa-spin"></i> Loading...</td></tr>
+                            <tr><td colspan="5"><div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading products...</p></div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -774,20 +927,8 @@
                     <h2><i class="fa-regular fa-file-lines"></i> RFQs</h2>
                     <span class="time" id="rfqCount">0 RFQs</span>
                 </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Customer</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="rfqTableBody">
-                            <tr><td colspan="4" style="text-align:center; color:var(--text-light); padding:1rem;"><i class="fa-regular fa-spinner fa-spin"></i> Loading...</td></tr>
-                        </tbody>
-                    </table>
+                <div id="rfqList">
+                    <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading RFQs...</p></div>
                 </div>
             </div>
 
@@ -803,14 +944,43 @@
                             <tr>
                                 <th>Store</th>
                                 <th>Owner</th>
+                                <th>Products</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="sellerTableBody">
-                            <tr><td colspan="4" style="text-align:center; color:var(--text-light); padding:1rem;"><i class="fa-regular fa-spinner fa-spin"></i> Loading...</td></tr>
+                            <tr><td colspan="5"><div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading sellers...</p></div></td></tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- ANALYTICS -->
+            <div class="tab-content" id="tab-analytics">
+                <div class="page-header">
+                    <h2><i class="fa-regular fa-chart-line"></i> Analytics</h2>
+                    <span class="time">Performance Insights</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
+                    <div style="background:var(--light); border-radius:var(--radius-sm); padding:1rem; text-align:center; border:1px solid var(--border);">
+                        <div style="font-size:1.8rem; font-weight:800; color:var(--primary);" id="analyticsRevenue">$0</div>
+                        <div style="font-size:0.7rem; color:var(--text-light);">Total Revenue</div>
+                    </div>
+                    <div style="background:var(--light); border-radius:var(--radius-sm); padding:1rem; text-align:center; border:1px solid var(--border);">
+                        <div style="font-size:1.8rem; font-weight:800; color:#2980b9;" id="analyticsOrders">0</div>
+                        <div style="font-size:0.7rem; color:var(--text-light);">Total Orders</div>
+                    </div>
+                    <div style="background:var(--light); border-radius:var(--radius-sm); padding:1rem; text-align:center; border:1px solid var(--border);">
+                        <div style="font-size:1.8rem; font-weight:800; color:#e67e22;" id="analyticsCustomers">0</div>
+                        <div style="font-size:0.7rem; color:var(--text-light);">Total Customers</div>
+                    </div>
+                </div>
+                <div style="background:var(--light); border-radius:var(--radius-sm); padding:1.5rem; border:1px solid var(--border);">
+                    <h4 style="margin-bottom:0.8rem; color:var(--secondary);"><i class="fa-regular fa-clock"></i> Recent Activity</h4>
+                    <div id="analyticsActivity">
+                        <p style="color:var(--text-light); font-size:0.9rem;">No recent activity</p>
+                    </div>
                 </div>
             </div>
 
@@ -819,17 +989,25 @@
                 <div class="page-header">
                     <h2><i class="fa-regular fa-gear"></i> Settings</h2>
                 </div>
-                <form id="settingsForm" style="max-width:450px;">
-                    <div class="form-group" style="margin-bottom:0.8rem;">
-                        <label style="display:block; font-weight:600; color:var(--secondary); font-size:0.75rem;">Store Name</label>
-                        <input type="text" id="settingsStoreName" value="Pilot Sales Distribution" style="width:100%; padding:0.5rem 0.6rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.8rem;" />
+                <form id="settingsForm" style="max-width:500px;">
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label style="display:block; font-weight:600; color:var(--secondary); font-size:0.8rem;">Store Name</label>
+                        <input type="text" id="settingsStoreName" value="Pilot Sales Distribution" style="width:100%; padding:0.6rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;" />
                     </div>
-                    <div class="form-group" style="margin-bottom:0.8rem;">
-                        <label style="display:block; font-weight:600; color:var(--secondary); font-size:0.75rem;">Admin Email</label>
-                        <input type="email" id="settingsAdminEmail" style="width:100%; padding:0.5rem 0.6rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.8rem;" />
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label style="display:block; font-weight:600; color:var(--secondary); font-size:0.8rem;">Admin Email</label>
+                        <input type="email" id="settingsAdminEmail" style="width:100%; padding:0.6rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;" />
+                    </div>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label style="display:block; font-weight:600; color:var(--secondary); font-size:0.8rem;">Support Email</label>
+                        <input type="email" id="settingsSupportEmail" value="support@pilotsalesdistribution.com" style="width:100%; padding:0.6rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;" />
+                    </div>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label style="display:block; font-weight:600; color:var(--secondary); font-size:0.8rem;">WhatsApp Number</label>
+                        <input type="text" id="settingsWhatsApp" value="+19099384682" style="width:100%; padding:0.6rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;" />
                     </div>
                     <button type="button" class="btn-add-product" onclick="saveSettings()">
-                        <i class="fa-regular fa-floppy-disk"></i> Save
+                        <i class="fa-regular fa-floppy-disk"></i> Save Settings
                     </button>
                 </form>
             </div>
@@ -894,7 +1072,7 @@
                 <label>Images</label>
                 <div class="image-upload-box" onclick="document.getElementById('productImages').click()">
                     <i class="fa-regular fa-cloud-upload"></i>
-                    <p>Click to upload</p>
+                    <p>Click to upload images</p>
                     <span class="file-name" id="imageFileName">No files</span>
                 </div>
                 <input type="file" id="productImages" accept="image/*" multiple style="display:none;" onchange="handleImagePreview(event)" />
@@ -914,7 +1092,7 @@
             </div>
             <div class="btn-group">
                 <button type="submit" class="btn-submit" id="productSubmitBtn">
-                    <i class="fa-regular fa-plus"></i> Add
+                    <i class="fa-regular fa-plus"></i> Add Product
                 </button>
                 <button type="button" class="btn-close" onclick="closeAddProduct()">Cancel</button>
             </div>
@@ -922,21 +1100,52 @@
     </div>
 </div>
 
+<!-- VIEW MESSAGE MODAL -->
+<div class="modal-overlay" id="viewMessageModal">
+    <div class="modal-box">
+        <h3><i class="fa-regular fa-envelope"></i> Message Details</h3>
+        <div id="messageDetailContent">
+            <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading...</p></div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-submit" onclick="replyToMessage()"><i class="fa-regular fa-reply"></i> Reply</button>
+            <button class="btn-close" onclick="closeViewMessage()">Close</button>
+        </div>
+    </div>
+</div>
+
 <!-- REPLY MODAL -->
 <div class="modal-overlay" id="replyModal">
     <div class="modal-box">
-        <h3><i class="fa-regular fa-reply"></i> Reply</h3>
+        <h3><i class="fa-regular fa-reply"></i> Reply to Message</h3>
         <div class="form-group">
             <label>To</label>
             <input type="email" id="replyTo" disabled style="background:var(--light);" />
+        </div>
+        <div class="form-group">
+            <label>Subject</label>
+            <input type="text" id="replySubject" value="RE: " />
         </div>
         <div class="form-group">
             <label>Message</label>
             <textarea id="replyMessage" rows="4" placeholder="Type your reply..."></textarea>
         </div>
         <div class="btn-group">
-            <button class="btn-submit" onclick="sendReply()"><i class="fa-regular fa-paper-plane"></i> Send</button>
+            <button class="btn-submit" onclick="sendReply()"><i class="fa-regular fa-paper-plane"></i> Send Reply</button>
             <button class="btn-close" onclick="closeReplyModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- VIEW ORDER MODAL -->
+<div class="modal-overlay" id="viewOrderModal">
+    <div class="modal-box">
+        <h3><i class="fa-regular fa-receipt"></i> Order Details</h3>
+        <div id="orderDetailContent">
+            <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading...</p></div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-close" onclick="closeViewOrder()">Close</button>
         </div>
     </div>
 </div>
@@ -985,13 +1194,16 @@
         uploadPreset: 'pse_products'
     };
 
-    // ─── UPDATED: Use support email ───
     const SUPPORT_EMAIL = 'support@pilotsalesdistribution.com';
 
     let auth, db;
     let currentMessageId = null;
+    let currentOrderId = null;
     let editingProductId = null;
     let allMessages = [];
+    let allOrders = [];
+    let allRFQs = [];
+    let allUsers = [];
 
     // ─── INIT ───
     function initFirebase() {
@@ -1004,8 +1216,10 @@
             if (user) {
                 db.collection('users').doc(user.uid).get().then((doc) => {
                     if (doc.exists && doc.data().role === 'admin') {
-                        document.getElementById('adminName').textContent = doc.data().full_name || 'Admin';
+                        const data = doc.data();
+                        document.getElementById('adminName').textContent = data.full_name || 'Admin';
                         document.getElementById('adminEmail').textContent = user.email || SUPPORT_EMAIL;
+                        document.getElementById('adminAvatar').textContent = (data.full_name || 'A').charAt(0).toUpperCase();
                         loadAllData();
                         startRealTimeListeners();
                     } else {
@@ -1057,6 +1271,7 @@
         if (tab === 'products') loadProducts();
         if (tab === 'rfqs') loadRFQs();
         if (tab === 'sellers') loadSellers();
+        if (tab === 'analytics') loadAnalytics();
     }
 
     // ─── LOAD ALL DATA ───
@@ -1068,6 +1283,7 @@
             loadProducts(),
             loadRFQs(),
             loadSellers(),
+            loadAnalytics(),
             updateStats()
         ]);
     }
@@ -1077,32 +1293,40 @@
         const tbody = document.getElementById('customerTableBody');
         try {
             const snapshot = await db.collection('users').get();
-            const users = [];
-            snapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+            allUsers = [];
+            snapshot.forEach(doc => allUsers.push({ id: doc.id, ...doc.data() }));
             
-            document.getElementById('customerBadge').textContent = users.length;
-            document.getElementById('customerCount').textContent = `${users.length} users`;
+            document.getElementById('customerBadge').textContent = allUsers.length;
+            document.getElementById('customerCount').textContent = `${allUsers.length} users`;
 
-            if (users.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-light); padding:1rem;">No users</td></tr>`;
+            if (allUsers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-regular fa-users"></i><p>No users registered yet</p></div></td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = users.slice(0, 10).map(u => `
+            tbody.innerHTML = allUsers.slice(0, 20).map(u => `
                 <tr>
                     <td><strong>${u.full_name || u.email || 'N/A'}</strong></td>
                     <td>${u.email || ''}</td>
                     <td><span class="status-badge ${u.role === 'admin' ? 'active' : ''}">${u.role || 'buyer'}</span></td>
-                    <td><span class="status-badge ${u.status === 'active' ? 'active' : 'inactive'}">${u.status || 'active'}</span></td>
+                    <td><span class="status-badge ${u.status === 'active' ? 'active' : u.status === 'suspended' ? 'suspended' : 'inactive'}">${u.status || 'active'}</span></td>
+                    <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
                     <td>
-                        <button class="btn-action view" onclick="showToast('${u.full_name || u.email}: ${u.role || 'buyer'}', 'info')"><i class="fa-regular fa-eye"></i></button>
+                        <button class="btn-action view" onclick="viewUser('${u.id}')"><i class="fa-regular fa-eye"></i></button>
                         ${u.status !== 'suspended' ? `<button class="btn-action ban" onclick="suspendUser('${u.id}')"><i class="fa-regular fa-ban"></i></button>` : `<button class="btn-action unban" onclick="unsuspendUser('${u.id}')"><i class="fa-regular fa-circle-check"></i></button>`}
                     </td>
                 </tr>
             `).join('');
 
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-light); padding:1rem;">Error loading</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading customers</p></div></td></tr>`;
+        }
+    }
+
+    function viewUser(userId) {
+        const user = allUsers.find(u => u.id === userId);
+        if (user) {
+            showToast(`${user.full_name || user.email}\nRole: ${user.role || 'buyer'}\nStatus: ${user.status || 'active'}`, 'info');
         }
     }
 
@@ -1128,7 +1352,7 @@
 
     // ─── LOAD MESSAGES ───
     async function loadMessages() {
-        const tbody = document.getElementById('messageTableBody');
+        const container = document.getElementById('messageList');
         try {
             const snapshot = await db.collection('messages').orderBy('created_at', 'desc').get();
             allMessages = [];
@@ -1136,28 +1360,72 @@
 
             const unread = allMessages.filter(m => m.status === 'unread');
             document.getElementById('messageBadge').textContent = unread.length;
+            document.getElementById('notificationBadge').textContent = unread.length;
             document.getElementById('messageCount').textContent = `${unread.length} unread`;
 
             if (allMessages.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-light); padding:1rem;">No messages</td></tr>`;
+                container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-envelope"></i><p>No messages received yet</p></div>`;
                 return;
             }
 
-            tbody.innerHTML = allMessages.slice(0, 10).map(m => `
-                <tr>
-                    <td><strong>${m.firstName || ''} ${m.lastName || ''}</strong></td>
-                    <td>${m.subject || 'General'}</td>
-                    <td><span class="status-badge ${m.status === 'unread' ? 'unread' : 'read'}">${m.status || 'unread'}</span></td>
-                    <td>
-                        <button class="btn-action reply" onclick="openReplyModal('${m.id}')"><i class="fa-regular fa-reply"></i></button>
+            container.innerHTML = allMessages.map(m => `
+                <div class="message-preview" style="border-left: 3px solid ${m.status === 'unread' ? 'var(--primary)' : 'var(--border)'};">
+                    <div class="msg-header">
+                        <span class="sender">${m.firstName || ''} ${m.lastName || ''}</span>
+                        <span class="date">${m.created_at ? new Date(m.created_at).toLocaleString() : 'N/A'}</span>
+                    </div>
+                    <div class="msg-body">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.3rem;">
+                            <strong>${m.subject || 'General'}</strong>
+                            <span class="status-badge ${m.status === 'unread' ? 'unread' : 'read'}">${m.status || 'unread'}</span>
+                        </div>
+                        <div class="msg-preview-text">${m.message || 'No message content'}</div>
+                    </div>
+                    <div style="display:flex; gap:0.3rem; margin-top:0.5rem;">
+                        <button class="btn-action view" onclick="viewMessage('${m.id}')"><i class="fa-regular fa-eye"></i> View</button>
+                        <button class="btn-action reply" onclick="openReplyModal('${m.id}')"><i class="fa-regular fa-reply"></i> Reply</button>
                         <button class="btn-action delete" onclick="deleteMessage('${m.id}')"><i class="fa-regular fa-trash-can"></i></button>
-                    </td>
-                </tr>
+                    </div>
+                </div>
             `).join('');
 
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-light); padding:1rem;">Error loading</td></tr>`;
+            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading messages</p></div>`;
         }
+    }
+
+    function viewMessage(messageId) {
+        const message = allMessages.find(m => m.id === messageId);
+        if (!message) return;
+        
+        currentMessageId = messageId;
+        const content = document.getElementById('messageDetailContent');
+        content.innerHTML = `
+            <div style="margin-bottom:1rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.3rem;">
+                    <strong style="font-size:1rem;">${message.firstName || ''} ${message.lastName || ''}</strong>
+                    <span style="font-size:0.7rem; color:var(--text-light);">${message.created_at ? new Date(message.created_at).toLocaleString() : 'N/A'}</span>
+                </div>
+                <div style="font-size:0.85rem; color:var(--text-light);">${message.email || ''}</div>
+                <div style="font-size:0.85rem; color:var(--text-light);">${message.phone || ''}</div>
+                <div style="margin-top:0.5rem; font-weight:600;">Subject: ${message.subject || 'General'}</div>
+                <div style="margin-top:0.5rem; padding:1rem; background:var(--light); border-radius:var(--radius-sm);">
+                    ${message.message || 'No message content'}
+                </div>
+            </div>
+        `;
+        document.getElementById('viewMessageModal').classList.add('show');
+        
+        // Mark as read
+        if (message.status === 'unread') {
+            db.collection('messages').doc(messageId).update({ status: 'read', read_at: new Date().toISOString() });
+            loadMessages();
+            updateStats();
+        }
+    }
+
+    function closeViewMessage() {
+        document.getElementById('viewMessageModal').classList.remove('show');
     }
 
     function openReplyModal(messageId) {
@@ -1165,7 +1433,8 @@
         if (!message) return;
         currentMessageId = messageId;
         document.getElementById('replyTo').value = message.email || '';
-        document.getElementById('replyMessage').value = '';
+        document.getElementById('replySubject').value = `RE: ${message.subject || 'General'}`;
+        document.getElementById('replyMessage').value = `\n\n--- Original Message ---\nFrom: ${message.firstName || ''} ${message.lastName || ''}\nSubject: ${message.subject || 'General'}\nDate: ${message.created_at ? new Date(message.created_at).toLocaleString() : 'N/A'}\n\n${message.message || ''}`;
         document.getElementById('replyModal').classList.add('show');
     }
 
@@ -1174,8 +1443,17 @@
         currentMessageId = null;
     }
 
+    function replyToMessage() {
+        closeViewMessage();
+        setTimeout(() => {
+            const message = allMessages.find(m => m.id === currentMessageId);
+            if (message) openReplyModal(currentMessageId);
+        }, 300);
+    }
+
     async function sendReply() {
         const to = document.getElementById('replyTo').value;
+        const subject = document.getElementById('replySubject').value.trim();
         const message = document.getElementById('replyMessage').value.trim();
         if (!to || !message) { showToast('Fill in all fields', 'error'); return; }
 
@@ -1187,10 +1465,22 @@
                     replied_at: new Date().toISOString()
                 });
             }
+            // Save reply as a new message
+            await db.collection('messages').add({
+                firstName: 'Admin',
+                lastName: '',
+                email: to,
+                subject: subject || 'RE: General',
+                message: message,
+                status: 'read',
+                is_reply: true,
+                parent_id: currentMessageId,
+                created_at: new Date().toISOString()
+            });
             showToast('✅ Reply sent!', 'success');
             closeReplyModal();
             loadMessages();
-        } catch (error) { showToast('Failed', 'error'); }
+        } catch (error) { showToast('Failed to send reply', 'error'); }
     }
 
     async function deleteMessage(messageId) {
@@ -1198,49 +1488,174 @@
         try {
             await db.collection('messages').doc(messageId).delete();
             loadMessages();
-            showToast('Deleted', 'info');
+            updateStats();
+            showToast('Message deleted', 'info');
         } catch (error) { showToast('Failed', 'error'); }
     }
 
     // ─── LOAD ORDERS ───
     async function loadOrders() {
-        const tbody = document.getElementById('orderTableBody');
+        const container = document.getElementById('orderList');
         try {
             const snapshot = await db.collection('orders').orderBy('created_at', 'desc').get();
-            const orders = [];
-            snapshot.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
+            allOrders = [];
+            snapshot.forEach(doc => allOrders.push({ id: doc.id, ...doc.data() }));
 
-            const pending = orders.filter(o => o.status === 'pending');
+            const pending = allOrders.filter(o => o.status === 'pending' || o.status === 'processing');
             document.getElementById('orderBadge').textContent = pending.length;
-            document.getElementById('orderCount').textContent = `${orders.length} orders`;
+            document.getElementById('orderCount').textContent = `${allOrders.length} orders`;
 
-            if (orders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-light); padding:1rem;">No orders</td></tr>`;
+            if (allOrders.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-receipt"></i><p>No orders placed yet</p></div>`;
                 return;
             }
 
-            tbody.innerHTML = orders.slice(0, 10).map(o => `
-                <tr>
-                    <td><strong>${o.quoteNumber || o.orderNumber || 'N/A'}</strong></td>
-                    <td>${o.customer?.firstName || ''} ${o.customer?.lastName || ''}</td>
-                    <td>$${(o.totals?.total || 0).toFixed(2)}</td>
-                    <td><span class="status-badge ${o.status || 'pending'}">${o.status || 'Pending'}</span></td>
-                    <td>
-                        <button class="btn-action view" onclick="showToast('Order #${o.quoteNumber || 'N/A'}\nTotal: $${(o.totals?.total || 0).toFixed(2)}', 'info')"><i class="fa-regular fa-eye"></i></button>
-                        <button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'processing')"><i class="fa-regular fa-check"></i></button>
-                    </td>
-                </tr>
-            `).join('');
+            container.innerHTML = allOrders.slice(0, 20).map(o => {
+                const status = o.status || 'pending';
+                const statusLabels = {
+                    pending: 'Pending',
+                    processing: 'Processing',
+                    shipped: 'Shipped',
+                    delivered: 'Delivered',
+                    cancelled: 'Cancelled'
+                };
+                return `
+                    <div class="message-preview" style="border-left: 3px solid ${status === 'pending' ? '#f39c12' : status === 'processing' ? '#3498db' : status === 'shipped' ? '#2ecc71' : '#95a5a6'};">
+                        <div class="msg-header">
+                            <span class="sender">#${o.quoteNumber || o.orderNumber || 'N/A'}</span>
+                            <span class="date">${o.created_at ? new Date(o.created_at).toLocaleString() : 'N/A'}</span>
+                        </div>
+                        <div class="msg-body">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.3rem;">
+                                <span><strong>${o.customer?.firstName || ''} ${o.customer?.lastName || ''}</strong> - ${o.items?.length || 0} items</span>
+                                <span class="status-badge ${status}">${statusLabels[status] || status}</span>
+                            </div>
+                            <div style="margin-top:0.2rem;">Total: <strong>$${(o.totals?.total || 0).toFixed(2)}</strong></div>
+                        </div>
+                        <div style="display:flex; gap:0.3rem; margin-top:0.5rem; flex-wrap:wrap;">
+                            <button class="btn-action view" onclick="viewOrder('${o.id}')"><i class="fa-regular fa-eye"></i> View</button>
+                            ${status === 'pending' ? `<button class="btn-action process" onclick="updateOrderStatus('${o.id}', 'processing')"><i class="fa-regular fa-gear"></i> Process</button>` : ''}
+                            ${status === 'processing' ? `<button class="btn-action ship" onclick="updateOrderStatus('${o.id}', 'shipped')"><i class="fa-regular fa-truck"></i> Ship</button>` : ''}
+                            ${status === 'shipped' ? `<button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'delivered')"><i class="fa-regular fa-circle-check"></i> Deliver</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
 
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-light); padding:1rem;">Error loading</td></tr>`;
+            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading orders</p></div>`;
         }
+    }
+
+    function viewOrder(orderId) {
+        const order = allOrders.find(o => o.id === orderId);
+        if (!order) return;
+        
+        currentOrderId = orderId;
+        const content = document.getElementById('orderDetailContent');
+        
+        const statusSteps = [
+            { key: 'pending', label: 'Order Received', icon: 'fa-regular fa-receipt' },
+            { key: 'processing', label: 'Processing', icon: 'fa-regular fa-gear' },
+            { key: 'shipped', label: 'Shipped', icon: 'fa-regular fa-truck' },
+            { key: 'delivered', label: 'Delivered', icon: 'fa-regular fa-circle-check' }
+        ];
+        
+        const currentStatus = order.status || 'pending';
+        const currentIndex = statusSteps.findIndex(s => s.key === currentStatus);
+        
+        const timelineHtml = statusSteps.map((step, index) => {
+            let statusClass = '';
+            let iconHtml = '';
+            if (index < currentIndex) { 
+                statusClass = 'completed'; 
+                iconHtml = '<i class="fa-solid fa-check"></i>';
+            } else if (index === currentIndex) { 
+                statusClass = 'active'; 
+                iconHtml = '<i class="fa-solid fa-circle"></i>';
+            } else {
+                iconHtml = '<i class="fa-regular fa-circle"></i>';
+            }
+            return `
+                <div class="timeline-step">
+                    <div class="step-dot ${statusClass}">${iconHtml}</div>
+                    <div class="step-label ${statusClass}">${step.label}</div>
+                </div>
+            `;
+        }).join('');
+
+        const itemsHtml = (order.items || []).map(item => `
+            <div style="display:flex; justify-content:space-between; padding:0.3rem 0; border-bottom:1px solid var(--border); font-size:0.85rem;">
+                <span>${item.quantity || 1}x ${item.title || 'Product'}</span>
+                <span>$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</span>
+            </div>
+        `).join('');
+
+        content.innerHTML = `
+            <div style="margin-bottom:1rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.3rem;">
+                    <strong style="font-size:1rem;">Order #${order.quoteNumber || order.orderNumber || 'N/A'}</strong>
+                    <span class="status-badge ${order.status || 'pending'}">${order.status || 'Pending'}</span>
+                </div>
+                <div style="font-size:0.85rem; color:var(--text-light);">
+                    ${order.created_at ? new Date(order.created_at).toLocaleString() : 'N/A'}
+                </div>
+                <div style="margin-top:0.5rem;">
+                    <strong>Customer:</strong> ${order.customer?.firstName || ''} ${order.customer?.lastName || ''}
+                    ${order.customer?.email ? `<br><strong>Email:</strong> ${order.customer.email}` : ''}
+                    ${order.customer?.phone ? `<br><strong>Phone:</strong> ${order.customer.phone}` : ''}
+                    ${order.customer?.address ? `<br><strong>Address:</strong> ${order.customer.address}, ${order.customer.city || ''} ${order.customer.state || ''} ${order.customer.zip || ''}` : ''}
+                </div>
+                
+                <div style="margin-top:1rem;">
+                    <strong>Order Timeline</strong>
+                    <div class="order-timeline">${timelineHtml}</div>
+                </div>
+                
+                <div style="margin-top:1rem;">
+                    <strong>Items (${(order.items || []).length})</strong>
+                    <div style="margin-top:0.3rem; background:var(--light); border-radius:var(--radius-sm); padding:0.5rem 1rem;">
+                        ${itemsHtml || '<p style="color:var(--text-light); font-size:0.85rem;">No items</p>'}
+                    </div>
+                </div>
+                
+                <div style="margin-top:1rem; padding-top:0.5rem; border-top:2px solid var(--border);">
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                        <span>Subtotal</span>
+                        <span>$${(order.totals?.subtotal || 0).toFixed(2)}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                        <span>Shipping</span>
+                        <span>${order.totals?.shipping === 0 ? 'FREE' : '$' + (order.totals?.shipping || 0).toFixed(2)}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                        <span>Tax</span>
+                        <span>$${(order.totals?.tax || 0).toFixed(2)}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:1.1rem; font-weight:700; padding-top:0.5rem; border-top:1px solid var(--border); margin-top:0.3rem;">
+                        <span>Total</span>
+                        <span style="color:var(--primary);">$${(order.totals?.total || 0).toFixed(2)}</span>
+                    </div>
+                </div>
+                
+                ${order.notes ? `<div style="margin-top:0.5rem; padding:0.5rem; background:var(--light); border-radius:var(--radius-sm); font-size:0.85rem;"><strong>Notes:</strong> ${order.notes}</div>` : ''}
+            </div>
+        `;
+        document.getElementById('viewOrderModal').classList.add('show');
+    }
+
+    function closeViewOrder() {
+        document.getElementById('viewOrderModal').classList.remove('show');
     }
 
     async function updateOrderStatus(orderId, status) {
         try {
-            await db.collection('orders').doc(orderId).update({ status, updated_at: new Date().toISOString() });
-            showToast(`Status: ${status}`, 'success');
+            await db.collection('orders').doc(orderId).update({ 
+                status, 
+                updated_at: new Date().toISOString(),
+                status_updated_at: new Date().toISOString()
+            });
+            showToast(`✅ Order status updated to ${status}`, 'success');
             loadOrders();
             updateStats();
         } catch (error) { showToast('Failed', 'error'); }
@@ -1258,19 +1673,20 @@
             document.getElementById('productCount').textContent = `${products.length} products`;
 
             if (products.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-light); padding:1rem;">No products</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-box"></i><p>No products added yet</p></div></td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = products.slice(0, 10).map(p => `
+            tbody.innerHTML = products.slice(0, 20).map(p => `
                 <tr>
                     <td>
-                        <div style="display:flex; align-items:center; gap:0.4rem;">
-                            ${p.image_url ? `<img src="${p.image_url}" style="width:28px; height:28px; object-fit:cover; border-radius:4px;" />` : `<i class="fa-solid fa-box" style="color:var(--text-light);"></i>`}
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            ${p.image_url ? `<img src="${p.image_url}" style="width:32px; height:32px; object-fit:cover; border-radius:4px;" />` : `<i class="fa-solid fa-box" style="color:var(--text-light);"></i>`}
                             <strong>${p.title || 'Untitled'}</strong>
                         </div>
                     </td>
                     <td>$${(p.price || 0).toFixed(2)}</td>
+                    <td>${p.stock || 0}</td>
                     <td><span class="status-badge ${p.status === 'active' || p.status === 'approved' ? 'active' : 'inactive'}">${p.status || 'pending'}</span></td>
                     <td>
                         <button class="btn-action edit" onclick="openAddProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
@@ -1280,7 +1696,7 @@
             `).join('');
 
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-light); padding:1rem;">Error loading</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading products</p></div></td></tr>`;
         }
     }
 
@@ -1296,42 +1712,59 @@
 
     // ─── LOAD RFQS ───
     async function loadRFQs() {
-        const tbody = document.getElementById('rfqTableBody');
+        const container = document.getElementById('rfqList');
         try {
             const snapshot = await db.collection('rfqs').orderBy('created_at', 'desc').get();
-            const rfqs = [];
-            snapshot.forEach(doc => rfqs.push({ id: doc.id, ...doc.data() }));
+            allRFQs = [];
+            snapshot.forEach(doc => allRFQs.push({ id: doc.id, ...doc.data() }));
 
-            const pending = rfqs.filter(r => r.status === 'pending');
+            const pending = allRFQs.filter(r => r.status === 'pending');
             document.getElementById('rfqBadge').textContent = pending.length;
-            document.getElementById('rfqCount').textContent = `${rfqs.length} RFQs`;
+            document.getElementById('rfqCount').textContent = `${allRFQs.length} RFQs`;
 
-            if (rfqs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-light); padding:1rem;">No RFQs</td></tr>`;
+            if (allRFQs.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-file-lines"></i><p>No RFQs submitted yet</p></div>`;
                 return;
             }
 
-            tbody.innerHTML = rfqs.slice(0, 10).map(rfq => `
-                <tr>
-                    <td><strong>${rfq.title || 'N/A'}</strong></td>
-                    <td>${rfq.user_email || 'N/A'}</td>
-                    <td><span class="status-badge ${rfq.status || 'pending'}">${rfq.status || 'Pending'}</span></td>
-                    <td>
-                        <button class="btn-action view" onclick="showToast('RFQ: ${rfq.title}\nCustomer: ${rfq.user_email}\nQty: ${rfq.quantity}', 'info')"><i class="fa-regular fa-eye"></i></button>
-                        ${rfq.status === 'pending' ? `<button class="btn-action approve" onclick="updateRFQStatus('${rfq.id}', 'reviewing')"><i class="fa-regular fa-check"></i></button>` : ''}
-                    </td>
-                </tr>
+            container.innerHTML = allRFQs.slice(0, 20).map(rfq => `
+                <div class="message-preview" style="border-left: 3px solid ${rfq.status === 'pending' ? '#f39c12' : rfq.status === 'reviewing' ? '#3498db' : rfq.status === 'quoted' ? '#2ecc71' : '#95a5a6'};">
+                    <div class="msg-header">
+                        <span class="sender">${rfq.title || 'N/A'}</span>
+                        <span class="date">${rfq.created_at ? new Date(rfq.created_at).toLocaleString() : 'N/A'}</span>
+                    </div>
+                    <div class="msg-body">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.3rem;">
+                            <span><strong>${rfq.user_email || 'Guest'}</strong> - ${rfq.quantity || 0} units</span>
+                            <span class="status-badge ${rfq.status || 'pending'}">${rfq.status || 'Pending'}</span>
+                        </div>
+                        <div style="font-size:0.8rem; color:var(--text-light);">Category: ${rfq.category || 'N/A'}${rfq.budget ? ` | Budget: $${rfq.budget}` : ''}</div>
+                        <div class="msg-preview-text">${rfq.description || 'No description'}</div>
+                    </div>
+                    <div style="display:flex; gap:0.3rem; margin-top:0.5rem; flex-wrap:wrap;">
+                        <button class="btn-action view" onclick="viewRFQ('${rfq.id}')"><i class="fa-regular fa-eye"></i> View</button>
+                        ${rfq.status === 'pending' ? `<button class="btn-action approve" onclick="updateRFQStatus('${rfq.id}', 'reviewing')"><i class="fa-regular fa-check"></i> Review</button>` : ''}
+                        ${rfq.status === 'reviewing' ? `<button class="btn-action approve" onclick="updateRFQStatus('${rfq.id}', 'quoted')"><i class="fa-regular fa-file-lines"></i> Quote</button>` : ''}
+                    </div>
+                </div>
             `).join('');
 
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-light); padding:1rem;">Error loading</td></tr>`;
+            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading RFQs</p></div>`;
+        }
+    }
+
+    function viewRFQ(rfqId) {
+        const rfq = allRFQs.find(r => r.id === rfqId);
+        if (rfq) {
+            showToast(`RFQ: ${rfq.title}\nCustomer: ${rfq.user_email}\nQuantity: ${rfq.quantity}\nCategory: ${rfq.category}\nStatus: ${rfq.status}`, 'info');
         }
     }
 
     async function updateRFQStatus(rfqId, status) {
         try {
             await db.collection('rfqs').doc(rfqId).update({ status, updated_at: new Date().toISOString() });
-            showToast(`RFQ: ${status}`, 'success');
+            showToast(`✅ RFQ updated to ${status}`, 'success');
             loadRFQs();
             updateStats();
         } catch (error) { showToast('Failed', 'error'); }
@@ -1349,33 +1782,102 @@
             document.getElementById('sellerCount').textContent = `${sellers.length} sellers`;
 
             if (sellers.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-light); padding:1rem;">No sellers</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-store"></i><p>No sellers registered yet</p></div></td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = sellers.slice(0, 10).map(s => `
+            // Get product counts for each seller
+            const productCounts = {};
+            const prodSnapshot = await db.collection('products').get();
+            prodSnapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.supplier_id) {
+                    productCounts[data.supplier_id] = (productCounts[data.supplier_id] || 0) + 1;
+                }
+            });
+
+            tbody.innerHTML = sellers.slice(0, 20).map(s => `
                 <tr>
                     <td><strong>${s.company || s.full_name || 'N/A'}</strong></td>
                     <td>${s.full_name || ''}</td>
+                    <td>${productCounts[s.id] || 0}</td>
                     <td><span class="status-badge ${s.status === 'approved' ? 'active' : 'pending'}">${s.status || 'pending'}</span></td>
                     <td>
+                        <button class="btn-action view" onclick="viewSeller('${s.id}')"><i class="fa-regular fa-eye"></i></button>
                         ${s.status !== 'approved' ? `<button class="btn-action approve" onclick="approveSeller('${s.id}')"><i class="fa-regular fa-circle-check"></i></button>` : ''}
+                        ${s.status === 'approved' ? `<button class="btn-action ban" onclick="suspendUser('${s.id}')"><i class="fa-regular fa-ban"></i></button>` : ''}
                     </td>
                 </tr>
             `).join('');
 
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-light); padding:1rem;">Error loading</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading sellers</p></div></td></tr>`;
+        }
+    }
+
+    function viewSeller(sellerId) {
+        const seller = allUsers.find(u => u.id === sellerId);
+        if (seller) {
+            showToast(`${seller.company || seller.full_name}\nProducts: ${seller.products || 0}\nStatus: ${seller.status || 'pending'}`, 'info');
         }
     }
 
     async function approveSeller(sellerId) {
         try {
-            await db.collection('users').doc(sellerId).update({ status: 'approved', updated_at: new Date().toISOString() });
-            showToast('Seller approved!', 'success');
+            await db.collection('users').doc(sellerId).update({ 
+                status: 'approved', 
+                approved_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            });
+            showToast('✅ Seller approved!', 'success');
             loadSellers();
             updateStats();
         } catch (error) { showToast('Failed', 'error'); }
+    }
+
+    // ─── LOAD ANALYTICS ───
+    async function loadAnalytics() {
+        try {
+            const orderSnapshot = await db.collection('orders').get();
+            let totalRevenue = 0;
+            let totalOrders = orderSnapshot.size;
+            let ordersToday = 0;
+            const today = new Date().toDateString();
+
+            orderSnapshot.forEach(doc => {
+                const data = doc.data();
+                totalRevenue += data.totals?.total || 0;
+                if (data.created_at) {
+                    const orderDate = new Date(data.created_at).toDateString();
+                    if (orderDate === today) ordersToday++;
+                }
+            });
+
+            const userSnapshot = await db.collection('users').get();
+            const totalCustomers = userSnapshot.size;
+
+            document.getElementById('analyticsRevenue').textContent = '$' + totalRevenue.toFixed(0);
+            document.getElementById('analyticsOrders').textContent = totalOrders;
+            document.getElementById('analyticsCustomers').textContent = totalCustomers;
+            document.getElementById('statOrdersToday').textContent = ordersToday;
+
+            // Recent activity
+            const activityContainer = document.getElementById('analyticsActivity');
+            const recentOrders = allOrders.slice(0, 5);
+            if (recentOrders.length > 0) {
+                activityContainer.innerHTML = recentOrders.map(o => `
+                    <div style="display:flex; justify-content:space-between; padding:0.4rem 0; border-bottom:1px solid var(--border); font-size:0.85rem;">
+                        <span>Order #${o.quoteNumber || o.orderNumber || 'N/A'} - ${o.customer?.firstName || 'Guest'}</span>
+                        <span style="color:var(--text-light);">${o.created_at ? new Date(o.created_at).toLocaleDateString() : 'N/A'}</span>
+                        <span style="color:var(--primary); font-weight:600;">$${(o.totals?.total || 0).toFixed(2)}</span>
+                        <span class="status-badge ${o.status || 'pending'}">${o.status || 'pending'}</span>
+                    </div>
+                `).join('');
+            } else {
+                activityContainer.innerHTML = '<p style="color:var(--text-light); font-size:0.9rem;">No recent orders</p>';
+            }
+
+        } catch (error) { console.error('Analytics error:', error); }
     }
 
     // ─── UPDATE STATS ───
@@ -1396,13 +1898,16 @@
             const prodSnapshot = await db.collection('products').get();
             document.getElementById('statProducts').textContent = prodSnapshot.size;
 
-            const sellerSnapshot = await db.collection('users').where('role', '==', 'seller').get();
+            const sellerSnapshot = await db.collection('users').where('role', '==', 'seller').where('status', '==', 'approved').get();
             document.getElementById('statSellers').textContent = sellerSnapshot.size;
 
             let revenue = 0;
             const allOrders = await db.collection('orders').get();
             allOrders.forEach(doc => { revenue += doc.data().totals?.total || 0; });
             document.getElementById('statRevenue').textContent = '$' + revenue.toFixed(0);
+
+            // Update notification badge
+            document.getElementById('notificationBadge').textContent = msgSnapshot.size;
 
         } catch (error) { console.error('Stats error:', error); }
     }
@@ -1494,7 +1999,7 @@
         e.preventDefault();
         const submitBtn = document.getElementById('productSubmitBtn');
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
 
         try {
             const files = document.getElementById('productImages').files;
@@ -1583,7 +2088,9 @@
     function saveSettings() {
         const settings = {
             storeName: document.getElementById('settingsStoreName').value,
-            adminEmail: document.getElementById('settingsAdminEmail').value
+            adminEmail: document.getElementById('settingsAdminEmail').value,
+            supportEmail: document.getElementById('settingsSupportEmail').value,
+            whatsapp: document.getElementById('settingsWhatsApp').value
         };
         localStorage.setItem('pilot_admin_settings', JSON.stringify(settings));
         showToast('✅ Settings saved!', 'success');
@@ -1634,8 +2141,9 @@
             const settings = JSON.parse(localStorage.getItem('pilot_admin_settings'));
             if (settings) {
                 document.getElementById('settingsStoreName').value = settings.storeName || 'Pilot Sales Distribution';
-                // ─── UPDATED: Use support email ───
                 document.getElementById('settingsAdminEmail').value = settings.adminEmail || SUPPORT_EMAIL;
+                document.getElementById('settingsSupportEmail').value = settings.supportEmail || SUPPORT_EMAIL;
+                document.getElementById('settingsWhatsApp').value = settings.whatsapp || '+19099384682';
             }
         } catch (e) {}
 
@@ -1666,6 +2174,14 @@
     window.closeReplyModal = closeReplyModal;
     window.sendReply = sendReply;
     window.deleteMessage = deleteMessage;
+    window.viewMessage = viewMessage;
+    window.closeViewMessage = closeViewMessage;
+    window.viewOrder = viewOrder;
+    window.closeViewOrder = closeViewOrder;
+    window.viewUser = viewUser;
+    window.viewSeller = viewSeller;
+    window.viewRFQ = viewRFQ;
+    window.replyToMessage = replyToMessage;
     window.showToast = showToast;
 </script>
 </body>
