@@ -4,166 +4,616 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Order Success - Pilot Sales Distribution</title>
-
-    <meta name="description" content="Your wholesale order has been received. Thank you for choosing Pilot Sales Distribution." />
-    <meta name="keywords" content="order success, confirmation, wholesale, Pilot Sales" />
-
-    <meta property="og:title" content="Order Success - Pilot Sales Distribution" />
-    <meta property="og:description" content="Your order has been confirmed." />
-    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
-
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/logo-192.png" />
-
+    <meta name="description" content="Your wholesale order has been received." />
+    
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #1a7b6b;
+            --primary-dark: #0f4f43;
+            --primary-light: #e8f5f0;
+            --secondary: #0b2a3b;
+            --secondary-light: #1a4b5e;
+            --accent: #f1c40f;
+            --text-light: #6a889a;
+            --border: #e9edf2;
+            --border-dark: #dce3e9;
+            --light: #f0f4f8;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.06);
+            --shadow-hover: 0 20px 50px -10px rgba(0,20,30,0.12);
+            --radius: 1.5rem;
+            --radius-sm: 0.8rem;
+            --transition: 0.3s ease;
+        }
 
-    <link rel="stylesheet" href="style.css" />
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--light); color: var(--dark); line-height: 1.6; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 1.5rem; }
+
+        .animate-on-scroll { opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+
+        .top-bar {
+            background: var(--secondary);
+            color: #d4e2ed;
+            font-size: 0.75rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #1a4055;
+            overflow: hidden;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .top-bar .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+        .moving-words { flex: 1; overflow: hidden; white-space: nowrap; position: relative; }
+        .moving-words .words-track { display: inline-block; animation: scrollWords 30s linear infinite; }
+        .moving-words .words-track span { margin: 0 2rem; font-weight: 500; }
+        .moving-words .words-track span i { color: var(--accent); margin-right: 0.3rem; }
+        @keyframes scrollWords { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
+        .top-links { display: flex; gap: 1rem; flex-shrink: 0; }
+        .top-links a { color: #b4d0e0; transition: var(--transition); cursor: pointer; }
+        .top-links a:hover { color: var(--white); }
+        .top-links i { color: var(--accent); margin-right: 0.2rem; }
+
+        .header {
+            background: var(--white);
+            padding: 0.8rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 35px;
+            z-index: 100;
+        }
+        .header .container { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+        .logo { display: flex; align-items: center; gap: 0.8rem; text-decoration: none; flex-shrink: 0; }
+        .logo img { height: 45px; width: auto; border-radius: 8px; }
+        .logo .brand-name .main { font-size: 1.3rem; font-weight: 800; color: var(--secondary); }
+        .logo .brand-name .main span { color: var(--primary); }
+        .logo .brand-name .sub { font-size: 0.5rem; color: var(--text-light); font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
+
+        .search-bar {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            background: var(--light);
+            border-radius: 50px;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+        }
+        .search-bar:focus-within { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 4px rgba(26,123,107,0.08); }
+        .search-bar input { flex: 1; border: none; padding: 0.6rem 1rem; font-size: 0.9rem; background: transparent; outline: none; }
+        .search-bar button { background: var(--primary); border: none; color: var(--white); padding: 0 1.8rem; cursor: pointer; font-size: 1rem; transition: var(--transition); }
+        .search-bar button:hover { background: var(--primary-dark); }
+        .search-results {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-hover);
+            border: 1px solid var(--border);
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 200;
+        }
+        .search-results.show { display: block; }
+        .search-results .result-item { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 1rem; }
+        .search-results .result-item:hover { background: var(--primary-light); }
+        .search-results .result-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+        .search-results .result-item .info .title { font-weight: 600; font-size: 0.85rem; }
+        .search-results .result-item .info .price { color: var(--primary); font-weight: 700; font-size: 0.8rem; }
+
+        .header-actions { display: flex; align-items: center; gap: 1.2rem; font-size: 0.9rem; flex-wrap: wrap; }
+        .header-actions .icon-btn {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.6rem;
+            color: #1a3340;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.2rem 0.3rem;
+        }
+        .header-actions .icon-btn i { font-size: 1.3rem; margin-bottom: 2px; transition: var(--transition); }
+        .header-actions .icon-btn:hover { color: var(--primary); transform: translateY(-2px); }
+        .header-actions .icon-btn:hover i { transform: scale(1.1); }
+        .badge-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #c0392b;
+            color: var(--white);
+            font-size: 0.55rem;
+            font-weight: 700;
+            border-radius: 50%;
+            padding: 0.1rem 0.45rem;
+            min-width: 18px;
+            text-align: center;
+            animation: badgePop 0.3s ease;
+        }
+        @keyframes badgePop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+        .nav-categories {
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 0.4rem 0;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            position: sticky;
+            top: 75px;
+            z-index: 99;
+        }
+        .nav-categories::-webkit-scrollbar { height: 3px; }
+        .nav-categories::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #1a3340; }
+        .nav-tab { padding: 0.3rem 0; border-bottom: 3px solid transparent; transition: var(--transition); cursor: pointer; position: relative; flex-shrink: 0; }
+        .nav-tab::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 3px; background: var(--primary); transition: width 0.4s ease; }
+        .nav-tab:hover::after, .nav-tab.active::after { width: 100%; }
+        .nav-tab:hover { color: var(--secondary); }
+        .nav-tab.active { color: var(--primary); font-weight: 700; }
+        .wholesale-nav { color: var(--primary); font-weight: 700; }
+
+        .success-page { max-width: 700px; margin: 2rem auto; }
+        .success-card { background: var(--white); border-radius: var(--radius); padding: 3rem 2rem; border: 1px solid var(--border); text-align: center; }
+        .success-card .icon { font-size: 4rem; color: #27ae60; margin-bottom: 1rem; animation: successPop 0.6s ease; }
+        @keyframes successPop { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .success-card h2 { font-size: 1.8rem; color: var(--secondary); margin-bottom: 0.5rem; }
+        .success-card h2 span { color: var(--primary); }
+        .success-card .subtitle { color: var(--text-light); font-size: 1rem; margin-bottom: 1.5rem; }
+        .success-card .order-number-box { background: var(--light); border-radius: var(--radius-sm); padding: 1rem; border: 1px solid var(--border); margin: 1.5rem 0; }
+        .success-card .order-number-box .label { font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+        .success-card .order-number-box .number { font-size: 1.3rem; font-weight: 700; color: var(--secondary); margin-top: 0.2rem; }
+        .success-card .order-details { text-align: left; background: var(--light); border-radius: var(--radius-sm); padding: 1rem; margin: 1.5rem 0; border: 1px solid var(--border); }
+        .success-card .order-details .detail-row { display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
+        .success-card .order-details .detail-row:last-child { border-bottom: none; }
+        .success-card .order-details .detail-row .value.total { color: var(--primary); font-size: 1.1rem; }
+        .success-card .next-steps { text-align: left; background: var(--primary-light); border-radius: var(--radius-sm); padding: 1.2rem; margin: 1.5rem 0; border-left: 4px solid var(--primary); }
+        .success-card .next-steps h4 { color: var(--secondary); font-size: 0.95rem; margin-bottom: 0.5rem; }
+        .success-card .next-steps ul li { padding: 0.3rem 0; font-size: 0.85rem; color: var(--text); display: flex; align-items: center; gap: 0.5rem; }
+        .success-card .next-steps ul li i { color: var(--primary); width: 20px; }
+        .success-card .btn-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+        .success-card .btn-group a { padding: 0.7rem 2rem; border-radius: 50px; font-weight: 600; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary-custom { background: var(--primary); color: var(--white); }
+        .btn-primary-custom:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(26,123,107,0.3); }
+        .btn-outline-custom { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-outline-custom:hover { background: var(--primary); color: var(--white); transform: translateY(-2px); }
+        .success-card .whatsapp-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: #25D366; color: var(--white); padding: 0.7rem 2rem; border-radius: 50px; font-weight: 600; transition: var(--transition); margin-top: 0.5rem; }
+        .success-card .whatsapp-btn:hover { background: #1da851; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37,211,102,0.3); }
+        .success-card .secure-note { margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-light); }
+        .success-card .secure-note i { color: var(--primary); }
+
+        .footer {
+            background: var(--secondary);
+            color: #b4d0e0;
+            padding: 2rem 0 1rem;
+            margin-top: 3rem;
+        }
+        .footer .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
+        .footer .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .footer .footer-links a { color: #b4d0e0; font-size: 0.85rem; transition: var(--transition); }
+        .footer .footer-links a:hover { color: var(--white); }
+        .footer .footer-bottom { border-top: 1px solid #1a4055; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
+        .footer .footer-bottom strong { color: var(--white); }
+        .footer .footer-social { display: flex; gap: 1rem; }
+        .footer .footer-social a { color: #b4d0e0; transition: var(--transition); font-size: 1.1rem; }
+        .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
+
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--secondary);
+            color: var(--white);
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 90%;
+            text-align: center;
+        }
+        .toast.show { display: block; }
+        .toast.success { background: var(--primary); }
+        .toast.error { background: #c0392b; }
+        .toast.info { background: #2980b9; }
+
+        @media (max-width: 768px) {
+            .success-card { padding: 2rem 1.5rem; margin: 1rem; }
+            .success-card h2 { font-size: 1.5rem; }
+            .success-card .btn-group { flex-direction: column; }
+            .success-card .btn-group a { width: 100%; justify-content: center; }
+            .success-card .whatsapp-btn { width: 100%; justify-content: center; }
+            .top-bar .container { flex-direction: column; gap: 0.3rem; align-items: stretch; text-align: center; }
+            .top-links { justify-content: center; }
+            .header .container { gap: 0.8rem; }
+            .search-bar { min-width: 100%; order: 10; }
+            .header-actions .icon-btn span { display: none; }
+            .footer .footer-content { flex-direction: column; text-align: center; }
+            .footer .footer-links { justify-content: center; gap: 1rem; }
+        }
+        @media (max-width: 480px) {
+            .success-card { padding: 1.5rem 1rem; }
+            .success-card .order-number-box .number { font-size: 1rem; }
+            .top-bar .moving-words .words-track span { font-size: 0.65rem; }
+        }
+    </style>
 </head>
 <body>
 
+<!-- TOP BAR -->
 <div class="top-bar">
     <div class="container">
         <div class="moving-words">
             <div class="words-track">
-                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution</span>
-                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices</span>
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
             </div>
         </div>
         <div class="top-links">
-            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
 
+<!-- HEADER -->
 <header class="header">
     <div class="container">
-        <a href="/" class="logo">
+        <a href="home" class="logo">
             <img src="logo.jpg" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
             </div>
         </a>
+        <div class="search-bar" id="searchBar">
+            <input type="text" id="searchInput" placeholder="Search wholesale products..." onkeyup="handleSearch(event)" autocomplete="off" />
+            <button onclick="handleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+        <div class="header-actions">
+            <a href="#" class="icon-btn" onclick="toggleWishlist()">
+                <i class="fa-regular fa-heart"></i>
+                <span>Wishlist</span>
+                <span class="badge-count wishlist-count">0</span>
+            </a>
+            <a href="cart" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+            <a href="account" class="icon-btn" id="accountBtn">
+                <i class="fa-regular fa-user"></i>
+                <span id="accountLabel">Account</span>
+            </a>
+        </div>
     </div>
 </header>
 
-<div class="container" style="margin: 2rem auto; max-width: 700px;">
-    <div style="background: var(--white); border-radius: var(--radius); padding: 3rem 2rem; border: 1px solid var(--border); text-align: center;">
-        <div style="font-size: 4rem; color: #27ae60; margin-bottom: 1rem; animation: successPop 0.6s ease;"><i class="fa-solid fa-circle-check"></i></div>
-        
-        <h2 style="font-size: 1.8rem; color: var(--secondary); margin-bottom: 0.5rem;">
-            Order <span style="color: var(--primary);">Confirmed!</span>
-        </h2>
-        
-        <p style="color: var(--text-light); font-size: 1rem; margin-bottom: 1.5rem;">
-            Thank you for your order. We've received it and will process it shortly.
-        </p>
+<!-- NAVIGATION -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="home"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="contact"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+    </div>
+</nav>
 
-        <div style="background: var(--light); border-radius: var(--radius-sm); padding: 1rem; border: 1px solid var(--border); margin: 1.5rem 0;">
-            <div style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">Order Number</div>
-            <div id="orderNumber" style="font-size: 1.3rem; font-weight: 700; color: var(--secondary); margin-top: 0.2rem;">PSE-2026-######</div>
-        </div>
+<!-- MAIN CONTENT -->
+<div class="container">
+    <div class="success-page">
+        <div class="success-card animate-on-scroll">
+            <div class="icon"><i class="fa-regular fa-circle-check"></i></div>
+            <h2>Thank You for Your <span>Order!</span></h2>
+            <p class="subtitle">Your wholesale quote has been received and is being processed.</p>
 
-        <div style="background: var(--light); border-radius: var(--radius-sm); padding: 1rem; margin: 1.5rem 0; border: 1px solid var(--border); text-align: left;">
-            <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.85rem; border-bottom: 1px solid var(--border);">
-                <span style="color: var(--text-light);">Subtotal</span>
-                <span id="orderSubtotal" style="font-weight: 600; color: var(--secondary);">$0.00</span>
+            <div class="order-number-box">
+                <div class="label">📋 Order / Quote Number</div>
+                <div class="number" id="orderNumberDisplay">Loading...</div>
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.85rem; border-bottom: 1px solid var(--border);">
-                <span style="color: var(--text-light);">Shipping</span>
-                <span id="orderShipping" style="font-weight: 600; color: var(--secondary);">Free</span>
+
+            <div class="order-details" id="orderDetails">
+                <div class="detail-row"><span class="label">Items</span><span class="value" id="orderItemsCount">0</span></div>
+                <div class="detail-row"><span class="label">Subtotal</span><span class="value" id="orderSubtotal">$0.00</span></div>
+                <div class="detail-row"><span class="label">Shipping</span><span class="value" id="orderShipping">$0.00</span></div>
+                <div class="detail-row"><span class="label">Tax</span><span class="value" id="orderTax">$0.00</span></div>
+                <div class="detail-row" style="border-bottom: none; padding-top: 0.5rem; border-top: 2px solid var(--border); margin-top: 0.3rem;">
+                    <span class="label" style="font-weight: 700; color: var(--secondary);">Total</span>
+                    <span class="value total" id="orderTotal">$0.00</span>
+                </div>
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 1rem 0; border-top: 2px solid var(--border);">
-                <span style="font-weight: 700; color: var(--secondary);">Total</span>
-                <span id="orderTotal" style="font-weight: 700; color: var(--primary); font-size: 1.1rem;">$0.00</span>
+
+            <div class="next-steps">
+                <h4><i class="fa-regular fa-clock"></i> What Happens Next?</h4>
+                <ul>
+                    <li><i class="fa-regular fa-circle-check"></i> We'll review your quote within 24-48 hours</li>
+                    <li><i class="fa-regular fa-envelope"></i> You'll receive a confirmation email shortly</li>
+                    <li><i class="fa-regular fa-message"></i> Our team will contact you for any questions</li>
+                    <li><i class="fa-regular fa-truck"></i> Once confirmed, we'll arrange delivery</li>
+                </ul>
             </div>
-        </div>
 
-        <div style="background: var(--primary-light); border-radius: var(--radius-sm); padding: 1.2rem; margin: 1.5rem 0; border-left: 4px solid var(--primary);">
-            <h4 style="color: var(--secondary); font-size: 0.95rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-check"></i> What's Next?</h4>
-            <ul style="list-style: none; padding: 0;">
-                <li style="padding: 0.3rem 0; font-size: 0.85rem; color: var(--text); display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fa-solid fa-arrow-right" style="color: var(--primary); width: 20px;"></i>
-                    You'll receive a confirmation email shortly
-                </li>
-                <li style="padding: 0.3rem 0; font-size: 0.85rem; color: var(--text); display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fa-solid fa-arrow-right" style="color: var(--primary); width: 20px;"></i>
-                    Your order will be processed within 24 hours
-                </li>
-                <li style="padding: 0.3rem 0; font-size: 0.85rem; color: var(--text); display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fa-solid fa-arrow-right" style="color: var(--primary); width: 20px;"></i>
-                    You can track your shipment anytime
-                </li>
-            </ul>
-        </div>
+            <a href="https://wa.me/19099384682" target="_blank" class="whatsapp-btn">
+                <i class="fa-brands fa-whatsapp"></i> Contact us on WhatsApp
+            </a>
 
-        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem;">
-            <a href="/track-order" style="display: inline-flex; align-items: center; gap: 0.5rem; background: var(--primary); color: #fff; padding: 0.7rem 2rem; border-radius: 50px; font-weight: 600; text-decoration: none; transition: var(--transition);" onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'"><i class="fa-solid fa-truck"></i> Track Order</a>
-            
-            <a href="/" style="display: inline-flex; align-items: center; gap: 0.5rem; background: transparent; color: var(--primary); border: 2px solid var(--primary); padding: 0.7rem 2rem; border-radius: 50px; font-weight: 600; text-decoration: none; transition: var(--transition);" onmouseover="this.style.background='var(--primary-light)'" onmouseout="this.style.background='transparent'"><i class="fa-solid fa-house"></i> Back to Home</a>
-        </div>
+            <div class="btn-group">
+                <a href="home" class="btn-primary-custom"><i class="fa-regular fa-house"></i> Continue Shopping</a>
+                <a href="track-order" class="btn-outline-custom"><i class="fa-regular fa-truck"></i> Track Order</a>
+            </div>
 
-        <div style="margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-light);">
-            Need help? <a href="/help-center" style="color: var(--primary); font-weight: 600;">Contact our support team</a>
+            <div class="secure-note"><i class="fa-solid fa-lock"></i> Your information is secure. We'll never share your data.</div>
         </div>
     </div>
 </div>
 
+<!-- FOOTER -->
 <footer class="footer">
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="/about">About</a>
-                <a href="/contact">Contact</a>
-                <a href="/help-center">Help</a>
-                <a href="/privacy">Privacy</a>
-                <a href="/terms">Terms</a>
+                <a href="about">About</a>
+                <a href="contact">Contact</a>
+                <a href="help-center">Help</a>
+                <a href="privacy">Privacy Policy</a>
+                <a href="terms">Terms &amp; Conditions</a>
+                <a href="become-seller">Become a Seller</a>
+            </div>
+            <div class="footer-social">
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; <span id="year"></span> Pilot Sales Distribution. All rights reserved.
+            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
         </div>
     </div>
 </footer>
 
+<!-- TOAST -->
 <div id="toast" class="toast"></div>
 
-<script src="main.js"></script>
+<!-- JAVASCRIPT -->
 <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+    const firebaseConfig = {
+        apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
+        authDomain: "pilot-sales-distribution.firebaseapp.com",
+        projectId: "pilot-sales-distribution",
+        storageBucket: "pilot-sales-distribution.firebasestorage.app",
+        messagingSenderId: "729127273727",
+        appId: "1:729127273727:web:402d67be8346257755f8ca"
+    };
 
-    function generateOrderNumber() {
-        const num = Math.floor(Math.random() * 1000000);
-        return 'PSE-' + new Date().getFullYear() + '-' + String(num).padStart(6, '0');
+    let auth, db;
+
+    function initFirebase() {
+        if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        auth = firebase.auth();
+        db = firebase.firestore();
+        setupAuthListener();
+        loadOrderDetails();
+        loadCartCount();
+        loadWishlistCount();
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const orderNumber = generateOrderNumber();
-        document.getElementById('orderNumber').textContent = orderNumber;
-        
-        const orderData = sessionStorage.getItem('lastOrder');
-        if (orderData) {
-            const order = JSON.parse(orderData);
-            document.getElementById('orderSubtotal').textContent = '$' + (order.subtotal || 0).toFixed(2);
-            document.getElementById('orderTotal').textContent = '$' + (order.total || 0).toFixed(2);
-            sessionStorage.removeItem('lastOrder');
+    function setupAuthListener() {
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const doc = await db.collection('users').doc(user.uid).get();
+                    const data = doc.exists ? doc.data() : {};
+                    localStorage.setItem('pilot_user', JSON.stringify({
+                        id: user.uid, email: user.email,
+                        full_name: data.full_name || user.displayName || '',
+                        role: data.role || 'buyer'
+                    }));
+                } catch (e) {}
+            } else { localStorage.removeItem('pilot_user'); }
+            updateAuthUI();
+        });
+    }
+
+    function getCurrentUser() {
+        try { return JSON.parse(localStorage.getItem('pilot_user')); } catch (e) { return null; }
+    }
+
+    function updateAuthUI() {
+        const user = getCurrentUser();
+        const login = document.getElementById('loginLink');
+        const register = document.getElementById('registerLink');
+        const account = document.getElementById('accountLabel');
+        if (user) {
+            if (login) login.style.display = 'none';
+            if (register) register.style.display = 'none';
+            if (account) account.textContent = user.full_name || 'Account';
+        } else {
+            if (login) login.style.display = 'inline';
+            if (register) register.style.display = 'inline';
+            if (account) account.textContent = 'Account';
+        }
+    }
+
+    function showToast(message, type = 'info') {
+        let toast = document.getElementById('toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.className = 'toast';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.className = 'toast ' + type + ' show';
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
+    }
+
+    function generateSlug(title) {
+        if (!title) return '';
+        return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
+    }
+
+    async function loadOrderDetails() {
+        const params = new URLSearchParams(window.location.search);
+        const orderNumber = params.get('order') || params.get('quote') || 'N/A';
+        document.getElementById('orderNumberDisplay').textContent = orderNumber;
+
+        let order = null;
+        const orders = JSON.parse(localStorage.getItem('pilot_orders') || '[]');
+        order = orders.find(o => o.quoteNumber === orderNumber || o.orderNumber === orderNumber);
+
+        if (!order) {
+            try {
+                const user = getCurrentUser();
+                if (user) {
+                    const snapshot = await db.collection('orders').where('user_id', '==', user.id).get();
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.quoteNumber === orderNumber || data.orderNumber === orderNumber) {
+                            order = { id: doc.id, ...data };
+                        }
+                    });
+                }
+            } catch (error) {}
+        }
+
+        if (order) {
+            const items = order.items || [];
+            const totals = order.totals || {};
+            document.getElementById('orderItemsCount').textContent = items.length || 0;
+            document.getElementById('orderSubtotal').textContent = `$${(totals.subtotal || 0).toFixed(2)}`;
+            document.getElementById('orderShipping').textContent = totals.shipping === 0 ? 'FREE' : `$${(totals.shipping || 0).toFixed(2)}`;
+            document.getElementById('orderTax').textContent = `$${(totals.tax || 0).toFixed(2)}`;
+            document.getElementById('orderTotal').textContent = `$${(totals.total || 0).toFixed(2)}`;
+        }
+    }
+
+    async function loadCartCount() {
+        const user = getCurrentUser();
+        if (!user) {
+            document.querySelectorAll('.cart-count').forEach(el => { el.textContent = '0'; el.style.display = 'none'; });
+            return;
+        }
+        try {
+            const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
+            let count = 0;
+            snapshot.forEach(doc => { count += doc.data().quantity || 1; });
+            document.querySelectorAll('.cart-count').forEach(el => { el.textContent = count; el.style.display = count > 0 ? 'inline' : 'none'; });
+        } catch (error) {
+            document.querySelectorAll('.cart-count').forEach(el => { el.textContent = '0'; el.style.display = 'none'; });
+        }
+    }
+
+    async function loadWishlistCount() {
+        const user = getCurrentUser();
+        if (!user) {
+            document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
+            return;
+        }
+        try {
+            const snapshot = await db.collection('wishlist').where('user_id', '==', user.id).get();
+            const count = snapshot.size;
+            document.querySelectorAll('.wishlist-count').forEach(el => { el.textContent = count; });
+        } catch (error) {
+            document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
+        }
+    }
+
+    function toggleWishlist() {
+        const user = getCurrentUser();
+        if (!user) { showToast('Please login to view wishlist', 'error'); setTimeout(() => window.location.href = 'login', 1500); return; }
+        window.location.href = 'wishlist';
+    }
+
+    async function handleSearch(event) {
+        const input = document.getElementById('searchInput');
+        const query = input.value.trim();
+        if (event && event.key === 'Enter' && query) {
+            window.location.href = `/products?search=${encodeURIComponent(query)}`;
+            return;
+        }
+        if (query.length < 2) {
+            document.getElementById('searchResults').classList.remove('show');
+            return;
+        }
+        try {
+            const snapshot = await db.collection('products').where('status', 'in', ['active', 'approved']).limit(5).get();
+            const products = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.title && data.title.toLowerCase().includes(query.toLowerCase())) {
+                    products.push({ id: doc.id, title: data.title, price: data.price, image_url: data.image_url || data.images?.[0] || '', slug: data.slug || generateSlug(data.title) });
+                }
+            });
+            const resultsDiv = document.getElementById('searchResults');
+            if (products.length === 0) {
+                resultsDiv.innerHTML = `<div style="padding:1rem; text-align:center; color:var(--text-light);">No products found</div>`;
+                resultsDiv.classList.add('show');
+                return;
+            }
+            resultsDiv.innerHTML = products.map(p => `
+                <div class="result-item" onclick="window.location.href='/product/${p.slug}'">
+                    <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
+                    <div class="info">
+                        <div class="title">${p.title}</div>
+                        <div class="price">$${(p.price || 0).toFixed(2)}</div>
+                    </div>
+                </div>
+            `).join('');
+            resultsDiv.classList.add('show');
+        } catch (error) { console.error('Search error:', error); }
+    }
+
+    document.addEventListener('click', function(e) {
+        const searchBar = document.getElementById('searchBar');
+        if (!searchBar || !searchBar.contains(e.target)) {
+            document.getElementById('searchResults').classList.remove('show');
         }
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initFirebase();
+        document.getElementById('year').textContent = new Date().getFullYear();
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+    });
+
+    window.toggleWishlist = toggleWishlist;
+    window.handleSearch = handleSearch;
+    window.showToast = showToast;
 </script>
-
-<style>
-    @keyframes successPop {
-        0% { transform: scale(0); }
-        50% { transform: scale(1.2); }
-        100% { transform: scale(1); }
-    }
-</style>
-
 </body>
 </html>

@@ -4,63 +4,198 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>About - Pilot Sales Distribution</title>
-
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Pilot Sales Distribution - Premium wholesale marketplace founded by Caden Gibson. 12,000+ products, 580+ verified suppliers." />
-    <meta name="keywords" content="wholesale, distribution, about, Caden Gibson, Pilot Sales" />
-
-    <!-- Open Graph -->
-    <meta property="og:title" content="About - Pilot Sales Distribution" />
-    <meta property="og:description" content="Your trusted partner for wholesale distribution since 2020." />
-    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/logo-192.png" />
-
-    <!-- Font Awesome -->
+    <meta name="description" content="About Pilot Sales Distribution - Premium wholesale marketplace." />
+    
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-    <!-- Main Styles -->
-    <link rel="stylesheet" href="style.css" />
-
+    
     <style>
-        /* ─── ABOUT PAGE SPECIFIC STYLES ─── */
-        .about-page {
-            max-width: 1000px;
-            margin: 2rem auto;
+        /* ─── ALL STYLES INLINE ─── */
+        :root {
+            --primary: #1a7b6b;
+            --primary-dark: #0f4f43;
+            --primary-light: #e8f5f0;
+            --secondary: #0b2a3b;
+            --secondary-light: #1a4b5e;
+            --accent: #f1c40f;
+            --accent-hover: #e0b50e;
+            --dark: #0b1a2a;
+            --text: #2c5a6b;
+            --text-light: #6a889a;
+            --border: #e9edf2;
+            --border-dark: #dce3e9;
+            --light: #f0f4f8;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.06);
+            --shadow-hover: 0 20px 50px -10px rgba(0,20,30,0.12);
+            --radius: 1.5rem;
+            --radius-sm: 0.8rem;
+            --transition: 0.3s ease;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--light); color: var(--dark); line-height: 1.6; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* ─── SCROLL ANIMATIONS ─── */
+        .animate-on-scroll { opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+
+        /* ─── TOP BAR ─── */
+        .top-bar {
+            background: var(--secondary);
+            color: #d4e2ed;
+            font-size: 0.75rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #1a4055;
+            overflow: hidden;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .top-bar .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+        .moving-words { flex: 1; overflow: hidden; white-space: nowrap; position: relative; }
+        .moving-words .words-track { display: inline-block; animation: scrollWords 30s linear infinite; }
+        .moving-words .words-track span { margin: 0 2rem; font-weight: 500; }
+        .moving-words .words-track span i { color: var(--accent); margin-right: 0.3rem; }
+        @keyframes scrollWords { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
+        .top-links { display: flex; gap: 1rem; flex-shrink: 0; }
+        .top-links a { color: #b4d0e0; transition: var(--transition); cursor: pointer; }
+        .top-links a:hover { color: var(--white); }
+        .top-links i { color: var(--accent); margin-right: 0.2rem; }
+
+        /* ─── HEADER ─── */
+        .header {
+            background: var(--white);
+            padding: 0.8rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 35px;
+            z-index: 100;
+        }
+        .header .container { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+        .logo { display: flex; align-items: center; gap: 0.8rem; text-decoration: none; flex-shrink: 0; }
+        .logo img { height: 45px; width: auto; border-radius: 8px; }
+        .logo .brand-name .main { font-size: 1.3rem; font-weight: 800; color: var(--secondary); }
+        .logo .brand-name .main span { color: var(--primary); }
+        .logo .brand-name .sub { font-size: 0.5rem; color: var(--text-light); font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
+
+        /* ─── SEARCH BAR ─── */
+        .search-bar {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            background: var(--light);
+            border-radius: 50px;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+        }
+        .search-bar:focus-within { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 4px rgba(26,123,107,0.08); }
+        .search-bar input { flex: 1; border: none; padding: 0.6rem 1rem; font-size: 0.9rem; background: transparent; outline: none; }
+        .search-bar button { background: var(--primary); border: none; color: var(--white); padding: 0 1.8rem; cursor: pointer; font-size: 1rem; transition: var(--transition); }
+        .search-bar button:hover { background: var(--primary-dark); }
+        .search-results {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-hover);
+            border: 1px solid var(--border);
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 200;
+        }
+        .search-results.show { display: block; }
+        .search-results .result-item { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 1rem; }
+        .search-results .result-item:hover { background: var(--primary-light); }
+        .search-results .result-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+        .search-results .result-item .info .title { font-weight: 600; font-size: 0.85rem; }
+        .search-results .result-item .info .price { color: var(--primary); font-weight: 700; font-size: 0.8rem; }
+
+        /* ─── HEADER ACTIONS ─── */
+        .header-actions { display: flex; align-items: center; gap: 1.2rem; font-size: 0.9rem; flex-wrap: wrap; }
+        .header-actions .icon-btn {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.6rem;
+            color: #1a3340;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.2rem 0.3rem;
+        }
+        .header-actions .icon-btn i { font-size: 1.3rem; margin-bottom: 2px; transition: var(--transition); }
+        .header-actions .icon-btn:hover { color: var(--primary); transform: translateY(-2px); }
+        .header-actions .icon-btn:hover i { transform: scale(1.1); }
+        .badge-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #c0392b;
+            color: var(--white);
+            font-size: 0.55rem;
+            font-weight: 700;
+            border-radius: 50%;
+            padding: 0.1rem 0.45rem;
+            min-width: 18px;
+            text-align: center;
+            animation: badgePop 0.3s ease;
+        }
+        @keyframes badgePop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+        /* ─── NAVIGATION TABS ─── */
+        .nav-categories {
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 0.4rem 0;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            position: sticky;
+            top: 75px;
+            z-index: 99;
+        }
+        .nav-categories::-webkit-scrollbar { height: 3px; }
+        .nav-categories::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #1a3340; }
+        .nav-tab { padding: 0.3rem 0; border-bottom: 3px solid transparent; transition: var(--transition); cursor: pointer; position: relative; flex-shrink: 0; }
+        .nav-tab::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 3px; background: var(--primary); transition: width 0.4s ease; }
+        .nav-tab:hover::after, .nav-tab.active::after { width: 100%; }
+        .nav-tab:hover { color: var(--secondary); }
+        .nav-tab.active { color: var(--primary); font-weight: 700; }
+        .wholesale-nav { color: var(--primary); font-weight: 700; }
+
+        /* ─── ABOUT PAGE ─── */
+        .about-page { max-width: 1100px; margin: 2rem auto; }
+        
         .about-header {
             text-align: center;
-            padding: 2rem 0;
+            padding: 3rem 2rem;
             background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
             border-radius: var(--radius);
             color: var(--white);
             margin-bottom: 2rem;
         }
-        .about-header h1 {
-            font-size: 2.8rem;
-            font-weight: 900;
-        }
-        .about-header h1 span {
-            color: var(--accent);
-        }
-        .about-header p {
-            font-size: 1.1rem;
-            opacity: 0.85;
-            margin-top: 0.5rem;
-        }
-
-        /* ─── PRESIDENT SECTION ─── */
+        .about-header h1 { font-size: 3rem; font-weight: 900; }
+        .about-header h1 span { color: var(--accent); }
+        .about-header p { font-size: 1.15rem; opacity: 0.9; margin-top: 0.5rem; }
+        
         .president-section {
             display: flex;
             align-items: center;
@@ -72,24 +207,18 @@
             margin-bottom: 2rem;
             transition: var(--transition);
         }
-        .president-section:hover {
-            box-shadow: var(--shadow-hover);
-        }
-
+        .president-section:hover { box-shadow: var(--shadow-hover); }
         .president-section .photo {
-            width: 200px;
-            height: 200px;
+            width: 160px;
+            height: 160px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 5rem;
-            color: var(--white);
             flex-shrink: 0;
-            overflow: hidden;
             border: 4px solid var(--primary-light);
-            box-shadow: 0 10px 30px rgba(26, 123, 107, 0.2);
+            overflow: hidden;
         }
         .president-section .photo img {
             width: 100%;
@@ -97,42 +226,16 @@
             object-fit: cover;
         }
         .president-section .photo .placeholder {
-            font-size: 5rem;
-            color: rgba(255,255,255,0.7);
+            font-size: 4.5rem;
+            color: var(--white);
         }
-
-        .president-section .info h2 {
-            font-size: 2rem;
-            color: var(--secondary);
-            margin-bottom: 0.2rem;
-        }
-        .president-section .info .title {
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-        }
-        .president-section .info p {
-            color: var(--text-light);
-            line-height: 1.8;
-            font-size: 1rem;
-        }
-        .president-section .info .social-links {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .president-section .info .social-links a {
-            color: var(--text-light);
-            transition: var(--transition);
-            font-size: 1.2rem;
-        }
-        .president-section .info .social-links a:hover {
-            color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        /* ─── STATS ─── */
+        .president-section .info h2 { font-size: 2rem; color: var(--secondary); margin-bottom: 0.2rem; }
+        .president-section .info .title { color: var(--primary); font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem; }
+        .president-section .info p { color: var(--text-light); line-height: 1.8; font-size: 0.95rem; }
+        .president-section .info .social-links { display: flex; gap: 1rem; margin-top: 1rem; }
+        .president-section .info .social-links a { color: var(--text-light); transition: var(--transition); font-size: 1.2rem; }
+        .president-section .info .social-links a:hover { color: var(--primary); transform: translateY(-2px); }
+        
         .about-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -147,86 +250,15 @@
             border: 1px solid var(--border);
             transition: var(--transition);
         }
-        .about-stat:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
-        }
-        .about-stat .number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
-        .about-stat .label {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            margin-top: 0.2rem;
-        }
-        .about-stat i {
-            font-size: 2rem;
-            color: var(--primary);
-            display: block;
-            margin-bottom: 0.5rem;
-            opacity: 0.3;
-        }
-
-        /* ─── VALUES ─── */
-        .values-section {
-            margin: 2rem 0;
-        }
-        .values-section h2 {
-            text-align: center;
-            font-size: 2rem;
-            color: var(--secondary);
-            margin-bottom: 0.5rem;
-        }
-        .values-section h2 span {
-            color: var(--primary);
-        }
-        .values-section .subtitle {
-            text-align: center;
-            color: var(--text-light);
-            margin-bottom: 2rem;
-        }
-
-        .values-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-        }
-        .value-card {
-            background: var(--white);
-            border-radius: var(--radius-sm);
-            padding: 1.5rem;
-            text-align: center;
-            border: 1px solid var(--border);
-            transition: var(--transition);
-        }
-        .value-card:hover {
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-hover);
-            border-color: var(--primary-light);
-        }
-        .value-card i {
-            font-size: 2.5rem;
-            color: var(--primary);
-            margin-bottom: 0.8rem;
-        }
-        .value-card h3 {
-            font-size: 1rem;
-            color: var(--secondary);
-            margin-bottom: 0.3rem;
-        }
-        .value-card p {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            line-height: 1.6;
-        }
-
-        /* ─── MISSION ─── */
+        .about-stat:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+        .about-stat .number { font-size: 2.5rem; font-weight: 800; color: var(--primary); }
+        .about-stat .label { font-size: 0.85rem; color: var(--text-light); margin-top: 0.2rem; }
+        .about-stat i { font-size: 2rem; color: var(--primary); display: block; margin-bottom: 0.5rem; opacity: 0.3; }
+        
         .mission-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+            gap: 2.5rem;
             margin: 2rem 0;
             background: var(--white);
             border-radius: var(--radius);
@@ -234,19 +266,9 @@
             border: 1px solid var(--border);
             align-items: center;
         }
-        .mission-section .mission-content h2 {
-            font-size: 2rem;
-            color: var(--secondary);
-            margin-bottom: 0.5rem;
-        }
-        .mission-section .mission-content h2 span {
-            color: var(--primary);
-        }
-        .mission-section .mission-content p {
-            color: var(--text-light);
-            line-height: 1.8;
-            font-size: 1rem;
-        }
+        .mission-section .mission-content h2 { font-size: 2rem; color: var(--secondary); margin-bottom: 0.5rem; }
+        .mission-section .mission-content h2 span { color: var(--primary); }
+        .mission-section .mission-content p { color: var(--text-light); line-height: 1.8; font-size: 0.95rem; }
         .mission-section .mission-image {
             background: linear-gradient(135deg, var(--primary-light), var(--light));
             border-radius: var(--radius-sm);
@@ -258,75 +280,185 @@
             color: var(--primary);
             border: 1px solid var(--border);
         }
+        
+        .values-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+        .values-section h2 span { color: var(--primary); }
+        .values-section .subtitle { text-align: center; color: var(--text-light); margin-bottom: 2rem; }
+        
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin: 1rem 0 2rem;
+        }
+        .value-card {
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .value-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); border-color: var(--primary-light); }
+        .value-card i { font-size: 2.5rem; color: var(--primary); margin-bottom: 0.8rem; }
+        .value-card h3 { font-size: 1rem; color: var(--secondary); margin-bottom: 0.3rem; }
+        .value-card p { font-size: 0.85rem; color: var(--text-light); line-height: 1.6; }
+        
+        .timeline-section {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+        .timeline-section h2 { text-align: center; font-size: 2rem; color: var(--secondary); margin-bottom: 2rem; }
+        .timeline-section h2 span { color: var(--primary); }
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+            padding-left: 2.5rem;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--primary-light);
+        }
+        .timeline-item {
+            position: relative;
+            padding: 1rem 1.5rem;
+            background: var(--light);
+            border-radius: var(--radius-sm);
+            border-left: 4px solid var(--primary);
+        }
+        .timeline-item .year { font-weight: 700; color: var(--primary); font-size: 1.1rem; }
+        .timeline-item .event { color: var(--text); }
+        .timeline-item .dot {
+            position: absolute;
+            left: -2.1rem;
+            top: 1.2rem;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid var(--white);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        
+        .quote-section {
+            margin: 2rem 0;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+            border-radius: var(--radius);
+            text-align: center;
+            color: var(--white);
+        }
+        .quote-section h2 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .quote-section h2 span { color: var(--accent); }
+        .quote-section p { font-size: 1.1rem; opacity: 0.9; max-width: 600px; margin: 0 auto 1.5rem; }
+        .quote-section .btn-white {
+            background: var(--white);
+            color: var(--secondary);
+            padding: 0.8rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .quote-section .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,255,255,0.3); }
+
+        /* ─── FOOTER ─── */
+        .footer {
+            background: var(--secondary);
+            color: #b4d0e0;
+            padding: 2rem 0 1rem;
+            margin-top: 3rem;
+        }
+        .footer .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
+        .footer .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .footer .footer-links a { color: #b4d0e0; font-size: 0.85rem; transition: var(--transition); }
+        .footer .footer-links a:hover { color: var(--white); }
+        .footer .footer-bottom { border-top: 1px solid #1a4055; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
+        .footer .footer-bottom strong { color: var(--white); }
+        .footer .footer-social { display: flex; gap: 1rem; }
+        .footer .footer-social a { color: #b4d0e0; transition: var(--transition); font-size: 1.1rem; }
+        .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
+
+        /* ─── TOAST ─── */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--secondary);
+            color: var(--white);
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 90%;
+            text-align: center;
+        }
+        .toast.show { display: block; }
+        .toast.success { background: var(--primary); }
+        .toast.error { background: #c0392b; }
+        .toast.info { background: #2980b9; }
 
         /* ─── RESPONSIVE ─── */
         @media (max-width: 992px) {
-            .president-section {
-                flex-direction: column;
-                text-align: center;
-                padding: 2rem;
-            }
-            .president-section .info .social-links {
-                justify-content: center;
-            }
-            .mission-section {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-            .about-stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .president-section { flex-direction: column; text-align: center; padding: 2rem; }
+            .president-section .info .social-links { justify-content: center; }
+            .mission-section { grid-template-columns: 1fr; text-align: center; }
+            .about-stats { grid-template-columns: repeat(2, 1fr); }
         }
-
         @media (max-width: 768px) {
-            .about-header h1 {
-                font-size: 2rem;
-            }
-            .about-stats {
-                grid-template-columns: 1fr 1fr;
-                gap: 1rem;
-            }
-            .about-stat .number {
-                font-size: 2rem;
-            }
-            .president-section .photo {
-                width: 150px;
-                height: 150px;
-                font-size: 3.5rem;
-            }
-            .president-section .info h2 {
-                font-size: 1.5rem;
-            }
-            .values-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .mission-section {
-                padding: 1.5rem;
-            }
+            .top-bar .container { flex-direction: column; gap: 0.3rem; align-items: stretch; text-align: center; }
+            .top-links { justify-content: center; }
+            .header .container { gap: 0.8rem; }
+            .search-bar { min-width: 100%; order: 10; }
+            .header-actions .icon-btn span { display: none; }
+            .about-header h1 { font-size: 2rem; }
+            .president-section .photo { width: 120px; height: 120px; }
+            .president-section .info h2 { font-size: 1.5rem; }
+            .about-stats { grid-template-columns: 1fr 1fr; gap: 1rem; }
+            .about-stat .number { font-size: 2rem; }
+            .timeline { padding-left: 1.5rem; }
+            .timeline-item .dot { left: -1.1rem; width: 12px; height: 12px; }
+            .values-grid { grid-template-columns: 1fr 1fr; }
+            .footer .footer-content { flex-direction: column; text-align: center; }
+            .footer .footer-links { justify-content: center; gap: 1rem; }
         }
-
         @media (max-width: 480px) {
-            .about-stats {
-                grid-template-columns: 1fr 1fr;
-            }
-            .values-grid {
-                grid-template-columns: 1fr;
-            }
-            .president-section {
-                padding: 1.5rem;
-            }
-            .president-section .photo {
-                width: 120px;
-                height: 120px;
-                font-size: 2.5rem;
-            }
+            .about-header h1 { font-size: 1.6rem; }
+            .about-stats { grid-template-columns: 1fr 1fr; }
+            .values-grid { grid-template-columns: 1fr; }
+            .mission-section { padding: 1.5rem; }
+            .president-section { padding: 1.5rem; }
+            .top-bar .moving-words .words-track span { font-size: 0.65rem; }
         }
     </style>
 </head>
 <body>
 
 <!-- ============================================ -->
-<!-- TOP BAR WITH MOVING WORDS -->
+<!-- TOP BAR -->
 <!-- ============================================ -->
 <div class="top-bar">
     <div class="container">
@@ -368,11 +500,9 @@
             </div>
         </a>
 
-        <!-- Search -->
         <div class="search-bar" id="searchBar">
-            <input type="text" id="searchInput" placeholder="Search wholesale products..."
-                   onkeyup="searchProductsFirebase(event)" autocomplete="off" />
-            <button onclick="searchProductsFirebase()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <input type="text" id="searchInput" placeholder="Search wholesale products..." onkeyup="handleSearch(event)" autocomplete="off" />
+            <button onclick="handleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
             <div class="search-results" id="searchResults"></div>
         </div>
 
@@ -422,23 +552,23 @@
             <p>Your trusted partner for wholesale distribution since 2020</p>
         </div>
 
-        <!-- ─── PRESIDENT SECTION ─── -->
+        <!-- ─── PRESIDENT SECTION WITH PHOTO ─── -->
         <div class="president-section animate-on-scroll">
             <div class="photo">
-                <img src="caden-gibson.png" alt="Caden Gibson - President" onerror="this.parentElement.innerHTML='<span class=\'placeholder\'><i class=\'fa-regular fa-user\'></i></span>'" />
+                <img src="caden.png" alt="Caden Gibson" onerror="this.innerHTML='<span class=\'placeholder\'><i class=\'fa-regular fa-user\'></i></span>'" />
             </div>
             <div class="info">
                 <h2>Caden Gibson</h2>
-                <div class="title">President &amp; Founder</div>
+                <div class="title">Founder, Pilot Sales Enterprise | AI & Wholesale Operations, SalesMax Inc. | LLMs, RAG &amp; Automation</div>
                 <p>
                     With over 10 years of experience in wholesale distribution and supply chain management, 
                     Caden built Pilot Sales Distribution to connect businesses with quality products at competitive prices. 
                     His vision is to create a seamless, transparent, and efficient marketplace where businesses of all sizes can thrive.
                 </p>
                 <div class="social-links">
-                    <a href="#" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
-                    <a href="#" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
-                    <a href="#" title="Email"><i class="fa-regular fa-envelope"></i></a>
+                    <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="mailto:caden@pilotsalesdistribution.com"><i class="fa-regular fa-envelope"></i></a>
                 </div>
             </div>
         </div>
@@ -447,17 +577,17 @@
         <div class="about-stats animate-on-scroll">
             <div class="about-stat">
                 <i class="fa-regular fa-box"></i>
-                <div class="number">12K+</div>
+                <div class="number" id="statProducts">12,000+</div>
                 <div class="label">Products Available</div>
             </div>
             <div class="about-stat">
                 <i class="fa-regular fa-handshake"></i>
-                <div class="number">580+</div>
+                <div class="number" id="statSuppliers">580+</div>
                 <div class="label">Verified Suppliers</div>
             </div>
             <div class="about-stat">
                 <i class="fa-regular fa-star"></i>
-                <div class="number">99.7%</div>
+                <div class="number" id="statSatisfaction">99.7%</div>
                 <div class="label">Satisfaction Rate</div>
             </div>
             <div class="about-stat">
@@ -467,7 +597,7 @@
             </div>
         </div>
 
-        <!-- ─── MISSION SECTION ─── -->
+        <!-- ─── MISSION ─── -->
         <div class="mission-section animate-on-scroll">
             <div class="mission-content">
                 <h2>Our <span>Mission</span></h2>
@@ -514,8 +644,50 @@
             </div>
         </div>
 
-        <!-- ─── CONTACT CTA ─── -->
-        <div class="quote-section animate-on-scroll" style="margin-top: 2rem;">
+        <!-- ─── TIMELINE ─── -->
+        <div class="timeline-section animate-on-scroll">
+            <h2>Our <span>Journey</span></h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="dot"></span>
+                    <span class="year">2020</span>
+                    <span class="event"> — Pilot Sales Distribution founded with a vision to simplify wholesale purchasing.</span>
+                </div>
+                <div class="timeline-item">
+                    <span class="dot"></span>
+                    <span class="year">2021</span>
+                    <span class="event"> — Reached 100+ verified suppliers and 1,000+ products in catalog.</span>
+                </div>
+                <div class="timeline-item">
+                    <span class="dot"></span>
+                    <span class="year">2022</span>
+                    <span class="event"> — Expanded globally with suppliers from 20+ countries.</span>
+                </div>
+                <div class="timeline-item">
+                    <span class="dot"></span>
+                    <span class="year">2023</span>
+                    <span class="event"> — Surpassed 10,000 products and 500+ suppliers.</span>
+                </div>
+                <div class="timeline-item">
+                    <span class="dot"></span>
+                    <span class="year">2024</span>
+                    <span class="event"> — Launched RFQ system and real-time chat with suppliers.</span>
+                </div>
+                <div class="timeline-item">
+                    <span class="dot"></span>
+                    <span class="year">2025</span>
+                    <span class="event"> — Achieved 99.7% customer satisfaction rate.</span>
+                </div>
+                <div class="timeline-item">
+                    <span class="dot"></span>
+                    <span class="year">2026</span>
+                    <span class="event"> — Continues to grow with 12,000+ products and 580+ verified suppliers.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── CTA ─── -->
+        <div class="quote-section animate-on-scroll">
             <h2>Ready to <span>Partner With Us?</span></h2>
             <p>Join thousands of businesses that trust Pilot Sales Distribution for their wholesale needs.</p>
             <a href="contact" class="btn-white"><i class="fa-regular fa-envelope"></i> Get in Touch</a>
@@ -553,31 +725,271 @@
 </footer>
 
 <!-- ============================================ -->
-<!-- TOAST NOTIFICATION -->
+<!-- TOAST -->
 <!-- ============================================ -->
 <div id="toast" class="toast"></div>
 
 <!-- ============================================ -->
-<!-- MAIN JAVASCRIPT -->
+<!-- JAVASCRIPT -->
 <!-- ============================================ -->
-<script src="main.js"></script>
-
 <script>
-// ============================================
-// ABOUT PAGE - JAVASCRIPT
-// ============================================
+    // ─── FIREBASE CONFIG ───
+    const firebaseConfig = {
+        apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
+        authDomain: "pilot-sales-distribution.firebaseapp.com",
+        projectId: "pilot-sales-distribution",
+        storageBucket: "pilot-sales-distribution.firebasestorage.app",
+        messagingSenderId: "729127273727",
+        appId: "1:729127273727:web:402d67be8346257755f8ca"
+    };
 
-// ─── SET CURRENT YEAR ───
-document.getElementById('year').textContent = new Date().getFullYear();
+    let auth, db;
 
-// ─── SEARCH FUNCTION IS HANDLED BY MAIN.JS ───
-// No need to redefine it here
+    function initFirebase() {
+        if (typeof firebase === 'undefined') {
+            setTimeout(initFirebase, 500);
+            return;
+        }
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        auth = firebase.auth();
+        db = firebase.firestore();
+        setupAuthListener();
+        loadRealStats();
+        loadCartCount();
+        loadWishlistCount();
+    }
 
-// ─── INIT ───
-document.addEventListener('DOMContentLoaded', function() {
-    loadCartCount();
-    loadWishlistCount();
-});
+    function setupAuthListener() {
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const doc = await db.collection('users').doc(user.uid).get();
+                    const data = doc.exists ? doc.data() : {};
+                    localStorage.setItem('pilot_user', JSON.stringify({
+                        id: user.uid,
+                        email: user.email,
+                        full_name: data.full_name || user.displayName || '',
+                        role: data.role || 'buyer'
+                    }));
+                } catch (e) {}
+            } else {
+                localStorage.removeItem('pilot_user');
+            }
+            updateAuthUI();
+        });
+    }
+
+    function getCurrentUser() {
+        try {
+            return JSON.parse(localStorage.getItem('pilot_user'));
+        } catch (e) { return null; }
+    }
+
+    function updateAuthUI() {
+        const user = getCurrentUser();
+        const loginLink = document.getElementById('loginLink');
+        const registerLink = document.getElementById('registerLink');
+        const accountLabel = document.getElementById('accountLabel');
+        if (user) {
+            if (loginLink) loginLink.style.display = 'none';
+            if (registerLink) registerLink.style.display = 'none';
+            if (accountLabel) accountLabel.textContent = user.full_name || 'Account';
+        } else {
+            if (loginLink) loginLink.style.display = 'inline';
+            if (registerLink) registerLink.style.display = 'inline';
+            if (accountLabel) accountLabel.textContent = 'Account';
+        }
+    }
+
+    function showToast(message, type = 'info') {
+        let toast = document.getElementById('toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.className = 'toast';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.className = 'toast ' + type + ' show';
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
+    }
+
+    function generateSlug(title) {
+        if (!title) return '';
+        return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
+    }
+
+    async function loadRealStats() {
+        try {
+            const prodSnapshot = await db.collection('products').get();
+            let productCount = 0;
+            prodSnapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.status === 'active' || data.status === 'approved' || !data.status) {
+                    productCount++;
+                }
+            });
+
+            const sellerSnapshot = await db.collection('users')
+                .where('role', '==', 'seller')
+                .where('status', '==', 'approved')
+                .get();
+            const supplierCount = sellerSnapshot.size;
+
+            document.getElementById('statProducts').textContent = productCount.toLocaleString() + '+';
+            document.getElementById('statSuppliers').textContent = supplierCount.toLocaleString() + '+';
+        } catch (error) {
+            console.error('Error loading stats:', error);
+        }
+    }
+
+    async function loadCartCount() {
+        const user = getCurrentUser();
+        if (!user) {
+            document.querySelectorAll('.cart-count').forEach(el => {
+                el.textContent = '0';
+                el.style.display = 'none';
+            });
+            return;
+        }
+        try {
+            const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
+            let count = 0;
+            snapshot.forEach(doc => { count += doc.data().quantity || 1; });
+            document.querySelectorAll('.cart-count').forEach(el => {
+                el.textContent = count;
+                el.style.display = count > 0 ? 'inline' : 'none';
+            });
+        } catch (error) {
+            document.querySelectorAll('.cart-count').forEach(el => {
+                el.textContent = '0';
+                el.style.display = 'none';
+            });
+        }
+    }
+
+    async function loadWishlistCount() {
+        const user = getCurrentUser();
+        if (!user) {
+            document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
+            return;
+        }
+        try {
+            const snapshot = await db.collection('wishlist').where('user_id', '==', user.id).get();
+            const count = snapshot.size;
+            document.querySelectorAll('.wishlist-count').forEach(el => { el.textContent = count; });
+        } catch (error) {
+            document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
+        }
+    }
+
+    function toggleWishlist() {
+        const user = getCurrentUser();
+        if (!user) {
+            showToast('Please login to view wishlist', 'error');
+            setTimeout(() => window.location.href = 'login', 1500);
+            return;
+        }
+        window.location.href = 'wishlist';
+    }
+
+    async function handleSearch(event) {
+        const input = document.getElementById('searchInput');
+        const query = input.value.trim();
+
+        if (event && event.key === 'Enter' && query) {
+            window.location.href = `/products?search=${encodeURIComponent(query)}`;
+            return;
+        }
+
+        if (query.length < 2) {
+            document.getElementById('searchResults').classList.remove('show');
+            return;
+        }
+
+        try {
+            const snapshot = await db.collection('products')
+                .where('status', 'in', ['active', 'approved'])
+                .limit(5)
+                .get();
+
+            const products = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.title && data.title.toLowerCase().includes(query.toLowerCase())) {
+                    products.push({
+                        id: doc.id,
+                        title: data.title,
+                        price: data.price,
+                        image_url: data.image_url || data.images?.[0] || '',
+                        slug: data.slug || generateSlug(data.title)
+                    });
+                }
+            });
+
+            const resultsDiv = document.getElementById('searchResults');
+            if (products.length === 0) {
+                resultsDiv.innerHTML = `<div style="padding:1rem; text-align:center; color:var(--text-light);">No products found for "${query}"</div>`;
+                resultsDiv.classList.add('show');
+                return;
+            }
+
+            resultsDiv.innerHTML = products.map(p => `
+                <div class="result-item" onclick="window.location.href='/product/${p.slug}'">
+                    <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
+                    <div class="info">
+                        <div class="title">${p.title}</div>
+                        <div class="price">$${(p.price || 0).toFixed(2)}</div>
+                    </div>
+                </div>
+            `).join('') + `
+                <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
+                    <a href="/products?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
+                        See all results for "${query}" →
+                    </a>
+                </div>
+            `;
+
+            resultsDiv.classList.add('show');
+
+        } catch (error) {
+            console.error('Search error:', error);
+        }
+    }
+
+    document.addEventListener('click', function(e) {
+        const searchBar = document.getElementById('searchBar');
+        if (!searchBar || !searchBar.contains(e.target)) {
+            document.getElementById('searchResults').classList.remove('show');
+        }
+    });
+
+    // ─── SCROLL ANIMATIONS ───
+    document.addEventListener('DOMContentLoaded', function() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+    });
+
+    // ─── INIT ───
+    document.addEventListener('DOMContentLoaded', function() {
+        initFirebase();
+        document.getElementById('year').textContent = new Date().getFullYear();
+    });
+
+    window.toggleWishlist = toggleWishlist;
+    window.handleSearch = handleSearch;
+    window.showToast = showToast;
+    window.getCurrentUser = getCurrentUser;
 </script>
 
 </body>

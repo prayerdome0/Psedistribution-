@@ -13,9 +13,175 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <link rel="stylesheet" href="style.css">
     
     <style>
+        /* ─── ALL STYLES INLINE ─── */
+        :root {
+            --primary: #1a7b6b;
+            --primary-dark: #0f4f43;
+            --primary-light: #e8f5f0;
+            --secondary: #0b2a3b;
+            --secondary-light: #1a4b5e;
+            --accent: #f1c40f;
+            --accent-hover: #e0b50e;
+            --dark: #0b1a2a;
+            --text: #2c5a6b;
+            --text-light: #6a889a;
+            --border: #e9edf2;
+            --border-dark: #dce3e9;
+            --light: #f0f4f8;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.06);
+            --shadow-hover: 0 20px 50px -10px rgba(0,20,30,0.12);
+            --radius: 1.5rem;
+            --radius-sm: 0.8rem;
+            --transition: 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--light); color: var(--dark); line-height: 1.6; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* ─── SCROLL ANIMATIONS ─── */
+        .animate-on-scroll { opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+
+        /* ─── TOP BAR ─── */
+        .top-bar {
+            background: var(--secondary);
+            color: #d4e2ed;
+            font-size: 0.75rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #1a4055;
+            overflow: hidden;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .top-bar .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+        .moving-words { flex: 1; overflow: hidden; white-space: nowrap; position: relative; }
+        .moving-words .words-track { display: inline-block; animation: scrollWords 30s linear infinite; }
+        .moving-words .words-track span { margin: 0 2rem; font-weight: 500; }
+        .moving-words .words-track span i { color: var(--accent); margin-right: 0.3rem; }
+        @keyframes scrollWords { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
+        .top-links { display: flex; gap: 1rem; flex-shrink: 0; }
+        .top-links a { color: #b4d0e0; transition: var(--transition); cursor: pointer; }
+        .top-links a:hover { color: var(--white); }
+        .top-links i { color: var(--accent); margin-right: 0.2rem; }
+
+        /* ─── HEADER ─── */
+        .header {
+            background: var(--white);
+            padding: 0.8rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 35px;
+            z-index: 100;
+        }
+        .header .container { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+        .logo { display: flex; align-items: center; gap: 0.8rem; text-decoration: none; flex-shrink: 0; }
+        .logo img { height: 45px; width: auto; border-radius: 8px; }
+        .logo .brand-name .main { font-size: 1.3rem; font-weight: 800; color: var(--secondary); }
+        .logo .brand-name .main span { color: var(--primary); }
+        .logo .brand-name .sub { font-size: 0.5rem; color: var(--text-light); font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
+
+        /* ─── SEARCH BAR ─── */
+        .search-bar {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            background: var(--light);
+            border-radius: 50px;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+        }
+        .search-bar:focus-within { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 4px rgba(26,123,107,0.08); }
+        .search-bar input { flex: 1; border: none; padding: 0.6rem 1rem; font-size: 0.9rem; background: transparent; outline: none; }
+        .search-bar button { background: var(--primary); border: none; color: var(--white); padding: 0 1.8rem; cursor: pointer; font-size: 1rem; transition: var(--transition); }
+        .search-bar button:hover { background: var(--primary-dark); }
+        .search-results {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-hover);
+            border: 1px solid var(--border);
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 200;
+        }
+        .search-results.show { display: block; }
+        .search-results .result-item { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 1rem; }
+        .search-results .result-item:hover { background: var(--primary-light); }
+        .search-results .result-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+        .search-results .result-item .info .title { font-weight: 600; font-size: 0.85rem; }
+        .search-results .result-item .info .price { color: var(--primary); font-weight: 700; font-size: 0.8rem; }
+
+        /* ─── HEADER ACTIONS ─── */
+        .header-actions { display: flex; align-items: center; gap: 1.2rem; font-size: 0.9rem; flex-wrap: wrap; }
+        .header-actions .icon-btn {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.6rem;
+            color: #1a3340;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.2rem 0.3rem;
+        }
+        .header-actions .icon-btn i { font-size: 1.3rem; margin-bottom: 2px; transition: var(--transition); }
+        .header-actions .icon-btn:hover { color: var(--primary); transform: translateY(-2px); }
+        .header-actions .icon-btn:hover i { transform: scale(1.1); }
+        .badge-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #c0392b;
+            color: var(--white);
+            font-size: 0.55rem;
+            font-weight: 700;
+            border-radius: 50%;
+            padding: 0.1rem 0.45rem;
+            min-width: 18px;
+            text-align: center;
+            animation: badgePop 0.3s ease;
+        }
+        @keyframes badgePop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+        /* ─── NAVIGATION TABS ─── */
+        .nav-categories {
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 0.4rem 0;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            position: sticky;
+            top: 75px;
+            z-index: 99;
+        }
+        .nav-categories::-webkit-scrollbar { height: 3px; }
+        .nav-categories::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #1a3340; }
+        .nav-tab { padding: 0.3rem 0; border-bottom: 3px solid transparent; transition: var(--transition); cursor: pointer; position: relative; flex-shrink: 0; }
+        .nav-tab::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 3px; background: var(--primary); transition: width 0.4s ease; }
+        .nav-tab:hover::after, .nav-tab.active::after { width: 100%; }
+        .nav-tab:hover { color: var(--secondary); }
+        .nav-tab.active { color: var(--primary); font-weight: 700; }
+        .wholesale-nav { color: var(--primary); font-weight: 700; }
+
+        /* ─── CONTACT PAGE ─── */
         .contact-page { max-width: 1000px; margin: 2rem auto; }
         .contact-header { text-align: center; padding: 2rem 0; background: linear-gradient(135deg, var(--secondary), var(--secondary-light)); border-radius: var(--radius); color: var(--white); margin-bottom: 2rem; }
         .contact-header h1 { font-size: 2.8rem; font-weight: 900; }
@@ -52,17 +218,83 @@
         .whatsapp-cta .btn-whatsapp { background: var(--white); color: #25D366; border: none; padding: 0.7rem 2rem; border-radius: 50px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; }
         .whatsapp-cta .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,255,255,0.3); }
         
+        /* ─── FOOTER ─── */
+        .footer {
+            background: var(--secondary);
+            color: #b4d0e0;
+            padding: 2rem 0 1rem;
+            margin-top: 3rem;
+        }
+        .footer .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
+        .footer .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .footer .footer-links a { color: #b4d0e0; font-size: 0.85rem; transition: var(--transition); }
+        .footer .footer-links a:hover { color: var(--white); }
+        .footer .footer-bottom { border-top: 1px solid #1a4055; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
+        .footer .footer-bottom strong { color: var(--white); }
+        .footer .footer-social { display: flex; gap: 1rem; }
+        .footer .footer-social a { color: #b4d0e0; transition: var(--transition); font-size: 1.1rem; }
+        .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
+
+        /* ─── TOAST ─── */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--secondary);
+            color: var(--white);
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 90%;
+            text-align: center;
+        }
+        .toast.show { display: block; }
+        .toast.success { background: var(--primary); }
+        .toast.error { background: #c0392b; }
+        .toast.info { background: #2980b9; }
+
         @media (max-width: 992px) { .contact-layout { grid-template-columns: 1fr; } .contact-info { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; } }
-        @media (max-width: 768px) { .contact-header h1 { font-size: 2rem; } .contact-form { padding: 1.5rem; } .contact-form .form-row { grid-template-columns: 1fr; } .contact-info { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .top-bar .container { flex-direction: column; gap: 0.3rem; align-items: stretch; text-align: center; }
+            .top-links { justify-content: center; }
+            .header .container { gap: 0.8rem; }
+            .search-bar { min-width: 100%; order: 10; }
+            .header-actions .icon-btn span { display: none; }
+            .contact-header h1 { font-size: 2rem; }
+            .contact-form { padding: 1.5rem; }
+            .contact-form .form-row { grid-template-columns: 1fr; }
+            .contact-info { grid-template-columns: 1fr; }
+            .footer .footer-content { flex-direction: column; text-align: center; }
+            .footer .footer-links { justify-content: center; gap: 1rem; }
+        }
+        @media (max-width: 480px) {
+            .contact-header h1 { font-size: 1.6rem; }
+            .contact-form { padding: 1rem; }
+            .whatsapp-cta { padding: 1rem; }
+            .whatsapp-cta .btn-whatsapp { width: 100%; justify-content: center; }
+            .top-bar .moving-words .words-track span { font-size: 0.65rem; }
+        }
     </style>
 </head>
 <body>
 
+<!-- ============================================ -->
 <!-- TOP BAR -->
+<!-- ============================================ -->
 <div class="top-bar">
     <div class="container">
         <div class="moving-words">
             <div class="words-track">
+                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
+                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
+                <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
+                <span><i class="fa-solid fa-box"></i> 12,000+ Products Available - Shop Now!</span>
+                <span><i class="fa-solid fa-star"></i> 99.7% Customer Satisfaction Rate</span>
+                <span><i class="fa-solid fa-truck"></i> Free Shipping on Orders Over $250</span>
                 <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
                 <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
                 <span><i class="fa-solid fa-handshake"></i> Join 580+ Verified Suppliers Worldwide</span>
@@ -80,7 +312,9 @@
     </div>
 </div>
 
+<!-- ============================================ -->
 <!-- HEADER -->
+<!-- ============================================ -->
 <header class="header">
     <div class="container">
         <a href="home" class="logo">
@@ -90,11 +324,13 @@
                 <span class="sub">wholesale</span>
             </div>
         </a>
+
         <div class="search-bar" id="searchBar">
             <input type="text" id="searchInput" placeholder="Search wholesale products..." onkeyup="handleSearch(event)" autocomplete="off" />
             <button onclick="handleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
             <div class="search-results" id="searchResults"></div>
         </div>
+
         <div class="header-actions">
             <a href="#" class="icon-btn" onclick="toggleWishlist()">
                 <i class="fa-regular fa-heart"></i>
@@ -114,50 +350,63 @@
     </div>
 </header>
 
-<!-- NAVIGATION -->
+<!-- ============================================ -->
+<!-- NAVIGATION TABS -->
+<!-- ============================================ -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="home"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="products" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="about" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
         <a href="contact" class="nav-tab active"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
+<!-- ============================================ -->
 <!-- MAIN CONTENT -->
+<!-- ============================================ -->
 <div class="container">
+
     <div class="contact-page">
+
+        <!-- ─── CONTACT HEADER ─── -->
         <div class="contact-header animate-on-scroll">
             <h1>Get in <span>Touch</span></h1>
             <p>We'd love to hear from you. Reach out for quotes, support, or partnership inquiries.</p>
         </div>
 
+        <!-- ─── CONTACT LAYOUT ─── -->
         <div class="contact-layout">
-            <!-- FORM -->
+
+            <!-- ─── CONTACT FORM ─── -->
             <div class="contact-form animate-on-scroll">
                 <h2>Send Us a Message</h2>
                 <p class="subtitle">Fill out the form and we'll get back to you within 24 hours.</p>
+
                 <form id="contactForm">
                     <div class="form-row">
                         <div class="form-group">
                             <label>First Name <span class="required">*</span></label>
-                            <input type="text" id="contactFirstName" placeholder="John" required />
+                            <input type="text" id="contactFirstName" placeholder="caden" required />
                         </div>
                         <div class="form-group">
                             <label>Last Name <span class="required">*</span></label>
-                            <input type="text" id="contactLastName" placeholder="Doe" required />
+                            <input type="text" id="contactLastName" placeholder="gibson" required />
                         </div>
                     </div>
+
                     <div class="form-group">
                         <label>Email Address <span class="required">*</span></label>
                         <input type="email" id="contactEmail" placeholder="you@example.com" required />
                     </div>
+
                     <div class="form-group">
                         <label>Phone Number</label>
                         <input type="tel" id="contactPhone" placeholder="(555) 123-4567" />
                     </div>
+
                     <div class="form-group">
                         <label>Subject <span class="required">*</span></label>
                         <select id="contactSubject" required>
@@ -168,20 +417,24 @@
                             <option value="seller">Become a Seller</option>
                             <option value="wholesale">Wholesale Pricing</option>
                             <option value="support">Technical Support</option>
+                            <option value="partnership">Partnership</option>
                         </select>
                     </div>
+
                     <div class="form-group">
                         <label>Message <span class="required">*</span></label>
                         <textarea id="contactMessage" placeholder="Describe your question or concern in detail..." required></textarea>
                     </div>
+
                     <button type="submit" class="btn-submit" id="contactSubmitBtn">
                         <i class="fa-regular fa-paper-plane"></i> Send Message
                     </button>
                 </form>
             </div>
 
-            <!-- INFO -->
-            <div class="contact-info animate-on-scroll" style="animation-delay:0.1s;">
+            <!-- ─── CONTACT INFO ─── -->
+            <div class="contact-info animate-on-scroll" style="animation-delay: 0.1s;">
+
                 <div class="info-card">
                     <div class="icon"><i class="fa-regular fa-envelope"></i></div>
                     <div class="content">
@@ -189,6 +442,7 @@
                         <p><a href="mailto:support@pilotsalesdistribution.com">support@pilotsalesdistribution.com</a></p>
                     </div>
                 </div>
+
                 <div class="info-card">
                     <div class="icon"><i class="fa-regular fa-phone"></i></div>
                     <div class="content">
@@ -196,6 +450,7 @@
                         <p><a href="tel:+19099384682">+1 (909) 938-4682</a></p>
                     </div>
                 </div>
+
                 <div class="info-card">
                     <div class="icon"><i class="fa-regular fa-clock"></i></div>
                     <div class="content">
@@ -204,6 +459,17 @@
                         <p style="font-size:0.8rem; color:var(--text-light);">Sat-Sun: Closed</p>
                     </div>
                 </div>
+
+                <div class="info-card">
+                    <div class="icon"><i class="fa-regular fa-location-dot"></i></div>
+                    <div class="content">
+                        <h4>Location</h4>
+                        <p>9554 7th Street, Rancho Cucamonga, California, 91730</p>
+                        <p style="font-size:0.8rem; color:var(--text-light);">Serving businesses worldwide</p>
+                    </div>
+                </div>
+
+                <!-- ─── WHATSAPP CTA ─── -->
                 <div class="whatsapp-cta">
                     <h3><i class="fa-brands fa-whatsapp"></i> Quick Response</h3>
                     <p>Chat with us on WhatsApp for immediate assistance.</p>
@@ -211,12 +477,18 @@
                         <i class="fa-brands fa-whatsapp"></i> WhatsApp Us
                     </a>
                 </div>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
 
+<!-- ============================================ -->
 <!-- FOOTER -->
+<!-- ============================================ -->
 <footer class="footer">
     <div class="container">
         <div class="footer-content">
@@ -241,11 +513,16 @@
     </div>
 </footer>
 
+<!-- ============================================ -->
 <!-- TOAST -->
+<!-- ============================================ -->
 <div id="toast" class="toast"></div>
 
+<!-- ============================================ -->
 <!-- JAVASCRIPT -->
+<!-- ============================================ -->
 <script>
+    // ─── FIREBASE CONFIG ───
     const firebaseConfig = {
         apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
         authDomain: "pilot-sales-distribution.firebaseapp.com",
@@ -258,10 +535,12 @@
     let auth, db;
 
     function initFirebase() {
-        if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
+        if (typeof firebase === 'undefined') {
+            setTimeout(initFirebase, 500);
+            return;
+        }
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
-            console.log('✅ Firebase initialized');
         }
         auth = firebase.auth();
         db = firebase.firestore();
@@ -292,8 +571,7 @@
 
     function getCurrentUser() {
         try {
-            const user = localStorage.getItem('pilot_user');
-            return user ? JSON.parse(user) : null;
+            return JSON.parse(localStorage.getItem('pilot_user'));
         } catch (e) { return null; }
     }
 
@@ -332,8 +610,10 @@
         return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
     }
 
+    // ─── CONTACT FORM ───
     document.getElementById('contactForm').addEventListener('submit', function(e) {
         e.preventDefault();
+
         const firstName = document.getElementById('contactFirstName').value.trim();
         const lastName = document.getElementById('contactLastName').value.trim();
         const email = document.getElementById('contactEmail').value.trim();
@@ -345,6 +625,7 @@
             showToast('Please fill in all required fields', 'error');
             return;
         }
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             showToast('Please enter a valid email address', 'error');
@@ -356,6 +637,7 @@
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
 
         const user = getCurrentUser();
+
         db.collection('messages').add({
             firstName: firstName,
             lastName: lastName,
@@ -367,30 +649,45 @@
             userEmail: user?.email || email,
             status: 'unread',
             created_at: new Date().toISOString()
-        }).then(() => {
+        })
+        .then(() => {
             showToast('✅ Message sent successfully! We\'ll get back to you soon.', 'success');
             document.getElementById('contactForm').reset();
-        }).catch((error) => {
+        })
+        .catch((error) => {
             console.error('Error sending message:', error);
             showToast('❌ Failed to send message. Please try again.', 'error');
-        }).finally(() => {
+        })
+        .finally(() => {
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Send Message';
         });
     });
 
+    // ─── LOAD CART COUNT ───
     async function loadCartCount() {
         const user = getCurrentUser();
         if (!user) {
-            document.querySelectorAll('.cart-count').forEach(el => el.textContent = '0');
+            document.querySelectorAll('.cart-count').forEach(el => {
+                el.textContent = '0';
+                el.style.display = 'none';
+            });
             return;
         }
         try {
             const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
             let count = 0;
             snapshot.forEach(doc => { count += doc.data().quantity || 1; });
-            document.querySelectorAll('.cart-count').forEach(el => { el.textContent = count; el.style.display = count > 0 ? 'inline' : 'none'; });
-        } catch (error) { document.querySelectorAll('.cart-count').forEach(el => el.textContent = '0'); }
+            document.querySelectorAll('.cart-count').forEach(el => {
+                el.textContent = count;
+                el.style.display = count > 0 ? 'inline' : 'none';
+            });
+        } catch (error) {
+            document.querySelectorAll('.cart-count').forEach(el => {
+                el.textContent = '0';
+                el.style.display = 'none';
+            });
+        }
     }
 
     async function loadWishlistCount() {
@@ -403,45 +700,62 @@
             const snapshot = await db.collection('wishlist').where('user_id', '==', user.id).get();
             const count = snapshot.size;
             document.querySelectorAll('.wishlist-count').forEach(el => { el.textContent = count; });
-        } catch (error) { document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0'); }
+        } catch (error) {
+            document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
+        }
     }
 
     function toggleWishlist() {
         const user = getCurrentUser();
-        if (!user) { showToast('Please login to view wishlist', 'error'); setTimeout(() => window.location.href = 'login', 1500); return; }
+        if (!user) {
+            showToast('Please login to view wishlist', 'error');
+            setTimeout(() => window.location.href = 'login', 1500);
+            return;
+        }
         window.location.href = 'wishlist';
     }
 
     async function handleSearch(event) {
         const input = document.getElementById('searchInput');
         const query = input.value.trim();
+
         if (event && event.key === 'Enter' && query) {
             window.location.href = `/products?search=${encodeURIComponent(query)}`;
             return;
         }
+
         if (query.length < 2) {
             document.getElementById('searchResults').classList.remove('show');
             return;
         }
+
         try {
-            const snapshot = await db.collection('products').where('status', 'in', ['active', 'approved']).limit(5).get();
+            const snapshot = await db.collection('products')
+                .where('status', 'in', ['active', 'approved'])
+                .limit(5)
+                .get();
+
             const products = [];
             snapshot.forEach(doc => {
                 const data = doc.data();
                 if (data.title && data.title.toLowerCase().includes(query.toLowerCase())) {
                     products.push({
-                        id: doc.id, title: data.title, price: data.price,
+                        id: doc.id,
+                        title: data.title,
+                        price: data.price,
                         image_url: data.image_url || data.images?.[0] || '',
                         slug: data.slug || generateSlug(data.title)
                     });
                 }
             });
+
             const resultsDiv = document.getElementById('searchResults');
             if (products.length === 0) {
-                resultsDiv.innerHTML = `<div style="padding:1rem; text-align:center; color:var(--text-light);">No products found</div>`;
+                resultsDiv.innerHTML = `<div style="padding:1rem; text-align:center; color:var(--text-light);">No products found for "${query}"</div>`;
                 resultsDiv.classList.add('show');
                 return;
             }
+
             resultsDiv.innerHTML = products.map(p => `
                 <div class="result-item" onclick="window.location.href='/product/${p.slug}'">
                     <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
@@ -450,9 +764,19 @@
                         <div class="price">$${(p.price || 0).toFixed(2)}</div>
                     </div>
                 </div>
-            `).join('');
+            `).join('') + `
+                <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
+                    <a href="/products?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
+                        See all results for "${query}" →
+                    </a>
+                </div>
+            `;
+
             resultsDiv.classList.add('show');
-        } catch (error) { console.error('Search error:', error); }
+
+        } catch (error) {
+            console.error('Search error:', error);
+        }
     }
 
     document.addEventListener('click', function(e) {
@@ -462,6 +786,20 @@
         }
     });
 
+    // ─── SCROLL ANIMATIONS ───
+    document.addEventListener('DOMContentLoaded', function() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+    });
+
+    // ─── INIT ───
     document.addEventListener('DOMContentLoaded', function() {
         initFirebase();
         document.getElementById('year').textContent = new Date().getFullYear();
@@ -470,6 +808,8 @@
     window.toggleWishlist = toggleWishlist;
     window.handleSearch = handleSearch;
     window.showToast = showToast;
+    window.getCurrentUser = getCurrentUser;
 </script>
+
 </body>
 </html>
