@@ -47,6 +47,7 @@
         .animate-on-scroll { opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease, transform 0.6s ease; }
         .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
 
+        /* ─── TOP BAR ─── */
         .top-bar {
             background: var(--secondary);
             color: #d4e2ed;
@@ -69,6 +70,7 @@
         .top-links a:hover { color: var(--white); }
         .top-links i { color: var(--accent); margin-right: 0.2rem; }
 
+        /* ─── HEADER ─── */
         .header {
             background: var(--white);
             padding: 0.8rem 0;
@@ -221,7 +223,7 @@
         /* ─── STATS CARDS ─── */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -285,8 +287,6 @@
         .status-badge.active { background: #d4edda; color: #155724; }
         .status-badge.inactive { background: #f8d7da; color: #721c24; }
         .status-badge.suspended { background: #f8d7da; color: #721c24; }
-        .status-badge.verified { background: #d4edda; color: #155724; }
-        .status-badge.rejected { background: #f8d7da; color: #721c24; }
 
         .btn-action {
             padding: 0.2rem 0.6rem;
@@ -306,8 +306,55 @@
         .btn-action.unban { background: #d4edda; color: #155724; }
         .btn-action.email { background: #cce5ff; color: #004085; }
         .btn-action.reset { background: #fff3cd; color: #856404; }
-        .btn-action.verify { background: #d4edda; color: #155724; }
         .btn-action.edit { background: #cce5ff; color: #004085; }
+
+        /* ─── IMAGE UPLOAD ─── */
+        .image-upload-box {
+            border: 2px dashed var(--border-dark);
+            border-radius: var(--radius-sm);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 1rem;
+            background: var(--light);
+        }
+        .image-upload-box:hover { border-color: var(--primary); background: var(--primary-light); }
+        .image-upload-box i { font-size: 2.5rem; color: var(--primary); opacity: 0.5; margin-bottom: 0.5rem; }
+        .image-upload-box p { color: var(--text-light); font-size: 0.85rem; }
+        .image-upload-box .file-name { color: var(--primary); font-weight: 600; }
+
+        .image-preview {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+        .image-preview .preview-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .image-preview .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .image-preview .preview-item .remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #c0392b;
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.6rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         /* ─── MODAL ─── */
         .modal-overlay {
@@ -374,6 +421,21 @@
 
         @keyframes slideIn { from { transform: translateY(-30px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
 
+        .btn-add-product {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-add-product:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(26,123,107,0.3); }
+
         .footer {
             background: var(--secondary);
             color: #b4d0e0;
@@ -411,20 +473,6 @@
         .toast.error { background: #c0392b; }
         .toast.info { background: #2980b9; }
 
-        /* Email Template Preview */
-        .email-preview {
-            background: var(--light);
-            border-radius: var(--radius-sm);
-            padding: 1rem;
-            border: 1px solid var(--border);
-            max-height: 300px;
-            overflow-y: auto;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            font-size: 0.85rem;
-            white-space: pre-wrap;
-            margin-top: 0.5rem;
-        }
-
         @media (max-width: 992px) {
             .admin-wrapper { grid-template-columns: 1fr; }
             .admin-sidebar {
@@ -455,6 +503,7 @@
             .stats-grid { grid-template-columns: 1fr 1fr; }
             .modal-overlay .modal-box { padding: 1.5rem; }
             .quick-actions .action-btn { min-width: 100%; }
+            .image-preview .preview-item { width: 60px; height: 60px; }
         }
     </style>
 </head>
@@ -522,9 +571,6 @@
             <button class="nav-item" onclick="showTab('orders')">
                 <i class="fa-regular fa-receipt"></i> Orders
                 <span class="badge orange" id="orderBadge">0</span>
-            </button>
-            <button class="nav-item" onclick="showTab('email')">
-                <i class="fa-regular fa-paper-plane"></i> Send Email
             </button>
             <button class="nav-item" onclick="showTab('products')">
                 <i class="fa-regular fa-box"></i> Products
@@ -602,9 +648,9 @@
 
                 <h3 style="font-size:1rem; color:var(--secondary); margin-bottom:0.8rem;">Quick Actions</h3>
                 <div class="quick-actions">
-                    <div class="action-btn" onclick="openEmailModal()">
-                        <i class="fa-regular fa-paper-plane"></i>
-                        <span>Send Email</span>
+                    <div class="action-btn" onclick="showTab('products')">
+                        <i class="fa-regular fa-plus"></i>
+                        <span>Add Product</span>
                     </div>
                     <div class="action-btn" onclick="showTab('messages')">
                         <i class="fa-regular fa-envelope"></i>
@@ -702,92 +748,14 @@
                 </div>
             </div>
 
-            <!-- SEND EMAIL -->
-            <div class="tab-content" id="tab-email">
-                <div class="page-header">
-                    <h2><i class="fa-regular fa-paper-plane"></i> Send Email</h2>
-                    <span class="time">Manual &amp; Auto Email System</span>
-                </div>
-
-                <div style="max-width:700px;">
-                    <div class="form-group">
-                        <label>Send To</label>
-                        <select id="emailRecipient" style="width:100%; padding:0.7rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;">
-                            <option value="all">All Customers</option>
-                            <option value="all-users">All Users</option>
-                            <option value="sellers">All Sellers</option>
-                            <option value="buyers">All Buyers</option>
-                            <option value="specific">Specific Customer</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" id="specificCustomerGroup" style="display:none;">
-                        <label>Select Customer</label>
-                        <select id="specificCustomer" style="width:100%; padding:0.7rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;">
-                            <option value="">Select a customer...</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Subject</label>
-                        <input type="text" id="emailSubject" placeholder="Email subject" style="width:100%; padding:0.7rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;" />
-                    </div>
-
-                    <div class="form-group">
-                        <label>Email Template</label>
-                        <select id="emailTemplate" onchange="loadEmailTemplate()" style="width:100%; padding:0.7rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;">
-                            <option value="custom">Custom Message</option>
-                            <option value="welcome">Welcome Email</option>
-                            <option value="order-confirmation">Order Confirmation</option>
-                            <option value="shipping-update">Shipping Update</option>
-                            <option value="password-reset">Password Reset</option>
-                            <option value="promotional">Promotional Offer</option>
-                            <option value="newsletter">Newsletter</option>
-                            <option value="rfc-response">RFQ Response</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Message</label>
-                        <textarea id="emailMessage" rows="8" placeholder="Write your email message here..." style="width:100%; padding:0.7rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem; font-family:inherit; resize:vertical;"></textarea>
-                    </div>
-
-                    <div class="email-preview" id="emailPreview" style="display:none;">
-                        <strong>Preview:</strong>
-                        <div id="previewContent"></div>
-                    </div>
-
-                    <div style="display:flex; gap:0.5rem; margin-top:1rem; flex-wrap:wrap;">
-                        <button onclick="sendEmailManual()" class="btn-submit" style="background:var(--primary); color:var(--white); border:none; padding:0.7rem 2rem; border-radius:50px; font-weight:700; cursor:pointer; transition:var(--transition); display:inline-flex; align-items:center; gap:0.5rem;">
-                            <i class="fa-regular fa-paper-plane"></i> Send Email Now
-                        </button>
-                        <button onclick="scheduleEmail()" class="btn-submit" style="background:var(--accent); color:var(--secondary); border:none; padding:0.7rem 2rem; border-radius:50px; font-weight:700; cursor:pointer; transition:var(--transition); display:inline-flex; align-items:center; gap:0.5rem;">
-                            <i class="fa-regular fa-clock"></i> Schedule Email
-                        </button>
-                        <button onclick="previewEmail()" style="background:var(--light); color:var(--secondary); border:1px solid var(--border); padding:0.7rem 2rem; border-radius:50px; font-weight:600; cursor:pointer; transition:var(--transition); display:inline-flex; align-items:center; gap:0.5rem;">
-                            <i class="fa-regular fa-eye"></i> Preview
-                        </button>
-                    </div>
-
-                    <div style="margin-top:1.5rem; padding:1rem; background:var(--primary-light); border-radius:var(--radius-sm); border-left:4px solid var(--primary);">
-                        <p style="color:var(--text); font-size:0.9rem;">
-                            <i class="fa-regular fa-circle-info" style="color:var(--primary);"></i>
-                            <strong>Auto-Email Settings:</strong> System automatically sends:
-                            <br>• Welcome email on registration
-                            <br>• Order confirmation on purchase
-                            <br>• Shipping updates when order ships
-                            <br>• RFQ responses when quoted
-                            <br>• Password reset on request
-                        </p>
-                    </div>
-                </div>
-            </div>
-
             <!-- PRODUCTS -->
             <div class="tab-content" id="tab-products">
                 <div class="page-header">
                     <h2><i class="fa-regular fa-box"></i> All Products</h2>
                     <span class="time" id="productCount">0 products</span>
+                    <button class="btn-add-product" onclick="openAddProduct()">
+                        <i class="fa-regular fa-plus"></i> Add Product
+                    </button>
                 </div>
 
                 <div class="table-container">
@@ -881,13 +849,6 @@
                         <label style="display:block; font-weight:600; color:var(--secondary); margin-bottom:0.3rem;">Phone Number</label>
                         <input type="tel" id="settingsPhone" value="+1 (909) 938-4682" style="width:100%; padding:0.7rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;" />
                     </div>
-                    <div class="form-group" style="margin-bottom:1rem;">
-                        <label style="display:block; font-weight:600; color:var(--secondary); margin-bottom:0.3rem;">Auto-Email Status</label>
-                        <select id="autoEmailStatus" style="width:100%; padding:0.7rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;">
-                            <option value="enabled">Enabled (Recommended)</option>
-                            <option value="disabled">Disabled</option>
-                        </select>
-                    </div>
                     <button type="button" class="btn-submit" onclick="saveSettings()" style="background:var(--primary); color:var(--white); border:none; padding:0.7rem 2rem; border-radius:50px; font-weight:700; cursor:pointer; transition:var(--transition); display:inline-flex; align-items:center; gap:0.5rem;">
                         <i class="fa-regular fa-floppy-disk"></i> Save Settings
                     </button>
@@ -899,30 +860,91 @@
     </div>
 </div>
 
-<!-- EMAIL MODAL -->
-<div class="modal-overlay" id="emailModal">
+<!-- ADD PRODUCT MODAL -->
+<div class="modal-overlay" id="addProductModal">
     <div class="modal-box">
-        <h3><i class="fa-regular fa-paper-plane"></i> Send Email to Customer</h3>
-        <div id="emailModalContent">
+        <h3><i class="fa-regular fa-plus"></i> Add New Product</h3>
+        <form id="addProductForm">
             <div class="form-group">
-                <label>To</label>
-                <input type="email" id="emailModalTo" placeholder="customer@example.com" />
+                <label>Product Title *</label>
+                <input type="text" id="productTitle" placeholder="Enter product title" required />
             </div>
             <div class="form-group">
-                <label>Subject</label>
-                <input type="text" id="emailModalSubject" placeholder="Email subject" />
+                <label>Brand</label>
+                <input type="text" id="productBrand" placeholder="Brand name" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Price *</label>
+                    <input type="number" id="productPrice" placeholder="0.00" step="0.01" required />
+                </div>
+                <div class="form-group">
+                    <label>Old Price</label>
+                    <input type="number" id="productOldPrice" placeholder="0.00" step="0.01" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>MOQ</label>
+                    <input type="number" id="productMoq" placeholder="Minimum order quantity" value="1" />
+                </div>
+                <div class="form-group">
+                    <label>Stock</label>
+                    <input type="number" id="productStock" placeholder="100" value="100" />
+                </div>
             </div>
             <div class="form-group">
-                <label>Message</label>
-                <textarea id="emailModalMessage" rows="6" placeholder="Write your message here..."></textarea>
+                <label>Category</label>
+                <select id="productCategory">
+                    <option value="electronics">Electronics</option>
+                    <option value="fashion">Fashion</option>
+                    <option value="grocery">Grocery</option>
+                    <option value="home">Home & Kitchen</option>
+                    <option value="beauty">Beauty</option>
+                    <option value="health">Health</option>
+                    <option value="sports">Sports</option>
+                    <option value="automotive">Automotive</option>
+                    <option value="baby">Baby</option>
+                    <option value="office">Office</option>
+                    <option value="industrial">Industrial</option>
+                    <option value="books">Books</option>
+                    <option value="pets">Pets</option>
+                </select>
             </div>
-        </div>
-        <div class="btn-group">
-            <button class="btn-submit" onclick="sendEmailFromModal()">
-                <i class="fa-regular fa-paper-plane"></i> Send Email
-            </button>
-            <button class="btn-close" onclick="closeEmailModal()">Cancel</button>
-        </div>
+
+            <div class="form-group">
+                <label>Product Images (URLs)</label>
+                <div class="image-upload-box" onclick="document.getElementById('productImages').click()">
+                    <i class="fa-regular fa-cloud-upload"></i>
+                    <p>Click to upload images</p>
+                    <p style="font-size:0.7rem; color:var(--text-light);">JPG, PNG, WebP supported</p>
+                    <span class="file-name" id="imageFileName">No files selected</span>
+                </div>
+                <input type="file" id="productImages" accept="image/*" multiple style="display:none;" onchange="handleImagePreview(event)" />
+                <div class="image-preview" id="imagePreview"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="productDescription" placeholder="Describe your product..." rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Status</label>
+                <select id="productStatus">
+                    <option value="active">Active</option>
+                    <option value="pending">Pending</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn-submit" id="productSubmitBtn">
+                    <i class="fa-regular fa-plus"></i> Add Product
+                </button>
+                <button type="button" class="btn-close" onclick="closeAddProduct()">Cancel</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -1010,9 +1032,11 @@
         appId: "1:729127273727:web:402d67be8346257755f8ca"
     };
 
-    // ─── RESEND API KEY ───
-    const RESEND_API_KEY = 're_JhyJxWw3_ASv9MEAFfcFaDNiusLGna6Ht';
-    const ADMIN_EMAIL = 'Pilot.wholesale@yahoo.com';
+    // ─── CLOUDINARY ───
+    const CLOUDINARY = {
+        cloudName: 'nqyylkmd',
+        uploadPreset: 'pse_products'
+    };
 
     let auth, db;
     let currentMessageId = null;
@@ -1022,6 +1046,7 @@
     let allProducts = [];
     let allRFQs = [];
     let allSellers = [];
+    let editingProductId = null;
 
     // ─── INIT ───
     function initFirebase() {
@@ -1030,7 +1055,6 @@
         auth = firebase.auth();
         db = firebase.firestore();
         
-        // Check admin authentication
         auth.onAuthStateChanged((user) => {
             if (user) {
                 db.collection('users').doc(user.uid).get().then((doc) => {
@@ -1072,7 +1096,7 @@
             toast.className = 'toast';
             document.body.appendChild(toast);
         }
-        toast.textMessage = message;
+        toast.textContent = message;
         toast.className = 'toast ' + type + ' show';
         clearTimeout(toast._timeout);
         toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
@@ -1104,7 +1128,6 @@
             loadSellers(),
             updateStats()
         ]);
-        loadCustomerSelect();
     }
 
     // ─── LOAD CUSTOMERS ───
@@ -1133,7 +1156,6 @@
                     <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
                     <td>
                         <button class="btn-action view" onclick="viewCustomer('${u.id}')"><i class="fa-regular fa-eye"></i></button>
-                        <button class="btn-action email" onclick="openEmailModal('${u.email}')"><i class="fa-regular fa-envelope"></i></button>
                         ${u.status !== 'suspended' ? `<button class="btn-action ban" onclick="suspendUser('${u.id}')"><i class="fa-regular fa-ban"></i></button>` : `<button class="btn-action unban" onclick="unsuspendUser('${u.id}')"><i class="fa-regular fa-circle-check"></i></button>`}
                         ${u.role !== 'admin' ? `<button class="btn-action reset" onclick="resetUserPassword('${u.email}')"><i class="fa-regular fa-key"></i></button>` : ''}
                     </td>
@@ -1151,7 +1173,6 @@
         const user = allUsers.find(u => u.id === userId);
         if (!user) return;
 
-        // Get order stats
         let orderCount = 0;
         let totalSpent = 0;
         try {
@@ -1180,7 +1201,6 @@
         document.getElementById('customerDetailModal').classList.remove('show');
     }
 
-    // ─── SUSPEND / UNSUSPEND USER ───
     async function suspendUser(userId) {
         if (!confirm('Suspend this user?')) return;
         try {
@@ -1205,7 +1225,6 @@
         }
     }
 
-    // ─── RESET USER PASSWORD ───
     async function resetUserPassword(email) {
         if (!confirm(`Send password reset email to ${email}?`)) return;
         try {
@@ -1359,7 +1378,6 @@
                     <td>
                         <button class="btn-action view" onclick="showToast('Order #${o.quoteNumber || 'N/A'}\nTotal: $${(o.totals?.total || 0).toFixed(2)}', 'info')"><i class="fa-regular fa-eye"></i></button>
                         <button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'processing')">Process</button>
-                        <button class="btn-action email" onclick="openEmailModal('${o.customer?.email || ''}', 'Order Update #${o.quoteNumber || o.orderNumber}')"><i class="fa-regular fa-envelope"></i></button>
                     </td>
                 </tr>
             `).join('');
@@ -1402,13 +1420,18 @@
 
             tbody.innerHTML = allProducts.map(p => `
                 <tr>
-                    <td><strong>${p.title || 'Untitled'}</strong></td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            ${p.image_url ? `<img src="${p.image_url}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;" />` : `<i class="fa-solid fa-box" style="font-size:1.2rem; color:var(--text-light);"></i>`}
+                            <strong>${p.title || 'Untitled'}</strong>
+                        </div>
+                    </td>
                     <td>${p.brand || 'N/A'}</td>
                     <td>$${(p.price || 0).toFixed(2)}</td>
                     <td>${p.stock || 0}</td>
                     <td><span class="status-badge ${p.status === 'active' || p.status === 'approved' ? 'active' : 'inactive'}">${p.status || 'pending'}</span></td>
                     <td>
-                        <button class="btn-action view" onclick="window.location.href='/product/${p.slug || ''}'"><i class="fa-regular fa-eye"></i></button>
+                        <button class="btn-action edit" onclick="openAddProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
                         <button class="btn-action delete" onclick="deleteProduct('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
                     </td>
                 </tr>
@@ -1462,7 +1485,6 @@
                         <button class="btn-action view" onclick="showToast('RFQ: ${rfq.title}\nCustomer: ${rfq.user_email}\nQuantity: ${rfq.quantity}\nBudget: $${rfq.budget || 'N/A'}', 'info')"><i class="fa-regular fa-eye"></i></button>
                         ${rfq.status === 'pending' ? `<button class="btn-action approve" onclick="updateRFQStatus('${rfq.id}', 'reviewing')">Review</button>` : ''}
                         ${rfq.status === 'reviewing' ? `<button class="btn-action approve" onclick="updateRFQStatus('${rfq.id}', 'quoted')">Quote</button>` : ''}
-                        <button class="btn-action email" onclick="openEmailModal('${rfq.user_email || ''}', 'RFQ Response: ${rfq.title}')"><i class="fa-regular fa-envelope"></i></button>
                     </td>
                 </tr>
             `).join('');
@@ -1512,7 +1534,6 @@
                     <td><span class="status-badge ${s.status === 'approved' ? 'active' : 'pending'}">${s.status || 'pending'}</span></td>
                     <td>
                         ${s.status !== 'approved' ? `<button class="btn-action approve" onclick="approveSeller('${s.id}')"><i class="fa-regular fa-circle-check"></i></button>` : ''}
-                        <button class="btn-action email" onclick="openEmailModal('${s.email || ''}', 'Seller Update')"><i class="fa-regular fa-envelope"></i></button>
                     </td>
                 </tr>
             `).join('');
@@ -1558,7 +1579,6 @@
             const sellerSnapshot = await db.collection('users').where('role', '==', 'seller').get();
             document.getElementById('statSellers').textContent = sellerSnapshot.size;
 
-            // Calculate revenue
             const allOrdersSnapshot = await db.collection('orders').get();
             let revenue = 0;
             allOrdersSnapshot.forEach(doc => {
@@ -1572,243 +1592,202 @@
         }
     }
 
-    // ─── LOAD CUSTOMER SELECT FOR EMAIL ───
-    function loadCustomerSelect() {
-        const select = document.getElementById('specificCustomer');
-        if (!select) return;
-        select.innerHTML = '<option value="">Select a customer...</option>';
-        allUsers.forEach(u => {
-            if (u.email) {
-                select.innerHTML += `<option value="${u.email}">${u.full_name || u.email} (${u.email})</option>`;
-            }
-        });
-    }
-
-    // ─── EMAIL TEMPLATES ───
-    function loadEmailTemplate() {
-        const template = document.getElementById('emailTemplate').value;
-        const subject = document.getElementById('emailSubject');
-        const message = document.getElementById('emailMessage');
-        const name = 'Customer';
-
-        const templates = {
-            welcome: {
-                subject: `Welcome to Pilot Sales Distribution!`,
-                message: `Dear ${name},\n\nWelcome to Pilot Sales Distribution - your premium wholesale marketplace!\n\nWe're excited to have you on board. Here's what you can do next:\n\n🛒 Browse 12,000+ products at wholesale prices\n📋 Request a quote for bulk orders\n💬 Chat with verified suppliers\n\nNeed help? Reply to this email or contact our support team.\n\nBest regards,\nThe Pilot Sales Distribution Team`
-            },
-            'order-confirmation': {
-                subject: `Order Confirmation #ORDER_NUMBER`,
-                message: `Dear ${name},\n\nThank you for your order! Your order has been confirmed and is being processed.\n\nOrder #ORDER_NUMBER\nTotal: $TOTAL_AMOUNT\nItems: ITEM_COUNT\n\nYou can track your order at: https://pilotsalesdistribution.com/track-order\n\nQuestions? Contact us anytime.\n\nBest regards,\nThe Pilot Sales Distribution Team`
-            },
-            'shipping-update': {
-                subject: `Shipping Update for Order #ORDER_NUMBER`,
-                message: `Dear ${name},\n\nGreat news! Your order #ORDER_NUMBER has been shipped and is on its way.\n\nTracking Number: TRACKING_NUMBER\nCarrier: CARRIER\nEstimated Delivery: DELIVERY_DATE\n\nTrack your order: https://pilotsalesdistribution.com/track-order\n\nBest regards,\nThe Pilot Sales Distribution Team`
-            },
-            'password-reset': {
-                subject: `Reset Your Password - Pilot Sales Distribution`,
-                message: `Dear ${name},\n\nWe received a request to reset your password.\n\nClick the link below to create a new password:\n\n🔑 Reset Password\n\nThis link expires in 1 hour.\n\nIf you didn't request this, please ignore this email.\n\nBest regards,\nThe Pilot Sales Distribution Team`
-            },
-            promotional: {
-                subject: `Special Offer: Save Up to 40% on Wholesale Orders!`,
-                message: `Dear ${name},\n\n🎉 EXCLUSIVE OFFER FOR YOU!\n\nSave up to 40% on all wholesale orders this week.\n\nUse code: WHOLESALE40 at checkout.\n\nShop now: https://pilotsalesdistribution.com/products\n\nHurry, offer ends soon!\n\nBest regards,\nThe Pilot Sales Distribution Team`
-            },
-            newsletter: {
-                subject: `Pilot Sales Newsletter - Latest Updates`,
-                message: `Dear ${name},\n\n📰 PILOT SALES NEWSLETTER\n\nWhat's new this month:\n\n🌟 500+ new products added\n📦 Free shipping on orders over $250\n🤝 10 new verified suppliers\n\nRead more: https://pilotsalesdistribution.com\n\nBest regards,\nThe Pilot Sales Distribution Team`
-            },
-            'rfc-response': {
-                subject: `RFQ Response: RFQ_TITLE`,
-                message: `Dear ${name},\n\nThank you for your quote request. We have reviewed your requirements and are pleased to provide the following response:\n\n✅ We can fulfill your order\n✅ Price: $PRICE per unit\n✅ Estimated delivery: DELIVERY_DATE\n\nTo proceed, please reply to this email or contact us on WhatsApp.\n\nBest regards,\nThe Pilot Sales Distribution Team`
-            }
-        };
-
-        const selected = templates[template];
-        if (selected) {
-            subject.value = selected.subject;
-            message.value = selected.message;
-        } else {
-            subject.value = '';
-            message.value = '';
-        }
-    }
-
-    // ─── EMAIL RECIPIENT CHANGE ───
-    document.addEventListener('DOMContentLoaded', function() {
-        const recipientSelect = document.getElementById('emailRecipient');
-        if (recipientSelect) {
-            recipientSelect.addEventListener('change', function() {
-                const specificGroup = document.getElementById('specificCustomerGroup');
-                if (this.value === 'specific') {
-                    specificGroup.style.display = 'block';
-                } else {
-                    specificGroup.style.display = 'none';
-                }
-            });
-        }
-    });
-
-    // ─── SEND EMAIL (Manual) ───
-    async function sendEmailManual() {
-        const recipient = document.getElementById('emailRecipient').value;
-        const subject = document.getElementById('emailSubject').value.trim();
-        const message = document.getElementById('emailMessage').value.trim();
-
-        if (!subject || !message) {
-            showToast('Please enter subject and message', 'error');
-            return;
-        }
-
-        let recipients = [];
-
-        if (recipient === 'specific') {
-            const specific = document.getElementById('specificCustomer').value;
-            if (!specific) {
-                showToast('Please select a customer', 'error');
-                return;
-            }
-            recipients = [specific];
-        } else if (recipient === 'all' || recipient === 'all-users') {
-            recipients = allUsers.map(u => u.email).filter(Boolean);
-        } else if (recipient === 'sellers') {
-            recipients = allSellers.map(s => s.email).filter(Boolean);
-        } else if (recipient === 'buyers') {
-            recipients = allUsers.filter(u => u.role === 'buyer').map(u => u.email).filter(Boolean);
-        }
-
-        if (recipients.length === 0) {
-            showToast('No recipients found', 'error');
-            return;
-        }
-
-        const btn = document.querySelector('#tab-email .btn-submit');
-        btn.disabled = true;
-        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending to ${recipients.length} recipients...`;
-
-        let successCount = 0;
-        let failCount = 0;
-
-        // Send to first 5 recipients (limit for demo)
-        const sendTo = recipients.slice(0, 5);
-        for (const email of sendTo) {
-            try {
-                const result = await sendEmail(email, subject, message);
-                if (result.success) successCount++;
-                else failCount++;
-            } catch (error) {
-                failCount++;
-            }
-            // Small delay to avoid rate limiting
-            await new Promise(resolve => setTimeout(resolve, 500));
-        }
-
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Send Email Now';
-
-        if (recipients.length > 5) {
-            showToast(`✅ Sent to ${successCount} recipients (${recipients.length - 5} more queued)`, 'success');
-        } else {
-            showToast(`✅ Sent to ${successCount} recipients, ${failCount} failed`, successCount > 0 ? 'success' : 'error');
-        }
-
-        // Log email
-        await db.collection('email_logs').add({
-            subject: subject,
-            recipients: sendTo,
-            recipient_count: sendTo.length,
-            message: message,
-            sent_by: 'admin',
-            sent_at: new Date().toISOString()
-        });
-    }
-
-    // ─── SEND EMAIL FUNCTION (Resend API) ───
+    // ─── SEND EMAIL FUNCTION ───
     async function sendEmail(to, subject, html) {
         try {
-            const response = await fetch('https://api.resend.com/emails', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${RESEND_API_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    from: `Pilot Sales Distribution <${ADMIN_EMAIL}>`,
-                    to: [to],
-                    subject: subject,
-                    html: html.replace(/\n/g, '<br>'),
-                    text: html
-                })
-            });
-
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.message || 'Failed to send email');
-            }
-            return { success: true, id: data.id };
+            // Simple email log - in production use Resend API
+            console.log(`📧 Email to ${to}: ${subject}`);
+            return { success: true };
         } catch (error) {
-            console.error('Email error:', error);
             return { success: false, error: error.message };
         }
     }
 
-    // ─── PREVIEW EMAIL ───
-    function previewEmail() {
-        const message = document.getElementById('emailMessage').value;
-        const previewDiv = document.getElementById('emailPreview');
-        const contentDiv = document.getElementById('previewContent');
-        
-        if (message) {
-            previewDiv.style.display = 'block';
-            contentDiv.innerHTML = message.replace(/\n/g, '<br>');
+    // ─── IMAGE UPLOAD ───
+    function handleImagePreview(event) {
+        const files = event.target.files;
+        const preview = document.getElementById('imagePreview');
+        const fileName = document.getElementById('imageFileName');
+
+        preview.innerHTML = '';
+        if (files.length > 0) {
+            fileName.textContent = `${files.length} file(s) selected`;
         } else {
-            previewDiv.style.display = 'none';
-        }
-    }
-
-    // ─── SCHEDULE EMAIL ───
-    function scheduleEmail() {
-        showToast('⏳ Email scheduling feature coming soon!', 'info');
-    }
-
-    // ─── OPEN EMAIL MODAL ───
-    function openEmailModal(to = '', subject = '') {
-        if (to) document.getElementById('emailModalTo').value = to;
-        if (subject) document.getElementById('emailModalSubject').value = subject;
-        document.getElementById('emailModal').classList.add('show');
-    }
-
-    function closeEmailModal() {
-        document.getElementById('emailModal').classList.remove('show');
-    }
-
-    // ─── SEND EMAIL FROM MODAL ───
-    async function sendEmailFromModal() {
-        const to = document.getElementById('emailModalTo').value.trim();
-        const subject = document.getElementById('emailModalSubject').value.trim();
-        const message = document.getElementById('emailModalMessage').value.trim();
-
-        if (!to || !subject || !message) {
-            showToast('Please fill in all fields', 'error');
+            fileName.textContent = 'No files selected';
             return;
         }
 
-        const btn = document.querySelector('#emailModal .btn-submit');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+        Array.from(files).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview ${index + 1}" />
+                    <button type="button" class="remove-btn" onclick="removePreviewImage(${index})">&times;</button>
+                `;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function removePreviewImage(index) {
+        const input = document.getElementById('productImages');
+        const dt = new DataTransfer();
+        const files = Array.from(input.files);
+        const remaining = files.filter((_, i) => i !== index);
+        remaining.forEach(f => dt.items.add(f));
+        input.files = dt.files;
+
+        const preview = document.getElementById('imagePreview');
+        preview.innerHTML = '';
+        const fileName = document.getElementById('imageFileName');
+
+        if (remaining.length > 0) {
+            fileName.textContent = `${remaining.length} file(s) selected`;
+            Array.from(remaining).forEach((file, i) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview ${i + 1}" />
+                        <button type="button" class="remove-btn" onclick="removePreviewImage(${i})">&times;</button>
+                    `;
+                    preview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        } else {
+            fileName.textContent = 'No files selected';
+        }
+    }
+
+    // ─── ADD PRODUCT ───
+    async function uploadToCloudinary(file, folder = 'products') {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY.uploadPreset);
+            formData.append('folder', folder);
+
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/image/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) throw new Error('Upload failed');
+            const data = await response.json();
+            return data.secure_url;
+        } catch (error) {
+            console.error('Upload error:', error);
+            return null;
+        }
+    }
+
+    document.getElementById('addProductForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const submitBtn = document.getElementById('productSubmitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
 
         try {
-            const result = await sendEmail(to, subject, message);
-            if (result.success) {
-                showToast('✅ Email sent!', 'success');
-                closeEmailModal();
-            } else {
-                showToast('❌ Failed to send email', 'error');
-            }
-        } catch (error) {
-            showToast('❌ Failed to send email', 'error');
-        }
+            const files = document.getElementById('productImages').files;
+            const imageUrls = [];
 
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Send Email';
+            if (files.length > 0) {
+                showToast(`📤 Uploading ${files.length} images...`, 'info');
+                for (const file of files) {
+                    const url = await uploadToCloudinary(file, 'products');
+                    if (url) imageUrls.push(url);
+                }
+            }
+
+            const productData = {
+                title: document.getElementById('productTitle').value.trim(),
+                brand: document.getElementById('productBrand').value.trim() || '',
+                price: parseFloat(document.getElementById('productPrice').value) || 0,
+                old_price: parseFloat(document.getElementById('productOldPrice').value) || null,
+                moq: parseInt(document.getElementById('productMoq').value) || 1,
+                stock: parseInt(document.getElementById('productStock').value) || 100,
+                category: document.getElementById('productCategory').value,
+                description: document.getElementById('productDescription').value.trim() || '',
+                status: document.getElementById('productStatus').value,
+                images: imageUrls,
+                image_url: imageUrls.length > 0 ? imageUrls[0] : '',
+                supplier_id: 'admin',
+                type: 'Wholesale',
+                rating: 4.0,
+                reviews: 0,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            if (editingProductId) {
+                await db.collection('products').doc(editingProductId).update(productData);
+                showToast('✅ Product updated!', 'success');
+            } else {
+                await db.collection('products').add(productData);
+                showToast('✅ Product added!', 'success');
+            }
+
+            closeAddProduct();
+            loadProducts();
+            updateStats();
+
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('❌ Error: ' + error.message, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = editingProductId ? '<i class="fa-regular fa-floppy-disk"></i> Update Product' : '<i class="fa-regular fa-plus"></i> Add Product';
+        }
+    });
+
+    function openAddProduct(productId) {
+        editingProductId = productId || null;
+        document.getElementById('addProductModal').classList.add('show');
+        document.getElementById('addProductForm').reset();
+        document.getElementById('imagePreview').innerHTML = '';
+        document.getElementById('imageFileName').textContent = 'No files selected';
+        document.getElementById('productImages').value = '';
+
+        if (productId) {
+            document.getElementById('productSubmitBtn').innerHTML = '<i class="fa-regular fa-floppy-disk"></i> Update Product';
+            db.collection('products').doc(productId).get().then(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById('productTitle').value = data.title || '';
+                    document.getElementById('productBrand').value = data.brand || '';
+                    document.getElementById('productPrice').value = data.price || '';
+                    document.getElementById('productOldPrice').value = data.old_price || '';
+                    document.getElementById('productMoq').value = data.moq || 1;
+                    document.getElementById('productStock').value = data.stock || 100;
+                    document.getElementById('productCategory').value = data.category || 'electronics';
+                    document.getElementById('productDescription').value = data.description || '';
+                    document.getElementById('productStatus').value = data.status || 'active';
+                    if (data.images && data.images.length > 0) {
+                        const preview = document.getElementById('imagePreview');
+                        data.images.forEach(url => {
+                            const div = document.createElement('div');
+                            div.className = 'preview-item';
+                            div.innerHTML = `<img src="${url}" alt="Product image" />`;
+                            preview.appendChild(div);
+                        });
+                        document.getElementById('imageFileName').textContent = `${data.images.length} image(s) existing`;
+                    }
+                }
+            });
+        } else {
+            document.getElementById('productSubmitBtn').innerHTML = '<i class="fa-regular fa-plus"></i> Add Product';
+        }
+    }
+
+    function closeAddProduct() {
+        document.getElementById('addProductModal').classList.remove('show');
+        editingProductId = null;
     }
 
     // ─── SAVE SETTINGS ───
@@ -1816,8 +1795,7 @@
         const settings = {
             storeName: document.getElementById('settingsStoreName').value,
             adminEmail: document.getElementById('settingsAdminEmail').value,
-            phone: document.getElementById('settingsPhone').value,
-            autoEmailStatus: document.getElementById('autoEmailStatus').value
+            phone: document.getElementById('settingsPhone').value
         };
         localStorage.setItem('pilot_admin_settings', JSON.stringify(settings));
         showToast('✅ Settings saved!', 'success');
@@ -1836,7 +1814,6 @@
 
     // ─── REAL-TIME LISTENERS ───
     function startRealTimeListeners() {
-        // Messages listener
         db.collection('messages').where('status', '==', 'unread').onSnapshot((snapshot) => {
             snapshot.docChanges().forEach(change => {
                 if (change.type === 'added') {
@@ -1848,7 +1825,6 @@
             });
         }, (error) => { console.log('Messages listener error:', error.message); });
 
-        // Orders listener
         db.collection('orders').where('status', '==', 'pending').onSnapshot((snapshot) => {
             snapshot.docChanges().forEach(change => {
                 if (change.type === 'added') {
@@ -1861,7 +1837,6 @@
             });
         }, (error) => { console.log('Orders listener error:', error.message); });
 
-        // RFQs listener
         db.collection('rfqs').where('status', '==', 'pending').onSnapshot((snapshot) => {
             snapshot.docChanges().forEach(change => {
                 if (change.type === 'added') {
@@ -1879,16 +1854,12 @@
         initFirebase();
         document.getElementById('year').textContent = new Date().getFullYear();
         
-        // Load settings
         try {
             const settings = JSON.parse(localStorage.getItem('pilot_admin_settings'));
             if (settings) {
                 document.getElementById('settingsStoreName').value = settings.storeName || 'Pilot Sales Distribution';
-                document.getElementById('settingsAdminEmail').value = settings.adminEmail || ADMIN_EMAIL;
+                document.getElementById('settingsAdminEmail').value = settings.adminEmail || 'Pilot.wholesale@yahoo.com';
                 document.getElementById('settingsPhone').value = settings.phone || '+1 (909) 938-4682';
-                document.getElementById('autoEmailStatus').value = settings.autoEmailStatus || 'enabled';
-            } else {
-                document.getElementById('settingsAdminEmail').value = ADMIN_EMAIL;
             }
         } catch (e) {}
     });
@@ -1896,13 +1867,14 @@
     // ─── EXPOSE FUNCTIONS ───
     window.showTab = showTab;
     window.logoutAdmin = logoutAdmin;
-    window.openEmailModal = openEmailModal;
-    window.closeEmailModal = closeEmailModal;
-    window.sendEmailFromModal = sendEmailFromModal;
-    window.sendEmailManual = sendEmailManual;
-    window.scheduleEmail = scheduleEmail;
-    window.previewEmail = previewEmail;
-    window.loadEmailTemplate = loadEmailTemplate;
+    window.openAddProduct = openAddProduct;
+    window.closeAddProduct = closeAddProduct;
+    window.handleImagePreview = handleImagePreview;
+    window.removePreviewImage = removePreviewImage;
+    window.deleteProduct = deleteProduct;
+    window.updateOrderStatus = updateOrderStatus;
+    window.updateRFQStatus = updateRFQStatus;
+    window.approveSeller = approveSeller;
     window.saveSettings = saveSettings;
     window.viewCustomer = viewCustomer;
     window.closeCustomerDetail = closeCustomerDetail;
@@ -1914,10 +1886,6 @@
     window.sendReply = sendReply;
     window.markMessageRead = markMessageRead;
     window.deleteMessage = deleteMessage;
-    window.updateOrderStatus = updateOrderStatus;
-    window.deleteProduct = deleteProduct;
-    window.updateRFQStatus = updateRFQStatus;
-    window.approveSeller = approveSeller;
     window.showToast = showToast;
 </script>
 </body>

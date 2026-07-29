@@ -4,16 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Product Detail - Pilot Sales Distribution</title>
-    <meta name="description" content="View 3D product details at Pilot Sales Distribution." />
+    <meta name="description" content="View product details at Pilot Sales Distribution." />
     
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    
-    <!-- ─── MODEL-VIEWER 3D ─── -->
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -178,7 +174,7 @@
         .nav-tab.active { color: var(--primary); font-weight: 700; }
         .wholesale-nav { color: var(--primary); font-weight: 700; }
 
-        /* ─── PRODUCT DETAIL PAGE ─── */
+        /* ─── PRODUCT DETAIL ─── */
         .product-detail-page { max-width: 1200px; margin: 2rem auto; }
         .breadcrumb { font-size: 0.85rem; color: var(--text-light); margin-bottom: 1.5rem; padding: 0.5rem 0; }
         .breadcrumb a { color: var(--primary); transition: var(--transition); }
@@ -195,112 +191,7 @@
             border: 1px solid var(--border);
         }
 
-        /* ─── 3D MODEL VIEWER ─── */
-        .model-viewer-container {
-            width: 100%;
-            height: 450px;
-            background: var(--light);
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            border: 1px solid var(--border);
-            position: relative;
-        }
-        model-viewer {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #f5f7f4, #e8f0ea);
-        }
-        model-viewer::part(default-progress-bar) {
-            background: var(--primary);
-        }
-        .viewer-controls {
-            position: absolute;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 0.8rem;
-            z-index: 10;
-            background: rgba(0,0,0,0.5);
-            padding: 6px 12px;
-            border-radius: 30px;
-            backdrop-filter: blur(8px);
-        }
-        .viewer-controls button {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 0.8rem;
-            cursor: pointer;
-            padding: 4px 10px;
-            border-radius: 20px;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .viewer-controls button:hover {
-            background: rgba(255,255,255,0.2);
-        }
-        .viewer-controls button i {
-            font-size: 0.9rem;
-        }
-        .viewer-controls .active {
-            background: var(--primary);
-            color: #fff;
-        }
-        .viewer-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: rgba(0,0,0,0.7);
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            backdrop-filter: blur(4px);
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .viewer-badge i {
-            color: var(--accent);
-        }
-
-        /* ─── VIEW SWITCHER ─── */
-        .view-switcher {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            justify-content: center;
-        }
-        .view-switcher button {
-            padding: 0.4rem 1.2rem;
-            border: 2px solid var(--border);
-            border-radius: 30px;
-            background: var(--white);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.8rem;
-            transition: var(--transition);
-            color: var(--text-light);
-        }
-        .view-switcher button:hover {
-            border-color: var(--primary-light);
-            color: var(--secondary);
-        }
-        .view-switcher button.active {
-            border-color: var(--primary);
-            background: var(--primary);
-            color: var(--white);
-        }
-        .view-switcher button i {
-            margin-right: 0.3rem;
-        }
-
-        /* ─── 2D IMAGE GALLERY ─── */
+        /* ─── IMAGE GALLERY ─── */
         .product-gallery .main-image-container {
             background: var(--light);
             border-radius: var(--radius-sm);
@@ -312,10 +203,6 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            display: none;
-        }
-        .product-gallery .main-image-container.active {
-            display: flex;
         }
         .product-gallery .main-image-container img {
             width: 100%;
@@ -461,34 +348,6 @@
         .lightbox-overlay .lightbox-nav.prev { left: 20px; }
         .lightbox-overlay .lightbox-nav.next { right: 20px; }
 
-        /* ─── RESPONSIVE ─── */
-        @media (max-width: 992px) {
-            .product-detail-layout { grid-template-columns: 1fr; padding: 1.5rem; }
-            .model-viewer-container { height: 350px; }
-        }
-        @media (max-width: 768px) {
-            .product-detail-layout { padding: 1rem; }
-            .product-info .product-title { font-size: 1.4rem; }
-            .product-info .product-price .current { font-size: 1.6rem; }
-            .action-buttons { flex-direction: column; }
-            .action-buttons .btn-add-cart,
-            .action-buttons .btn-buy-now { width: 100%; }
-            .thumbnail-grid .thumb { width: 60px; height: 60px; }
-            .related-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
-            .model-viewer-container { height: 280px; }
-            .viewer-controls { padding: 4px 10px; }
-            .viewer-controls button { font-size: 0.65rem; padding: 2px 8px; }
-        }
-        @media (max-width: 480px) {
-            .product-detail-layout { padding: 0.8rem; }
-            .thumbnail-grid .thumb { width: 50px; height: 50px; }
-            .quantity-section { flex-direction: column; align-items: stretch; }
-            .quantity-section .qty-control { width: fit-content; margin: 0 auto; }
-            .related-grid { grid-template-columns: 1fr 1fr; }
-            .model-viewer-container { height: 220px; }
-            .viewer-controls { flex-wrap: wrap; justify-content: center; width: 90%; }
-        }
-
         .toast {
             position: fixed;
             bottom: 80px;
@@ -529,6 +388,43 @@
         .footer .footer-social { display: flex; gap: 1rem; }
         .footer .footer-social a { color: #b4d0e0; transition: var(--transition); font-size: 1.1rem; }
         .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
+
+        @media (max-width: 992px) {
+            .product-detail-layout { grid-template-columns: 1fr; padding: 1.5rem; }
+            .product-gallery .main-image-container { aspect-ratio: 4/3; }
+        }
+        @media (max-width: 768px) {
+            .product-detail-layout { padding: 1rem; }
+            .product-info .product-title { font-size: 1.4rem; }
+            .product-info .product-price .current { font-size: 1.6rem; }
+            .action-buttons { flex-direction: column; }
+            .action-buttons .btn-add-cart,
+            .action-buttons .btn-buy-now { width: 100%; }
+            .thumbnail-grid .thumb { width: 60px; height: 60px; }
+            .related-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+            .lightbox-overlay .lightbox-close { top: 15px; right: 20px; font-size: 2.5rem; }
+            .lightbox-overlay .lightbox-image { max-width: 95%; max-height: 80vh; }
+            .lightbox-overlay .lightbox-nav { font-size: 2rem; padding: 10px; }
+            .lightbox-overlay .lightbox-nav.prev { left: 10px; }
+            .lightbox-overlay .lightbox-nav.next { right: 10px; }
+            .top-bar .container { flex-direction: column; gap: 0.3rem; align-items: stretch; text-align: center; }
+            .top-links { justify-content: center; }
+            .header .container { gap: 0.8rem; }
+            .search-bar { min-width: 100%; order: 10; }
+            .header-actions .icon-btn span { display: none; }
+            .footer .footer-content { flex-direction: column; text-align: center; }
+            .footer .footer-links { justify-content: center; gap: 1rem; }
+        }
+        @media (max-width: 480px) {
+            .product-detail-layout { padding: 0.8rem; }
+            .thumbnail-grid .thumb { width: 50px; height: 50px; }
+            .quantity-section { flex-direction: column; align-items: stretch; }
+            .quantity-section .qty-control { width: fit-content; margin: 0 auto; }
+            .related-grid { grid-template-columns: 1fr 1fr; }
+            .lightbox-overlay .lightbox-dots { bottom: 60px; }
+            .lightbox-overlay .lightbox-counter { bottom: 20px; font-size: 0.75rem; }
+            .top-bar .moving-words .words-track span { font-size: 0.65rem; }
+        }
     </style>
 </head>
 <body>
@@ -613,64 +509,19 @@
         </div>
 
         <div class="product-detail-layout" id="productDetail">
-            
-            <!-- ─── GALLERY ─── -->
-            <div class="product-gallery" id="productGallery">
-                
-                <!-- View Switcher -->
-                <div class="view-switcher" id="viewSwitcher">
-                    <button class="active" onclick="switchView('3d')" id="view3dBtn">
-                        <i class="fa-solid fa-cube"></i> 3D View
-                    </button>
-                    <button onclick="switchView('2d')" id="view2dBtn">
-                        <i class="fa-solid fa-image"></i> 2D View
-                    </button>
+            <!-- Gallery -->
+            <div class="product-gallery">
+                <div class="main-image-container" id="mainImageContainer" onclick="openLightbox()">
+                    <span class="placeholder" id="mainImagePlaceholder"><i class="fa-solid fa-box"></i></span>
+                    <div class="zoom-icon"><i class="fa-solid fa-expand"></i> Click to zoom</div>
                 </div>
-
-                <!-- 3D Model Viewer -->
-                <div class="model-viewer-container" id="modelViewerContainer">
-                    <model-viewer 
-                        id="modelViewer"
-                        src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
-                        alt="3D Product"
-                        ar
-                        ar-modes="webxr scene-viewer quick-look"
-                        camera-controls
-                        auto-rotate
-                        rotation-per-second="15deg"
-                        exposure="1"
-                        shadow-intensity="0.6"
-                        style="width:100%; height:100%;"
-                        poster="https://via.placeholder.com/600x600?text=Loading+3D...">
-                    </model-viewer>
-                    <span class="viewer-badge"><i class="fa-solid fa-cube"></i> 3D Interactive</span>
-                    <div class="viewer-controls">
-                        <button onclick="toggleAutoRotate()" id="rotateBtn" class="active">
-                            <i class="fa-solid fa-rotate-right"></i> Auto
-                        </button>
-                        <button onclick="resetView()">
-                            <i class="fa-solid fa-arrows-rotate"></i> Reset
-                        </button>
-                        <button onclick="toggleAR()">
-                            <i class="fa-solid fa-vr-cardboard"></i> AR
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 2D Image Gallery -->
-                <div id="imageGallery">
-                    <div class="main-image-container active" id="mainImageContainer" onclick="openLightbox()">
-                        <span class="placeholder" id="mainImagePlaceholder"><i class="fa-solid fa-box"></i></span>
-                        <div class="zoom-icon"><i class="fa-solid fa-expand"></i> Click to zoom</div>
-                    </div>
-                    <div class="thumbnail-grid" id="thumbnailGrid"></div>
-                    <div class="swipe-indicator">
-                        <i class="fa-solid fa-arrow-left"></i> Swipe to browse images <i class="fa-solid fa-arrow-right"></i>
-                    </div>
+                <div class="thumbnail-grid" id="thumbnailGrid"></div>
+                <div class="swipe-indicator">
+                    <i class="fa-solid fa-arrow-left"></i> Swipe to browse images <i class="fa-solid fa-arrow-right"></i>
                 </div>
             </div>
 
-            <!-- ─── INFO ─── -->
+            <!-- Info -->
             <div class="product-info">
                 <div class="product-title" id="productTitle">Loading...</div>
                 <div class="product-brand" id="productBrand">by <a href="#">Brand</a></div>
@@ -687,6 +538,7 @@
 
                 <div class="product-description" id="productDescription">Loading product description...</div>
 
+                <!-- Bulk Pricing -->
                 <div class="bulk-pricing" id="bulkPricing">
                     <table>
                         <thead><tr><th>Quantity</th><th>Price per unit</th><th>Savings</th></tr></thead>
@@ -694,6 +546,7 @@
                     </table>
                 </div>
 
+                <!-- Quantity -->
                 <div class="quantity-section">
                     <label for="qtyInput">Quantity:</label>
                     <div class="qty-control">
@@ -703,6 +556,7 @@
                     </div>
                 </div>
 
+                <!-- Actions -->
                 <div class="action-buttons">
                     <button class="btn-add-cart" onclick="addToCartFromDetail()" id="addToCartBtn">
                         <i class="fa-solid fa-cart-plus"></i> Add to Cart
@@ -715,14 +569,17 @@
                     </button>
                 </div>
 
+                <!-- RFQ -->
                 <button class="btn-rfq" onclick="requestQuote()">
                     <i class="fa-regular fa-file-lines"></i> Request a Quotation (RFQ)
                 </button>
 
+                <!-- Chat -->
                 <button class="btn-chat-seller" onclick="startChatWithSeller()">
                     <i class="fa-regular fa-comment"></i> Chat with Seller
                 </button>
 
+                <!-- Seller Info -->
                 <div class="seller-info">
                     <h4>Seller Information</h4>
                     <div class="seller-name" id="sellerName"><i class="fa-regular fa-building"></i> Pilot Sales Distribution</div>
@@ -735,6 +592,7 @@
             </div>
         </div>
 
+        <!-- Related Products -->
         <div class="related-section">
             <h3>You May Also <span>Like</span></h3>
             <div class="related-grid" id="relatedGrid">
@@ -802,8 +660,6 @@
     let productImages = [];
     let currentImageIndex = 0;
     let lightboxImages = [];
-    let modelViewer = null;
-    let is3DView = true;
 
     // ─── INIT ───
     function initFirebase() {
@@ -875,59 +731,6 @@
         return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
     }
 
-    // ─── VIEW SWITCHER ───
-    function switchView(view) {
-        is3DView = (view === '3d');
-        const modelContainer = document.getElementById('modelViewerContainer');
-        const imageGallery = document.getElementById('imageGallery');
-        const btn3d = document.getElementById('view3dBtn');
-        const btn2d = document.getElementById('view2dBtn');
-
-        if (is3DView) {
-            modelContainer.style.display = 'block';
-            imageGallery.style.display = 'none';
-            btn3d.classList.add('active');
-            btn2d.classList.remove('active');
-            // Initialize model viewer if not already
-            if (!modelViewer) {
-                modelViewer = document.getElementById('modelViewer');
-            }
-        } else {
-            modelContainer.style.display = 'none';
-            imageGallery.style.display = 'block';
-            btn2d.classList.add('active');
-            btn3d.classList.remove('active');
-            // Update thumbnails
-            renderThumbnails();
-        }
-    }
-
-    // ─── 3D CONTROLS ───
-    function toggleAutoRotate() {
-        if (!modelViewer) return;
-        const btn = document.getElementById('rotateBtn');
-        modelViewer.autoRotate = !modelViewer.autoRotate;
-        btn.classList.toggle('active');
-        showToast(modelViewer.autoRotate ? 'Auto-rotate ON' : 'Auto-rotate OFF', 'info');
-    }
-
-    function resetView() {
-        if (!modelViewer) return;
-        modelViewer.cameraOrbit = '0deg 90deg 2m';
-        modelViewer.autoRotate = true;
-        document.getElementById('rotateBtn').classList.add('active');
-        showToast('View reset', 'info');
-    }
-
-    function toggleAR() {
-        if (!modelViewer) return;
-        if (modelViewer.canActivateAR) {
-            modelViewer.activateAR();
-        } else {
-            showToast('AR not supported on this device', 'error');
-        }
-    }
-
     // ─── LIGHTBOX ───
     function openLightbox() {
         if (lightboxImages.length === 0) return;
@@ -973,6 +776,35 @@
         if (e.key === 'ArrowLeft') changeLightboxImage(-1);
         if (e.key === 'ArrowRight') changeLightboxImage(1);
     });
+
+    // ─── SWIPE SUPPORT ───
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const gallery = document.getElementById('productGallery');
+        if (gallery) {
+            gallery.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+            gallery.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+        }
+    });
+
+    function handleSwipe() {
+        const threshold = 50;
+        const diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > threshold) {
+            if (diff > 0 && currentImageIndex < productImages.length - 1) {
+                goToImage(currentImageIndex + 1);
+            } else if (diff < 0 && currentImageIndex > 0) {
+                goToImage(currentImageIndex - 1);
+            }
+        }
+    }
 
     // ─── GET PRODUCT ───
     function getProductIdentifier() {
@@ -1032,26 +864,11 @@
         else if (product.image_url) productImages = [product.image_url];
         lightboxImages = productImages;
 
-        // Update 3D model if available
-        if (product.model_url) {
-            const viewer = document.getElementById('modelViewer');
-            if (viewer) {
-                viewer.src = product.model_url;
-            }
-        }
-
         renderProduct(product);
         renderThumbnails();
         renderBulkPricing(product);
         loadRelatedProducts(product);
         updateWishlistStatus(product.id);
-        
-        // Default to 3D view if available, else 2D
-        if (product.model_url) {
-            switchView('3d');
-        } else {
-            switchView('2d');
-        }
     }
 
     function renderProduct(product) {
@@ -1394,10 +1211,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         initFirebase();
         document.getElementById('year').textContent = new Date().getFullYear();
-        modelViewer = document.getElementById('modelViewer');
     });
 
-    // ─── EXPOSE FUNCTIONS ───
     window.addToCartFromDetail = addToCartFromDetail;
     window.buyNow = buyNow;
     window.toggleWishlistFromDetail = toggleWishlistFromDetail;
@@ -1412,10 +1227,6 @@
     window.closeLightbox = closeLightbox;
     window.goToLightboxImage = goToLightboxImage;
     window.changeLightboxImage = changeLightboxImage;
-    window.switchView = switchView;
-    window.toggleAutoRotate = toggleAutoRotate;
-    window.resetView = resetView;
-    window.toggleAR = toggleAR;
 </script>
 </body>
 </html>
