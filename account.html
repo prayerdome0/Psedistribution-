@@ -195,10 +195,38 @@
         .role-badge.seller { background: #d4edda; color: #155724; }
         .role-badge.admin { background: #f8d7da; color: #721c24; }
         
+        /* ─── ADMIN NAV ITEM ─── */
+        .account-sidebar .nav-item.admin-nav { 
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            margin-top: 0.3rem;
+            margin-bottom: 0.3rem;
+            padding: 0.6rem 0.8rem;
+            font-weight: 600;
+        }
+        .account-sidebar .nav-item.admin-nav:hover { 
+            background: linear-gradient(135deg, #f5c6cb, #f1b0b7);
+            color: #491217;
+        }
+        .account-sidebar .nav-item.admin-nav i { 
+            color: #721c24; 
+        }
+        .account-sidebar .nav-item.admin-nav .admin-badge {
+            margin-left: auto;
+            background: #721c24;
+            color: #fff;
+            font-size: 0.55rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 30px;
+        }
+
         .account-sidebar .nav-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 0.8rem; border-radius: 8px; color: var(--text); cursor: pointer; transition: var(--transition); margin-bottom: 0.2rem; font-size: 0.85rem; border: none; background: none; width: 100%; text-align: left; }
         .account-sidebar .nav-item:hover { background: var(--light); color: var(--secondary); }
         .account-sidebar .nav-item.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
         .account-sidebar .nav-item .badge { margin-left: auto; background: #e67e22; color: #fff; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 30px; }
+        .account-sidebar .nav-item .badge.admin-badge { background: #721c24; }
         .account-sidebar .logout-btn { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); color: #c0392b; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.85rem; width: 100%; border: none; background: none; text-align: left; }
         .account-sidebar .logout-btn:hover { background: #fdf2f2; }
         
@@ -434,6 +462,13 @@
                 <button class="nav-item" onclick="showTab('security')">
                     <i class="fa-regular fa-shield"></i> Security
                 </button>
+                
+                <!-- ─── ADMIN DASHBOARD LINK (VISIBLE ONLY TO ADMINS) ─── -->
+                <button class="nav-item admin-nav" id="adminNavLink" style="display:none;" onclick="goToAdminDashboard()">
+                    <i class="fa-solid fa-gauge-high"></i> Admin Dashboard
+                    <span class="admin-badge">⭐ Admin</span>
+                </button>
+                
                 <button class="logout-btn" onclick="logoutUser()">
                     <i class="fa-regular fa-right-from-bracket"></i> Logout
                 </button>
@@ -690,20 +725,48 @@
                 try {
                     const doc = await db.collection('users').doc(user.uid).get();
                     const data = doc.exists ? doc.data() : {};
-                    localStorage.setItem('pilot_user', JSON.stringify({
+                    const userData = {
                         id: user.uid,
                         email: user.email,
                         full_name: data.full_name || user.displayName || '',
                         role: data.role || 'buyer',
                         avatar: data.avatar || data.profile_image || '',
                         phone: data.phone || ''
-                    }));
-                } catch (e) {}
+                    };
+                    localStorage.setItem('pilot_user', JSON.stringify(userData));
+                    
+                    // ─── CHECK IF USER IS ADMIN AND SHOW ADMIN NAV ───
+                    const role = data.role || 'buyer';
+                    const adminNav = document.getElementById('adminNavLink');
+                    if (role === 'admin') {
+                        adminNav.style.display = 'flex';
+                    } else {
+                        adminNav.style.display = 'none';
+                    }
+                } catch (e) {
+                    console.error('Error loading user data:', e);
+                }
             } else {
                 localStorage.removeItem('pilot_user');
+                document.getElementById('adminNavLink').style.display = 'none';
             }
             updateAuthUI();
         });
+    }
+
+    // ─── GO TO ADMIN DASHBOARD ───
+    function goToAdminDashboard() {
+        const user = getCurrentUser();
+        if (!user) {
+            showToast('Please login first', 'error');
+            return;
+        }
+        // Check if user is admin
+        if (user.role === 'admin') {
+            window.location.href = 'admin-dashboard';
+        } else {
+            showToast('Admin access required', 'error');
+        }
     }
 
     // ─── GET USER ───
@@ -884,6 +947,14 @@
                 const role = data.role || 'buyer';
                 roleBadge.textContent = role.charAt(0).toUpperCase() + role.slice(1);
                 roleBadge.className = 'role-badge ' + role;
+
+                // ─── SHOW/HIDE ADMIN NAV BASED ON ROLE ───
+                const adminNav = document.getElementById('adminNavLink');
+                if (role === 'admin') {
+                    adminNav.style.display = 'flex';
+                } else {
+                    adminNav.style.display = 'none';
+                }
 
                 const avatar = data.avatar || data.profile_image || '';
                 if (avatar) {
@@ -1417,6 +1488,7 @@
     window.handleSearch = handleSearch;
     window.showToast = showToast;
     window.getCurrentUser = getCurrentUser;
+    window.goToAdminDashboard = goToAdminDashboard;
 </script>
 </body>
 </html>
