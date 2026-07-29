@@ -220,6 +220,9 @@
         .order-summary .btn-place-order:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .order-summary .secure-badge { text-align: center; margin-top: 0.8rem; font-size: 0.75rem; color: var(--text-light); }
         .order-summary .secure-badge i { color: var(--primary); }
+        .order-summary .email-option { text-align: center; margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-light); }
+        .order-summary .email-option a { color: var(--primary); font-weight: 600; cursor: pointer; }
+        .order-summary .email-option a:hover { text-decoration: underline; }
 
         .footer {
             background: var(--secondary);
@@ -258,7 +261,6 @@
         .toast.error { background: #c0392b; }
         .toast.info { background: #2980b9; }
 
-        /* ─── AUTO-DETECT SPINNER ─── */
         .detecting { font-size: 0.7rem; color: var(--text-light); margin-left: 0.5rem; }
         .detecting i { animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -361,7 +363,7 @@
     <div class="checkout-page">
         <div class="checkout-header animate-on-scroll">
             <h1>Secure <span>Checkout</span></h1>
-            <p>Complete your wholesale order. We'll send a quote via WhatsApp.</p>
+            <p>Complete your wholesale order. We'll send a quote via WhatsApp or email.</p>
         </div>
 
         <div class="checkout-layout">
@@ -634,6 +636,9 @@
                 <button class="btn-place-order" id="placeOrderBtn" onclick="placeOrder()">
                     <i class="fa-brands fa-whatsapp"></i> Send Quote via WhatsApp
                 </button>
+                <div class="email-option">
+                    <i class="fa-regular fa-envelope"></i> Or <a onclick="sendEmailQuote()">send via email</a>
+                </div>
                 <div class="secure-badge">
                     <i class="fa-solid fa-lock"></i> Your information is secure
                 </div>
@@ -672,6 +677,7 @@
 
 <!-- JAVASCRIPT -->
 <script>
+    // ─── FIREBASE CONFIG ───
     const firebaseConfig = {
         apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
         authDomain: "pilot-sales-distribution.firebaseapp.com",
@@ -688,9 +694,16 @@
     let cartItems = [];
     let zipTimeout = null;
 
+    // ─── INIT ───
     function initFirebase() {
-        if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        if (typeof firebase === 'undefined') { 
+            setTimeout(initFirebase, 500); 
+            return; 
+        }
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            console.log('✅ Firebase initialized');
+        }
         auth = firebase.auth();
         db = firebase.firestore();
         setupAuthListener();
@@ -700,6 +713,7 @@
         setupZipLookup();
     }
 
+    // ─── AUTH LISTENER ───
     function setupAuthListener() {
         auth.onAuthStateChanged(async (user) => {
             if (user) {
@@ -707,7 +721,8 @@
                     const doc = await db.collection('users').doc(user.uid).get();
                     const data = doc.exists ? doc.data() : {};
                     localStorage.setItem('pilot_user', JSON.stringify({
-                        id: user.uid, email: user.email,
+                        id: user.uid,
+                        email: user.email,
                         full_name: data.full_name || user.displayName || '',
                         role: data.role || 'buyer'
                     }));
@@ -722,15 +737,22 @@
                     if (data.zip) document.getElementById('zip').value = data.zip || '';
                     if (data.country) document.getElementById('country').value = data.country || 'US';
                 } catch (e) {}
-            } else { localStorage.removeItem('pilot_user'); }
+            } else { 
+                localStorage.removeItem('pilot_user'); 
+            }
             updateAuthUI();
         });
     }
 
+    // ─── GET USER ───
     function getCurrentUser() {
-        try { return JSON.parse(localStorage.getItem('pilot_user')); } catch (e) { return null; }
+        try { 
+            const user = localStorage.getItem('pilot_user');
+            return user ? JSON.parse(user) : null;
+        } catch (e) { return null; }
     }
 
+    // ─── UPDATE AUTH UI ───
     function updateAuthUI() {
         const user = getCurrentUser();
         const login = document.getElementById('loginLink');
@@ -747,6 +769,7 @@
         }
     }
 
+    // ─── TOAST ───
     function showToast(message, type = 'info') {
         let toast = document.getElementById('toast');
         if (!toast) {
@@ -758,15 +781,18 @@
         toast.textContent = message;
         toast.className = 'toast ' + type + ' show';
         clearTimeout(toast._timeout);
-        toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
+        toast._timeout = setTimeout(() => { 
+            toast.classList.remove('show'); 
+        }, 4000);
     }
 
+    // ─── GENERATE SLUG ───
     function generateSlug(title) {
         if (!title) return '';
         return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
     }
 
-    // ─── ZIP CODE AUTO-DETECT CITY/STATE ───
+    // ─── ZIP CODE AUTO-DETECT ───
     function setupZipLookup() {
         const zipInput = document.getElementById('zip');
         const detecting = document.getElementById('detectingCity');
@@ -790,13 +816,11 @@
         const detecting = document.getElementById('detectingCity');
         const country = document.getElementById('country').value;
         
-        // Only lookup for US ZIP codes
         if (country !== 'US' || zip.length < 5) {
             detecting.style.display = 'none';
             return;
         }
 
-        // Use free Zippopotamus API
         fetch(`https://api.zippopotam.us/us/${zip}`)
             .then(response => {
                 if (!response.ok) throw new Error('ZIP not found');
@@ -817,6 +841,31 @@
             });
     }
 
+    // ─── FETCH PRODUCT ───
+    async function fetchProductById(id) {
+        try {
+            const doc = await db.collection('products').doc(id).get();
+            if (doc.exists) {
+                const data = doc.data();
+                let imageUrl = data.image_url || '';
+                if (!imageUrl && data.images && data.images.length > 0) imageUrl = data.images[0];
+                return { 
+                    id: doc.id, 
+                    ...data, 
+                    image_url: imageUrl,
+                    title: data.title || 'Product',
+                    price: data.price || 0,
+                    brand: data.brand || 'Pilot Distribution',
+                    moq: data.moq || 1
+                };
+            }
+            return null;
+        } catch (error) { 
+            console.error('Error fetching product:', error);
+            return null; 
+        }
+    }
+
     // ─── LOAD CHECKOUT ───
     async function loadCheckout() {
         const container = document.getElementById('orderItems');
@@ -824,10 +873,34 @@
         let items = [];
 
         try {
+            // Check localStorage for guest cart
+            const localCart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+            
             if (user) {
-                const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
+                // User is logged in - load from Firebase
+                const snapshot = await db.collection('cart')
+                    .where('user_id', '==', user.id)
+                    .get();
                 const cartData = [];
                 snapshot.forEach(doc => cartData.push({ id: doc.id, ...doc.data() }));
+                
+                // Merge local cart if exists
+                if (localCart.length > 0) {
+                    for (const localItem of localCart) {
+                        const existing = cartData.find(c => c.product_id === localItem.product_id);
+                        if (existing) {
+                            existing.quantity = (existing.quantity || 1) + (localItem.quantity || 1);
+                        } else {
+                            cartData.push({
+                                product_id: localItem.product_id,
+                                quantity: localItem.quantity || 1
+                            });
+                        }
+                    }
+                    // Clear local cart after merge
+                    localStorage.setItem('pilot_cart', '[]');
+                }
+                
                 for (const item of cartData) {
                     const product = await fetchProductById(item.product_id);
                     if (product) {
@@ -845,7 +918,18 @@
                     }
                 }
             } else {
-                items = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+                // Guest user - use localStorage
+                items = localCart.map(item => ({
+                    id: 'local_' + Date.now(),
+                    product_id: item.product_id,
+                    title: item.title || 'Product',
+                    price: item.price || 0,
+                    old_price: item.old_price || 0,
+                    image: item.image_url || '',
+                    brand: item.brand || 'Pilot Distribution',
+                    moq: item.moq || 1,
+                    quantity: item.quantity || 1
+                }));
             }
 
             cartItems = items;
@@ -867,7 +951,10 @@
                 return `
                     <div class="order-item">
                         <div class="item-image">
-                            ${item.image ? `<img src="${item.image}" alt="${item.title}" />` : `<i class="fa-solid fa-box"></i>`}
+                            ${item.image ? 
+                                `<img src="${item.image}" alt="${item.title}" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />` : 
+                                `<i class="fa-solid fa-box"></i>`
+                            }
                         </div>
                         <div class="item-info">
                             <div class="title">${item.title}</div>
@@ -893,19 +980,7 @@
         }
     }
 
-    async function fetchProductById(id) {
-        try {
-            const doc = await db.collection('products').doc(id).get();
-            if (doc.exists) {
-                const data = doc.data();
-                let imageUrl = data.image_url || '';
-                if (!imageUrl && data.images && data.images.length > 0) imageUrl = data.images[0];
-                return { id: doc.id, ...data, image_url: imageUrl };
-            }
-            return null;
-        } catch (error) { return null; }
-    }
-
+    // ─── UPDATE CHECKOUT SUMMARY ───
     function updateCheckoutSummary(items) {
         let subtotal = 0;
         items.forEach(item => {
@@ -922,6 +997,160 @@
         document.getElementById('checkoutShipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
         document.getElementById('checkoutTax').textContent = `$${tax.toFixed(2)}`;
         document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
+    }
+
+    // ─── SEND WHATSAPP QUOTE ───
+    function sendWhatsAppQuote(orderData) {
+        let itemsTable = '';
+        orderData.items.forEach((item, index) => {
+            const num = (index + 1).toString().padStart(2);
+            const qty = (item.quantity || 1).toString();
+            const title = item.title || 'Product';
+            const price = `$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}`;
+            itemsTable += `│ ${num} │ ${qty.padStart(3)} │ ${title.substring(0, 25).padEnd(25)} │ ${price.padStart(10)} │\n`;
+        });
+
+        let message = '📋 *QUOTE REQUEST - Pilot Sales Distribution*\n';
+        message += `📄 *Quote #:* ${orderData.quoteNumber}\n`;
+        message += `📅 *Date:* ${new Date().toLocaleString()}\n`;
+        message += '━'.repeat(50) + '\n\n';
+        
+        message += '*👤 Customer Details*\n';
+        message += `Name: ${orderData.customer.firstName} ${orderData.customer.lastName}\n`;
+        message += `Email: ${orderData.customer.email}\n`;
+        message += `Phone: ${orderData.customer.phone}\n`;
+        message += `Address: ${orderData.customer.address}, ${orderData.customer.city}, ${orderData.customer.state} ${orderData.customer.zip}\n`;
+        message += `Country: ${orderData.customer.country}\n\n`;
+        
+        message += '*📦 Order Items*\n';
+        message += '┌────┬─────────┬───────────────────────────┬────────────┐\n';
+        message += '│ #  │ Qty     │ Product Name              │ Amount     │\n';
+        message += '├────┼─────────┼───────────────────────────┼────────────┤\n';
+        message += itemsTable;
+        message += '└────┴─────────┴───────────────────────────┴────────────┘\n\n';
+        
+        message += '*💰 Summary*\n';
+        message += `Subtotal: $${(orderData.totals.subtotal || 0).toFixed(2)}\n`;
+        message += `Shipping: ${orderData.totals.shipping === 0 ? 'FREE' : '$' + orderData.totals.shipping.toFixed(2)}\n`;
+        message += `Tax (8%): $${(orderData.totals.tax || 0).toFixed(2)}\n`;
+        message += `*TOTAL: $${(orderData.totals.total || 0).toFixed(2)}*\n\n`;
+        
+        if (orderData.notes) {
+            message += `📝 *Notes:* ${orderData.notes}\n\n`;
+        }
+        
+        message += `✅ *Next Steps:*\n`;
+        message += `1. We will review your quote request\n`;
+        message += `2. Confirm availability and pricing\n`;
+        message += `3. Send you a formal invoice\n`;
+        message += `4. Arrange delivery\n\n`;
+        
+        message += `🙏 *Thank you for choosing Pilot Sales Distribution!*\n`;
+        message += `📧 ${STORE_EMAIL}\n`;
+        message += `📞 ${WHATSAPP_NUMBER}`;
+        
+        const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace('+', '')}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+        return true;
+    }
+
+    // ─── SEND EMAIL QUOTE (FALLBACK) ───
+    function sendEmailQuote(orderData) {
+        if (!orderData) {
+            // Try to create order data from current cart
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const state = document.getElementById('state').value.trim();
+            const zip = document.getElementById('zip').value.trim();
+            const country = document.getElementById('country').value;
+            const notes = document.getElementById('notes').value.trim();
+
+            let subtotal = 0;
+            cartItems.forEach(item => {
+                const qty = item.quantity || 1;
+                const price = item.price || 0;
+                subtotal += price * qty;
+            });
+
+            const shipping = subtotal < 250 && subtotal > 0 ? 15 : 0;
+            const tax = subtotal * 0.08;
+            const total = subtotal + shipping + tax;
+            const quoteNumber = 'QTE-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 5).toUpperCase();
+
+            orderData = {
+                quoteNumber: quoteNumber,
+                date: new Date().toISOString(),
+                items: cartItems.map(item => ({
+                    id: item.product_id || item.id,
+                    title: item.title,
+                    brand: item.brand || 'Pilot Distribution',
+                    price: item.price || 0,
+                    old_price: item.old_price || null,
+                    quantity: item.quantity || 1,
+                    moq: item.moq || 1
+                })),
+                customer: {
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    phone: phone,
+                    address: address,
+                    city: city,
+                    state: state,
+                    zip: zip,
+                    country: country
+                },
+                totals: {
+                    subtotal: subtotal,
+                    discount: 0,
+                    shipping: shipping,
+                    tax: tax,
+                    total: total
+                },
+                paymentMethod: 'email',
+                notes: notes,
+                status: 'pending'
+            };
+        }
+
+        let itemsText = '';
+        orderData.items.forEach((item, index) => {
+            itemsText += `${index + 1}. ${item.quantity}x ${item.title} - $${((item.price || 0) * (item.quantity || 1)).toFixed(2)}\n`;
+        });
+
+        const body = `📋 QUOTE REQUEST - Pilot Sales Distribution
+
+Quote #: ${orderData.quoteNumber}
+Date: ${new Date().toLocaleString()}
+
+👤 Customer Details:
+Name: ${orderData.customer.firstName} ${orderData.customer.lastName}
+Email: ${orderData.customer.email}
+Phone: ${orderData.customer.phone}
+Address: ${orderData.customer.address}, ${orderData.customer.city}, ${orderData.customer.state} ${orderData.customer.zip}
+Country: ${orderData.customer.country}
+
+📦 Order Items:
+${itemsText}
+
+💰 Summary:
+Subtotal: $${(orderData.totals.subtotal || 0).toFixed(2)}
+Shipping: ${orderData.totals.shipping === 0 ? 'FREE' : '$' + orderData.totals.shipping.toFixed(2)}
+Tax (8%): $${(orderData.totals.tax || 0).toFixed(2)}
+TOTAL: $${(orderData.totals.total || 0).toFixed(2)}
+
+${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
+
+🙏 Thank you for choosing Pilot Sales Distribution!
+📧 ${STORE_EMAIL}
+📞 ${WHATSAPP_NUMBER}`;
+
+        window.location.href = `mailto:${STORE_EMAIL}?subject=Quote Request ${orderData.quoteNumber}&body=${encodeURIComponent(body)}`;
+        return true;
     }
 
     // ─── PLACE ORDER ───
@@ -1021,8 +1250,15 @@
                 localStorage.setItem('pilot_orders', JSON.stringify(orders));
             }
 
-            sendWhatsAppQuote(orderData);
+            // Try WhatsApp first
+            try {
+                sendWhatsAppQuote(orderData);
+            } catch (whatsappError) {
+                console.log('WhatsApp failed, using email fallback');
+                sendEmailQuote(orderData);
+            }
 
+            // Clear cart
             if (user) {
                 const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
                 const batch = db.batch();
@@ -1041,84 +1277,47 @@
 
         } catch (error) {
             console.error('Error placing order:', error);
-            showToast('❌ Failed to place order. Please try again.', 'error');
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Send Quote via WhatsApp';
+            // Try email as fallback
+            try {
+                sendEmailQuote(orderData);
+                showToast('✅ Quote sent via email!', 'success');
+                setTimeout(() => {
+                    window.location.href = `order-success?quote=${quoteNumber}`;
+                }, 2000);
+            } catch (emailError) {
+                showToast('❌ Failed to place order. Please try again.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Send Quote via WhatsApp';
+            }
         }
-    }
-
-    // ─── SEND WHATSAPP QUOTE ───
-    function sendWhatsAppQuote(orderData) {
-        let itemsTable = '';
-        orderData.items.forEach((item, index) => {
-            const num = (index + 1).toString().padStart(2);
-            const qty = (item.quantity || 1).toString();
-            const title = item.title || 'Product';
-            const price = `$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}`;
-            itemsTable += `│ ${num} │ ${qty.padStart(3)} │ ${title.substring(0, 25).padEnd(25)} │ ${price.padStart(10)} │\n`;
-        });
-
-        let message = '📋 *QUOTE REQUEST - Pilot Sales Distribution*\n';
-        message += `📄 *Quote #:* ${orderData.quoteNumber}\n`;
-        message += `📅 *Date:* ${new Date().toLocaleString()}\n`;
-        message += '━'.repeat(50) + '\n\n';
-        
-        message += '*👤 Customer Details*\n';
-        message += `Name: ${orderData.customer.firstName} ${orderData.customer.lastName}\n`;
-        message += `Email: ${orderData.customer.email}\n`;
-        message += `Phone: ${orderData.customer.phone}\n`;
-        message += `Address: ${orderData.customer.address}, ${orderData.customer.city}, ${orderData.customer.state} ${orderData.customer.zip}\n`;
-        message += `Country: ${orderData.customer.country}\n\n`;
-        
-        message += '*📦 Order Items*\n';
-        message += '┌────┬─────────┬───────────────────────────┬────────────┐\n';
-        message += '│ #  │ Qty     │ Product Name              │ Amount     │\n';
-        message += '├────┼─────────┼───────────────────────────┼────────────┤\n';
-        message += itemsTable;
-        message += '└────┴─────────┴───────────────────────────┴────────────┘\n\n';
-        
-        message += '*💰 Summary*\n';
-        message += `Subtotal: $${(orderData.totals.subtotal || 0).toFixed(2)}\n`;
-        message += `Shipping: ${orderData.totals.shipping === 0 ? 'FREE' : '$' + orderData.totals.shipping.toFixed(2)}\n`;
-        message += `Tax (8%): $${(orderData.totals.tax || 0).toFixed(2)}\n`;
-        message += `*TOTAL: $${(orderData.totals.total || 0).toFixed(2)}*\n\n`;
-        
-        if (orderData.notes) {
-            message += `📝 *Notes:* ${orderData.notes}\n\n`;
-        }
-        
-        message += `✅ *Next Steps:*\n`;
-        message += `1. We will review your quote request\n`;
-        message += `2. Confirm availability and pricing\n`;
-        message += `3. Send you a formal invoice\n`;
-        message += `4. Arrange delivery\n\n`;
-        
-        message += `🙏 *Thank you for choosing Pilot Sales Distribution!*\n`;
-        message += `📧 ${STORE_EMAIL}\n`;
-        message += `📞 ${WHATSAPP_NUMBER}`;
-        
-        const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace('+', '')}?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, '_blank');
-        return true;
     }
 
     // ─── LOAD CART COUNT ───
     async function loadCartCount() {
         const user = getCurrentUser();
         if (!user) {
-            document.querySelectorAll('.cart-count').forEach(el => { el.textContent = '0'; el.style.display = 'none'; });
+            const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+            const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            document.querySelectorAll('.cart-count').forEach(el => {
+                el.textContent = count;
+                el.style.display = count > 0 ? 'inline' : 'none';
+            });
             return;
         }
         try {
             const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
             let count = 0;
             snapshot.forEach(doc => { count += doc.data().quantity || 1; });
-            document.querySelectorAll('.cart-count').forEach(el => { el.textContent = count; el.style.display = count > 0 ? 'inline' : 'none'; });
+            document.querySelectorAll('.cart-count').forEach(el => {
+                el.textContent = count;
+                el.style.display = count > 0 ? 'inline' : 'none';
+            });
         } catch (error) {
-            document.querySelectorAll('.cart-count').forEach(el => { el.textContent = '0'; el.style.display = 'none'; });
+            document.querySelectorAll('.cart-count').forEach(el => el.textContent = '0');
         }
     }
 
+    // ─── LOAD WISHLIST COUNT ───
     async function loadWishlistCount() {
         const user = getCurrentUser();
         if (!user) {
@@ -1134,12 +1333,18 @@
         }
     }
 
+    // ─── TOGGLE WISHLIST ───
     function toggleWishlist() {
         const user = getCurrentUser();
-        if (!user) { showToast('Please login to view wishlist', 'error'); setTimeout(() => window.location.href = 'login', 1500); return; }
+        if (!user) {
+            showToast('Please login to view wishlist', 'error');
+            setTimeout(() => window.location.href = 'login', 1500);
+            return;
+        }
         window.location.href = 'wishlist';
     }
 
+    // ─── SEARCH HANDLER ───
     async function handleSearch(event) {
         const input = document.getElementById('searchInput');
         const query = input.value.trim();
@@ -1152,12 +1357,21 @@
             return;
         }
         try {
-            const snapshot = await db.collection('products').where('status', 'in', ['active', 'approved']).limit(5).get();
+            const snapshot = await db.collection('products')
+                .where('status', 'in', ['active', 'approved'])
+                .limit(5)
+                .get();
             const products = [];
             snapshot.forEach(doc => {
                 const data = doc.data();
                 if (data.title && data.title.toLowerCase().includes(query.toLowerCase())) {
-                    products.push({ id: doc.id, title: data.title, price: data.price, image_url: data.image_url || data.images?.[0] || '', slug: data.slug || generateSlug(data.title) });
+                    products.push({
+                        id: doc.id,
+                        title: data.title,
+                        price: data.price,
+                        image_url: data.image_url || data.images?.[0] || '',
+                        slug: data.slug || generateSlug(data.title)
+                    });
                 }
             });
             const resultsDiv = document.getElementById('searchResults');
@@ -1179,6 +1393,7 @@
         } catch (error) { console.error('Search error:', error); }
     }
 
+    // ─── CLOSE SEARCH ───
     document.addEventListener('click', function(e) {
         const searchBar = document.getElementById('searchBar');
         if (!searchBar || !searchBar.contains(e.target)) {
@@ -1186,20 +1401,29 @@
         }
     });
 
+    // ─── INIT ───
     document.addEventListener('DOMContentLoaded', function() {
         initFirebase();
         document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Scroll animations
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
         }, { threshold: 0.1 });
         document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
     });
 
+    // ─── EXPOSE ───
     window.placeOrder = placeOrder;
     window.loadCheckout = loadCheckout;
     window.toggleWishlist = toggleWishlist;
     window.handleSearch = handleSearch;
     window.showToast = showToast;
+    window.sendEmailQuote = sendEmailQuote;
 </script>
 </body>
 </html>
