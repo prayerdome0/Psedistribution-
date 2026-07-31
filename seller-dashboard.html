@@ -690,6 +690,21 @@
                             <option value="industrial">Industrial</option>
                         </select>
                     </div>
+                    <div style="background:var(--primary-light);border-radius:var(--radius-sm);padding:0.8rem 1rem;margin-bottom:1rem;border-left:4px solid var(--primary);">
+                        <p style="margin:0;font-size:0.8rem;color:var(--text);"><i class="fa-solid fa-comments" style="color:var(--primary);margin-right:0.3rem;"></i> <strong>Buyer Contact Details</strong> - These are the contacts buyers reach when they click Contact Seller on your products.</p>
+                    </div>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label style="display:block; font-weight:600; color:var(--secondary); margin-bottom:0.3rem;">WhatsApp Number <span style="color:#c0392b;">*</span></label>
+                        <input type="tel" id="sellerWa" placeholder="+1 (555) 123-4567" style="width:100%; padding:0.7rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;" />
+                    </div>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label style="display:block; font-weight:600; color:var(--secondary); margin-bottom:0.3rem;">Phone Number</label>
+                        <input type="tel" id="sellerPhone" placeholder="+1 (555) 123-4567" style="width:100%; padding:0.7rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;" />
+                    </div>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label style="display:block; font-weight:600; color:var(--secondary); margin-bottom:0.3rem;">Contact Email for Buyers <span style="color:#c0392b;">*</span></label>
+                        <input type="email" id="sellerContactEmail" placeholder="sales@yourbusiness.com" style="width:100%; padding:0.7rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;" />
+                    </div>
                     <button type="button" class="btn-add-product" onclick="saveSettings()">
                         <i class="fa-regular fa-floppy-disk"></i> Save Settings
                     </button>
@@ -915,6 +930,7 @@
         if (tab === 'products') loadProducts();
         if (tab === 'orders') loadOrders();
         if (tab === 'analytics') loadAnalytics();
+        if (tab === 'settings') loadSettings();
     }
 
     // ─── IMAGE UPLOAD ───
@@ -1319,21 +1335,65 @@
     }
 
     // ─── SAVE SETTINGS ───
-    function saveSettings() {
+    async function saveSettings() {
         const settings = {
             storeName: document.getElementById('storeName').value,
             storeDescription: document.getElementById('storeDescription').value,
-            storeCategory: document.getElementById('storeCategory').value
+            storeCategory: document.getElementById('storeCategory').value,
+            whatsapp: document.getElementById('sellerWa').value.trim(),
+            phone: document.getElementById('sellerPhone').value.trim(),
+            contactEmail: document.getElementById('sellerContactEmail').value.trim(),
+            contact_email: document.getElementById('sellerContactEmail').value.trim()
         };
         localStorage.setItem('pilot_seller_settings', JSON.stringify(settings));
+        // Persist buyer-contact details to Firestore so buyers reach the right seller
+        try {
+            const user = auth.currentUser;
+            if (user && db) {
+                await db.collection('users').doc(user.uid).update({
+                    whatsapp: settings.whatsapp,
+                    phone: settings.phone,
+                    contactEmail: settings.contactEmail,
+                    contact_email: settings.contactEmail,
+                    company: settings.storeName,
+                    updated_at: new Date().toISOString()
+                });
+                // Sync to this seller's existing products so RFQ/chat route correctly
+                try {
+                    const prods = await db.collection('products').where('supplier_id', '==', user.uid).get();
+                    await Promise.all(prods.docs.map(d => d.ref.update({
+                        supplier_whatsapp: settings.whatsapp,
+                        supplier_phone: settings.phone,
+                        supplier_email: settings.contactEmail
+                    })));
+                } catch (e) {}
+            }
+        } catch (e) { console.error('Save settings to Firestore:', e); }
         showToast('✅ Settings saved!', 'success');
     }
 
-    function loadSettings() {
+    async function loadSettings() {
+        // Prefer Firestore (source of truth) so approved contact info shows up
+        try {
+            const user = auth.currentUser;
+            if (user && db) {
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists) {
+                    const d = doc.data();
+                    document.getElementById('storeName').value = d.company || d.business_name || d.storeName || '';
+                    document.getElementById('sellerWa').value = d.whatsapp || '';
+                    document.getElementById('sellerPhone').value = d.phone || '';
+                    document.getElementById('sellerContactEmail').value = d.contactEmail || d.contact_email || d.email || '';
+                }
+            }
+        } catch (e) {}
         try {
             const settings = JSON.parse(localStorage.getItem('pilot_seller_settings'));
             if (settings) {
-                document.getElementById('storeName').value = settings.storeName || '';
+                if (!document.getElementById('storeName').value) document.getElementById('storeName').value = settings.storeName || '';
+                if (!document.getElementById('sellerWa').value) document.getElementById('sellerWa').value = settings.whatsapp || '';
+                if (!document.getElementById('sellerPhone').value) document.getElementById('sellerPhone').value = settings.phone || '';
+                if (!document.getElementById('sellerContactEmail').value) document.getElementById('sellerContactEmail').value = settings.contactEmail || '';
                 document.getElementById('storeDescription').value = settings.storeDescription || '';
                 document.getElementById('storeCategory').value = settings.storeCategory || '';
             }

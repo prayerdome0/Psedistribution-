@@ -402,6 +402,8 @@
         .seller-info .seller-name { font-weight: 600; color: var(--primary); font-size: 1rem; }
         .seller-info .seller-stats { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.3rem; font-size: 0.8rem; color: var(--text-light); }
         .seller-info .seller-stats i { margin-right: 0.3rem; color: var(--primary); }
+        .seller-contact-btn { border: none; padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.35rem; }
+        .seller-contact-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); opacity: 0.95; }
 
         .bulk-pricing { margin: 1.5rem 0; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
         .bulk-pricing table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
@@ -803,6 +805,7 @@
                         <span><i class="fa-regular fa-clock"></i> Responds in 2 hours</span>
                         <span><i class="fa-regular fa-store"></i> <span id="sellerProducts">0</span> products</span>
                     </div>
+                    <div id="sellerContactBox" class="seller-contact-box" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.8rem;"></div>
                     <button onclick="openReportModal()" style="margin-top:0.7rem;background:none;border:1px solid #f5b7b1;color:#c0392b;padding:0.35rem 0.8rem;border-radius:50px;font-size:0.72rem;cursor:pointer;font-weight:600;transition:0.2s;" onmouseover="this.style.background='#fdecea'" onmouseout="this.style.background='none'">
                         <i class="fa-regular fa-flag"></i> Report this product or seller
                     </button>
@@ -937,6 +940,7 @@
     let currentImageIndex = 0;
     let lightboxImages = [];
     let db, auth;
+    let currentSellerContact = { whatsapp: '', phone: '', email: '', contactEmail: '' };
 
     // ─── FALLBACK PRODUCTS (synced with products.html so every catalog card resolves) ───
     const FALLBACK_PRODUCTS = [
@@ -1207,7 +1211,76 @@
         renderBulkPricing(product);
         loadRelatedProducts(product);
         updateWishlistStatus(product.id);
+        if (product.supplier_id) { loadSellerContact(product.supplier_id); }
+        else { renderSellerContactBox(); }
     }
+
+    // --- LOAD SELLER CONTACT (so buyers are redirected to the seller's own contact) ---
+    async function loadSellerContact(supplierId) {
+        // Defaults pulled from the product document itself
+        const p = currentProduct || {};
+        currentSellerContact = {
+            whatsapp: p.supplier_whatsapp || '',
+            phone: p.supplier_phone || '',
+            email: p.supplier_email || p.contactEmail || '',
+            contactEmail: p.supplier_email || p.contactEmail || ''
+        };
+        if (!supplierId) { renderSellerContactBox(); return; }
+        try {
+            const doc = await db.collection('users').doc(supplierId).get();
+            if (doc.exists) {
+                const d = doc.data();
+                currentSellerContact = {
+                    whatsapp: d.whatsapp || currentSellerContact.whatsapp || '',
+                    phone: d.phone || currentSellerContact.phone || '',
+                    email: d.contactEmail || d.contact_email || d.email || currentSellerContact.email || '',
+                    contactEmail: d.contactEmail || d.contact_email || d.email || currentSellerContact.contactEmail || ''
+                };
+            }
+        } catch (e) { console.error('Seller contact load error:', e); }
+        renderSellerContactBox();
+    }
+
+    // --- RENDER THE SELLER CONTACT BOX (WhatsApp + Email buttons) ---
+    function renderSellerContactBox() {
+        const box = document.getElementById('sellerContactBox');
+        if (!box) return;
+        const wa = (currentSellerContact.whatsapp || currentSellerContact.phone || '').replace(/[^0-9]/g, '');
+        const email = currentSellerContact.email || currentSellerContact.contactEmail || '';
+        const waBtn = wa
+            ? `<button class="seller-contact-btn" style="background:#25D366;color:#fff;" onclick="contactSellerWhatsApp()"><i class="fa-brands fa-whatsapp"></i> WhatsApp Seller</button>`
+            : '';
+        const emailBtn = email
+            ? `<button class="seller-contact-btn" style="background:var(--primary);color:#fff;" onclick="contactSellerEmail()"><i class="fa-regular fa-envelope"></i> Email Seller</button>`
+            : '';
+        const callBtn = currentSellerContact.phone
+            ? `<button class="seller-contact-btn" style="background:var(--secondary);color:#fff;" onclick="contactSellerPhone()"><i class="fa-solid fa-phone"></i> Call</button>`
+            : '';
+        box.innerHTML = waBtn + emailBtn + callBtn;
+        box.style.display = (wa || email || currentSellerContact.phone) ? 'flex' : 'none';
+    }
+
+    // --- CONTACT SELLER ACTIONS ---
+    window.contactSellerWhatsApp = function () {
+        const wa = (currentSellerContact.whatsapp || currentSellerContact.phone || '').replace(/[^0-9]/g, '');
+        if (!wa) { showToast('Seller WhatsApp not available', 'error'); return; }
+        const p = currentProduct || {};
+        const msg = 'Hi, I am interested in ' + (p.title || 'your product') + ' on Pilot Sales Distribution. Is it available?';
+        window.open('https://wa.me/' + wa + '?text=' + encodeURIComponent(msg), '_blank');
+    };
+    window.contactSellerEmail = function () {
+        const email = currentSellerContact.email || currentSellerContact.contactEmail || '';
+        if (!email) { showToast('Seller email not available', 'error'); return; }
+        const p = currentProduct || {};
+        const subject = encodeURIComponent('Inquiry: ' + (p.title || 'Product on PSE'));
+        const body = encodeURIComponent('Hi, I am interested in ' + (p.title || 'your product') + '. Please share more details.\n\nThanks.');
+        window.location.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
+    };
+    window.contactSellerPhone = function () {
+        const phone = (currentSellerContact.phone || '').trim();
+        if (!phone) { showToast('Seller phone not available', 'error'); return; }
+        window.location.href = 'tel:' + phone.replace(/[^0-9+]/g, '');
+    };
 
     // ─── RENDER PRODUCT ───
     function renderProduct(product) {
@@ -1544,18 +1617,31 @@
         const qty = parseInt(document.getElementById('qtyInput').value) || 1;
         const product = currentProduct;
         const message = `📋 *RFQ REQUEST*%0A%0A*Product:* ${product.title}%0A*Brand:* ${product.brand || 'N/A'}%0A*Quantity:* ${qty} units%0A*Price:* $${(product.price || 0).toFixed(2)} per unit%0A*Total:* $${((product.price || 0) * qty).toFixed(2)}%0A*MOQ:* ${product.moq || 1}%0A%0APlease send me a quote.`;
-        window.open(`https://wa.me/19099384682?text=${encodeURIComponent(message)}`, '_blank');
-        showToast('📤 Quote request sent via WhatsApp!', 'success');
+        // Route to the seller's own WhatsApp when available, else the platform number
+        const sellerWa = (currentSellerContact.whatsapp || currentSellerContact.phone || '').replace(/[^0-9]/g, '');
+        const waNumber = sellerWa || '19099384682';
+        window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`, '_blank');
+        showToast(sellerWa ? '📤 Quote request sent to the seller!' : '📤 Quote request sent via WhatsApp!', 'success');
     }
 
     // ─── START CHAT ───
     function startChatWithSeller() {
         const user = getCurrentUser();
         if (!user) {
-            showToast('Please login to chat', 'error');
+            showToast('Please login to contact the seller', 'error');
             setTimeout(() => window.location.href = '/login', 1500);
             return;
         }
+        // Redirect the buyer straight to the seller's own WhatsApp contact when available
+        const sellerWa = (currentSellerContact.whatsapp || currentSellerContact.phone || '').replace(/[^0-9]/g, '');
+        const p = currentProduct || {};
+        if (sellerWa) {
+            const msg = 'Hi, I am interested in ' + (p.title || 'your product') + ' on Pilot Sales Distribution. Is it available?';
+            window.open('https://wa.me/' + sellerWa + '?text=' + encodeURIComponent(msg), '_blank');
+            showToast('Opening chat with the seller...', 'success');
+            return;
+        }
+        // No direct WhatsApp on file - use the in-app chat
         window.location.href = `chat?product=${currentProductId}`;
     }
 

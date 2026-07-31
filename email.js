@@ -74,6 +74,30 @@ function getTemplate(templateName, data) {
                 return data?.subject || 'Message from Pilot Sales Distribution';
             },
             file: 'admin-message.html'
+        },
+        // Seller application received → auto-confirmation to the applicant
+        'seller-application-received': {
+            subject: 'We received your seller application - Pilot Sales Distribution',
+            file: 'seller-application-received.html'
+        },
+        // New seller application → notification to the admin team
+        'seller-application-admin': {
+            subject: function (data) {
+                return `🏪 New Seller Application: ${data?.businessName || data?.name || 'New Seller'}`;
+            },
+            file: 'seller-application-admin.html'
+        },
+        // Application approved → congrats + verified badge notice
+        'seller-application-approved': {
+            subject: function (data) {
+                return `🎉 Your seller application is approved, ${data?.name || 'Seller'}!`;
+            },
+            file: 'seller-application-approved.html'
+        },
+        // Application rejected → polite decline
+        'seller-application-rejected': {
+            subject: 'Update on your seller application - Pilot Sales Distribution',
+            file: 'seller-application-rejected.html'
         }
     };
 
@@ -635,6 +659,205 @@ function buildTemplateHTML(templateName, data) {
     </div>
 </body>
 </html>
+        `,
+
+        // ─── SELLER APPLICATION RECEIVED (auto-confirmation to applicant) ───
+        'seller-application-received': `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Application Received</title>
+    <style>
+        body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
+        .container { max-width:600px; margin:0 auto; padding:20px; }
+        .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .logo { max-width:160px; height:auto; }
+        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
+        .footer a { color:#b4d0e0; text-decoration:none; }
+        .steps { background:#f8fafb; border-radius:8px; padding:15px; border:1px solid #e9edf2; margin:15px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
+                <h2 style="color:#0b2a3b;font-size:22px;margin:8px 0 0;">📋 Application Received!</h2>
+            </div>
+            <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
+            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+                Thank you for applying to sell on <strong>Pilot Sales Distribution</strong>. We have received your application for <strong>${data.businessName || 'your business'}</strong> and our team is now reviewing it.
+            </p>
+            <div class="steps">
+                <p style="margin:0 0 8px;font-weight:600;color:#0b2a3b;">What happens next?</p>
+                <p style="margin:0 0 5px;font-size:14px;color:#2c5a6b;">✅ 1. Our Trust &amp; Safety team reviews your details</p>
+                <p style="margin:0 0 5px;font-size:14px;color:#2c5a6b;">🔍 2. We verify your business information (usually within 48 hours)</p>
+                <p style="margin:0;font-size:14px;color:#2c5a6b;">🎉 3. Once approved, you'll get the Verified Seller badge and full dashboard access</p>
+            </div>
+            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:15px 0 0;">
+                We'll email you the moment your application is reviewed. No action needed from you right now.
+            </p>
+            <div class="footer">
+                <p>&copy; 2026 Pilot Sales Distribution &bull; <a href="https://pilotsalesdistribution.com">Visit our store</a></p>
+                <p style="margin:5px 0 0;">📧 support@pilotsalesdistribution.com &bull; 📞 +1 (909) 938-4682</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+        `,
+
+        // ─── SELLER APPLICATION → ADMIN NOTIFICATION ───
+        'seller-application-admin': `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Seller Application</title>
+    <style>
+        body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
+        .container { max-width:600px; margin:0 auto; padding:20px; }
+        .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .logo { max-width:160px; height:auto; }
+        .details { background:#f8fafb; border-radius:8px; padding:15px; border:1px solid #e9edf2; margin:15px 0; }
+        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
+        .footer a { color:#b4d0e0; text-decoration:none; }
+        .btn { background:#1a7b6b; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
+                <h2 style="color:#0b2a3b;font-size:22px;margin:8px 0 0;">🏪 New Seller Application</h2>
+            </div>
+            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+                A new seller has applied to join the marketplace. Review and verify it from the admin dashboard.
+            </p>
+            <div class="details">
+                <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
+                <p><strong>Business:</strong> ${data.businessName || 'N/A'}</p>
+                <p><strong>Email:</strong> ${data.email || 'N/A'}</p>
+                <p><strong>Phone:</strong> ${data.phone || 'N/A'}</p>
+                <p><strong>WhatsApp:</strong> ${data.whatsapp || 'N/A'}</p>
+                <p><strong>Type:</strong> ${data.businessType || 'N/A'}</p>
+                <p><strong>Categories:</strong> ${(Array.isArray(data.categories) ? data.categories.join(', ') : data.categories) || 'N/A'}</p>
+                <p><strong>Years:</strong> ${data.yearsInBusiness || 'N/A'}</p>
+                <p><strong>Website:</strong> ${data.website || 'N/A'}</p>
+                <p><strong>Contact Email (buyers):</strong> ${data.contactEmail || 'N/A'}</p>
+                <p><strong>Reason:</strong> ${data.reason || 'N/A'}</p>
+                ${data.profileImage ? `<p><strong>Profile Photo:</strong><br><img src="${data.profileImage}" style="max-width:120px;border-radius:8px;margin-top:5px;" /></p>` : ''}
+            </div>
+            <div style="text-align:center;margin:20px 0;">
+                <a href="https://pilotsalesdistribution.com/admin-dashboard" class="btn">⚡ Review in Admin Dashboard</a>
+            </div>
+            <div class="footer">
+                <p>&copy; 2026 Pilot Sales Distribution — Admin Notification</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+        `,
+
+        // ─── SELLER APPLICATION APPROVED ───
+        'seller-application-approved': `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Approved</title>
+    <style>
+        body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
+        .container { max-width:600px; margin:0 auto; padding:20px; }
+        .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .logo { max-width:160px; height:auto; }
+        .btn { background:#1a7b6b; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
+        .footer a { color:#b4d0e0; text-decoration:none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
+                <h2 style="color:#0b2a3b;font-size:22px;margin:8px 0 0;">🎉 You're Approved!</h2>
+            </div>
+            <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
+            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+                Great news! Your application for <strong>${data.businessName || 'your business'}</strong> has been <strong>approved</strong> by our Trust &amp; Safety team.
+            </p>
+            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+                Your account now carries the <strong>✓ Verified Seller</strong> badge, so buyers can trust you more and buy with confidence. You can start listing products right away from your seller dashboard.
+            </p>
+            <div style="text-align:center;margin:20px 0;">
+                <a href="https://pilotsalesdistribution.com/seller-dashboard" class="btn">🚀 Open Seller Dashboard</a>
+            </div>
+            <p style="color:#6a889a;font-size:13px;margin:0;">
+                Need help getting started? <a href="https://wa.me/19099384682" style="color:#1a7b6b;text-decoration:none;">Chat with us on WhatsApp</a>
+            </p>
+            <div class="footer">
+                <p>&copy; 2026 Pilot Sales Distribution &bull; <a href="https://pilotsalesdistribution.com">Visit our store</a></p>
+                <p style="margin:5px 0 0;">📧 support@pilotsalesdistribution.com &bull; 📞 +1 (909) 938-4682</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+        `,
+
+        // ─── SELLER APPLICATION REJECTED ───
+        'seller-application-rejected': `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Update</title>
+    <style>
+        body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
+        .container { max-width:600px; margin:0 auto; padding:20px; }
+        .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .logo { max-width:160px; height:auto; }
+        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
+        .footer a { color:#b4d0e0; text-decoration:none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
+                <h2 style="color:#0b2a3b;font-size:22px;margin:8px 0 0;">Update on Your Application</h2>
+            </div>
+            <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
+            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+                Thank you for your interest in selling on <strong>Pilot Sales Distribution</strong>. After reviewing your application, we're unable to approve it at this time.
+            </p>
+            <div style="background:#f8fafb;border-radius:8px;padding:15px;border:1px solid #e9edf2;margin:15px 0;color:#2c5a6b;font-size:14px;line-height:1.7;">
+                ${data.reason ? '<strong>Reason:</strong> ' + data.reason : "You're welcome to re-apply in the future once the required information or documentation is available."}
+            </div>
+            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:15px 0 0;">
+                If you believe this is a mistake or have additional details to share, just reply to this email and our team will be happy to take another look.
+            </p>
+            <div class="footer">
+                <p>&copy; 2026 Pilot Sales Distribution &bull; <a href="https://pilotsalesdistribution.com">Visit our store</a></p>
+                <p style="margin:5px 0 0;">📧 support@pilotsalesdistribution.com &bull; 📞 +1 (909) 938-4682</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
         `
     };
 
@@ -965,6 +1188,44 @@ async function sendAdminEmail(toEmail, name, subject, message, buttonText, butto
     return sendEmailResend('admin-message', data, toEmail);
 }
 
+// ─── SELLER APPLICATION EMAILS (fully automatic) ───
+// 1. Auto-confirmation to the applicant that their application was received
+async function sendSellerApplicationReceived(toEmail, name, businessName) {
+    const data = { name: name || 'there', email: toEmail, businessName: businessName || '' };
+    return sendEmailResend('seller-application-received', data, toEmail);
+}
+
+// 2. Auto-notification to the admin team that a new application arrived
+async function sendSellerApplicationAdmin(appData) {
+    const data = {
+        name: ((appData.firstName || '') + ' ' + (appData.lastName || '')).trim() || appData.name || 'New Seller',
+        email: appData.email || '',
+        phone: appData.phone || '',
+        whatsapp: appData.whatsapp || '',
+        businessName: appData.businessName || '',
+        businessType: appData.businessType || '',
+        categories: appData.categories || '',
+        yearsInBusiness: appData.yearsInBusiness || '',
+        website: appData.website || '',
+        contactEmail: appData.contactEmail || '',
+        reason: appData.reason || '',
+        profileImage: appData.profileImage || ''
+    };
+    return sendEmailResend('seller-application-admin', data, EMAIL_CONFIG.fallbackEmail);
+}
+
+// 3. Auto "approved" email to the seller when admin verifies them
+async function sendSellerApplicationApproved(toEmail, name, businessName) {
+    const data = { name: name || 'there', email: toEmail, businessName: businessName || '' };
+    return sendEmailResend('seller-application-approved', data, toEmail);
+}
+
+// 4. Auto "rejected" email to the seller when admin declines the application
+async function sendSellerApplicationRejected(toEmail, name, reason) {
+    const data = { name: name || 'there', email: toEmail, reason: reason || '' };
+    return sendEmailResend('seller-application-rejected', data, toEmail);
+}
+
 // ─── EXPOSE FUNCTIONS ───
 window.sendEmailResend = sendEmailResend;
 window.sendFestivalGreeting = sendFestivalGreeting;
@@ -981,6 +1242,10 @@ window.sendEmailFallback = sendEmailFallback;
 window.sendEmailFormSubmit = sendEmailFormSubmit;
 window.sendNotificationEmail = sendNotificationEmail;
 window.sendSupportMessage = sendSupportMessage;
+window.sendSellerApplicationReceived = sendSellerApplicationReceived;
+window.sendSellerApplicationAdmin = sendSellerApplicationAdmin;
+window.sendSellerApplicationApproved = sendSellerApplicationApproved;
+window.sendSellerApplicationRejected = sendSellerApplicationRejected;
 
 // Export for Node.js (if using server-side)
 if (typeof module !== 'undefined' && module.exports) {
@@ -999,6 +1264,10 @@ if (typeof module !== 'undefined' && module.exports) {
         sendEmailFormSubmit,
         sendNotificationEmail,
         sendSupportMessage,
+        sendSellerApplicationReceived,
+        sendSellerApplicationAdmin,
+        sendSellerApplicationApproved,
+        sendSellerApplicationRejected,
         EMAIL_CONFIG
     };
 }

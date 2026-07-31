@@ -771,6 +771,10 @@
                 <i class="fa-regular fa-store"></i> Sellers
                 <span class="badge orange" id="sellerBadge">0</span>
             </button>
+            <button class="nav-item" onclick="showTab('applications')">
+                <i class="fa-regular fa-file-signature"></i> Applications
+                <span class="badge orange" id="applicationBadge" style="display:none;">0</span>
+            </button>
             <button class="nav-item" onclick="showTab('support')">
                 <i class="fa-regular fa-headset"></i> Live Support
                 <span class="badge red" id="supportBadge">0</span>
@@ -1030,6 +1034,20 @@
                             <tr><td colspan="6"><div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading sellers...</p></div></td></tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- SELLER APPLICATIONS -->
+            <div class="tab-content" id="tab-applications">
+                <div class="page-header">
+                    <h2><i class="fa-regular fa-file-signature"></i> Seller Applications</h2>
+                    <span class="time" id="applicationCount">0 pending</span>
+                </div>
+                <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:0.8rem;">
+                    <i class="fa-solid fa-circle-info"></i> Seller applications submitted from the Become a Seller page appear here. Approving an application creates the verified seller account and automatically emails the seller their approval + verified badge.
+                </p>
+                <div id="applicationList">
+                    <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading applications...</p></div>
                 </div>
             </div>
 
@@ -1511,6 +1529,7 @@
     let allOrders = [];
     let allRFQs = [];
     let allUsers = [];
+    let allApplications = [];
 
     // ─── INIT ───
     function initFirebase() {
@@ -1578,6 +1597,7 @@
         if (tab === 'products') loadProducts();
         if (tab === 'rfqs') loadRFQs();
         if (tab === 'sellers') loadSellers();
+        if (tab === 'applications') loadSellerApplications();
         if (tab === 'analytics') loadAnalytics();
         // Extension tabs (subscribers, support, email center, reviews, trust, holidays)
         if (window.AdminExt && typeof AdminExt.onTabShow === 'function') AdminExt.onTabShow(tab);
@@ -1593,7 +1613,8 @@
             loadRFQs(),
             loadSellers(),
             loadAnalytics(),
-            updateStats()
+            updateStats(),
+            loadSellerApplications()
         ]);
     }
 
@@ -2184,6 +2205,192 @@
         } catch (error) { showToast('Failed', 'error'); }
     }
 
+    // --- LOAD SELLER APPLICATIONS ---
+    async function loadSellerApplications() {
+        const list = document.getElementById('applicationList');
+        try {
+            const snapshot = await db.collection('seller_applications').orderBy('created_at', 'desc').get();
+            allApplications = [];
+            snapshot.forEach(doc => allApplications.push({ id: doc.id, ...doc.data() }));
+
+            const pending = allApplications.filter(a => (a.status || 'pending') === 'pending');
+            document.getElementById('applicationCount').textContent = pending.length + ' pending';
+            const badge = document.getElementById('applicationBadge');
+            if (badge) {
+                badge.textContent = pending.length;
+                badge.style.display = pending.length > 0 ? 'inline-block' : 'none';
+            }
+
+            if (allApplications.length === 0) {
+                list.innerHTML = `<div class="empty-state"><i class="fa-regular fa-file-signature"></i><p>No seller applications yet</p></div>`;
+                return;
+            }
+
+            list.innerHTML = allApplications.map(a => {
+                const status = a.status || 'pending';
+                const cats = Array.isArray(a.categories) ? a.categories.join(', ') : (a.categories || 'N/A');
+                const profileImg = a.profileImage
+                    ? `<img src="${a.profileImage}" alt="${a.businessName || 'Seller'}" style="width:54px;height:54px;border-radius:10px;object-fit:cover;border:2px solid var(--border);" />`
+                    : `<div style="width:54px;height:54px;border-radius:10px;background:var(--light);display:flex;align-items:center;justify-content:center;color:var(--text-light);font-size:1.4rem;"><i class="fa-regular fa-store"></i></div>`;
+                return `
+                <div style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:0.8rem;">
+                    <div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;">
+                        ${profileImg}
+                        <div style="flex:1;min-width:220px;">
+                            <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                                <strong style="color:var(--secondary);font-size:1rem;">${a.businessName || 'Unknown Business'}</strong>
+                                <span class="status-badge ${status === 'approved' ? 'approved' : status === 'rejected' ? 'suspended' : 'pending'}">${status}</span>
+                            </div>
+                            <p style="font-size:0.82rem;color:var(--text-light);margin:0.2rem 0;">${a.firstName || ''} ${a.lastName || ''} &bull; ${a.email || 'N/A'}</p>
+                            <div style="font-size:0.78rem;color:var(--text);margin-top:0.4rem;line-height:1.7;">
+                                <span style="display:inline-block;margin-right:1rem;"><i class="fa-solid fa-phone" style="color:var(--primary);"></i> ${a.phone || 'N/A'}</span>
+                                <span style="display:inline-block;margin-right:1rem;"><i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> ${a.whatsapp || 'N/A'}</span>
+                                <span style="display:inline-block;margin-right:1rem;"><i class="fa-solid fa-envelope" style="color:var(--primary);"></i> ${a.contactEmail || a.email || 'N/A'}</span>
+                                <span style="display:inline-block;"><i class="fa-solid fa-location-dot" style="color:var(--primary);"></i> ${a.location || 'N/A'}</span>
+                                <br><span style="display:inline-block;margin-right:1rem;"><i class="fa-solid fa-tag" style="color:var(--primary);"></i> ${a.businessType || 'N/A'}</span>
+                                <span style="display:inline-block;margin-right:1rem;"><i class="fa-regular fa-clock"></i> ${a.yearsInBusiness || 'N/A'}</span>
+                                ${a.website ? `<span style="display:inline-block;"><i class="fa-solid fa-globe"></i> <a href="${a.website}" target="_blank" style="color:var(--primary);">${a.website}</a></span>` : ''}
+                                <br><span><i class="fa-solid fa-boxes-stacked" style="color:var(--primary);"></i> ${cats}</span>
+                            </div>
+                            ${a.reason ? `<p style="font-size:0.78rem;color:var(--text);background:var(--light);border-radius:8px;padding:0.5rem 0.7rem;margin:0.5rem 0 0;"><strong>Why:</strong> ${a.reason}</p>` : ''}
+                            <p style="font-size:0.7rem;color:var(--text-light);margin:0.4rem 0 0;">Applied ${a.created_at ? new Date(a.created_at).toLocaleString() : ''}</p>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:0.4rem;align-items:flex-end;">
+                            ${status === 'pending' ? `
+                                <button class="btn-action approve" style="width:auto;padding:0.4rem 0.8rem;border-radius:8px;" onclick="approveApplication('${a.id}')" title="Approve & verify"><i class="fa-regular fa-circle-check"></i> Approve &amp; Verify</button>
+                                <button class="btn-action ban" style="width:auto;padding:0.4rem 0.8rem;border-radius:8px;" onclick="rejectApplication('${a.id}')" title="Reject"><i class="fa-regular fa-circle-xmark"></i> Reject</button>
+                            ` : `<span style="font-size:0.75rem;color:var(--text-light);">Reviewed ${a.reviewed_at ? new Date(a.reviewed_at).toLocaleDateString() : ''}</span>`}
+                            <button class="btn-action email" style="width:auto;padding:0.4rem 0.8rem;border-radius:8px;" onclick="emailApplicant('${a.id}')" title="Email applicant"><i class="fa-regular fa-envelope"></i> Email</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        } catch (error) {
+            console.error('Applications error:', error);
+            list.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading applications</p></div>`;
+        }
+    }
+
+    // --- APPROVE APPLICATION (creates verified seller + auto email) ---
+    async function approveApplication(appId) {
+        const app = allApplications.find(a => a.id === appId);
+        if (!app) { showToast('Application not found', 'error'); return; }
+        if (!confirm(`Approve and verify "${app.businessName || app.email}"?\n\nThis makes them a Verified Seller and automatically emails them.`)) return;
+
+        try {
+            const sellerData = {
+                role: 'seller',
+                full_name: app.full_name || ((app.firstName || '') + ' ' + (app.lastName || '')).trim(),
+                first_name: app.firstName || '',
+                last_name: app.lastName || '',
+                email: app.email || '',
+                company: app.businessName || '',
+                business_type: app.businessType || '',
+                business_name: app.businessName || '',
+                phone: app.phone || '',
+                whatsapp: app.whatsapp || '',
+                contact_email: app.contactEmail || app.email || '',
+                contactEmail: app.contactEmail || app.email || '',
+                location: app.location || '',
+                website: app.website || '',
+                categories: app.categories || [],
+                years_in_business: app.yearsInBusiness || '',
+                avatar: app.profileImage || '',
+                profile_image: app.profileImage || '',
+                verified: true,
+                status: 'approved',
+                verified_at: new Date().toISOString(),
+                approved_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            // Update the registered user if linked, otherwise create a seller record
+            if (app.userId && app.userId !== 'guest') {
+                await db.collection('users').doc(app.userId).set(sellerData, { merge: true });
+                // Flag their products as verified
+                try {
+                    const prods = await db.collection('products').where('supplier_id', '==', app.userId).get();
+                    await Promise.all(prods.docs.map(d => d.ref.update({
+                        supplier_verified: true,
+                        supplier_name: app.businessName || '',
+                        supplier_whatsapp: app.whatsapp || '',
+                        supplier_phone: app.phone || '',
+                        supplier_email: app.contactEmail || app.email || ''
+                    })));
+                } catch (e) {}
+            } else {
+                // No linked account: create a seller record keyed by email so listings resolve
+                await db.collection('users').add(Object.assign({ created_at: new Date().toISOString(), account_status: 'pending-registration' }, sellerData));
+            }
+
+            // Mark application approved
+            await db.collection('seller_applications').doc(appId).update({
+                status: 'approved',
+                reviewed_at: new Date().toISOString()
+            });
+
+            // Automatic approval email (no manual step)
+            try {
+                if (typeof sendSellerApplicationApproved === 'function') {
+                    sendSellerApplicationApproved(app.email, sellerData.full_name || app.businessName, app.businessName).catch(() => {});
+                }
+            } catch (e) {}
+
+            showToast('Seller approved, verified and emailed automatically!', 'success');
+            loadSellerApplications();
+            loadSellers();
+            updateStats();
+        } catch (error) {
+            console.error('Approve application error:', error);
+            showToast('Failed to approve application', 'error');
+        }
+    }
+
+    // --- REJECT APPLICATION (auto email) ---
+    async function rejectApplication(appId) {
+        const app = allApplications.find(a => a.id === appId);
+        if (!app) { showToast('Application not found', 'error'); return; }
+        const reason = prompt(`Optional: tell ${app.firstName || 'the seller'} why their application was declined:`, '') || '';
+        if (!confirm(`Reject the application from "${app.businessName || app.email}"?\n\nThey will be automatically emailed.`)) return;
+
+        try {
+            await db.collection('seller_applications').doc(appId).update({
+                status: 'rejected',
+                rejection_reason: reason,
+                reviewed_at: new Date().toISOString()
+            });
+            try {
+                if (typeof sendSellerApplicationRejected === 'function') {
+                    sendSellerApplicationRejected(app.email, ((app.firstName || '') + ' ' + (app.lastName || '')).trim() || app.businessName, reason).catch(() => {});
+                }
+            } catch (e) {}
+            // mark the linked account's seller_application status
+            if (app.userId && app.userId !== 'guest') {
+                try { await db.collection('users').doc(app.userId).update({ seller_application: 'rejected', updated_at: new Date().toISOString() }); } catch (e) {}
+            }
+            showToast('Application rejected and email sent', 'info');
+            loadSellerApplications();
+        } catch (error) {
+            console.error('Reject application error:', error);
+            showToast('Failed to reject application', 'error');
+        }
+    }
+
+    // --- EMAIL AN APPLICANT (opens Email Center) ---
+    function emailApplicant(appId) {
+        const app = allApplications.find(a => a.id === appId);
+        if (!app) return;
+        showTab('emailcenter');
+        setTimeout(() => {
+            const to = document.getElementById('emailTo');
+            const name = document.getElementById('emailToName');
+            const subj = document.getElementById('emailSubject');
+            if (to) to.value = app.email || '';
+            if (name) name.value = app.businessName || ((app.firstName || '') + ' ' + (app.lastName || '')).trim();
+            if (subj) subj.value = 'Regarding your seller application';
+        }, 150);
+    }
+
     // ─── LOAD ANALYTICS ───
     async function loadAnalytics() {
         try {
@@ -2516,6 +2723,10 @@
     window.updateOrderStatus = updateOrderStatus;
     window.updateRFQStatus = updateRFQStatus;
     window.approveSeller = approveSeller;
+    window.loadSellerApplications = loadSellerApplications;
+    window.approveApplication = approveApplication;
+    window.rejectApplication = rejectApplication;
+    window.emailApplicant = emailApplicant;
     window.saveSettings = saveSettings;
     window.suspendUser = suspendUser;
     window.unsuspendUser = unsuspendUser;

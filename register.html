@@ -172,6 +172,9 @@
             </div>
 
             <div id="sellerFields">
+                <div class="info-box" style="background:var(--primary-light); border-radius:var(--radius-sm); padding:0.8rem 1rem; border-left:4px solid var(--primary); margin-bottom:1rem;">
+                    <p style="margin:0; font-size:0.8rem; color:var(--text);"><i class="fa-regular fa-circle-info" style="color:var(--primary); margin-right:0.3rem;"></i> Sellers complete a short <strong>application</strong> for review &amp; verification. After creating your account you'll be taken to the seller application form.</p>
+                </div>
                 <div class="form-group">
                     <label>Company Name <span class="required">*</span></label>
                     <input type="text" id="regCompany" placeholder="Your business name" />
@@ -408,30 +411,37 @@
                 full_name: `${firstName} ${lastName}`,
                 first_name: firstName,
                 last_name: lastName,
-                role: selectedRole,
+                role: selectedRole === 'seller' ? 'buyer' : selectedRole,
                 company: company || '',
                 business_type: businessType || '',
                 created_at: new Date().toISOString(),
                 status: 'active',
-                verification_status: 'pending'
+                verification_status: 'pending',
+                seller_application: selectedRole === 'seller' ? 'pending' : 'none'
             });
             localStorage.setItem('pilot_user', JSON.stringify({
                 id: user.uid,
                 email: email,
                 full_name: `${firstName} ${lastName}`,
-                role: selectedRole
+                role: selectedRole === 'seller' ? 'buyer' : selectedRole
             }));
             updateAuthUI();
-            showToast(`✅ Welcome ${firstName}! Account created!`, 'success');
             try {
                 if (typeof sendWelcomeEmail === 'function') {
                     sendWelcomeEmail(email, firstName).catch(() => {});
                 }
             } catch (e) {}
-            setTimeout(() => {
-                if (selectedRole === 'seller') { window.location.href = '/seller-dashboard'; }
-                else { window.location.href = '/home'; }
-            }, 1500);
+            // Sellers are redirected to the seller application form for review & verification
+            if (selectedRole === 'seller') {
+                showToast("✅ Account created! Now let's complete your seller application…", 'success');
+                sessionStorage.setItem('pse_seller_prefill', JSON.stringify({
+                    firstName, lastName, email, company, businessType
+                }));
+                setTimeout(() => { window.location.href = '/become-seller'; }, 1500);
+                return;
+            }
+            showToast(`✅ Welcome ${firstName}! Account created!`, 'success');
+            setTimeout(() => { window.location.href = '/home'; }, 1500);
         } catch (error) {
             let msg = error.message;
             if (error.code === 'auth/email-already-in-use') msg = 'This email is already registered.';
