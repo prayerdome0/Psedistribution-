@@ -37,7 +37,9 @@ Key routes (clean URLs on Vercel):
 
 ## Features
 
+- Landing image carousel — full-width promo images that auto-scroll horizontally (arrows, dots, swipe, pause-on-hover); no text banner
 - Featured products, category browsing, live search
+- Email/password + Google sign-up and login (no SMS/phone verification)
 - Guest cart (localStorage) that merges on login
 - Wishlist, RFQ, order tracking, WhatsApp quote checkout
 - Seller / buyer / admin dashboards
@@ -52,9 +54,9 @@ Key routes (clean URLs on Vercel):
 
 - All header/footer/nav links are **absolute** (`/products`, `/cart`, …) so they never 404 on deep URLs like `/product/slug`
 - `/product/:path*` rewrites in `vercel.json` cover every product URL
-- `product-detail.html` fallback catalog synced with the store catalog (all 8 products); unknown products redirect to `/products` with a message instead of a dead page
+- `404.html` now includes a **deep-link rescue**: if it is ever served for a valid clean route (e.g. hosts where the Vercel rewrites are not applied), it instantly forwards `/product/<slug>` → `product-detail.html?slug=…` and other known routes to their pages, instead of stranding visitors
+- `product-detail.html` parses `?slug=`, `?id=`, `/product/<slug>` and `/product-detail/<slug>` (URL-decoded, trailing-slash tolerant), has a fallback catalog synced with the store catalog (all 8 products), redirects unknown products to `/products` with a message, and still renders from local data if the Firebase CDN can't load
 - Missing `main.js` (referenced by `chat.html`) recreated — no more broken-script 404
-- `404.html` upgraded: absolute links, product search, helpful shortcuts, auto-redirect home
 
 ## Configuration
 

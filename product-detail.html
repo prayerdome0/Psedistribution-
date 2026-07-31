@@ -928,10 +928,20 @@
     }
 
     // ─── INIT ───
+    let firebaseRetries = 0;
     function initFirebase() {
-        if (typeof firebase === 'undefined') { 
-            setTimeout(initFirebase, 500); 
-            return; 
+        if (typeof firebase === 'undefined') {
+            // If the Firebase SDK never loads (blocked network/ad-blocker),
+            // stop retrying after ~8s and load from the local fallback catalog.
+            if (++firebaseRetries > 16) {
+                console.warn('Firebase unavailable — using local product data');
+                loadProductDetail();
+                loadCartCount();
+                loadWishlistCount();
+                return;
+            }
+            setTimeout(initFirebase, 500);
+            return;
         }
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
@@ -1016,15 +1026,19 @@
     function getProductIdentifier() {
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
-        if (id) return { type: 'id', value: id };
+        if (id) return { type: 'id', value: id.trim() };
+
+        const decodeSlug = (s) => {
+            try { return decodeURIComponent(s); } catch (e) { return s; }
+        };
 
         const slugParam = params.get('slug');
-        if (slugParam) return { type: 'slug', value: slugParam };
+        if (slugParam) return { type: 'slug', value: decodeSlug(slugParam.trim().replace(/\/+$/, '')) };
 
-        const path = window.location.pathname;
-        const slugMatch = path.match(/\/product\/([^\/]+)/);
-        if (slugMatch) return { type: 'slug', value: slugMatch[1] };
-        
+        const path = (window.location.pathname || '').replace(/\/+$/, '');
+        const slugMatch = path.match(/\/product(?:-detail)?\/([^\/?#]+)/i);
+        if (slugMatch) return { type: 'slug', value: decodeSlug(slugMatch[1]) };
+
         return null;
     }
 

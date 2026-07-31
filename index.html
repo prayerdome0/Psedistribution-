@@ -199,48 +199,51 @@
         .nav-tab.active { color: var(--primary); font-weight: 700; }
         .wholesale-nav { color: var(--primary); font-weight: 700; }
 
+        /* ─── IMAGE CAROUSEL (images only — auto-scrolls horizontally, swipeable) ─── */
         .banner-slider {
             position: relative;
             border-radius: var(--radius);
             overflow: hidden;
             margin: 1.5rem 0;
-            height: 450px;
+            height: 420px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            background: var(--secondary);
+            touch-action: pan-y;
         }
-        .banner-slider .slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
+        .banner-track {
+            display: flex;
             height: 100%;
-            opacity: 0;
-            transition: opacity 0.8s ease, transform 0.8s ease;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            align-items: center;
-            padding: 3rem 4rem;
-            gap: 2rem;
-            transform: scale(1.02);
+            transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1);
         }
-        .banner-slider .slide.active { opacity: 1; transform: scale(1); }
-        .banner-slider .slide .content { z-index: 2; color: var(--white); }
-        .banner-slider .slide .content .badge { display: inline-block; background: rgba(255,255,255,0.15); padding: 0.3rem 1.2rem; border-radius: 30px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; backdrop-filter: blur(4px); }
-        .banner-slider .slide .content h2 { font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1.2; }
-        .banner-slider .slide .content h2 span { color: var(--accent); }
-        .banner-slider .slide .content p { font-size: 1.1rem; opacity: 0.9; margin-bottom: 1.5rem; max-width: 500px; }
-        .banner-slider .slide .content .buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
-        .banner-slider .slide .slide-image { border-radius: 1rem; overflow: hidden; aspect-ratio: 16/10; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .banner-slider .slide .slide-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-        .banner-slider .slide.active .slide-image img { transform: scale(1.05); }
-        .banner-slider .dots { position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 0.8rem; z-index: 10; }
-        .banner-slider .dots .dot { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: 0.4s; border: 2px solid rgba(255,255,255,0.1); }
-        .banner-slider .dots .dot:hover { background: rgba(255,255,255,0.6); }
-        .banner-slider .dots .dot.active { background: var(--accent); transform: scale(1.2); border-color: var(--accent); }
-
-        .btn-primary { background: var(--accent); color: var(--secondary); padding: 0.7rem 2rem; border-radius: 50px; font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; }
-        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 25px rgba(241,196,15,0.3); }
-        .btn-outline-light { background: transparent; border: 2px solid rgba(255,255,255,0.4); color: var(--white); padding: 0.7rem 2rem; border-radius: 50px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; }
-        .btn-outline-light:hover { background: rgba(255,255,255,0.1); border-color: var(--white); transform: translateY(-2px); }
+        .banner-slider .slide { min-width: 100%; height: 100%; }
+        .banner-slider .slide a { display: block; width: 100%; height: 100%; }
+        .banner-slider .slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .banner-slider .banner-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 20;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            background: rgba(11,42,59,0.45);
+            color: #fff;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            backdrop-filter: blur(4px);
+        }
+        .banner-slider .banner-nav:hover { background: var(--primary); }
+        .banner-slider .banner-nav.prev { left: 15px; }
+        .banner-slider .banner-nav.next { right: 15px; }
+        .banner-slider .dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 0.6rem; z-index: 10; }
+        .banner-slider .dots .dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.45); cursor: pointer; transition: 0.4s; border: none; padding: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+        .banner-slider .dots .dot:hover { background: rgba(255,255,255,0.85); }
+        .banner-slider .dots .dot.active { background: var(--accent); transform: scale(1.25); }
 
         .stats-section {
             display: grid;
@@ -535,12 +538,7 @@
         .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
 
         @media (max-width: 992px) {
-            .banner-slider { height: 400px; }
-            .banner-slider .slide { grid-template-columns: 1fr; padding: 2rem; text-align: center; }
-            .banner-slider .slide .content p { margin: 0 auto 1.5rem; }
-            .banner-slider .slide .content .buttons { justify-content: center; }
-            .banner-slider .slide .slide-image { display: none; }
-            .banner-slider .slide .content h2 { font-size: 2.2rem; }
+            .banner-slider { height: 330px; }
             .stats-section { grid-template-columns: repeat(2, 1fr); }
             .stat-item .number { font-size: 2.2rem; }
         }
@@ -549,10 +547,8 @@
             .top-links { justify-content: center; }
             .header .container { gap: 0.8rem; }
             .search-bar { min-width: 100%; order: 10; }
-            .banner-slider { height: 320px; }
-            .banner-slider .slide .content h2 { font-size: 1.6rem; }
-            .banner-slider .slide .content p { font-size: 0.9rem; }
-            .banner-slider .slide { padding: 1.5rem; }
+            .banner-slider { height: 240px; margin: 1rem 0; }
+            .banner-slider .banner-nav { width: 34px; height: 34px; font-size: 0.8rem; }
             .product-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
             .header-actions .icon-btn span { display: none; }
             .stats-section { grid-template-columns: 1fr 1fr; padding: 1.5rem; }
@@ -570,6 +566,7 @@
             .category-item span { font-size: 0.65rem; }
         }
         @media (max-width: 480px) {
+            .banner-slider { height: 180px; }
             .product-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
             .product-card { padding: 0.6rem; }
             .product-card .product-title { font-size: 0.8rem; }
@@ -671,50 +668,27 @@
 <!-- MAIN CONTENT -->
 <div class="container">
 
-    <!-- 1. HERO BANNER SLIDER -->
+    <!-- 1. IMAGE CAROUSEL — images only, auto-scrolls (swipe / arrows / dots) -->
     <div class="banner-slider" id="bannerSlider">
-        <div class="slide active" style="background: linear-gradient(135deg, #0b2a3b 0%, #1a4b5e 100%);">
-            <div class="content">
-                <span class="badge">🏪 Wholesale Marketplace</span>
-                <h2>Premium Products at <span>Wholesale Prices</span></h2>
-                <p>12,000+ products from 580+ verified suppliers. Quality guaranteed.</p>
-                <div class="buttons">
-                    <a href="/products" class="btn-primary"><i class="fa-solid fa-cart-plus"></i> Shop Now</a>
-                    <a href="/about" class="btn-outline-light">Learn More</a>
-                </div>
+        <div class="banner-track" id="bannerTrack">
+            <div class="slide">
+                <a href="/products" aria-label="Browse wholesale products">
+                    <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1600&q=80" alt="Wholesale marketplace products" />
+                </a>
             </div>
-            <div class="slide-image">
-                <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&h=800&q=80" alt="Wholesale Marketplace" loading="lazy" />
+            <div class="slide">
+                <a href="/track-order" aria-label="Track your order">
+                    <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1600&q=80" alt="Fast and reliable delivery" loading="lazy" />
+                </a>
             </div>
-        </div>
-        <div class="slide" style="background: linear-gradient(135deg, #1a7b6b 0%, #0f4f43 100%);">
-            <div class="content">
-                <span class="badge">🚚 Logistics & Distribution</span>
-                <h2>Fast & Reliable <span>Delivery</span></h2>
-                <p>Free shipping on orders over $250. Track your order in real-time.</p>
-                <div class="buttons">
-                    <a href="/products" class="btn-primary"><i class="fa-solid fa-truck"></i> Browse Products</a>
-                    <a href="/track-order" class="btn-outline-light">Track Order</a>
-                </div>
-            </div>
-            <div class="slide-image">
-                <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&h=800&q=80" alt="Logistics" loading="lazy" />
+            <div class="slide">
+                <a href="/become-seller" aria-label="Become a supplier">
+                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1600&q=80" alt="Trusted supplier partnerships" loading="lazy" />
+                </a>
             </div>
         </div>
-        <div class="slide" style="background: linear-gradient(135deg, #2c3e50 0%, #1a2a3a 100%);">
-            <div class="content">
-                <span class="badge">🤝 Business Partnership</span>
-                <h2>Trusted <span>Suppliers</span></h2>
-                <p>Connect with verified suppliers worldwide. Quality products guaranteed.</p>
-                <div class="buttons">
-                    <a href="/become-seller" class="btn-primary"><i class="fa-regular fa-store"></i> Become a Supplier</a>
-                    <a href="/about" class="btn-outline-light">About Us</a>
-                </div>
-            </div>
-            <div class="slide-image">
-                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&h=800&q=80" alt="Business Partnership" loading="lazy" />
-            </div>
-        </div>
+        <button class="banner-nav prev" onclick="prevSlide()" aria-label="Previous image"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="banner-nav next" onclick="nextSlide()" aria-label="Next image"><i class="fa-solid fa-chevron-right"></i></button>
         <div class="dots" id="bannerDots"></div>
     </div>
 
@@ -866,7 +840,7 @@
             </div>
             <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(8px);padding:1.2rem;border-radius:10px;border:1px solid rgba(255,255,255,0.1);">
                 <div style="color:#f1c40f;margin-bottom:0.5rem;font-size:1.1rem;">★★★★★</div>
-                <p style="font-size:0.9rem;line-height:1.6;opacity:0.9;margin-bottom:0.8rem;">"The SMS verification and easy login made onboarding smooth. We've been ordering for 6 months with zero issues."</p>
+                <p style="font-size:0.9rem;line-height:1.6;opacity:0.9;margin-bottom:0.8rem;">"The quick sign-up and easy login made onboarding smooth. We've been ordering for 6 months with zero issues."</p>
                 <div style="font-weight:600;">David Nakamura</div>
                 <div style="font-size:0.75rem;opacity:0.7;">E-commerce Director</div>
             </div>
@@ -1277,27 +1251,63 @@
     }
 
     function initBanner() {
-        const slides = document.querySelectorAll('.slide');
+        const track = document.getElementById('bannerTrack');
+        const slider = document.getElementById('bannerSlider');
         const dots = document.getElementById('bannerDots');
-        if (!slides || slides.length === 0) return;
-        
-        dots.innerHTML = Array.from(slides).map((_, i) => 
+        if (!track || !slider || !dots) return;
+
+        const slides = track.querySelectorAll('.slide');
+        if (slides.length === 0) return;
+
+        dots.innerHTML = Array.from(slides).map((_, i) =>
             `<span class="dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></span>`
         ).join('');
-        
-        slideInterval = setInterval(() => {
-            const next = (currentSlide + 1) % slides.length;
-            goToSlide(next);
-        }, 5000);
+
+        startBannerAuto();
+
+        // Pause auto-scroll while the visitor hovers over the images
+        slider.addEventListener('mouseenter', stopBannerAuto);
+        slider.addEventListener('mouseleave', startBannerAuto);
+
+        // Swipe support on touch devices
+        let touchStartX = 0;
+        slider.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            stopBannerAuto();
+        }, { passive: true });
+        slider.addEventListener('touchend', (e) => {
+            const diff = e.changedTouches[0].clientX - touchStartX;
+            if (Math.abs(diff) > 40) {
+                if (diff < 0) { nextSlide(); } else { prevSlide(); }
+            }
+            startBannerAuto();
+        }, { passive: true });
+    }
+
+    function startBannerAuto() {
+        stopBannerAuto();
+        slideInterval = setInterval(() => nextSlide(), 5000);
+    }
+
+    function stopBannerAuto() {
+        if (slideInterval) { clearInterval(slideInterval); slideInterval = null; }
     }
 
     function goToSlide(index) {
-        const slides = document.querySelectorAll('.slide');
-        const dots = document.querySelectorAll('.dot');
-        slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
-        dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+        const track = document.getElementById('bannerTrack');
+        if (!track) return;
+        const slides = track.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('#bannerDots .dot');
+        if (slides.length === 0) return;
+        if (index < 0) index = slides.length - 1;
+        if (index >= slides.length) index = 0;
         currentSlide = index;
+        track.style.transform = `translateX(-${index * 100}%)`;
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
     }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
 
     async function loadProducts() {
         const grid = document.getElementById('productGrid');
@@ -1546,6 +1556,8 @@
     window.toggleWishlist = toggleWishlist;
     window.loadProducts = loadProducts;
     window.goToSlide = goToSlide;
+    window.nextSlide = nextSlide;
+    window.prevSlide = prevSlide;
     window.handleSearch = handleSearch;
     window.showToast = showToast;
     window.getCurrentUser = getCurrentUser;

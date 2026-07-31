@@ -5,7 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
     <title>Page Not Found - Pilot Sales Distribution</title>
-    
+
+    <script>
+        // ─── DEEP-LINK RESCUE ───
+        // On hosts where clean-URL rewrites are not applied, valid routes like
+        // /product/my-product-slug land on this 404 page. Detect known routes and
+        // forward the visitor to the correct page instead of stranding them here.
+        (function () {
+            try {
+                var rawPath = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
+                var lower = rawPath.toLowerCase();
+                if (lower === '/404' || lower === '/404.html') return;
+
+                // /product/<slug> (or /product-detail/<slug>) → product detail page
+                var m = lower.match(/^\/product(?:-detail)?\/([^\/?#]+)/);
+                if (m) {
+                    var slug = m[1];
+                    try { slug = decodeURIComponent(m[1]); } catch (e) { slug = m[1]; }
+                    window.location.replace('/product-detail.html?slug=' + encodeURIComponent(slug));
+                    return;
+                }
+
+                var map = {
+                    '/home': '/index.html',
+                    '/index': '/index.html',
+                    '/products': '/products.html',
+                    '/product': '/product-detail.html',
+                    '/product-detail': '/product-detail.html',
+                    '/cart': '/cart.html',
+                    '/checkout': '/checkout.html',
+                    '/login': '/login.html',
+                    '/register': '/register.html',
+                    '/account': '/account.html',
+                    '/admin': '/admin-dashboard.html',
+                    '/admin-dashboard': '/admin-dashboard.html',
+                    '/seller': '/seller-dashboard.html',
+                    '/seller-dashboard': '/seller-dashboard.html',
+                    '/buyer-dashboard': '/buyer-dashboard.html',
+                    '/about': '/about.html',
+                    '/contact': '/contact.html',
+                    '/help-center': '/help-center.html',
+                    '/help': '/help-center.html',
+                    '/privacy': '/privacy.html',
+                    '/terms': '/terms.html',
+                    '/track-order': '/track-order.html',
+                    '/become-seller': '/become-seller.html',
+                    '/order-success': '/order-success.html',
+                    '/order-sucess': '/order-success.html',
+                    '/wishlist': '/wishlist.html',
+                    '/chat': '/chat.html',
+                    '/rfq': '/rfq.html',
+                    '/supplier-verification': '/supplier-verification.html',
+                    '/notifications': '/index.html'
+                };
+
+                var first = '/' + (lower.split('/')[1] || '');
+                if (map[first]) {
+                    window.location.replace(map[first] + (window.location.search || '') + (window.location.hash || ''));
+                }
+            } catch (e) { /* stay on the friendly 404 page */ }
+        })();
+    </script>
+
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
