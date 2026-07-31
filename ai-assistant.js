@@ -1,12 +1,7 @@
 // ============================================
 // AI-ASSISTANT.JS - Pilot Sales Distribution
 // PSE Assistant: AI chatbot + Live Support.
-// 100% client-side rule/knowledge-base engine:
-//   * No API key, no external AI service, no cost
-//   * Runs in the visitor's browser
-//   * Context aware (current page, product, cart, user)
-//   * Live support tab: message → Firestore + email +
-//     WhatsApp escalation
+// Client-side engine — runs entirely in the browser.
 // ============================================
 (function () {
     'use strict';
@@ -32,7 +27,7 @@
         {
             id: 'how_are_you',
             keywords: ['how are you', 'how do you do', 'what\'s up', 'whats up'],
-            reply: 'I\'m great, thanks for asking! 😊 I\'m running 100% in your browser — no server, no API key, no cost. How can I help you shop today?'
+            reply: 'I\'m great, thanks for asking! 😊 How can I help you shop today?'
         },
         {
             id: 'products_browse',
@@ -763,5 +758,5 @@
         init();
     }
 
-    console.log('✅ ai-assistant.js loaded — AI assistant & live support (no API key, no cost)');
+    console.log('✅ ai-assistant.js loaded — AI assistant & live support');
 })();

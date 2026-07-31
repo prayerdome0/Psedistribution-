@@ -807,6 +807,31 @@
             </div>
         </div>
 
+        <!-- REVIEWS SECTION -->
+        <div class="reviews-section" style="margin-top:2rem;padding:1.5rem;background:var(--light);border-radius:var(--radius-sm);border:1px solid var(--border);">
+            <h3 style="font-size:1.2rem;color:var(--secondary);margin-bottom:1rem;"><i class="fa-solid fa-star" style="color:#f1c40f;margin-right:0.5rem;"></i> Customer Reviews</h3>
+            <div id="reviewsList" style="margin-bottom:1rem;">
+                <p style="color:var(--text-light);font-size:0.9rem;">No reviews yet for this product.</p>
+            </div>
+            <form id="reviewForm" onsubmit="submitReview(event)" style="margin-top:0.5rem;">
+                <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;">
+                    <label style="font-weight:600;font-size:0.85rem;">Your Rating:</label>
+                    <div style="font-size:1.2rem;color:#ddd;cursor:pointer;" id="starInput">
+                        <span onclick="setRating(1)" style="color:#ddd;transition:0.2s;">★</span>
+                        <span onclick="setRating(2)" style="color:#ddd;transition:0.2s;">★</span>
+                        <span onclick="setRating(3)" style="color:#ddd;transition:0.2s;">★</span>
+                        <span onclick="setRating(4)" style="color:#ddd;transition:0.2s;">★</span>
+                        <span onclick="setRating(5)" style="color:#ddd;transition:0.2s;">★</span>
+                    </div>
+                    <span id="ratingText" style="font-size:0.8rem;color:var(--text-light);">Select stars</span>
+                </div>
+                <textarea id="reviewText" placeholder="Share your experience with this product..." required style="width:100%;padding:0.8rem;border:1px solid var(--border-dark);border-radius:var(--radius-sm);font-size:0.9rem;resize:vertical;min-height:80px;outline:none;font-family:inherit;"></textarea>
+                <button type="submit" style="margin-top:0.8rem;background:var(--primary);color:#fff;border:none;padding:0.6rem 1.5rem;border-radius:30px;font-weight:600;font-size:0.85rem;cursor:pointer;transition:0.3s;">
+                    <i class="fa-solid fa-pen"></i> Submit Review
+                </button>
+            </form>
+        </div>
+
         <!-- Related Products -->
         <div class="related-section">
             <h3>You May Also <span>Like</span></h3>
@@ -1697,6 +1722,101 @@
     document.addEventListener('DOMContentLoaded', function() {
         initFirebase();
         document.getElementById('year').textContent = new Date().getFullYear();
+    });
+
+    // ─── REVIEWS ───
+    let currentReviewRating = 0;
+
+    window.setRating = function(n) {
+        currentReviewRating = n;
+        const stars = document.querySelectorAll('#starInput span');
+        stars.forEach((s, i) => {
+            s.style.color = i < n ? '#f1c40f' : '#ddd';
+        });
+        document.getElementById('ratingText').textContent = n + ' star' + (n > 1 ? 's' : '');
+    };
+
+    window.submitReview = async function(e) {
+        e.preventDefault();
+        const user = getCurrentUser();
+        if (!user) {
+            showToast('Please login to submit a review', 'error');
+            setTimeout(() => window.location.href = '/login', 1500);
+            return;
+        }
+        if (currentReviewRating < 1) {
+            showToast('Please select a star rating', 'error');
+            return;
+        }
+        const text = document.getElementById('reviewText').value.trim();
+        if (!text) {
+            showToast('Please write your review', 'error');
+            return;
+        }
+        const btn = e.target.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+        try {
+            await db.collection('reviews').add({
+                product_id: currentProductId || 'unknown',
+                user_id: user.id,
+                user_name: user.full_name || 'Buyer',
+                rating: currentReviewRating,
+                text: text,
+                created_at: new Date().toISOString()
+            });
+            document.getElementById('reviewText').value = '';
+            currentReviewRating = 0;
+            window.setRating(0);
+            showToast('✅ Review submitted! Thank you.', 'success');
+            loadReviews();
+        } catch (err) {
+            console.error(err);
+            showToast('❌ Failed to submit review', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-pen"></i> Submit Review';
+        }
+    };
+
+    async function loadReviews() {
+        const listEl = document.getElementById('reviewsList');
+        if (!listEl || !currentProductId) return;
+        try {
+            const snapshot = await db.collection('reviews').where('product_id', '==', currentProductId).orderBy('created_at', 'desc').limit(10).get();
+            if (snapshot.empty) {
+                listEl.innerHTML = '<p style="color:var(--text-light);font-size:0.9rem;">No reviews yet for this product. Be the first!</p>';
+                return;
+            }
+            listEl.innerHTML = snapshot.docs.map(doc => {
+                const r = doc.data();
+                const starsHtml = '★'.repeat(r.rating || 5) + '☆'.repeat(5 - (r.rating || 5));
+                return `<div style="padding:0.8rem 0;border-bottom:1px solid var(--border);margin-bottom:0.5rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem;">
+                        <strong style="font-size:0.9rem;color:var(--secondary);">${esc(r.user_name || 'Buyer')}</strong>
+                        <span style="color:#f1c40f;font-size:0.85rem;">${starsHtml}</span>
+                    </div>
+                    <p style="font-size:0.85rem;color:var(--text);line-height:1.5;">${esc(r.text || '')}</p>
+                    <div style="font-size:0.7rem;color:var(--text-light);margin-top:0.3rem;">${r.created_at ? new Date(r.created_at).toLocaleDateString() : ''}</div>
+                </div>`;
+            }).join('');
+        } catch (err) {
+            console.error('Reviews load error:', err);
+            listEl.innerHTML = '<p style="color:var(--text-light);font-size:0.9rem;">Reviews unavailable.</p>';
+        }
+    }
+
+    function esc(s) {
+        return String(s || '').replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    // Initialize reviews when product loads
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('reviewsList')) {
+            setTimeout(loadReviews, 2000);
+        }
     });
 
     // ─── EXPOSE GLOBALS ───
