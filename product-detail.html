@@ -13,6 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="main.js"></script>
     
     <style>
         :root {
@@ -630,10 +631,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
-            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="/seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -641,8 +642,8 @@
 <!-- HEADER -->
 <header class="header">
     <div class="container">
-        <a href="home" class="logo">
-            <img src="logo.jpg" alt="" />
+        <a href="/home" class="logo">
+            <img src="/logo.jpg" alt="" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -659,12 +660,12 @@
                 <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="cart" class="icon-btn">
+            <a href="/cart" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
             </a>
-            <a href="account" class="icon-btn" id="accountBtn">
+            <a href="/account" class="icon-btn" id="accountBtn">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
@@ -675,12 +676,12 @@
 <!-- NAVIGATION -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/products" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="/about" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="/contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="/help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="/become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -834,13 +835,13 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about">About</a>
-                <a href="contact">Contact</a>
-                <a href="help-center">Help</a>
-                <a href="privacy">Privacy Policy</a>
-                <a href="terms">Terms &amp; Conditions</a>
-                <a href="become-seller">Become a Seller</a>
-                <a href="supplier-verification">Supplier Verification</a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/help-center">Help</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms &amp; Conditions</a>
+                <a href="/become-seller">Become a Seller</a>
+                <a href="/supplier-verification">Supplier Verification</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -877,11 +878,16 @@
     let lightboxImages = [];
     let db, auth;
 
-    // ─── FALLBACK PRODUCTS ───
+    // ─── FALLBACK PRODUCTS (synced with products.html so every catalog card resolves) ───
     const FALLBACK_PRODUCTS = [
-        { id: '1', title: 'Premium Wireless Headphones', brand: 'Sony', price: 89.99, old_price: 129.99, image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&h=400&q=80', moq: 10, supplier_verified: true, description: 'High-quality wireless headphones with noise cancellation. Perfect for music lovers and professionals.', rating: 4.8, stock: 150, sku: 'WH-1000XM4', model: '1000XM4', warranty: '1 Year' },
-        { id: '2', title: 'Smartphone 5G 128GB', brand: 'Samsung', price: 499.99, old_price: 599.99, image_url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&h=400&q=80', moq: 5, supplier_verified: true, description: 'Latest 5G smartphone with 128GB storage and amazing camera quality.', rating: 4.9, stock: 85, sku: 'S23-128', model: 'Galaxy S23', warranty: '2 Years' },
-        { id: '3', title: 'Organic Cotton T-Shirt', brand: 'Nike', price: 24.99, old_price: 34.99, image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=400&h=400&q=80', moq: 20, supplier_verified: false, description: 'Comfortable organic cotton t-shirt. Available in multiple colors.', rating: 4.2, stock: 200, sku: 'CT-ORG-01', model: 'Organic Tee', warranty: '30 Days' }
+        { id: '1', title: 'Premium Wireless Headphones', brand: 'Sony', price: 89.99, old_price: 129.99, image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&h=400&q=80', moq: 10, supplier_verified: true, description: 'High-quality wireless headphones with noise cancellation. Perfect for music lovers and professionals.', rating: 4.8, stock: 150, sku: 'WH-1000XM4', model: '1000XM4', warranty: '1 Year', category: 'electronics' },
+        { id: '2', title: 'Smartphone 5G 128GB', brand: 'Samsung', price: 499.99, old_price: 599.99, image_url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&h=400&q=80', moq: 5, supplier_verified: true, description: 'Latest 5G smartphone with 128GB storage and amazing camera quality.', rating: 4.9, stock: 85, sku: 'S23-128', model: 'Galaxy S23', warranty: '2 Years', category: 'electronics' },
+        { id: '3', title: 'Organic Cotton T-Shirt', brand: 'Nike', price: 24.99, old_price: 34.99, image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=400&h=400&q=80', moq: 20, supplier_verified: false, description: 'Comfortable organic cotton t-shirt. Available in multiple colors.', rating: 4.2, stock: 200, sku: 'CT-ORG-01', model: 'Organic Tee', warranty: '30 Days', category: 'fashion' },
+        { id: '4', title: 'Professional Kitchen Knife Set', brand: 'Zwilling', price: 149.99, old_price: 199.99, image_url: 'https://images.unsplash.com/photo-1593618998160-e3408e6769a1?auto=format&fit=crop&w=400&h=400&q=80', moq: 6, supplier_verified: true, description: 'Professional-grade kitchen knife set. Perfect for chefs and home cooks.', rating: 4.7, stock: 45, sku: 'KK-PRO-04', model: 'Pro Chef Series', warranty: 'Lifetime', category: 'home' },
+        { id: '5', title: 'LED Desk Lamp', brand: 'Philips', price: 39.99, old_price: 59.99, image_url: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=400&h=400&q=80', moq: 15, supplier_verified: true, description: 'Energy-efficient LED desk lamp with adjustable brightness and USB charging.', rating: 4.5, stock: 120, sku: 'LED-DL-05', model: 'BrightFlex LED', warranty: '2 Years', category: 'home' },
+        { id: '6', title: 'Fitness Tracker Watch', brand: 'Garmin', price: 129.99, old_price: 169.99, image_url: 'https://images.unsplash.com/photo-1576243345690-4e4b79b63288?auto=format&fit=crop&w=400&h=400&q=80', moq: 10, supplier_verified: true, description: 'Advanced fitness tracker with heart-rate monitoring, GPS and 7-day battery.', rating: 4.6, stock: 60, sku: 'FT-GAR-06', model: 'ActiveTrack 55', warranty: '1 Year', category: 'sports' },
+        { id: '7', title: 'Leather Wallet', brand: 'Coach', price: 49.99, old_price: 69.99, image_url: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=400&h=400&q=80', moq: 12, supplier_verified: false, description: 'Genuine leather wallet with RFID protection and premium stitching.', rating: 4.0, stock: 80, sku: 'LW-COA-07', model: 'Classic Slim', warranty: '30 Days', category: 'fashion' },
+        { id: '8', title: 'Wireless Charging Pad', brand: 'Anker', price: 29.99, old_price: 39.99, image_url: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?auto=format&fit=crop&w=400&h=400&q=80', moq: 25, supplier_verified: true, description: 'Fast 15W wireless charging pad compatible with iPhone and Android.', rating: 4.3, stock: 300, sku: 'WC-ANK-08', model: 'PowerWave 15', warranty: '18 Months', category: 'electronics' }
     ];
 
     // ─── RESERVED SLUGS ───
@@ -986,7 +992,10 @@
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
         if (id) return { type: 'id', value: id };
-        
+
+        const slugParam = params.get('slug');
+        if (slugParam) return { type: 'slug', value: slugParam };
+
         const path = window.location.pathname;
         const slugMatch = path.match(/\/product\/([^\/]+)/);
         if (slugMatch) return { type: 'slug', value: slugMatch[1] };
@@ -1058,51 +1067,53 @@
         }
     }
 
+    // ─── REDIRECT TO CATALOG (never leave the user on a dead page) ───
+    function redirectToCatalog(message) {
+        if (typeof showToast === 'function') showToast(message || 'Product not found', 'error');
+        setTimeout(() => window.location.href = '/products', 1200);
+    }
+
     // ─── LOAD PRODUCT DETAIL ───
     async function loadProductDetail() {
         const identifier = getProductIdentifier();
         let product = null;
-        
-        // Check for reserved slugs first
-        if (identifier && identifier.type === 'slug') {
-            if (isReservedSlug(identifier.value)) {
-                showToast('Product not found', 'error');
-                setTimeout(() => window.location.href = '/products', 1500);
-                return;
-            }
+
+        // No identifier at all (e.g. opening /product-detail directly) → go to catalog
+        if (!identifier) {
+            redirectToCatalog('Please choose a product first');
+            return;
         }
-        
-        if (identifier) {
-            if (identifier.type === 'slug' && identifier.value) {
-                product = await loadProductBySlug(identifier.value);
-            } else if (identifier.type === 'id' && identifier.value) {
-                product = await fetchProductById(identifier.value);
-            }
+
+        // Check for reserved slugs first
+        if (identifier.type === 'slug' && isReservedSlug(identifier.value)) {
+            redirectToCatalog('Product not found');
+            return;
+        }
+
+        if (identifier.type === 'slug' && identifier.value) {
+            product = await loadProductBySlug(identifier.value);
+        } else if (identifier.type === 'id' && identifier.value) {
+            product = await fetchProductById(identifier.value);
         }
 
         // If no product found, try to find a matching fallback product
         if (!product) {
-            const path = window.location.pathname;
-            const slugMatch = path.match(/\/product\/([^\/]+)/);
-            if (slugMatch) {
-                const slug = slugMatch[1];
-                // Check if it's a reserved slug first
-                if (isReservedSlug(slug)) {
-                    showToast('Product not found', 'error');
-                    setTimeout(() => window.location.href = '/products', 1500);
-                    return;
+            if (identifier.type === 'slug') {
+                const fallback = FALLBACK_PRODUCTS.find(p => generateSlug(p.title) === identifier.value);
+                if (fallback) {
+                    product = { ...fallback, id: fallback.id };
                 }
-                const fallback = FALLBACK_PRODUCTS.find(p => generateSlug(p.title) === slug);
+            } else if (identifier.type === 'id') {
+                const fallback = FALLBACK_PRODUCTS.find(p => p.id === identifier.value);
                 if (fallback) {
                     product = { ...fallback, id: fallback.id };
                 }
             }
-            
-            // If still no product, use first fallback
+
+            // Still nothing → send them to the catalog instead of a 404
             if (!product) {
-                product = { ...FALLBACK_PRODUCTS[0] };
-                product.id = product.id;
-                showToast('Showing sample product', 'info');
+                redirectToCatalog('That product could not be found — showing the full catalog instead');
+                return;
             }
         }
 
@@ -1277,6 +1288,9 @@
             localStorage.setItem('pilot_cart', JSON.stringify(cart));
             showToast('✅ Added to cart!', 'success');
             loadCartCount();
+            if (typeof window.pushNotification === 'function') {
+                window.pushNotification('Added to cart 🛒', (currentProduct && currentProduct.title ? currentProduct.title + ' — ' : '') + 'Ready to checkout when you are.', { icon: 'fa-cart-shopping', url: '/cart', tag: 'cart' });
+            }
             return { success: true };
         }
 
@@ -1303,6 +1317,9 @@
             }
             showToast('✅ Added to cart!', 'success');
             loadCartCount();
+            if (typeof window.pushNotification === 'function') {
+                window.pushNotification('Added to cart 🛒', (currentProduct && currentProduct.title ? currentProduct.title + ' — ' : '') + 'Ready to checkout when you are.', { icon: 'fa-cart-shopping', url: '/cart', tag: 'cart' });
+            }
             return { success: true };
         } catch (error) {
             showToast('❌ Failed to add to cart', 'error');
@@ -1336,7 +1353,7 @@
     async function buyNow() {
         const result = await addToCart(currentProductId, parseInt(document.getElementById('qtyInput').value) || 1);
         if (result.success) {
-            setTimeout(() => window.location.href = 'checkout', 500);
+            setTimeout(() => window.location.href = '/checkout', 500);
         }
     }
 
@@ -1345,7 +1362,7 @@
         const user = getCurrentUser();
         if (!user) {
             showToast('Please login first', 'error');
-            setTimeout(() => window.location.href = 'login', 1500);
+            setTimeout(() => window.location.href = '/login', 1500);
             return;
         }
         try {
@@ -1447,7 +1464,7 @@
         const user = getCurrentUser();
         if (!user) {
             showToast('Please login to chat', 'error');
-            setTimeout(() => window.location.href = 'login', 1500);
+            setTimeout(() => window.location.href = '/login', 1500);
             return;
         }
         window.location.href = `chat?product=${currentProductId}`;
@@ -1613,10 +1630,10 @@
         const user = getCurrentUser();
         if (!user) {
             showToast('Please login to view wishlist', 'error');
-            setTimeout(() => window.location.href = 'login', 1500);
+            setTimeout(() => window.location.href = '/login', 1500);
             return;
         }
-        window.location.href = 'wishlist';
+        window.location.href = '/wishlist';
     }
 
     // ─── SEARCH HANDLER ───
@@ -1700,6 +1717,9 @@
     window.shareProduct = shareProduct;
     window.copyProductLink = copyProductLink;
 </script>
+    <script src="email.js"></script>
+    <script src="ai-assistant.js"></script>
+    <script src="notifications.js"></script>
 </body>
 </html>
 </html>

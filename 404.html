@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
     <title>Page Not Found - Pilot Sales Distribution</title>
     
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -26,7 +27,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
         body { background: #f0f4f8; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
         
-        .error-container { text-align: center; max-width: 500px; }
+        .error-container { text-align: center; max-width: 560px; width: 100%; }
         .error-container .code { font-size: 8rem; font-weight: 900; color: #1a7b6b; line-height: 1; }
         .error-container .logo { width: 80px; height: 80px; margin: 0 auto 1rem; }
         .error-container .logo img { width: 100%; height: 100%; object-fit: contain; }
@@ -34,6 +35,29 @@
         .error-container p { color: #6a889a; margin-bottom: 1.5rem; }
         .error-container .btn-home { display: inline-block; background: #1a7b6b; color: #fff; padding: 0.7rem 2.5rem; border-radius: 50px; font-weight: 600; text-decoration: none; transition: 0.3s; }
         .error-container .btn-home:hover { background: #0f4f43; transform: translateY(-2px); }
+
+        .error-search {
+            display: flex; background: #fff; border-radius: 50px; border: 2px solid #e2e8ef;
+            overflow: hidden; margin: 1.2rem 0 0.4rem; box-shadow: 0 8px 25px rgba(11,42,59,0.08);
+        }
+        .error-search input {
+            flex: 1; border: none; padding: 0.85rem 1.4rem; font-size: 0.95rem; outline: none; min-width: 0;
+        }
+        .error-search button {
+            background: var(--primary); border: none; color: #fff; padding: 0 1.8rem; cursor: pointer; font-size: 1rem; transition: background 0.3s;
+        }
+        .error-search button:hover { background: var(--primary-dark); }
+
+        .help-links { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin-top: 1.2rem; }
+        .help-links a {
+            display: inline-flex; align-items: center; gap: 0.45rem; background: #fff; color: #2c5a6b;
+            padding: 0.55rem 1.2rem; border-radius: 40px; font-size: 0.83rem; font-weight: 600; text-decoration: none;
+            border: 1px solid #e2e8ef; transition: all 0.25s;
+        }
+        .help-links a:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
+        .help-links a i { color: var(--primary); }
+
+        .auto-redirect { font-size: 0.75rem; color: #9fb3c2; margin-top: 1.4rem; }
         
         @media (max-width: 480px) {
             .error-container .code { font-size: 5rem; }
@@ -44,15 +68,51 @@
 <body>
     <div class="error-container">
         <div class="logo">
-            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
         </div>
         <div class="code">404</div>
         <h2>Page Not Found</h2>
         <p>Oops! The page you're looking for doesn't exist or has been moved.</p>
-        <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
-            <a href="home" class="btn-home">🏠 Back to Home</a>
-            <a href="products" class="btn-home" style="background:#0b2a3b;">Browse Products</a>
+
+        <div class="error-search">
+            <input type="text" id="notFoundSearch" placeholder="Search our 12,000+ products..." />
+            <button onclick="searchProducts()" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
+
+        <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-top:0.8rem;">
+            <a href="/" class="btn-home">🏠 Back to Home</a>
+            <a href="/products" class="btn-home" style="background:#0b2a3b;">Browse Products</a>
+        </div>
+
+        <div class="help-links">
+            <a href="/cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+            <a href="/track-order"><i class="fa-solid fa-truck"></i> Track Order</a>
+            <a href="/rfq"><i class="fa-regular fa-file-lines"></i> Request Quote</a>
+            <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help Center</a>
+            <a href="/contact"><i class="fa-regular fa-envelope"></i> Contact Us</a>
+            <a href="https://wa.me/19099384682" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+        </div>
+
+        <p class="auto-redirect">Taking you home in <span id="countdown">10</span>s…</p>
     </div>
+
+    <script>
+        function searchProducts() {
+            const q = document.getElementById('notFoundSearch').value.trim();
+            window.location.href = q ? '/products?search=' + encodeURIComponent(q) : '/products';
+        }
+        document.getElementById('notFoundSearch').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') searchProducts();
+        });
+        // Auto-redirect to home after 10s
+        var seconds = 10;
+        var timer = setInterval(function () {
+            seconds--;
+            document.getElementById('countdown').textContent = seconds;
+            if (seconds <= 0) { clearInterval(timer); window.location.href = '/'; }
+        }, 1000);
+    </script>
+    <script src="ai-assistant.js"></script>
+    <script src="notifications.js"></script>
 </body>
 </html>

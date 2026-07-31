@@ -48,6 +48,18 @@ function getTemplate(templateName, data) {
         'rfq-confirmation': {
             subject: 'RFQ Received - Pilot Sales Distribution',
             file: 'rfq-confirmation.html'
+        },
+        'contact': {
+            subject: 'New Contact Message - Pilot Sales Distribution',
+            file: 'contact.html'
+        },
+        'contact-auto-reply': {
+            subject: 'We received your message - Pilot Sales Distribution',
+            file: 'contact-auto-reply.html'
+        },
+        'notification': {
+            subject: 'Notification - Pilot Sales Distribution',
+            file: 'notification.html'
         }
     };
 
@@ -384,10 +396,191 @@ function buildTemplateHTML(templateName, data) {
     </div>
 </body>
 </html>
+        `,
+        'contact': `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Contact Message</title>
+    <style>
+        body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
+        .container { max-width:600px; margin:0 auto; padding:20px; }
+        .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .logo { max-width:160px; height:auto; }
+        .title { color:#0b2a3b; font-size:22px; margin:10px 0 0; }
+        .details { background:#f8fafb; border-radius:8px; padding:15px; border:1px solid #e9edf2; margin:15px 0; }
+        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
+        .footer a { color:#b4d0e0; text-decoration:none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
+                <h2 class="title">📬 New Contact Message</h2>
+            </div>
+            <div class="details">
+                <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
+                <p><strong>Email:</strong> ${data.email || 'N/A'}</p>
+                <p><strong>Phone:</strong> ${data.phone || 'N/A'}</p>
+                <p><strong>Subject:</strong> ${data.subject || 'General Inquiry'}</p>
+                <p><strong>Message:</strong></p>
+                <p style="background:#fff;border:1px solid #e9edf2;border-radius:8px;padding:12px;">${data.message || 'No message provided.'}</p>
+            </div>
+            <div class="footer">
+                <p>&copy; 2026 Pilot Sales Distribution &bull; <a href="https://pilotsalesdistribution.com">Visit our store</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+        `,
+
+        'contact-auto-reply': `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>We received your message</title>
+    <style>
+        body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
+        .container { max-width:600px; margin:0 auto; padding:20px; }
+        .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .logo { max-width:160px; height:auto; }
+        .btn { background:#1a7b6b; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
+        .footer a { color:#b4d0e0; text-decoration:none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
+                <h2 style="color:#0b2a3b;font-size:22px;">✅ Message Received!</h2>
+            </div>
+            <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
+            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+                Thank you for contacting <strong>Pilot Sales Distribution</strong>. We have received your message and our support team will get back to you within <strong>24 hours</strong>.
+            </p>
+            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+                ${data.message || ''}
+            </p>
+            <div style="text-align:center;margin:20px 0;">
+                <a href="https://wa.me/19099384682" class="btn" style="background:#25D366;">💬 Chat on WhatsApp</a>
+            </div>
+            <p style="color:#6a889a;font-size:13px;margin:0;">
+                Need help urgently? Call us at <strong>+1 (909) 938-4682</strong>.
+            </p>
+            <div class="footer">
+                <p>&copy; 2026 Pilot Sales Distribution &bull; <a href="https://pilotsalesdistribution.com">Visit our store</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+        `,
+
+        'notification': `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSE Notification</title>
+    <style>
+        body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
+        .container { max-width:600px; margin:0 auto; padding:20px; }
+        .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .logo { max-width:160px; height:auto; }
+        .btn { background:#1a7b6b; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
+        .footer a { color:#b4d0e0; text-decoration:none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
+                <h2 style="color:#0b2a3b;font-size:22px;">🔔 ${data.title || 'Update'}</h2>
+            </div>
+            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+                Hi ${data.name || 'there'},
+            </p>
+            <div style="background:#f8fafb;border-radius:8px;padding:15px;border:1px solid #e9edf2;margin:15px 0;">
+                ${data.message || 'You have a new update from Pilot Sales Distribution.'}
+            </div>
+            ${data.buttonText && data.buttonUrl ? '<div style="text-align:center;margin:20px 0;"><a href="' + data.buttonUrl + '" class="btn">' + data.buttonText + '</a></div>' : ''}
+            <p style="color:#6a889a;font-size:13px;margin:0;">
+                Questions? <a href="https://wa.me/19099384682" style="color:#1a7b6b;text-decoration:none;">Chat with us on WhatsApp</a>
+            </p>
+            <div class="footer">
+                <p>&copy; 2026 Pilot Sales Distribution &bull; <a href="https://pilotsalesdistribution.com">Visit our store</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
         `
     };
 
     return templates[templateName] || '';
+}
+
+// ─── FORMSUBMIT TRANSPORT (FREE - NO API KEY) ───
+// Resend's API cannot be called directly from a browser (CORS), so this
+// free, keyless endpoint is used as an automatic fallback. No signup needed.
+const FORMSUBMIT_EMAIL = 'support@pilotsalesdistribution.com';
+const FORMSUBMIT_URL = `https://formsubmit.co/ajax/${FORMSUBMIT_EMAIL}`;
+
+async function sendEmailFormSubmit(templateType, data, toEmail) {
+    try {
+        const template = getTemplate(templateType, data);
+        if (!template) {
+            throw new Error(`Template "${templateType}" not found`);
+        }
+        const email = toEmail || data.email || EMAIL_CONFIG.fallbackEmail;
+        const plainText = template.html
+            .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+            .replace(/<[^>]*>/g, ' ')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&amp;/g, '&')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        const payload = {
+            name: data.name || 'PSE Customer',
+            email: email,
+            _subject: template.subject,
+            message: plainText.substring(0, 4000),
+            _template: 'table',
+            _captcha: 'false'
+        };
+
+        const response = await fetch(FORMSUBMIT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || result.success === 'false') {
+            throw new Error(result.message || 'FormSubmit failed');
+        }
+        console.log('📧 Email sent via FormSubmit (free, no API key):', email);
+        return { success: true, transport: 'formsubmit', result };
+    } catch (error) {
+        console.error('❌ FormSubmit error:', error);
+        return { success: false, transport: 'formsubmit', error: error.message };
+    }
 }
 
 // ─── SEND EMAIL USING RESEND API ───
@@ -422,11 +615,16 @@ async function sendEmailResend(templateType, data, toEmail) {
 
         const result = await response.json();
         console.log('✅ Email sent via Resend:', result);
-        return { success: true, result };
+        return { success: true, transport: 'resend', result };
 
     } catch (error) {
         console.error('❌ Resend email error:', error);
-        // Fallback to mailto
+        // Fallback 1: FormSubmit (free, no API key)
+        const formSubmitResult = await sendEmailFormSubmit(templateType, data, toEmail);
+        if (formSubmitResult.success) {
+            return formSubmitResult;
+        }
+        // Fallback 2: mailto
         return sendEmailFallback(templateType, data, toEmail);
     }
 }
@@ -445,7 +643,10 @@ function sendEmailFallback(templateType, data, toEmail) {
         // Generate plain text version from HTML
         const htmlContent = template.html;
         const plainText = htmlContent
+            .replace(/<style[\s\S]*?<\/style>/gi, ' ')
             .replace(/<[^>]*>/g, ' ')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&amp;/g, '&')
             .replace(/\s+/g, ' ')
             .trim();
         
@@ -590,6 +791,42 @@ async function sendTestEmail(email) {
     return sendEmailResend('order-confirmation', data, data.email);
 }
 
+// ─── SEND NOTIFICATION EMAIL (used by live support + alerts) ───
+async function sendNotificationEmail(toEmail, name, title, message, buttonText, buttonUrl) {
+    const data = {
+        name: name || 'there',
+        email: toEmail,
+        title: title || 'Update from PSE Distribution',
+        message: message || '',
+        buttonText: buttonText || '',
+        buttonUrl: buttonUrl || ''
+    };
+    return sendEmailResend('notification', data, toEmail);
+}
+
+// ─── SEND LIVE SUPPORT MESSAGE TO SUPPORT TEAM ───
+async function sendSupportMessage(supportData) {
+    // Notify the support team
+    const teamResult = await sendEmailResend('contact', {
+        name: supportData.name || 'Customer',
+        email: supportData.email || 'unknown@customer.com',
+        phone: supportData.phone || 'N/A',
+        subject: supportData.subject || 'Live Support Message',
+        message: supportData.message || ''
+    }, EMAIL_CONFIG.fallbackEmail);
+
+    // Auto-reply to the customer
+    if (supportData.email) {
+        await sendEmailResend('contact-auto-reply', {
+            name: supportData.name || 'there',
+            email: supportData.email,
+            message: supportData.message || ''
+        }, supportData.email);
+    }
+
+    return teamResult;
+}
+
 // ─── EXPOSE FUNCTIONS ───
 window.sendEmailResend = sendEmailResend;
 window.sendOrderConfirmation = sendOrderConfirmation;
@@ -601,6 +838,9 @@ window.sendRFQConfirmation = sendRFQConfirmation;
 window.sendContactMessage = sendContactMessage;
 window.sendTestEmail = sendTestEmail;
 window.sendEmailFallback = sendEmailFallback;
+window.sendEmailFormSubmit = sendEmailFormSubmit;
+window.sendNotificationEmail = sendNotificationEmail;
+window.sendSupportMessage = sendSupportMessage;
 
 // Export for Node.js (if using server-side)
 if (typeof module !== 'undefined' && module.exports) {
@@ -614,8 +854,10 @@ if (typeof module !== 'undefined' && module.exports) {
         sendRFQConfirmation,
         sendContactMessage,
         sendTestEmail,
-        EMAIL_CONFIG,
-        EMAIL_TEMPLATES
+        sendEmailFormSubmit,
+        sendNotificationEmail,
+        sendSupportMessage,
+        EMAIL_CONFIG
     };
 }
 

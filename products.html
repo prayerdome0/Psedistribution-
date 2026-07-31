@@ -20,6 +20,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="main.js"></script>
     
     <style>
         :root {
@@ -546,10 +547,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
-            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="/seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -557,8 +558,8 @@
 <!-- HEADER -->
 <header class="header">
     <div class="container">
-        <a href="home" class="logo">
-            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+        <a href="/home" class="logo">
+            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -575,12 +576,12 @@
                 <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="cart" class="icon-btn">
+            <a href="/cart" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
             </a>
-            <a href="account" class="icon-btn" id="accountBtn">
+            <a href="/account" class="icon-btn" id="accountBtn">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
@@ -591,12 +592,12 @@
 <!-- NAVIGATION -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products" class="nav-tab active"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/products" class="nav-tab active"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="/about" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="/contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="/help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="/become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -686,13 +687,13 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about">About</a>
-                <a href="contact">Contact</a>
-                <a href="help-center">Help</a>
-                <a href="privacy">Privacy Policy</a>
-                <a href="terms">Terms &amp; Conditions</a>
-                <a href="become-seller">Become a Seller</a>
-                <a href="supplier-verification">Supplier Verification</a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/help-center">Help</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms &amp; Conditions</a>
+                <a href="/become-seller">Become a Seller</a>
+                <a href="/supplier-verification">Supplier Verification</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -1143,6 +1144,9 @@
             localStorage.setItem('pilot_cart', JSON.stringify(cart));
             showToast('✅ Added to cart!', 'success');
             loadCartCount();
+            if (typeof window.pushNotification === 'function') {
+                window.pushNotification('Added to cart 🛒', (product?.title || 'Product') + ' — ready to checkout when you are.', { icon: 'fa-cart-shopping', url: '/cart', tag: 'cart' });
+            }
             return;
         }
 
@@ -1169,6 +1173,10 @@
             }
             showToast('✅ Added to cart!', 'success');
             loadCartCount();
+            if (typeof window.pushNotification === 'function') {
+                const p = allProducts.find(x => x.id === productId);
+                window.pushNotification('Added to cart 🛒', (p?.title || 'Product') + ' — ready to checkout when you are.', { icon: 'fa-cart-shopping', url: '/cart', tag: 'cart' });
+            }
         } catch (error) {
             showToast('❌ Failed to add to cart', 'error');
         }
@@ -1179,7 +1187,7 @@
         const user = getCurrentUser();
         if (!user) {
             showToast('Please login first', 'error');
-            setTimeout(() => window.location.href = 'login', 1500);
+            setTimeout(() => window.location.href = '/login', 1500);
             return;
         }
         try {
@@ -1250,10 +1258,10 @@
         const user = getCurrentUser();
         if (!user) {
             showToast('Please login to view wishlist', 'error');
-            setTimeout(() => window.location.href = 'login', 1500);
+            setTimeout(() => window.location.href = '/login', 1500);
             return;
         }
-        window.location.href = 'wishlist';
+        window.location.href = '/wishlist';
     }
 
     // ─── SEARCH HANDLER ───
@@ -1338,5 +1346,8 @@
     window.handleSearch = handleSearch;
     window.showToast = showToast;
 </script>
+    <script src="email.js"></script>
+    <script src="ai-assistant.js"></script>
+    <script src="notifications.js"></script>
 </body>
 </html>

@@ -13,6 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="main.js"></script>
     
     <style>
         /* ─── ALL STYLES INLINE ─── */
@@ -479,10 +480,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
-            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="/seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -492,8 +493,8 @@
 <!-- ============================================ -->
 <header class="header">
     <div class="container">
-        <a href="home" class="logo">
-            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+        <a href="/home" class="logo">
+            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -512,12 +513,12 @@
                 <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="cart" class="icon-btn">
+            <a href="/cart" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
             </a>
-            <a href="account" class="icon-btn" id="accountBtn">
+            <a href="/account" class="icon-btn" id="accountBtn">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
@@ -530,12 +531,12 @@
 <!-- ============================================ -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about" class="nav-tab active"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/home" class="nav-tab"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/products" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="/about" class="nav-tab active"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="/contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="/help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="/become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -690,7 +691,7 @@
         <div class="quote-section animate-on-scroll">
             <h2>Ready to <span>Partner With Us?</span></h2>
             <p>Join thousands of businesses that trust Pilot Sales Distribution for their wholesale needs.</p>
-            <a href="contact" class="btn-white"><i class="fa-regular fa-envelope"></i> Get in Touch</a>
+            <a href="/contact" class="btn-white"><i class="fa-regular fa-envelope"></i> Get in Touch</a>
         </div>
 
     </div>
@@ -704,13 +705,13 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about">About</a>
-                <a href="contact">Contact</a>
-                <a href="help-center">Help</a>
-                <a href="privacy">Privacy Policy</a>
-                <a href="terms">Terms &amp; Conditions</a>
-                <a href="become-seller">Become a Seller</a>
-                <a href="supplier-verification">Supplier Verification</a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/help-center">Help</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms &amp; Conditions</a>
+                <a href="/become-seller">Become a Seller</a>
+                <a href="/supplier-verification">Supplier Verification</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -900,10 +901,10 @@
         const user = getCurrentUser();
         if (!user) {
             showToast('Please login to view wishlist', 'error');
-            setTimeout(() => window.location.href = 'login', 1500);
+            setTimeout(() => window.location.href = '/login', 1500);
             return;
         }
-        window.location.href = 'wishlist';
+        window.location.href = '/wishlist';
     }
 
     async function handleSearch(event) {
@@ -1002,5 +1003,8 @@
     window.getCurrentUser = getCurrentUser;
 </script>
 
+    <script src="email.js"></script>
+    <script src="ai-assistant.js"></script>
+    <script src="notifications.js"></script>
 </body>
 </html>
