@@ -300,6 +300,31 @@
         .quick-actions .action-btn:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
         .quick-actions .action-btn i { font-size: 1rem; color: var(--primary); }
 
+        /* ─── TOGGLE SWITCH (Festival auto-emails) ─── */
+        .pse-switch { position: relative; display: inline-block; width: 52px; height: 28px; flex-shrink: 0; }
+        .pse-switch input { opacity: 0; width: 0; height: 0; }
+        .pse-slider {
+            position: absolute; cursor: pointer; inset: 0;
+            background: #cbd5dd; border-radius: 34px; transition: 0.3s;
+        }
+        .pse-slider:before {
+            content: ''; position: absolute; height: 22px; width: 22px;
+            left: 3px; top: 3px; background: #fff; border-radius: 50%;
+            transition: 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        }
+        .pse-switch input:checked + .pse-slider { background: var(--primary); }
+        .pse-switch input:checked + .pse-slider:before { transform: translateX(24px); }
+
+        .verified-chip {
+            display: inline-flex; align-items: center; gap: 0.25rem;
+            background: #e8f6ff; color: #0b6bcb; border: 1px solid #bfe3ff;
+            border-radius: 20px; padding: 0.1rem 0.55rem; font-size: 0.62rem; font-weight: 700;
+        }
+        .badge.red { background: #e74c3c !important; }
+        .badge.green { background: #27ae60 !important; }
+
+        .holiday-preview-img { width: 100%; border-radius: 8px; border: 1px solid var(--border); min-height: 120px; background: var(--light); }
+
         /* ─── TABLES ─── */
         .table-container { overflow-x: auto; }
         .table-container table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
@@ -746,6 +771,30 @@
                 <i class="fa-regular fa-store"></i> Sellers
                 <span class="badge orange" id="sellerBadge">0</span>
             </button>
+            <button class="nav-item" onclick="showTab('support')">
+                <i class="fa-regular fa-headset"></i> Live Support
+                <span class="badge red" id="supportBadge">0</span>
+            </button>
+            <button class="nav-item" onclick="showTab('subscribers')">
+                <i class="fa-regular fa-envelope-open"></i> Subscribers
+                <span class="badge blue" id="subscriberBadge">0</span>
+            </button>
+            <button class="nav-item" onclick="showTab('emailcenter')">
+                <i class="fa-regular fa-paper-plane"></i> Email Center
+                <span class="badge gold">NEW</span>
+            </button>
+            <button class="nav-item" onclick="showTab('reviews')">
+                <i class="fa-regular fa-star"></i> Reviews
+                <span class="badge green" id="reviewBadge">0</span>
+            </button>
+            <button class="nav-item" onclick="showTab('trust')">
+                <i class="fa-regular fa-shield-halved"></i> Trust & Safety
+                <span class="badge red" id="reportBadge">0</span>
+            </button>
+            <button class="nav-item" onclick="showTab('holidays')">
+                <i class="fa-regular fa-calendar-days"></i> Festivals
+                <span class="badge purple">🎉</span>
+            </button>
             <button class="nav-item" onclick="showTab('analytics')">
                 <i class="fa-regular fa-chart-line"></i> Analytics
                 <span class="badge gold">NEW</span>
@@ -826,6 +875,20 @@
                             <div class="stat-label">Orders Today</div>
                         </div>
                     </div>
+                    <div class="stat-card" onclick="showTab('subscribers')">
+                        <div class="stat-icon"><i class="fa-regular fa-envelope-open"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-number blue" id="statSubscribers">0</div>
+                            <div class="stat-label">Subscribers</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="showTab('trust')">
+                        <div class="stat-icon"><i class="fa-regular fa-shield-halved"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-number red" id="statReports">0</div>
+                            <div class="stat-label">Open Scam Reports</div>
+                        </div>
+                    </div>
                 </div>
 
                 <h3 style="font-size:0.85rem; color:var(--secondary); margin-bottom:0.5rem;">Quick Actions</h3>
@@ -841,6 +904,18 @@
                     </div>
                     <div class="action-btn" onclick="showTab('customers')">
                         <i class="fa-regular fa-users"></i> Customers
+                    </div>
+                    <div class="action-btn" onclick="showTab('emailcenter')">
+                        <i class="fa-regular fa-paper-plane"></i> Email Center
+                    </div>
+                    <div class="action-btn" onclick="showTab('holidays')">
+                        <i class="fa-regular fa-calendar-days"></i> Festivals
+                    </div>
+                    <div class="action-btn" onclick="showTab('support')">
+                        <i class="fa-regular fa-headset"></i> Support
+                    </div>
+                    <div class="action-btn" onclick="showTab('trust')">
+                        <i class="fa-regular fa-shield-halved"></i> Trust
                     </div>
                     <div class="action-btn" onclick="showTab('analytics')">
                         <i class="fa-regular fa-chart-line"></i> Analytics
@@ -947,13 +1022,224 @@
                                 <th>Owner</th>
                                 <th>Products</th>
                                 <th>Status</th>
+                                <th>Verified</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="sellerTableBody">
-                            <tr><td colspan="5"><div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading sellers...</p></div></td></tr>
+                            <tr><td colspan="6"><div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading sellers...</p></div></td></tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- LIVE SUPPORT -->
+            <div class="tab-content" id="tab-support">
+                <div class="page-header">
+                    <h2><i class="fa-regular fa-headset"></i> Live Support Tickets</h2>
+                    <span class="time" id="supportCount">0 open</span>
+                </div>
+                <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:0.8rem;">
+                    <i class="fa-solid fa-circle-info"></i> Every message sent from the <strong>Live Support</strong> widget lands here.
+                    Customers instantly receive an <strong>automatic confirmation email</strong> (🤖 Auto-replied) —
+                    you follow up with the Reply button which drafts an email in the Email Center.
+                </p>
+                <div id="supportList">
+                    <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading tickets...</p></div>
+                </div>
+            </div>
+
+            <!-- SUBSCRIBERS -->
+            <div class="tab-content" id="tab-subscribers">
+                <div class="page-header">
+                    <h2><i class="fa-regular fa-envelope-open"></i> Newsletter Subscribers</h2>
+                    <span class="time" id="subscriberCount">0 subscribers</span>
+                </div>
+                <div style="display:flex;gap:0.5rem;margin-bottom:0.8rem;flex-wrap:wrap;">
+                    <button class="btn-add-product" onclick="AdminExt.exportSubscribersCsv()">
+                        <i class="fa-regular fa-file-csv"></i> Export CSV
+                    </button>
+                    <button class="btn-add-product" style="background:#2980b9;" onclick="AdminExt.loadSubscribers()">
+                        <i class="fa-regular fa-rotate"></i> Refresh
+                    </button>
+                    <button class="btn-add-product" style="background:#8e44ad;" onclick="showTab('emailcenter'); setTimeout(function(){var a=document.getElementById('emailAudience'); if(a){a.value='subscribers'; AdminExt.onAudienceChange();}},150);">
+                        <i class="fa-regular fa-paper-plane"></i> Email All Subscribers
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Source</th>
+                                <th>Status</th>
+                                <th>Subscribed</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subscriberTableBody">
+                            <tr><td colspan="6"><div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading subscribers...</p></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- EMAIL CENTER -->
+            <div class="tab-content" id="tab-emailcenter">
+                <div class="page-header">
+                    <h2><i class="fa-regular fa-paper-plane"></i> Email Center</h2>
+                    <span class="time">Compose & send real emails</span>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;">
+                    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;">
+                        <h4 style="margin-bottom:0.7rem;color:var(--secondary);"><i class="fa-regular fa-envelope"></i> Compose Campaign</h4>
+                        <div style="margin-bottom:0.7rem;">
+                            <label style="display:block;font-weight:600;color:var(--secondary);font-size:0.78rem;margin-bottom:0.2rem;">Audience</label>
+                            <select id="emailAudience" onchange="AdminExt.onAudienceChange()" style="width:100%;padding:0.55rem 0.7rem;border:1px solid var(--border-dark);border-radius:var(--radius-sm);font-size:0.85rem;">
+                                <option value="single">Single recipient</option>
+                                <option value="subscribers">All newsletter subscribers</option>
+                                <option value="buyers">All buyers</option>
+                                <option value="sellers">All sellers</option>
+                                <option value="everyone">Everyone (subscribers + users)</option>
+                            </select>
+                            <div id="emailAudienceHint" style="font-size:0.7rem;color:var(--text-light);margin-top:0.2rem;"></div>
+                        </div>
+                        <div id="emailToWrap" style="margin-bottom:0.7rem;">
+                            <label style="display:block;font-weight:600;color:var(--secondary);font-size:0.78rem;margin-bottom:0.2rem;">Recipient email *</label>
+                            <input type="email" id="emailTo" placeholder="customer@example.com" style="width:100%;padding:0.55rem 0.7rem;border:1px solid var(--border-dark);border-radius:var(--radius-sm);font-size:0.85rem;" />
+                            <input type="text" id="emailToName" placeholder="Recipient name (optional)" style="width:100%;padding:0.55rem 0.7rem;border:1px solid var(--border-dark);border-radius:var(--radius-sm);font-size:0.85rem;margin-top:0.35rem;" />
+                        </div>
+                        <div style="margin-bottom:0.7rem;">
+                            <label style="display:block;font-weight:600;color:var(--secondary);font-size:0.78rem;margin-bottom:0.2rem;">Subject *</label>
+                            <input type="text" id="emailSubject" placeholder="e.g. Special wholesale offer this week" style="width:100%;padding:0.55rem 0.7rem;border:1px solid var(--border-dark);border-radius:var(--radius-sm);font-size:0.85rem;" />
+                        </div>
+                        <div style="margin-bottom:0.7rem;">
+                            <label style="display:block;font-weight:600;color:var(--secondary);font-size:0.78rem;margin-bottom:0.2rem;">Message *</label>
+                            <textarea id="emailMessage" rows="6" placeholder="Write your email… line breaks are preserved." style="width:100%;padding:0.55rem 0.7rem;border:1px solid var(--border-dark);border-radius:var(--radius-sm);font-size:0.85rem;resize:vertical;"></textarea>
+                        </div>
+                        <div style="display:flex;gap:0.5rem;margin-bottom:0.9rem;flex-wrap:wrap;">
+                            <input type="text" id="emailCta" placeholder="Button text (optional)" style="flex:1;min-width:140px;padding:0.55rem 0.7rem;border:1px solid var(--border-dark);border-radius:var(--radius-sm);font-size:0.8rem;" />
+                            <input type="url" id="emailBtnUrl" placeholder="Button link (optional)" style="flex:2;min-width:180px;padding:0.55rem 0.7rem;border:1px solid var(--border-dark);border-radius:var(--radius-sm);font-size:0.8rem;" />
+                        </div>
+                        <button class="btn-add-product" id="emailSendBtn" onclick="AdminExt.sendEmailCenter()">
+                            <i class="fa-regular fa-paper-plane"></i> Send Campaign
+                        </button>
+                        <div id="emailSendProgress" style="font-size:0.75rem;color:var(--text-light);margin-top:0.5rem;"></div>
+                    </div>
+                    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;">
+                        <h4 style="margin-bottom:0.7rem;color:var(--secondary);"><i class="fa-regular fa-clock-rotate-left"></i> Send History <span style="font-size:0.7rem;color:var(--text-light);" id="emailLogCount"></span></h4>
+                        <div class="table-container" style="max-height:430px;overflow-y:auto;">
+                            <table>
+                                <thead>
+                                    <tr><th>To</th><th>Subject</th><th>Type</th><th>Status</th><th>When</th></tr>
+                                </thead>
+                                <tbody id="emailLogBody">
+                                    <tr><td colspan="5"><div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading log...</p></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REVIEWS -->
+            <div class="tab-content" id="tab-reviews">
+                <div class="page-header">
+                    <h2><i class="fa-regular fa-star"></i> Customer Reviews</h2>
+                    <span class="time" id="reviewCount">0 reviews</span>
+                </div>
+                <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:0.8rem;">
+                    <i class="fa-solid fa-circle-info"></i> Only <strong>real reviews written by logged-in customers</strong> appear here —
+                    no samples, no fake placeholders. You can remove anything abusive.
+                </p>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rating</th>
+                                <th>Review</th>
+                                <th>Written by</th>
+                                <th>Product</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewsTableBody">
+                            <tr><td colspan="6"><div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading reviews...</p></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TRUST & SAFETY -->
+            <div class="tab-content" id="tab-trust">
+                <div class="page-header">
+                    <h2><i class="fa-regular fa-shield-halved"></i> Trust & Safety</h2>
+                    <span class="time" id="reportCount">0 open reports</span>
+                </div>
+                <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:0.8rem;">
+                    <i class="fa-solid fa-circle-info"></i> Buyers flag suspicious products & sellers here (🚩 "Report" button on every product page).
+                    Resolve reports, suspend risky sellers and keep PSE <strong>scam-free</strong>. Verified sellers get the blue ✓ badge from the Sellers tab.
+                </p>
+                <div id="reportList">
+                    <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading reports...</p></div>
+                </div>
+            </div>
+
+            <!-- FESTIVAL CALENDAR -->
+            <div class="tab-content" id="tab-holidays">
+                <div class="page-header">
+                    <h2><i class="fa-regular fa-calendar-days"></i> Festival Calendar</h2>
+                    <span class="time">Auto greetings & branded images</span>
+                </div>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:0.8rem;background:linear-gradient(90deg,rgba(26,123,107,0.08),rgba(241,196,15,0.08));border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.8rem 1rem;margin-bottom:1rem;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:0.6rem;">
+                        <span style="font-size:1.4rem;">🤖</span>
+                        <div>
+                            <strong style="font-size:0.85rem;color:var(--secondary);display:block;">Auto-send festival emails</strong>
+                            <span style="font-size:0.72rem;color:var(--text-light);">On each festival day, greeting emails (with an auto-generated branded image) go to all subscribers & users.</span>
+                        </div>
+                    </div>
+                    <label class="pse-switch">
+                        <input type="checkbox" id="holidayAutoToggle" onchange="AdminExt.toggleHolidayAuto(this)" checked />
+                        <span class="pse-slider"></span>
+                    </label>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;">
+                    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;">
+                        <h4 style="margin-bottom:0.7rem;color:var(--secondary);"><i class="fa-regular fa-hourglass-half"></i> Coming up next</h4>
+                        <div id="holidayUpcomingList"></div>
+
+                        <h4 style="margin:1rem 0 0.6rem;color:var(--secondary);"><i class="fa-regular fa-calendar-plus"></i> Add custom festival</h4>
+                        <div style="display:grid;grid-template-columns:2fr 1fr;gap:0.4rem;margin-bottom:0.4rem;">
+                            <input type="text" id="hName" placeholder="Festival name *" style="padding:0.5rem 0.6rem;border:1px solid var(--border-dark);border-radius:8px;font-size:0.8rem;" />
+                            <input type="text" id="hEmoji" placeholder="Emoji 🎉" maxlength="4" style="padding:0.5rem 0.6rem;border:1px solid var(--border-dark);border-radius:8px;font-size:0.8rem;" />
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;margin-bottom:0.4rem;">
+                            <select id="hMonth" style="padding:0.5rem 0.6rem;border:1px solid var(--border-dark);border-radius:8px;font-size:0.8rem;">
+                                <option value="">Month *</option>
+                                <option value="1">January</option><option value="2">February</option>
+                                <option value="3">March</option><option value="4">April</option>
+                                <option value="5">May</option><option value="6">June</option>
+                                <option value="7">July</option><option value="8">August</option>
+                                <option value="9">September</option><option value="10">October</option>
+                                <option value="11">November</option><option value="12">December</option>
+                            </select>
+                            <input type="number" id="hDay" placeholder="Day *" min="1" max="31" style="padding:0.5rem 0.6rem;border:1px solid var(--border-dark);border-radius:8px;font-size:0.8rem;" />
+                        </div>
+                        <textarea id="hMessage" rows="2" placeholder="Greeting message (optional)" style="width:100%;padding:0.5rem 0.6rem;border:1px solid var(--border-dark);border-radius:8px;font-size:0.8rem;resize:vertical;margin-bottom:0.4rem;"></textarea>
+                        <div style="display:flex;gap:0.4rem;margin-bottom:0.6rem;">
+                            <input type="text" id="hCta" placeholder="Button text e.g. Shop Deals" style="flex:1;padding:0.5rem 0.6rem;border:1px solid var(--border-dark);border-radius:8px;font-size:0.8rem;" />
+                            <button class="btn-add-product" style="white-space:nowrap;" onclick="AdminExt.addHolidayFromForm()"><i class="fa-regular fa-plus"></i> Add</button>
+                        </div>
+                    </div>
+                    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;max-height:560px;overflow-y:auto;">
+                        <h4 style="margin-bottom:0.7rem;color:var(--secondary);"><i class="fa-regular fa-calendar"></i> Full year calendar</h4>
+                        <div id="holidayCalendarList"></div>
+                    </div>
                 </div>
             </div>
 
@@ -1139,6 +1425,26 @@
 </div>
 
 <!-- VIEW ORDER MODAL -->
+<!-- HOLIDAY PREVIEW MODAL -->
+<div class="modal-overlay" id="holidayPreviewModal">
+    <div class="modal-box" style="max-width:680px;">
+        <h3><i class="fa-regular fa-image"></i> <span id="holidayPreviewTitle">Festival Card</span></h3>
+        <p style="font-size:0.75rem;color:var(--text-light);margin-bottom:0.6rem;">
+            Auto-generated festival image with our company name — this exact image is embedded in festival emails.
+        </p>
+        <img class="holiday-preview-img" id="holidayPreviewImg" alt="Festival card preview" />
+        <div class="btn-group">
+            <button type="button" class="btn-submit" id="holidayPreviewDownload" onclick="AdminExt.downloadHolidayCard(this)">
+                <i class="fa-regular fa-download"></i> Download PNG
+            </button>
+            <button type="button" class="btn-submit" id="holidayPreviewSend" style="background:#8e44ad;" onclick="AdminExt.sendHolidayNow(this.dataset.key)">
+                <i class="fa-regular fa-paper-plane"></i> Send Emails Now
+            </button>
+            <button type="button" class="btn-close" onclick="AdminExt.closeHolidayPreview()">Close</button>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="viewOrderModal">
     <div class="modal-box">
         <h3><i class="fa-regular fa-receipt"></i> Order Details</h3>
@@ -1273,6 +1579,8 @@
         if (tab === 'rfqs') loadRFQs();
         if (tab === 'sellers') loadSellers();
         if (tab === 'analytics') loadAnalytics();
+        // Extension tabs (subscribers, support, email center, reviews, trust, holidays)
+        if (window.AdminExt && typeof AdminExt.onTabShow === 'function') AdminExt.onTabShow(tab);
     }
 
     // ─── LOAD ALL DATA ───
@@ -1313,8 +1621,13 @@
                     <td><span class="status-badge ${u.status === 'active' ? 'active' : u.status === 'suspended' ? 'suspended' : 'inactive'}">${u.status || 'active'}</span></td>
                     <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
                     <td>
-                        <button class="btn-action view" onclick="viewUser('${u.id}')"><i class="fa-regular fa-eye"></i></button>
-                        ${u.status !== 'suspended' ? `<button class="btn-action ban" onclick="suspendUser('${u.id}')"><i class="fa-regular fa-ban"></i></button>` : `<button class="btn-action unban" onclick="unsuspendUser('${u.id}')"><i class="fa-regular fa-circle-check"></i></button>`}
+                        <button class="btn-action view" onclick="viewUser('${u.id}')" title="View"><i class="fa-regular fa-eye"></i></button>
+                        <button class="btn-action reply" onclick="AdminExt.emailOne('${u.email || ''}')" title="Email this user"><i class="fa-regular fa-paper-plane"></i></button>
+                        ${u.role === 'seller'
+                            ? `<button class="btn-action approve" onclick="AdminExt.setUserRole('${u.id}','buyer')" title="Change to buyer"><i class="fa-regular fa-user"></i></button>`
+                            : `<button class="btn-action approve" onclick="AdminExt.setUserRole('${u.id}','seller')" title="Make seller"><i class="fa-regular fa-store"></i></button>`}
+                        ${u.status !== 'suspended' ? `<button class="btn-action ban" onclick="suspendUser('${u.id}')" title="Suspend"><i class="fa-regular fa-ban"></i></button>` : `<button class="btn-action unban" onclick="unsuspendUser('${u.id}')" title="Reactivate"><i class="fa-regular fa-circle-check"></i></button>`}
+                        <button class="btn-action delete" onclick="AdminExt.deleteUser('${u.id}')" title="Delete user record"><i class="fa-regular fa-trash-can"></i></button>
                     </td>
                 </tr>
             `).join('');
@@ -1458,6 +1771,22 @@
         const message = document.getElementById('replyMessage').value.trim();
         if (!to || !message) { showToast('Fill in all fields', 'error'); return; }
 
+        const parent = allMessages.find(m => m.id === currentMessageId);
+        const btn = document.querySelector('#replyModal .btn-submit');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…'; }
+
+        // 1) Send the actual email to the customer (Resend → FormSubmit → mailto chain)
+        let emailOk = false;
+        try {
+            if (typeof window.sendAdminEmail === 'function') {
+                const htmlMsg = message
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/\n/g, '<br>');
+                const res = await window.sendAdminEmail(to, parent ? (parent.firstName || 'there') : 'there', subject || 'RE: Your message — Pilot Sales Distribution', htmlMsg);
+                emailOk = !!(res && res.success);
+            }
+        } catch (e) { console.warn('Reply email transport failed:', e); }
+
         try {
             if (currentMessageId) {
                 await db.collection('messages').doc(currentMessageId).update({
@@ -1475,13 +1804,24 @@
                 message: message,
                 status: 'read',
                 is_reply: true,
+                email_sent: emailOk,
                 parent_id: currentMessageId,
                 created_at: new Date().toISOString()
             });
-            showToast('✅ Reply sent!', 'success');
+            // Log into the Email Center history
+            try {
+                await db.collection('email_log').add({
+                    to: to, name: parent ? (parent.firstName || '') : '',
+                    subject: subject || 'RE: General', type: 'admin-reply',
+                    status: emailOk ? 'sent' : 'failed',
+                    created_at: new Date().toISOString()
+                });
+            } catch (e) {}
+            showToast(emailOk ? '✅ Reply emailed to ' + to + '!' : '⚠️ Reply saved — email transport unavailable', emailOk ? 'success' : 'info');
             closeReplyModal();
             loadMessages();
-        } catch (error) { showToast('Failed to send reply', 'error'); }
+        } catch (error) { showToast('Failed to save reply', 'error'); }
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Send Reply'; }
     }
 
     async function deleteMessage(messageId) {
@@ -1783,7 +2123,7 @@
             document.getElementById('sellerCount').textContent = `${sellers.length} sellers`;
 
             if (sellers.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-store"></i><p>No sellers registered yet</p></div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-regular fa-store"></i><p>No sellers registered yet</p></div></td></tr>`;
                 return;
             }
 
@@ -1799,20 +2139,28 @@
 
             tbody.innerHTML = sellers.slice(0, 20).map(s => `
                 <tr>
-                    <td><strong>${s.company || s.full_name || 'N/A'}</strong></td>
+                    <td><strong>${s.verified ? '✓ ' : ''}${s.company || s.full_name || 'N/A'}</strong></td>
                     <td>${s.full_name || ''}</td>
                     <td>${productCounts[s.id] || 0}</td>
-                    <td><span class="status-badge ${s.status === 'approved' ? 'active' : 'pending'}">${s.status || 'pending'}</span></td>
+                    <td><span class="status-badge ${s.status === 'approved' ? 'active' : s.status === 'suspended' ? 'suspended' : 'pending'}">${s.status || 'pending'}</span></td>
+                    <td>
+                        ${s.verified
+                            ? '<span class="verified-chip"><i class="fa-solid fa-circle-check"></i> Verified</span>'
+                            : '<span class="status-badge pending">Unverified</span>'}
+                    </td>
                     <td>
                         <button class="btn-action view" onclick="viewSeller('${s.id}')"><i class="fa-regular fa-eye"></i></button>
-                        ${s.status !== 'approved' ? `<button class="btn-action approve" onclick="approveSeller('${s.id}')"><i class="fa-regular fa-circle-check"></i></button>` : ''}
-                        ${s.status === 'approved' ? `<button class="btn-action ban" onclick="suspendUser('${s.id}')"><i class="fa-regular fa-ban"></i></button>` : ''}
+                        ${s.status !== 'approved' ? `<button class="btn-action approve" onclick="approveSeller('${s.id}')" title="Approve seller"><i class="fa-regular fa-circle-check"></i></button>` : ''}
+                        ${!s.verified
+                            ? `<button class="btn-action reply" onclick="AdminExt.verifySeller('${s.id}')" title="Grant Verified Seller badge"><i class="fa-solid fa-award"></i></button>`
+                            : `<button class="btn-action ban" onclick="AdminExt.unverifySeller('${s.id}')" title="Remove Verified badge" style="background:#8e44ad;"><i class="fa-solid fa-award"></i></button>`}
+                        ${s.status === 'approved' ? `<button class="btn-action ban" onclick="suspendUser('${s.id}')" title="Suspend"><i class="fa-regular fa-ban"></i></button>` : ''}
                     </td>
                 </tr>
             `).join('');
 
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading sellers</p></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading sellers</p></div></td></tr>`;
         }
     }
 
@@ -2186,6 +2534,8 @@
     window.showToast = showToast;
 </script>
     <script src="email.js"></script>
+    <script src="holiday-engine.js"></script>
+    <script src="admin-extensions.js"></script>
     <script src="ai-assistant.js"></script>
     <script src="notifications.js"></script>
 </body>

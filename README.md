@@ -46,9 +46,15 @@ Key routes (clean URLs on Vercel):
 - PWA manifest + favicons
 - SEO: `robots.txt`, `sitemap.xml`, Open Graph tags
 - **🤖 AI Assistant** — floating chat widget on every page; answers product/price/MOQ/shipping/order/RFQ questions, recommends products, escalates to live support. Runs entirely in the browser (no API key, no cost)
-- **💬 Live Support** — widget tab that saves messages to Firestore (`support_messages` + admin `messages` inbox), emails the support team, and offers WhatsApp escalation
+- **💬 Live Support with instant auto-reply** — the first response is always automatic: the customer instantly gets an emailed confirmation (`contact-auto-reply`) the moment they send a message, while the ticket (flagged `auto_replied`) lands in the admin **Live Support** tab where admins resolve it or draft a real reply
 - **🔔 Notifications** — header bell with unread badge + panel, browser notifications (opt-in), cross-tab sync, and automatic notification on cart/RFQ/order/support events
-- **📧 Email upgrades** — missing `contact` / `contact-auto-reply` templates added; sending chain is now Resend → **FormSubmit (free, no API key)** → mailto fallback
+- **🎈 Center popup on the home page** — festival-aware welcome popup in the middle of the screen: on holiday days it shows an auto-generated branded greeting image, otherwise a promo; includes quick newsletter sign-up, shown max once per day
+- **📨 Real newsletter subscriptions** — the home-page subscribe form (and popup) now store every subscriber in Firestore `subscribers`, de-duplicate by email, send a confirmation email, ping the admin inbox — and the admin **Subscribers** tab lists, emails, deletes and CSV-exports them
+- **✉️ Admin Email Center** — compose & send real emails from the dashboard to a single user, all subscribers, buyers, sellers or everyone; message replies in the Messages tab now email the customer too; every send is logged in `email_log` with history view
+- **⭐ Real customer reviews only** — product reviews are written by logged-in customers (no samples/placeholders), aggregated into honest ratings (average + count synced back to the product), shown with a "Verified customer" chip, and moderated from the admin **Reviews** tab
+- **🏅 Verified sellers & anti-scam Trust system** — admins grant/strip the blue **✓ Verified** badge (applies to all the seller's products); products/cards show verified state, a "✓ Verified sellers only" filter exists on the catalog, and every product page has a **🚩 Report** button feeding the admin **Trust & Safety** tab (resolve reports, suspend scammers)
+- **🗓️ Festival Calendar with auto greetings** — 19 built-in holidays & sale events (Easter/Thanksgiving/Black Friday/computed movable feasts) plus admin-added custom festivals; on each festival day, greeting emails with an **auto-generated branded festival image** (canvas, includes the company name) are sent to all subscribers & users exactly once (Firestore `festival_runs` claim); admin can preview/download the generated cards, send campaigns manually, or toggle auto-send
+- **📧 Email upgrades** — missing `contact` / `contact-auto-reply` templates added, plus new `festival` and `admin-message` templates; sending chain: Resend → **FormSubmit (free, no API key)** → mailto fallback
 
 ## 404-proofing
 
@@ -76,12 +82,30 @@ Email sending uses Resend — set a valid key in `email.js` for production; othe
 ├── main.js                 # Shared core (Firebase init, toast, counters) — guarded
 ├── ai-assistant.js         # AI assistant + live support widget (no API key)
 ├── notifications.js        # Notification center (bell, badge, browser notifs)
-├── email.js                # Email helpers (Resend → FormSubmit → mailto)
+├── email.js                # Email helpers (+ festival & admin-message templates)
+├── newsletter.js           # Real newsletter subscriptions (Firestore subscribers)
+├── holiday-engine.js       # Festival calendar + branded card generator + auto emails
+├── admin-extensions.js     # Admin: subscribers, support, email center, reviews, trust, festivals
 ├── Email Template/         # Transactional HTML emails
 ├── manifest.json           # PWA
 ├── sitemap.xml / robots.txt
 └── vercel.json             # Routes & headers
 ```
+
+### Firestore collections used
+
+| Collection | Purpose |
+|------------|---------|
+| `users` | buyers / sellers / admins (incl. `role`, `status`, `verified`) |
+| `products` · `orders` · `rfqs` · `cart` · `wishlist` | marketplace data |
+| `reviews` | customer-written reviews (no seeds; aggregated into product rating) |
+| `messages` · `support_messages` | contact + live support inbox (`auto_replied` flag on tickets) |
+| `subscribers` | newsletter subscribers (shown to admin) |
+| `reports` | scam / trust reports from product pages |
+| `holidays` | admin-added custom festivals |
+| `festival_runs` | once-per-year claim that festival emails already went out |
+| `email_log` | history of every sent campaign/reply (Email Center) |
+| `config/holidays` | festival auto-email toggle |
 
 ## License
 

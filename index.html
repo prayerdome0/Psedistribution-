@@ -813,10 +813,11 @@
     <div class="newsletter-section animate-on-scroll" style="margin-top:2rem;padding:3rem 2rem;background:linear-gradient(135deg,rgba(11,42,59,0.92),rgba(26,75,94,0.92)),url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1920&q=80');background-size:cover;background-position:center;border-radius:12px;text-align:center;color:#fff;">
         <h2 style="font-size:2rem;margin-bottom:0.5rem;">Stay Updated <span style="color:var(--accent);">with Deals</span></h2>
         <p style="opacity:0.9;margin-bottom:1.5rem;">Subscribe to get exclusive wholesale deals and new supplier announcements delivered to your inbox.</p>
-        <form class="newsletter-form" onsubmit="event.preventDefault(); this.innerHTML='<p style=\\'color:#fff;font-weight:600;\\'>✅ Subscribed! Check your inbox.</p>'; showToast('✅ Newsletter subscribed!', 'success');" style="display:flex;max-width:500px;margin:0 auto;gap:0.5rem;flex-wrap:wrap;justify-content:center;">
+        <form class="newsletter-form" id="newsletterForm" onsubmit="event.preventDefault(); pseNewsletterSubmit(this,'home-newsletter');" style="display:flex;max-width:500px;margin:0 auto;gap:0.5rem;flex-wrap:wrap;justify-content:center;">
             <input type="email" placeholder="Enter your email" required style="flex:1;min-width:200px;padding:0.8rem 1.2rem;border:none;border-radius:50px;font-size:0.95rem;outline:none;" />
             <button type="submit" style="background:var(--accent);color:var(--secondary);border:none;padding:0.8rem 2rem;border-radius:50px;font-weight:700;cursor:pointer;transition:0.3s;"><i class="fa-solid fa-paper-plane"></i> Subscribe</button>
         </form>
+        <p style="opacity:0.7;font-size:0.75rem;margin-top:0.8rem;"><i class="fa-solid fa-lock"></i> No spam — unsubscribe any time. New subscribers instantly get a confirmation email.</p>
     </div>
 
     <!-- TESTIMONIALS -->
@@ -1562,7 +1563,186 @@
     window.showToast = showToast;
     window.getCurrentUser = getCurrentUser;
 </script>
+
+<!-- ═══════════ CENTER POPUP (promo + festival greeting) ═══════════ -->
+<style>
+    #psePopupOverlay {
+        position: fixed; inset: 0; background: rgba(11,26,42,0.55); backdrop-filter: blur(4px);
+        display: none; align-items: center; justify-content: center; z-index: 100001;
+        padding: 1rem; animation: psePopupFade 0.3s ease;
+    }
+    #psePopupOverlay.show { display: flex; }
+    @keyframes psePopupFade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes psePopupZoom { from { opacity: 0; transform: translateY(20px) scale(0.96); } to { opacity: 1; transform: none; } }
+    #psePopupBox {
+        background: #fff; border-radius: 20px; max-width: 430px; width: 100%;
+        box-shadow: 0 30px 80px rgba(0,20,40,0.35); overflow: hidden; position: relative;
+        animation: psePopupZoom 0.35s cubic-bezier(0.2,0.9,0.3,1.2);
+        max-height: 92vh; overflow-y: auto;
+    }
+    #psePopupClose {
+        position: absolute; top: 10px; right: 10px; z-index: 3;
+        width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer;
+        background: rgba(0,0,0,0.4); color: #fff; font-size: 0.9rem; transition: 0.2s;
+    }
+    #psePopupClose:hover { background: rgba(0,0,0,0.7); transform: rotate(90deg); }
+    #psePopupImg { width: 100%; display: block; }
+    #psePopupBody { padding: 1.4rem 1.5rem 1.5rem; text-align: center; }
+    #psePopupTitle { font-size: 1.35rem; font-weight: 800; color: #0b2a3b; margin-bottom: 0.4rem; }
+    #psePopupText { font-size: 0.88rem; color: #2c5a6b; line-height: 1.6; margin-bottom: 1rem; }
+    #psePopupCtas { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+    .pse-popup-btn {
+        display: inline-block; padding: 0.7rem 1.5rem; border-radius: 50px; font-weight: 700;
+        font-size: 0.85rem; cursor: pointer; border: none; transition: 0.25s; text-decoration: none;
+    }
+    .pse-popup-btn.primary { background: #1a7b6b; color: #fff; }
+    .pse-popup-btn.primary:hover { background: #0f4f43; transform: translateY(-1px); }
+    .pse-popup-btn.gold { background: #f1c40f; color: #0b2a3b; }
+    .pse-popup-btn.gold:hover { background: #e0b50e; transform: translateY(-1px); }
+    #psePopupSub { display: flex; gap: 0.4rem; max-width: 330px; margin: 0 auto; }
+    #psePopupSub input {
+        flex: 1; min-width: 0; padding: 0.6rem 1rem; border: 1.5px solid #dce3e9;
+        border-radius: 50px; font-size: 0.82rem; outline: none; transition: 0.2s;
+    }
+    #psePopupSub input:focus { border-color: #1a7b6b; }
+    #psePopupSub button {
+        background: #0b2a3b; color: #fff; border: none; border-radius: 50px;
+        padding: 0.6rem 1rem; font-size: 0.8rem; font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
+    #psePopupLater {
+        background: none; border: none; color: #6a889a; font-size: 0.72rem;
+        cursor: pointer; margin-top: 0.8rem; text-decoration: underline;
+    }
+    #psePopupTrust { display: flex; justify-content: center; gap: 1rem; margin-top: 0.9rem; flex-wrap: wrap; }
+    #psePopupTrust span { font-size: 0.68rem; color: #6a889a; display: flex; align-items: center; gap: 0.25rem; }
+    #psePopupTrust i { color: #1a7b6b; }
+</style>
+
+<div id="psePopupOverlay" role="dialog" aria-modal="true" aria-label="Special announcement">
+    <div id="psePopupBox">
+        <button id="psePopupClose" onclick="pseClosePopup(false)" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+        <img id="psePopupImg" alt="" style="display:none;" />
+        <div id="psePopupBody">
+            <div id="psePopupTitle">Welcome to Pilot Sales Distribution 🛒</div>
+            <p id="psePopupText">
+                Premium B2B wholesale marketplace — 580+ <strong>verified suppliers</strong>,
+                Buyer Protection on every order, and up to <strong>30% bulk discounts</strong>.
+            </p>
+            <div id="psePopupCtas">
+                <a href="/products" class="pse-popup-btn primary" onclick="pseClosePopup(false)"><i class="fa-solid fa-bag-shopping"></i> Shop Deals</a>
+                <a href="/become-seller" class="pse-popup-btn gold" onclick="pseClosePopup(false)"><i class="fa-solid fa-store"></i> Sell With Us</a>
+            </div>
+            <form id="psePopupSub" onsubmit="event.preventDefault(); psePopupSubscribe();">
+                <input type="email" id="psePopupEmail" placeholder="Email for exclusive deals" required />
+                <button type="submit"><i class="fa-solid fa-paper-plane"></i> Join</button>
+            </form>
+            <div id="psePopupTrust">
+                <span><i class="fa-solid fa-shield-halved"></i> Scam-free</span>
+                <span><i class="fa-solid fa-circle-check"></i> Verified sellers</span>
+                <span><i class="fa-solid fa-rotate-left"></i> 30-day returns</span>
+            </div>
+            <button id="psePopupLater" onclick="pseClosePopup(true)">Don't show me this today</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ─── CENTER POPUP LOGIC ───
+    (function () {
+        var OVERLAY_ID = 'psePopupOverlay';
+
+        function todayKey() {
+            var d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+        function dismissedToday() {
+            try { return localStorage.getItem('pse_popup_hide') === todayKey(); } catch (e) { return false; }
+        }
+
+        window.pseClosePopup = function (forToday) {
+            var el = document.getElementById(OVERLAY_ID);
+            if (el) el.classList.remove('show');
+            if (forToday) { try { localStorage.setItem('pse_popup_hide', todayKey()); } catch (e) {} }
+        };
+
+        window.psePopupSubscribe = function () {
+            var input = document.getElementById('psePopupEmail');
+            if (!input) return;
+            var done = function (res) {
+                if (res && res.success) {
+                    window.pseClosePopup(true);
+                }
+            };
+            if (typeof window.pseSubscribe === 'function') {
+                window.pseSubscribe(input.value, '', 'home-popup').then(done);
+            } else {
+                window.showToast && window.showToast('✅ Subscribed!', 'success');
+                window.pseClosePopup(true);
+            }
+        };
+
+        function openFestivePopup(holiday) {
+            var titleEl = document.getElementById('psePopupTitle');
+            var textEl = document.getElementById('psePopupText');
+            var imgEl = document.getElementById('psePopupImg');
+            var ctaWrap = document.getElementById('psePopupCtas');
+            titleEl.textContent = holiday.emoji + ' ' + holiday.name + '!';
+            textEl.innerHTML = holiday.message + '<br><strong>— with love from Pilot Sales Distribution</strong>';
+            ctaWrap.innerHTML = '<a href="/products" class="pse-popup-btn primary" onclick="pseClosePopup(false)">' +
+                '<i class="fa-solid fa-gift"></i> ' + (holiday.cta || 'Shop Festival Deals') + '</a>';
+            // Auto-generated branded festival image (canvas)
+            try {
+                if (window.PseHolidays && typeof PseHolidays.generateCard === 'function') {
+                    PseHolidays.generateCard(holiday).then(function (card) {
+                        imgEl.src = card.dataUrl;
+                        imgEl.style.display = 'block';
+                        imgEl.alt = holiday.name + ' — Pilot Sales Distribution';
+                    }).catch(function () {});
+                }
+            } catch (e) {}
+        }
+
+        function maybeOpen() {
+            if (dismissedToday()) return;
+            var el = document.getElementById(OVERLAY_ID);
+            if (!el) return;
+            var show = function (holiday) {
+                if (holiday) openFestivePopup(holiday);
+                el.classList.add('show');
+            };
+            try {
+                if (window.PseHolidays && typeof PseHolidays.todayHoliday === 'function') {
+                    // Ensure admin-added festivals are loaded before checking today
+                    PseHolidays.loadCustom()
+                        .then(function () { show(PseHolidays.todayHoliday()); })
+                        .catch(function () { show(PseHolidays.todayHoliday()); });
+                    return;
+                }
+            } catch (e) {}
+            show(null);
+        }
+
+        // Escape key closes
+        document.addEventListener('keydown', function (ev) {
+            if (ev.key === 'Escape') window.pseClosePopup(false);
+        });
+        // Click outside closes
+        document.addEventListener('click', function (ev) {
+            if (ev.target && ev.target.id === OVERLAY_ID) window.pseClosePopup(false);
+        });
+
+        // Open shortly after load (wait for custom holidays to load for festival match)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function () { setTimeout(maybeOpen, 1600); });
+        } else {
+            setTimeout(maybeOpen, 1600);
+        }
+    })();
+</script>
+
+    <script src="newsletter.js"></script>
     <script src="email.js"></script>
+    <script src="holiday-engine.js"></script>
     <script src="ai-assistant.js"></script>
     <script src="notifications.js"></script>
 </body>

@@ -608,12 +608,27 @@
         <p>Browse our extensive wholesale catalog</p>
     </div>
 
+    <!-- Trust strip -->
+    <div class="animate-on-scroll" style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;background:#fff;border:1px solid var(--border);border-radius:12px;padding:0.7rem 1rem;margin-bottom:1.2rem;font-size:0.78rem;color:var(--text);">
+        <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> <strong>Buyer Protection</strong> — refund guaranteed</span>
+        <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-circle-check" style="color:#0b6bcb;"></i> <strong>✓ Verified sellers</strong> — ID & license checked</span>
+        <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-flag" style="color:#c0392b;"></i> Report anything suspicious — <strong>scam-free marketplace</strong></span>
+        <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-rotate-left" style="color:#e67e22;"></i> 30-day easy returns</span>
+    </div>
+
     <div class="products-layout">
         <!-- Filters -->
         <aside class="filters-sidebar" id="filtersSidebar">
             <h3><i class="fa-solid fa-sliders"></i> Filters</h3>
 
             <div class="filter-group">
+                <h4><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> Trust</h4>
+                <label title="Only products from ID & license verified sellers">
+                    <input type="checkbox" id="verifiedOnly" onchange="applyFilters()" /> <span style="color:#0b6bcb;font-weight:600;">✓ Verified sellers only</span>
+                </label>
+            </div>
+
+            <div class="filter-group" id="categoryFilters">
                 <h4>Category</h4>
                 <label><input type="checkbox" value="electronics" onchange="applyFilters()" /> Electronics</label>
                 <label><input type="checkbox" value="fashion" onchange="applyFilters()" /> Fashion</label>
@@ -918,7 +933,7 @@
 
     // ─── APPLY FILTERS ───
     function applyFilters() {
-        const categoryChecks = document.querySelectorAll('.filter-group input[type="checkbox"]');
+        const categoryChecks = document.querySelectorAll('#categoryFilters input[type="checkbox"]');
         const selectedCategories = [];
         categoryChecks.forEach(cb => {
             if (cb.checked) {
@@ -958,6 +973,12 @@
                 const moq = p.moq || 0;
                 return moq >= moqValue;
             });
+        }
+
+        // Filter: verified sellers only (anti-scam trust filter)
+        const verifiedCb = document.getElementById('verifiedOnly');
+        if (verifiedCb && verifiedCb.checked) {
+            products = products.filter(p => !!p.supplier_verified);
         }
 
         // Filter by rating
@@ -1108,7 +1129,7 @@
 
     // ─── CLEAR ALL FILTERS ───
     function clearAllFilters() {
-        document.querySelectorAll('.filter-group input[type="checkbox"]').forEach(cb => cb.checked = false);
+        document.querySelectorAll('#categoryFilters input[type="checkbox"], .filter-group input[type="checkbox"]#verifiedOnly').forEach(cb => cb.checked = false);
         document.querySelector('input[name="moq"][value="any"]').checked = true;
         document.querySelector('input[name="rating"][value="any"]').checked = true;
         document.getElementById('priceMin').value = 0;

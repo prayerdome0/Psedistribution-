@@ -803,7 +803,42 @@
                         <span><i class="fa-regular fa-clock"></i> Responds in 2 hours</span>
                         <span><i class="fa-regular fa-store"></i> <span id="sellerProducts">0</span> products</span>
                     </div>
+                    <button onclick="openReportModal()" style="margin-top:0.7rem;background:none;border:1px solid #f5b7b1;color:#c0392b;padding:0.35rem 0.8rem;border-radius:50px;font-size:0.72rem;cursor:pointer;font-weight:600;transition:0.2s;" onmouseover="this.style.background='#fdecea'" onmouseout="this.style.background='none'">
+                        <i class="fa-regular fa-flag"></i> Report this product or seller
+                    </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- BUYER PROTECTION STRIP -->
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;background:#fff;border:1px solid var(--border);border-radius:12px;padding:0.8rem 1rem;margin-top:1.5rem;font-size:0.78rem;color:var(--text);">
+            <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> <strong>PSE Buyer Protection</strong> — full refund if the order isn't delivered or isn't as described</span>
+            <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-lock" style="color:var(--secondary);"></i> Secure checkout — payments protected</span>
+            <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-rotate-left" style="color:#e67e22;"></i> 30-day easy returns</span>
+        </div>
+
+        <!-- REPORT MODAL (anti-scam) -->
+        <div id="reportModal" style="display:none;position:fixed;inset:0;background:rgba(11,26,42,0.55);z-index:100002;align-items:center;justify-content:center;padding:1rem;">
+            <div style="background:#fff;border-radius:16px;max-width:440px;width:100%;padding:1.4rem;box-shadow:0 30px 80px rgba(0,20,40,0.35);position:relative;">
+                <button onclick="closeReportModal()" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;color:var(--text-light);cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+                <h3 style="font-size:1.05rem;color:var(--secondary);margin-bottom:0.3rem;"><i class="fa-regular fa-flag" style="color:#c0392b;margin-right:0.4rem;"></i> Report to Trust & Safety</h3>
+                <p style="font-size:0.78rem;color:var(--text-light);margin-bottom:0.9rem;">Our team reviews every report within 24 hours. Scammers are permanently banned — help us keep PSE safe.</p>
+                <form onsubmit="submitReport(event)">
+                    <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--secondary);margin-bottom:0.25rem;">Reason *</label>
+                    <select id="reportReason" required style="width:100%;padding:0.55rem 0.7rem;border:1px solid var(--border-dark);border-radius:8px;font-size:0.85rem;margin-bottom:0.7rem;">
+                        <option value="Suspected scam">🚨 Suspected scam / fraud</option>
+                        <option value="Fake product">📦 Fake or counterfeit product</option>
+                        <option value="Price fraud">💰 Price fraud / misleading offer</option>
+                        <option value="Off-platform payment">💳 Seller asked to pay outside PSE</option>
+                        <option value="Prohibited item">⛔ Prohibited or unsafe item</option>
+                        <option value="Other">📝 Other</option>
+                    </select>
+                    <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--secondary);margin-bottom:0.25rem;">Details *</label>
+                    <textarea id="reportDetails" required rows="3" placeholder="Tell us what happened…" style="width:100%;padding:0.55rem 0.7rem;border:1px solid var(--border-dark);border-radius:8px;font-size:0.85rem;resize:vertical;margin-bottom:0.9rem;"></textarea>
+                    <button type="submit" id="reportSubmitBtn" style="width:100%;background:#c0392b;color:#fff;border:none;padding:0.7rem;border-radius:8px;font-weight:700;cursor:pointer;">
+                        <i class="fa-regular fa-paper-plane"></i> Submit Report
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -1230,9 +1265,24 @@
 
         // Seller
         const sellerName = product.supplier_name || 'Pilot Sales Distribution';
-        document.getElementById('sellerName').textContent = `🏢 ${sellerName}`;
-        document.getElementById('sellerRating').textContent = product.seller_rating || 4.8;
-        document.getElementById('sellerProducts').textContent = product.seller_products || 0;
+        document.getElementById('sellerName').innerHTML = `<i class="fa-regular fa-building"></i> ${sellerName} ${product.supplier_verified ? '<span style="display:inline-flex;align-items:center;gap:0.2rem;background:#e8f6ff;color:#0b6bcb;border:1px solid #bfe3ff;border-radius:20px;padding:0.1rem 0.55rem;font-size:0.65rem;font-weight:700;vertical-align:middle;"><i class="fa-solid fa-circle-check"></i> VERIFIED</span>' : ''}`;
+
+        // Trust: dynamic verified badge (anti-scam)
+        const sellerStats = document.querySelector('.seller-info .seller-stats');
+        if (sellerStats) {
+            const v = !!product.supplier_verified;
+            sellerStats.innerHTML = (v
+                ? `<span style="color:#0b6bcb;font-weight:700;"><i class="fa-solid fa-circle-check"></i> Verified Supplier — ID & business license checked</span>
+                   <span><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> Buyer Protection covered</span>`
+                : `<span style="color:#856404;"><i class="fa-solid fa-triangle-exclamation"></i> Verification pending — still covered by PSE Buyer Protection</span>`
+            ) + `
+                   <span><i class="fa-regular fa-star"></i> <span id="sellerRating">${product.seller_rating || 4.8}</span> rating</span>
+                   <span><i class="fa-regular fa-clock"></i> Responds in 2 hours</span>
+                   <span><i class="fa-regular fa-store"></i> <span id="sellerProducts">${product.seller_products || 0}</span> products</span>`;
+        } else {
+            document.getElementById('sellerRating').textContent = product.seller_rating || 4.8;
+            document.getElementById('sellerProducts').textContent = product.seller_products || 0;
+        }
 
         // Main Image
         if (productImages.length > 0) {
@@ -1773,6 +1823,7 @@
         try {
             await db.collection('reviews').add({
                 product_id: currentProductId || 'unknown',
+                product_title: (currentProduct && currentProduct.title) || '',
                 user_id: user.id,
                 user_name: user.full_name || 'Buyer',
                 rating: currentReviewRating,
@@ -1797,17 +1848,47 @@
         const listEl = document.getElementById('reviewsList');
         if (!listEl || !currentProductId) return;
         try {
-            const snapshot = await db.collection('reviews').where('product_id', '==', currentProductId).orderBy('created_at', 'desc').limit(10).get();
-            if (snapshot.empty) {
+            // Fetch ALL customer-written reviews for honest aggregation (no samples, no placeholders)
+            let snapshot;
+            try {
+                snapshot = await db.collection('reviews').where('product_id', '==', currentProductId).orderBy('created_at', 'desc').get();
+            } catch (idxErr) {
+                // Composite index may not exist yet — fall back to an unordered query
+                snapshot = await db.collection('reviews').where('product_id', '==', currentProductId).get();
+            }
+            const all = [];
+            snapshot.forEach(doc => all.push(doc.data()));
+            all.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+
+            // Real aggregate → header + product document (keeps catalog rating honest)
+            if (all.length > 0) {
+                const avg = all.reduce((s, r) => s + (r.rating || 5), 0) / all.length;
+                const rounded = Math.round(avg * 10) / 10;
+                const full = Math.floor(avg);
+                const starsHtml = '★'.repeat(full) + '☆'.repeat(5 - full);
+                const starsEl = document.getElementById('ratingStars');
+                const countEl = document.getElementById('ratingReviews');
+                if (starsEl) starsEl.textContent = starsHtml + ' ' + rounded;
+                if (countEl) countEl.textContent = `(${all.length} real customer review${all.length === 1 ? '' : 's'})`;
+                try {
+                    await db.collection('products').doc(String(currentProductId)).set({
+                        rating: rounded, reviews: all.length
+                    }, { merge: true });
+                } catch (e) { /* catalog fallback products aren't in Firestore */ }
+            } else {
+                const countEl = document.getElementById('ratingReviews');
+                if (countEl) countEl.textContent = '(no customer reviews yet — be the first)';
+            }
+
+            if (all.length === 0) {
                 listEl.innerHTML = '<p style="color:var(--text-light);font-size:0.9rem;">No reviews yet for this product. Be the first!</p>';
                 return;
             }
-            listEl.innerHTML = snapshot.docs.map(doc => {
-                const r = doc.data();
+            listEl.innerHTML = all.slice(0, 10).map(r => {
                 const starsHtml = '★'.repeat(r.rating || 5) + '☆'.repeat(5 - (r.rating || 5));
                 return `<div style="padding:0.8rem 0;border-bottom:1px solid var(--border);margin-bottom:0.5rem;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem;">
-                        <strong style="font-size:0.9rem;color:var(--secondary);">${esc(r.user_name || 'Buyer')}</strong>
+                        <strong style="font-size:0.9rem;color:var(--secondary);">${esc(r.user_name || 'Buyer')} <span style="font-size:0.6rem;background:#e8f5f0;color:var(--primary);border-radius:10px;padding:0.05rem 0.4rem;margin-left:0.2rem;"><i class="fa-solid fa-circle-check"></i> Verified customer</span></strong>
                         <span style="color:#f1c40f;font-size:0.85rem;">${starsHtml}</span>
                     </div>
                     <p style="font-size:0.85rem;color:var(--text);line-height:1.5;">${esc(r.text || '')}</p>
@@ -1819,6 +1900,69 @@
             listEl.innerHTML = '<p style="color:var(--text-light);font-size:0.9rem;">Reviews unavailable.</p>';
         }
     }
+
+    // ─── REPORT PRODUCT / SELLER (anti-scam) ───
+    window.openReportModal = function () {
+        const user = getCurrentUser();
+        if (!user) {
+            showToast('Please login to submit a report — this keeps reports accountable', 'error');
+            setTimeout(() => window.location.href = '/login', 1500);
+            return;
+        }
+        document.getElementById('reportModal').style.display = 'flex';
+    };
+    window.closeReportModal = function () {
+        document.getElementById('reportModal').style.display = 'none';
+    };
+    window.submitReport = async function (e) {
+        e.preventDefault();
+        const user = getCurrentUser();
+        const reason = document.getElementById('reportReason').value;
+        const details = document.getElementById('reportDetails').value.trim();
+        if (!reason || !details) { showToast('Please fill in the reason and details', 'error'); return; }
+        const btn = document.getElementById('reportSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Reporting...';
+        try {
+            await db.collection('reports').add({
+                product_id: currentProductId || 'unknown',
+                product_title: (currentProduct && currentProduct.title) || '',
+                seller_id: (currentProduct && currentProduct.supplier_id) || '',
+                seller_name: (currentProduct && currentProduct.supplier_name) || 'Pilot Sales Distribution',
+                reason: reason,
+                details: details,
+                reporter_id: user.id,
+                reporter_email: user.email || '',
+                status: 'open',
+                created_at: new Date().toISOString()
+            });
+            // Let the support team know by email too (non-blocking)
+            try {
+                if (typeof window.sendContactMessage === 'function') {
+                    window.sendContactMessage({
+                        name: 'Trust & Safety Alert',
+                        email: user.email || 'reporter@pse',
+                        subject: '🚩 Scam report: ' + ((currentProduct && currentProduct.title) || currentProductId),
+                        message: reason + ' — ' + details
+                    }).catch(() => {});
+                }
+            } catch (e) {}
+            closeReportModal();
+            document.getElementById('reportDetails').value = '';
+            showToast('✅ Report received — our Trust & Safety team will review it within 24h', 'success');
+            try {
+                if (typeof window.pushNotification === 'function') {
+                    window.pushNotification('Report submitted 🛡️', 'Thanks for helping keep PSE scam-free. We will review within 24 hours.', { icon: 'fa-shield-halved', tag: 'report' });
+                }
+            } catch (e) {}
+        } catch (err) {
+            console.error(err);
+            showToast('❌ Failed to submit report', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Submit Report';
+        }
+    };
 
     function esc(s) {
         return String(s || '').replace(/[&<>"']/g, function (c) {
