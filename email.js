@@ -60,6 +60,20 @@ function getTemplate(templateName, data) {
         'notification': {
             subject: 'Notification - Pilot Sales Distribution',
             file: 'notification.html'
+        },
+        // Festival / holiday greeting (subject adapts to the festival)
+        'festival': {
+            subject: function (data) {
+                return `${data?.emoji || '🎉'} ${data?.holidayName || 'Season\'s Greetings'} - Pilot Sales Distribution`;
+            },
+            file: 'festival.html'
+        },
+        // Free-form message sent by the admin from the dashboard Email Center
+        'admin-message': {
+            subject: function (data) {
+                return data?.subject || 'Message from Pilot Sales Distribution';
+            },
+            file: 'admin-message.html'
         }
     };
 
@@ -70,9 +84,9 @@ function getTemplate(templateName, data) {
 
     // Build the HTML content by replacing placeholders
     const html = buildTemplateHTML(templateName, data);
-    
+
     return {
-        subject: template.subject,
+        subject: typeof template.subject === 'function' ? template.subject(data) : template.subject,
         html: html
     };
 }
@@ -529,6 +543,98 @@ function buildTemplateHTML(templateName, data) {
     </div>
 </body>
 </html>
+        `,
+
+        // Festival / holiday greeting — generated festival image is embedded
+        'festival': `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festival Greetings</title>
+    <style>
+        body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
+        .container { max-width:600px; margin:0 auto; padding:20px; }
+        .card { background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+        .banner { background:linear-gradient(135deg,${data.colorA || '#0b2a3b'},${data.colorB || '#1a7b6b'}); color:#ffffff; text-align:center; padding:30px 20px; }
+        .btn { background:#f1c40f; color:#0b2a3b; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:700; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2a3b; color:#b4d0e0; font-size:12px; }
+        .footer a { color:#b4d0e0; text-decoration:none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="banner">
+                <div style="font-size:46px;line-height:1;">${data.emoji || '🎉'}</div>
+                <h2 style="margin:10px 0 0;font-size:26px;">${data.holidayName || 'Season\'s Greetings'}</h2>
+                <p style="margin:8px 0 0;font-size:14px;opacity:0.9;">from Pilot Sales Distribution</p>
+            </div>
+            <div style="padding:26px 28px;">
+                <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
+                <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+                    ${data.message || 'Happy holidays from the whole Pilot Sales Distribution team!'}
+                </p>
+                ${data.image ? `
+                <div style="text-align:center;margin:18px 0;">
+                    <img src="${data.image}" alt="${data.holidayName || 'Festival'} - Pilot Sales Distribution" style="max-width:100%;border-radius:10px;border:1px solid #e9edf2;" />
+                </div>` : ''}
+                <div style="text-align:center;margin:22px 0;">
+                    <a href="${data.url || 'https://pilotsalesdistribution.com/products'}" class="btn">${data.cta || 'Shop Festival Deals'}</a>
+                </div>
+            </div>
+            <div class="footer">
+                <p>&copy; 2026 Pilot Sales Distribution &bull; <a href="https://pilotsalesdistribution.com">Visit our store</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+        `,
+
+        // Free-form admin email (Email Center / replies)
+        'admin-message': `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message from Pilot Sales Distribution</title>
+    <style>
+        body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
+        .container { max-width:600px; margin:0 auto; padding:20px; }
+        .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .logo { max-width:160px; height:auto; }
+        .btn { background:#1a7b6b; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
+        .footer a { color:#b4d0e0; text-decoration:none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
+                <h2 style="color:#0b2a3b;font-size:20px;margin:8px 0 0;">${data.subject || 'Message from our team'}</h2>
+            </div>
+            <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
+            <div style="background:#f8fafb;border-radius:8px;padding:15px;border:1px solid #e9edf2;margin:15px 0;color:#2c5a6b;font-size:15px;line-height:1.7;">
+                ${data.message || ''}
+            </div>
+            ${data.buttonText && data.buttonUrl ? '<div style="text-align:center;margin:20px 0;"><a href="' + data.buttonUrl + '" class="btn">' + data.buttonText + '</a></div>' : ''}
+            <p style="color:#6a889a;font-size:13px;margin:0;">
+                Reply to this email or <a href="https://wa.me/19099384682" style="color:#1a7b6b;text-decoration:none;">chat with us on WhatsApp</a> — we reply within 24 hours.
+            </p>
+            <div class="footer">
+                <p>&copy; 2026 Pilot Sales Distribution &bull; <a href="https://pilotsalesdistribution.com">Visit our store</a></p>
+                <p style="margin:5px 0 0;">📧 support@pilotsalesdistribution.com &bull; 📞 +1 (909) 938-4682</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
         `
     };
 
@@ -827,8 +933,42 @@ async function sendSupportMessage(supportData) {
     return teamResult;
 }
 
+// ─── SEND FESTIVAL / HOLIDAY GREETING ───
+// Used by holiday-engine.js — includes the auto-generated branded festival image
+async function sendFestivalGreeting(toEmail, name, holiday, imageDataUrl) {
+    holiday = holiday || {};
+    const data = {
+        name: name || 'there',
+        email: toEmail,
+        emoji: holiday.emoji || '🎉',
+        holidayName: holiday.name || 'Season\'s Greetings',
+        message: holiday.message || 'Warm wishes and great deals from Pilot Sales Distribution!',
+        cta: holiday.cta || 'Shop Festival Deals',
+        url: holiday.url || 'https://pilotsalesdistribution.com/products',
+        colorA: (holiday.colors && holiday.colors[0]) || '#0b2a3b',
+        colorB: (holiday.colors && holiday.colors[1]) || '#1a7b6b',
+        image: imageDataUrl || ''
+    };
+    return sendEmailResend('festival', data, toEmail);
+}
+
+// ─── SEND ADMIN EMAIL (Email Center + replies from dashboard) ───
+async function sendAdminEmail(toEmail, name, subject, message, buttonText, buttonUrl) {
+    const data = {
+        name: name || 'there',
+        email: toEmail,
+        subject: subject || 'Message from Pilot Sales Distribution',
+        message: message || '',
+        buttonText: buttonText || '',
+        buttonUrl: buttonUrl || ''
+    };
+    return sendEmailResend('admin-message', data, toEmail);
+}
+
 // ─── EXPOSE FUNCTIONS ───
 window.sendEmailResend = sendEmailResend;
+window.sendFestivalGreeting = sendFestivalGreeting;
+window.sendAdminEmail = sendAdminEmail;
 window.sendOrderConfirmation = sendOrderConfirmation;
 window.sendPasswordReset = sendPasswordReset;
 window.sendWelcomeEmail = sendWelcomeEmail;
@@ -846,6 +986,8 @@ window.sendSupportMessage = sendSupportMessage;
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         sendEmailResend,
+        sendFestivalGreeting,
+        sendAdminEmail,
         sendOrderConfirmation,
         sendPasswordReset,
         sendWelcomeEmail,

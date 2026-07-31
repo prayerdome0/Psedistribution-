@@ -483,8 +483,8 @@
                 </div>
                 <div class="pse-support-success" id="pse-support-success">
                     <i class="fa-regular fa-circle-check"></i>
-                    <h4>Message sent!</h4>
-                    <p>Our support team will reply within 24 hours.</p>
+                    <h4>Message sent! 🤖 Auto-reply on its way</h4>
+                    <p>An instant confirmation has been emailed to you, and our support team will reply within 24 hours.</p>
                 </div>
                 <div id="pse-support-form">
                     <label for="pse-s-name">Your name</label>
@@ -628,6 +628,8 @@
             user_id: (getCurrentUser() || {}).id || 'guest',
             source: 'live-support-widget',
             status: 'unread',
+            auto_replied: true, // instant auto confirmation is emailed below (and shown to admin)
+            auto_reply_text: 'Thanks for contacting Pilot Sales Distribution. We received your message and reply within 24 hours.',
             created_at: new Date().toISOString()
         };
 
@@ -660,6 +662,7 @@
                         userEmail: email,
                         status: 'unread',
                         source: 'live-support-widget',
+                        auto_replied: true,
                         created_at: new Date().toISOString()
                     });
                 } catch (e2) { console.warn('Admin inbox mirror skipped:', e2); }
@@ -668,11 +671,17 @@
         } catch (e) { console.warn('Support message Firestore save skipped:', e); }
 
         // 3) Email via shared email system (Resend → FormSubmit → mailto)
+        //    sendSupportMessage notifies the support team AND sends the
+        //    automatic first reply (contact-auto-reply) to the customer,
+        //    so live support is always auto-replied before a human answers.
         var emailSent = false;
         try {
-            if (typeof W.sendContactMessage === 'function') {
-                var res = await W.sendContactMessage({ name: name, email: email, subject: 'Live Support: ' + name, message: msg });
+            if (typeof W.sendSupportMessage === 'function') {
+                var res = await W.sendSupportMessage({ name: name, email: email, subject: 'Live Support: ' + name, message: msg });
                 emailSent = !!(res && res.success);
+            } else if (typeof W.sendContactMessage === 'function') {
+                var res2 = await W.sendContactMessage({ name: name, email: email, subject: 'Live Support: ' + name, message: msg });
+                emailSent = !!(res2 && res2.success);
             }
         } catch (e) { console.warn('Support email skipped:', e); }
 
