@@ -605,7 +605,12 @@
                     <div class="payment-method-single">
                         <i class="fa-brands fa-whatsapp"></i>
                         <h3>WhatsApp Quote</h3>
-                        <p>We'll send you a detailed quote via WhatsApp with order summary.</p>
+                        <p>We'll send you a detailed quote via WhatsApp with order summary. After confirmation you can pay via the methods below.</p>
+                        <div class="accepted-payments" style="display:flex;align-items:center;justify-content:center;gap:0.75rem;flex-wrap:wrap;margin-top:1rem;">
+                            <img src="visa.png" alt="Visa" style="height:28px;width:auto;object-fit:contain;" loading="lazy" />
+                            <img src="mastercard.png" alt="Mastercard" style="height:28px;width:auto;object-fit:contain;" loading="lazy" />
+                            <img src="Paypal.png" alt="PayPal" style="height:28px;width:auto;object-fit:contain;" loading="lazy" />
+                        </div>
                     </div>
                 </div>
 
@@ -658,6 +663,7 @@
                 <a href="privacy">Privacy Policy</a>
                 <a href="terms">Terms &amp; Conditions</a>
                 <a href="become-seller">Become a Seller</a>
+                <a href="supplier-verification">Supplier Verification</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -1277,6 +1283,24 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
             }
             loadCartCount();
 
+            // Best-effort order confirmation email
+            try {
+                if (typeof sendOrderConfirmation === 'function') {
+                    const productList = orderData.items.map(i => ({
+                        title: i.title,
+                        quantity: i.quantity,
+                        price: i.price
+                    }));
+                    sendOrderConfirmation(
+                        email,
+                        firstName + ' ' + lastName,
+                        quoteNumber,
+                        productList,
+                        total.toFixed(2)
+                    ).catch(() => {});
+                }
+            } catch (mailErr) { console.log('Email confirmation skipped', mailErr); }
+
             showToast('✅ Quote sent successfully! We\'ll confirm shortly.', 'success');
 
             setTimeout(() => {
@@ -1433,5 +1457,6 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
     window.showToast = showToast;
     window.sendEmailQuote = sendEmailQuote;
 </script>
+    <script src="email.js"></script>
 </body>
 </html>

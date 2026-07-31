@@ -466,7 +466,8 @@
                         <span>How do I become a seller?</span>
                         <i class="fa-solid fa-chevron-down"></i>
                     </div>
-                    <div class="answer">You can apply to become a seller by visiting our <a href="become-seller">Become a Seller</a> page. Fill out the application and our team will review it within 48 hours.</div>
+                    <div class="answer">You can apply to become a seller by visiting our <a href="become-seller">Become a Seller</a>
+                <a href="supplier-verification">Supplier Verification</a> page. Fill out the application and our team will review it within 48 hours.</div>
                 </div>
                 <!-- Billing -->
                 <div class="faq-item" data-category="billing">
@@ -677,7 +678,19 @@
     async function loadCartCount() {
         const user = getCurrentUser();
         if (!user) {
-            document.querySelectorAll('.cart-count').forEach(el => { el.textContent = '0'; el.style.display = 'none'; });
+            try {
+                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+                const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                document.querySelectorAll('.cart-count').forEach(el => {
+                    el.textContent = count;
+                    el.style.display = count > 0 ? 'inline' : 'none';
+                });
+            } catch (e) {
+                document.querySelectorAll('.cart-count').forEach(el => {
+                    el.textContent = '0';
+                    el.style.display = 'none';
+                });
+            }
             return;
         }
         try {

@@ -1,50 +1,204 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/home", "destination": "/index.html" },
-    { "source": "/products", "destination": "/products.html" },
-    { "source": "/products/:path*", "destination": "/products.html" },
-    { "source": "/product/:slug", "destination": "/product-detail.html" },
-    { "source": "/cart", "destination": "/cart.html" },
-    { "source": "/checkout", "destination": "/checkout.html" },
-    { "source": "/login", "destination": "/login.html" },
-    { "source": "/register", "destination": "/register.html" },
-    { "source": "/account", "destination": "/account.html" },
-    { "source": "/admin-dashboard", "destination": "/admin-dashboard.html" },
-    { "source": "/seller-dashboard", "destination": "/seller-dashboard.html" },
-    { "source": "/about", "destination": "/about.html" },
-    { "source": "/contact", "destination": "/contact.html" },
-    { "source": "/help-center", "destination": "/help-center.html" },
-    { "source": "/privacy", "destination": "/privacy.html" },
-    { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/track-order", "destination": "/track-order.html" },
-    { "source": "/track-order/:path*", "destination": "/track-order.html" },
-    { "source": "/become-seller", "destination": "/become-seller.html" },
-    { "source": "/order-success", "destination": "/order-success.html" },
-    { "source": "/order-success/:path*", "destination": "/order-success.html" },
-    { "source": "/wishlist", "destination": "/wishlist.html" },
-    { "source": "/chat", "destination": "/chat.html" },
-    { "source": "/chat/:path*", "destination": "/chat.html" },
-    { "source": "/rfq", "destination": "/rfq.html" },
-    { "source": "/rfq/:path*", "destination": "/rfq.html" },
-    { "source": "/supplier-verification", "destination": "/supplier-verification.html" },
-    { "source": "/buyer-dashboard", "destination": "/buyer-dashboard.html" },
-    { "source": "/api/ai-search", "destination": "/api/ai-search.js" }
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/home",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/products",
+      "destination": "/products.html"
+    },
+    {
+      "source": "/products/:path*",
+      "destination": "/products.html"
+    },
+    {
+      "source": "/product/:slug",
+      "destination": "/product-detail.html"
+    },
+    {
+      "source": "/cart",
+      "destination": "/cart.html"
+    },
+    {
+      "source": "/checkout",
+      "destination": "/checkout.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/register",
+      "destination": "/register.html"
+    },
+    {
+      "source": "/account",
+      "destination": "/account.html"
+    },
+    {
+      "source": "/admin-dashboard",
+      "destination": "/admin-dashboard.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin-dashboard.html"
+    },
+    {
+      "source": "/seller-dashboard",
+      "destination": "/seller-dashboard.html"
+    },
+    {
+      "source": "/seller",
+      "destination": "/seller-dashboard.html"
+    },
+    {
+      "source": "/buyer-dashboard",
+      "destination": "/buyer-dashboard.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact.html"
+    },
+    {
+      "source": "/help-center",
+      "destination": "/help-center.html"
+    },
+    {
+      "source": "/help",
+      "destination": "/help-center.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/track-order",
+      "destination": "/track-order.html"
+    },
+    {
+      "source": "/track-order/:path*",
+      "destination": "/track-order.html"
+    },
+    {
+      "source": "/become-seller",
+      "destination": "/become-seller.html"
+    },
+    {
+      "source": "/order-success",
+      "destination": "/order-success.html"
+    },
+    {
+      "source": "/order-success/:path*",
+      "destination": "/order-success.html"
+    },
+    {
+      "source": "/order-sucess",
+      "destination": "/order-success.html"
+    },
+    {
+      "source": "/wishlist",
+      "destination": "/wishlist.html"
+    },
+    {
+      "source": "/chat",
+      "destination": "/chat.html"
+    },
+    {
+      "source": "/chat/:path*",
+      "destination": "/chat.html"
+    },
+    {
+      "source": "/rfq",
+      "destination": "/rfq.html"
+    },
+    {
+      "source": "/rfq/:path*",
+      "destination": "/rfq.html"
+    },
+    {
+      "source": "/supplier-verification",
+      "destination": "/supplier-verification.html"
+    }
   ],
   "redirects": [
-    { "source": "/index", "destination": "/home", "permanent": true },
-    { "source": "/index.html", "destination": "/home", "permanent": true }
+    {
+      "source": "/index",
+      "destination": "/home",
+      "permanent": true
+    },
+    {
+      "source": "/index.html",
+      "destination": "/home",
+      "permanent": true
+    },
+    {
+      "source": "/order-sucess",
+      "destination": "/order-success",
+      "permanent": true
+    },
+    {
+      "source": "/order-sucess.html",
+      "destination": "/order-success",
+      "permanent": true
+    }
   ],
-  "trailingSlash": false,
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-XSS-Protection", "value": "1; mode=block" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "geolocation=(), microphone=(), camera=()" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "geolocation=(), microphone=(), camera=()"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)\\.(js|css|png|jpg|jpeg|gif|ico|svg|webp|woff2?)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(manifest.json|robots.txt|sitemap.xml)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
       ]
     }
   ]

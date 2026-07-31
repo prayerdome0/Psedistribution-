@@ -1,19 +1,21 @@
 User-agent: *
 Allow: /
 
+# Sitemaps
 Sitemap: https://pilotsalesdistribution.com/sitemap.xml
 
-# Disallow admin pages
+# Private / app areas
 Disallow: /admin-dashboard
+Disallow: /admin
 Disallow: /seller-dashboard
+Disallow: /seller
+Disallow: /buyer-dashboard
 Disallow: /account
 Disallow: /chat
-Disallow: /api/
 Disallow: /checkout
 Disallow: /cart
+Disallow: /api/
+Disallow: /order-success
 
-# Disallow query strings
-Disallow: /*?*
-
-# Crawl delay
+# Crawl politely
 Crawl-delay: 1

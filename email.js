@@ -17,7 +17,7 @@ const EMAIL_CONFIG = {
 const RESEND_API_URL = 'https://api.resend.com/emails';
 
 // ─── TEMPLATE BASE URL (GitHub) ───
-const TEMPLATE_BASE_URL = 'https://raw.githubusercontent.com/prayerdoc/Psedistribution-/main/Email%20Template/';
+const TEMPLATE_BASE_URL = 'https://raw.githubusercontent.com/prayerdome0/Psedistribution-/main/Email%20Template/';
 
 // ─── EMAIL TEMPLATE FUNCTIONS ───
 // These generate the HTML content using the GitHub templates with placeholders replaced
@@ -620,4 +620,4 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 console.log('📧 Email system loaded successfully with Resend API!');
-console.log('📁 Templates loaded from GitHub: https://github.com/prayerdoc/Psedistribution-/tree/main/Email%20Template');
+console.log('📁 Templates loaded from GitHub: https://github.com/prayerdome0/Psedistribution-/tree/main/Email%20Template');
