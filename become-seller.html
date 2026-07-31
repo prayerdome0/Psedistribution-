@@ -205,6 +205,21 @@
         .application-form .info-box p { color: var(--text); font-size: 0.9rem; margin: 0; }
         .application-form .info-box i { color: var(--primary); margin-right: 0.5rem; }
 
+        /* Profile picture upload */
+        .profile-upload { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; margin-bottom: 1.2rem; padding: 1.2rem; background: var(--light); border-radius: var(--radius-sm); border: 1px dashed var(--border-dark); }
+        .profile-upload .avatar-preview { width: 96px; height: 96px; border-radius: 50%; background: var(--white); border: 3px solid var(--primary); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--primary); font-size: 2.2rem; }
+        .profile-upload .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-upload .upload-label { font-size: 0.85rem; font-weight: 600; color: var(--secondary); }
+        .profile-upload .upload-hint { font-size: 0.72rem; color: var(--text-light); text-align: center; }
+        .profile-upload .btn-upload { background: var(--primary); color: var(--white); border: none; padding: 0.5rem 1.2rem; border-radius: 50px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: var(--transition); }
+        .profile-upload .btn-upload:hover { background: var(--primary-dark); }
+        .profile-upload .btn-upload:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* Contact info note */
+        .contact-info-box { background: #fff8e1; border-radius: var(--radius-sm); padding: 0.8rem 1rem; border-left: 4px solid var(--accent); margin: 0 0 1.2rem; }
+        .contact-info-box p { margin: 0; font-size: 0.82rem; color: var(--text); }
+        .contact-info-box i { color: #b8860b; margin-right: 0.3rem; }
+
         .footer {
             background: var(--secondary);
             color: #b4d0e0;
@@ -373,6 +388,17 @@
             </div>
 
             <form id="sellerApplicationForm">
+                <!-- Profile picture -->
+                <div class="profile-upload">
+                    <div class="avatar-preview" id="sellerAvatarPreview"><i class="fa-regular fa-user"></i></div>
+                    <span class="upload-label">Profile / Logo Picture</span>
+                    <span class="upload-hint">A clear photo or business logo helps buyers trust you. JPG/PNG/WebP (max 2MB).</span>
+                    <input type="file" id="sellerProfileInput" accept="image/*" style="display:none;" />
+                    <button type="button" class="btn-upload" id="sellerUploadBtn" onclick="document.getElementById('sellerProfileInput').click()">
+                        <i class="fa-regular fa-image"></i> Upload Picture
+                    </button>
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
                         <label>First Name <span class="required">*</span></label>
@@ -390,8 +416,24 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="tel" id="sellerPhone" placeholder="(555) 123-4567" />
+                    <label>Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="sellerPhone" placeholder="+1 (555) 123-4567" required />
+                </div>
+
+                <!-- Buyer contact details -->
+                <div class="contact-info-box">
+                    <p><i class="fa-solid fa-comments"></i> <strong>Buyer Contact Details</strong> - Add how you want buyers to reach you. When a buyer clicks Contact Seller on your products, they will be redirected straight to the contact you provide here.</p>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>WhatsApp Number <span class="required">*</span></label>
+                        <input type="tel" id="sellerWhatsApp" placeholder="+1 (555) 123-4567" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Email for Buyers <span class="required">*</span></label>
+                        <input type="email" id="sellerContactEmail" placeholder="sales@yourbusiness.com" required />
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -423,6 +465,11 @@
                             <option value="10+">10+ years</option>
                         </select>
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Business Address / Location</label>
+                    <input type="text" id="sellerLocation" placeholder="City, Country" />
                 </div>
 
                 <div class="form-group">
@@ -571,29 +618,84 @@
         return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
     }
 
-    document.getElementById('sellerApplicationForm').addEventListener('submit', function(e) {
+    // --- CLOUDINARY CONFIG (profile picture upload) ---
+    const CLOUDINARY = { cloudName: 'nqyylkmd', uploadPreset: 'pse_products' };
+    let sellerProfileImageURL = '';
+
+    // --- PROFILE IMAGE UPLOAD ---
+    async function uploadSellerProfileImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        if (!validTypes.includes(file.type)) {
+            showToast('Please upload a valid image (JPG, PNG, WebP, GIF)', 'error');
+            event.target.value = '';
+            return;
+        }
+        if (file.size > 2 * 1024 * 1024) {
+            showToast('Image must be less than 2MB', 'error');
+            event.target.value = '';
+            return;
+        }
+        const uploadBtn = document.getElementById('sellerUploadBtn');
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('sellerAvatarPreview').innerHTML = '<img src="' + e.target.result + '" alt="Profile preview" />';
+        };
+        reader.readAsDataURL(file);
+        showToast('Uploading profile picture...', 'info');
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY.uploadPreset);
+            formData.append('folder', 'seller_profiles');
+            const response = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY.cloudName + '/image/upload', {
+                method: 'POST', body: formData
+            });
+            if (!response.ok) throw new Error('Upload failed');
+            const data = await response.json();
+            sellerProfileImageURL = data.secure_url;
+            document.getElementById('sellerAvatarPreview').innerHTML = '<img src="' + sellerProfileImageURL + '" alt="Profile" />';
+            showToast('Profile picture uploaded!', 'success');
+        } catch (error) {
+            console.error('Upload error:', error);
+            showToast('Failed to upload picture. You can still submit without it.', 'error');
+            sellerProfileImageURL = '';
+            document.getElementById('sellerAvatarPreview').innerHTML = '<i class="fa-regular fa-user"></i>';
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fa-regular fa-image"></i> Change Picture';
+        }
+    }
+
+    document.getElementById('sellerApplicationForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const firstName = document.getElementById('sellerFirstName').value.trim();
         const lastName = document.getElementById('sellerLastName').value.trim();
         const email = document.getElementById('sellerEmail').value.trim();
         const phone = document.getElementById('sellerPhone').value.trim();
+        const whatsapp = document.getElementById('sellerWhatsApp').value.trim();
+        const contactEmail = document.getElementById('sellerContactEmail').value.trim();
         const businessName = document.getElementById('sellerBusinessName').value.trim();
         const businessType = document.getElementById('sellerBusinessType').value;
         const years = document.getElementById('sellerYears').value;
+        const location = document.getElementById('sellerLocation').value.trim();
         const website = document.getElementById('sellerWebsite').value.trim();
         const categories = document.getElementById('sellerCategories');
         const selectedCategories = Array.from(categories.selectedOptions).map(o => o.value);
         const reason = document.getElementById('sellerReason').value.trim();
 
-        if (!firstName || !lastName || !email || !businessName || !businessType || selectedCategories.length === 0) {
+        if (!firstName || !lastName || !email || !phone || !whatsapp || !contactEmail || !businessName || !businessType || selectedCategories.length === 0) {
             showToast('Please fill in all required fields', 'error');
             return;
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            showToast('Please enter a valid email address', 'error');
+        if (!emailRegex.test(email) || !emailRegex.test(contactEmail)) {
+            showToast('Please enter valid email addresses', 'error');
             return;
         }
 
@@ -602,23 +704,61 @@
         submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
 
         const user = getCurrentUser();
+        const fullName = firstName + ' ' + lastName;
 
-        db.collection('seller_applications').add({
-            firstName, lastName, email, phone: phone || '', businessName, businessType,
-            yearsInBusiness: years || '', website: website || '', categories: selectedCategories,
-            reason: reason || '', userId: user?.id || 'guest', userEmail: user?.email || email,
+        const applicationData = {
+            firstName: firstName, lastName: lastName, full_name: fullName,
+            email: email, phone: phone || '', whatsapp: whatsapp || '',
+            contactEmail: contactEmail, businessName: businessName, businessType: businessType,
+            yearsInBusiness: years || '', location: location || '',
+            website: website || '', categories: selectedCategories,
+            reason: reason || '', profileImage: sellerProfileImageURL || '',
+            userId: (user && user.id) || 'guest',
+            userEmail: (user && user.email) || email,
             status: 'pending', created_at: new Date().toISOString()
-        }).then(() => {
-            showToast('✅ Application submitted successfully! We\'ll review it within 48 hours.', 'success');
+        };
+
+        try {
+            await db.collection('seller_applications').add(applicationData);
+
+            // Mark the registered account as having submitted an application
+            if (user && user.id) {
+                try {
+                    await db.collection('users').doc(user.id).update({
+                        seller_application: 'submitted',
+                        company: businessName,
+                        updated_at: new Date().toISOString()
+                    });
+                } catch (err) { /* non-fatal */ }
+            }
+
+            // --- AUTOMATIC EMAILS (no manual step needed) ---
+            // 1. Confirmation to the applicant
+            try {
+                if (typeof sendSellerApplicationReceived === 'function') {
+                    sendSellerApplicationReceived(email, fullName, businessName).catch(function(){});
+                }
+            } catch (err) {}
+            // 2. Notification to the admin team
+            try {
+                if (typeof sendSellerApplicationAdmin === 'function') {
+                    sendSellerApplicationAdmin(applicationData).catch(function(){});
+                }
+            } catch (err) {}
+
+            showToast('Application submitted! We will review it within 48 hours and email you.', 'success');
             document.getElementById('sellerApplicationForm').reset();
-            setTimeout(() => { window.location.href = '/home'; }, 3000);
-        }).catch((error) => {
+            document.getElementById('sellerAvatarPreview').innerHTML = '<i class="fa-regular fa-user"></i>';
+            sellerProfileImageURL = '';
+            try { sessionStorage.removeItem('pse_seller_prefill'); } catch (e) {}
+            setTimeout(function() { window.location.href = '/account'; }, 3500);
+        } catch (error) {
             console.error('Error submitting application:', error);
-            showToast('❌ Failed to submit application. Please try again.', 'error');
-        }).finally(() => {
+            showToast('Failed to submit application. Please try again.', 'error');
+        } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Submit Application';
-        });
+        }
     });
 
     async function loadCartCount() {
@@ -723,11 +863,46 @@
             entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
         }, { threshold: 0.1 });
         document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+        // Profile picture file input
+        const profileInput = document.getElementById('sellerProfileInput');
+        if (profileInput) {
+            profileInput.addEventListener('change', uploadSellerProfileImage);
+        }
+
+        // Prefill from registration redirect (seller role chosen on register page)
+        try {
+            const prefill = JSON.parse(sessionStorage.getItem('pse_seller_prefill') || 'null');
+            if (prefill) {
+                if (prefill.firstName) document.getElementById('sellerFirstName').value = prefill.firstName;
+                if (prefill.lastName) document.getElementById('sellerLastName').value = prefill.lastName;
+                if (prefill.email) document.getElementById('sellerEmail').value = prefill.email;
+                if (prefill.company) {
+                    document.getElementById('sellerBusinessName').value = prefill.company;
+                    document.getElementById('sellerContactEmail').value = prefill.email;
+                }
+                if (prefill.businessType) {
+                    const sel = document.getElementById('sellerBusinessType');
+                    for (let i = 0; i < sel.options.length; i++) {
+                        if (sel.options[i].value === prefill.businessType.toLowerCase()) { sel.selectedIndex = i; break; }
+                    }
+                }
+                showToast('Complete your seller application to get verified', 'info');
+                sessionStorage.removeItem('pse_seller_prefill');
+            }
+        } catch (e) {}
+
+        // Prefill logged-in user details if available
+        const u = getCurrentUser();
+        if (u && u.email && !document.getElementById('sellerEmail').value) {
+            document.getElementById('sellerEmail').value = u.email;
+        }
     });
 
     window.toggleWishlist = toggleWishlist;
     window.handleSearch = handleSearch;
     window.showToast = showToast;
+    window.uploadSellerProfileImage = uploadSellerProfileImage;
 </script>
     <script src="email.js"></script>
     <script src="ai-assistant.js"></script>
