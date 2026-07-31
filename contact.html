@@ -499,6 +499,7 @@
                 <a href="privacy">Privacy Policy</a>
                 <a href="terms">Terms &amp; Conditions</a>
                 <a href="become-seller">Become a Seller</a>
+                <a href="supplier-verification">Supplier Verification</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -650,7 +651,18 @@
             status: 'unread',
             created_at: new Date().toISOString()
         })
-        .then(() => {
+        .then(async () => {
+            try {
+                if (typeof sendContactMessage === 'function') {
+                    await sendContactMessage({
+                        name: firstName + ' ' + lastName,
+                        email: email,
+                        phone: phone || '',
+                        subject: subject,
+                        message: message
+                    });
+                }
+            } catch (mailErr) { console.log('Contact email skipped', mailErr); }
             showToast('✅ Message sent successfully! We\'ll get back to you soon.', 'success');
             document.getElementById('contactForm').reset();
         })
@@ -668,10 +680,19 @@
     async function loadCartCount() {
         const user = getCurrentUser();
         if (!user) {
-            document.querySelectorAll('.cart-count').forEach(el => {
-                el.textContent = '0';
-                el.style.display = 'none';
-            });
+            try {
+                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+                const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                document.querySelectorAll('.cart-count').forEach(el => {
+                    el.textContent = count;
+                    el.style.display = count > 0 ? 'inline' : 'none';
+                });
+            } catch (e) {
+                document.querySelectorAll('.cart-count').forEach(el => {
+                    el.textContent = '0';
+                    el.style.display = 'none';
+                });
+            }
             return;
         }
         try {
@@ -811,5 +832,6 @@
     window.getCurrentUser = getCurrentUser;
 </script>
 
+    <script src="email.js"></script>
 </body>
 </html>

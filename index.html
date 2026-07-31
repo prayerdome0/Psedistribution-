@@ -20,6 +20,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
     
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
@@ -806,6 +808,7 @@
                 <a href="privacy">Privacy Policy</a>
                 <a href="terms">Terms &amp; Conditions</a>
                 <a href="become-seller">Become a Seller</a>
+                <a href="supplier-verification">Supplier Verification</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -846,16 +849,24 @@
     ];
 
     const COMPANY_LOGOS = [
-        { name: 'Samsung', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Samsung_Logo.svg/120px-Samsung_Logo.svg.png' },
-        { name: 'Sony', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/120px-Sony_logo.svg.png' },
-        { name: 'Nike', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/120px-Logo_NIKE.svg.png' },
-        { name: 'Adidas', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Adidas_Logo.svg/120px-Adidas_Logo.svg.png' },
-        { name: 'Apple', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/120px-Apple_logo_black.svg.png' },
-        { name: 'Google', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/120px-Google_2015_logo.svg.png' },
-        { name: 'Microsoft', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/120px-Microsoft_logo.svg.png' },
-        { name: 'Amazon', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/120px-Amazon_logo.svg.png' },
-        { name: 'Walmart', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Walmart_logo.svg/120px-Walmart_logo.svg.png' },
-        { name: 'Costco', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Costco_logo.svg/120px-Costco_logo.svg.png' }
+        { name: 'Samsung', image: 'samsung.png' },
+        { name: 'Sony', image: 'sony.png' },
+        { name: 'Nike', image: 'nike.png' },
+        { name: 'Adidas', image: 'adidas.png' },
+        { name: 'Apple', image: 'apple.png' },
+        { name: 'Google', image: 'google.png' },
+        { name: 'Dell', image: 'dell.png' },
+        { name: 'HP', image: 'hp.png' },
+        { name: 'Intel', image: 'intel.png' },
+        { name: 'NVIDIA', image: 'nvidia.png' },
+        { name: 'Lenovo', image: 'lenovo.png' },
+        { name: 'LG', image: 'lg.png' },
+        { name: 'Huawei', image: 'huawei.png' },
+        { name: 'Xiaomi', image: 'xiaomi.png' },
+        { name: 'Tesla', image: 'tesla.png' },
+        { name: 'BMW', image: 'bmw.png' },
+        { name: 'Toyota', image: 'Toyota.png' },
+        { name: 'Cisco', image: 'cisco.png' }
     ];
 
     let currentSlide = 0;
@@ -1039,39 +1050,61 @@
         `).join('');
     }
 
+    // Keep a local cache of rendered products for guest cart details
+    let featuredProductsCache = [];
+
     async function addToCart(productId) {
         const user = getCurrentUser();
-        if (!user) {
-            showToast('Please login first', 'error');
-            setTimeout(() => window.location.href = 'login', 1500);
-            return;
-        }
-
         const btn = document.querySelector(`.btn-add[data-product-id="${productId}"]`);
         if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; }
 
         try {
-            const snapshot = await db.collection('cart')
-                .where('user_id', '==', user.id)
-                .where('product_id', '==', productId)
-                .get();
-
-            if (!snapshot.empty) {
-                const docRef = snapshot.docs[0].ref;
-                const currentQty = snapshot.docs[0].data().quantity || 1;
-                await docRef.update({ quantity: currentQty + 1, updated_at: new Date().toISOString() });
+            if (!user) {
+                // Guest cart via localStorage
+                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+                const product = featuredProductsCache.find(p => p.id === productId) ||
+                                FALLBACK_PRODUCTS.find(p => p.id === productId);
+                const existingIndex = cart.findIndex(item => item.product_id === productId);
+                if (existingIndex > -1) {
+                    cart[existingIndex].quantity = (cart[existingIndex].quantity || 1) + 1;
+                } else {
+                    cart.push({
+                        product_id: productId,
+                        title: product?.title || 'Product',
+                        price: product?.price || 0,
+                        old_price: product?.old_price || 0,
+                        image_url: product?.image_url || '',
+                        brand: product?.brand || 'Pilot Distribution',
+                        moq: product?.moq || 1,
+                        quantity: 1
+                    });
+                }
+                localStorage.setItem('pilot_cart', JSON.stringify(cart));
+                showToast('✅ Added to cart!', 'success');
+                loadCartCount();
             } else {
-                await db.collection('cart').add({
-                    user_id: user.id,
-                    product_id: productId,
-                    quantity: 1,
-                    created_at: new Date().toISOString()
-                });
-            }
+                const snapshot = await db.collection('cart')
+                    .where('user_id', '==', user.id)
+                    .where('product_id', '==', productId)
+                    .get();
 
-            showToast('✅ Added to cart!', 'success');
-            loadCartCount();
+                if (!snapshot.empty) {
+                    const docRef = snapshot.docs[0].ref;
+                    const currentQty = snapshot.docs[0].data().quantity || 1;
+                    await docRef.update({ quantity: currentQty + 1, updated_at: new Date().toISOString() });
+                } else {
+                    await db.collection('cart').add({
+                        user_id: user.id,
+                        product_id: productId,
+                        quantity: 1,
+                        created_at: new Date().toISOString()
+                    });
+                }
+                showToast('✅ Added to cart!', 'success');
+                loadCartCount();
+            }
         } catch (error) {
+            console.error(error);
             showToast('❌ Failed to add to cart', 'error');
         }
 
@@ -1116,7 +1149,16 @@
     async function loadCartCount() {
         const user = getCurrentUser();
         if (!user) {
-            document.querySelectorAll('.cart-count').forEach(el => el.textContent = '0');
+            try {
+                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+                const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                document.querySelectorAll('.cart-count').forEach(el => {
+                    el.textContent = count;
+                    el.style.display = count > 0 ? 'inline' : 'none';
+                });
+            } catch (e) {
+                document.querySelectorAll('.cart-count').forEach(el => el.textContent = '0');
+            }
             return;
         }
 
@@ -1218,6 +1260,7 @@
 
     function renderProducts(products) {
         const grid = document.getElementById('productGrid');
+        featuredProductsCache = products || [];
         
         if (!products || products.length === 0) {
             grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-light);">

@@ -422,6 +422,7 @@
                 <a href="privacy">Privacy Policy</a>
                 <a href="terms">Terms &amp; Conditions</a>
                 <a href="become-seller">Become a Seller</a>
+                <a href="supplier-verification">Supplier Verification</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -691,7 +692,19 @@
     async function loadCartCount() {
         const user = getCurrentUser();
         if (!user) {
-            document.querySelectorAll('.cart-count').forEach(el => { el.textContent = '0'; el.style.display = 'none'; });
+            try {
+                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+                const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                document.querySelectorAll('.cart-count').forEach(el => {
+                    el.textContent = count;
+                    el.style.display = count > 0 ? 'inline' : 'none';
+                });
+            } catch (e) {
+                document.querySelectorAll('.cart-count').forEach(el => {
+                    el.textContent = '0';
+                    el.style.display = 'none';
+                });
+            }
             return;
         }
         try {

@@ -387,6 +387,7 @@
                 <a href="privacy">Privacy Policy</a>
                 <a href="terms">Terms &amp; Conditions</a>
                 <a href="become-seller">Become a Seller</a>
+                <a href="supplier-verification">Supplier Verification</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -559,12 +560,32 @@
 
     async function addToCart(productId) {
         const user = getCurrentUser();
-        if (!user) {
-            showToast('Please login first', 'error');
-            setTimeout(() => window.location.href = 'login', 1500);
-            return;
-        }
         try {
+            // Prefer product details from currently rendered wishlist cards if available
+            const card = document.querySelector(`[data-product-id="${productId}"]`)?.closest('.product-card');
+            const title = card?.querySelector('.product-title')?.textContent?.trim() || 'Product';
+            const priceText = card?.querySelector('.product-price')?.childNodes?.[0]?.textContent || '$0';
+            const price = parseFloat(String(priceText).replace(/[^0-9.]/g, '')) || 0;
+            const image_url = card?.querySelector('.product-image img')?.src || '';
+            const brand = card?.querySelector('.product-brand')?.textContent?.trim() || 'Pilot Distribution';
+
+            if (!user) {
+                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+                const existingIndex = cart.findIndex(item => item.product_id === productId);
+                if (existingIndex > -1) {
+                    cart[existingIndex].quantity = (cart[existingIndex].quantity || 1) + 1;
+                } else {
+                    cart.push({
+                        product_id: productId,
+                        title, price, old_price: 0, image_url, brand, moq: 1, quantity: 1
+                    });
+                }
+                localStorage.setItem('pilot_cart', JSON.stringify(cart));
+                showToast('✅ Added to cart!', 'success');
+                loadCartCount();
+                return;
+            }
+
             const snapshot = await db.collection('cart')
                 .where('user_id', '==', user.id)
                 .where('product_id', '==', productId)
@@ -606,7 +627,16 @@
     async function loadCartCount() {
         const user = getCurrentUser();
         if (!user) {
-            document.querySelectorAll('.cart-count').forEach(el => { el.textContent = '0'; el.style.display = 'none'; });
+            try {
+                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+                const count = cart.reduce((s, i) => s + (i.quantity || 1), 0);
+                document.querySelectorAll('.cart-count').forEach(el => {
+                    el.textContent = count;
+                    el.style.display = count > 0 ? 'inline' : 'none';
+                });
+            } catch (e) {
+                document.querySelectorAll('.cart-count').forEach(el => { el.textContent = '0'; el.style.display = 'none'; });
+            }
             return;
         }
         try {
