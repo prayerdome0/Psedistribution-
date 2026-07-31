@@ -134,6 +134,35 @@
                 <label>Email Address</label>
                 <input type="email" id="loginEmail" placeholder="you@example.com" required />
             </div>
+
+            <!-- SMS Login Option -->
+            <div class="form-group">
+                <label>Or login with SMS (production verification)</label>
+                <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                    <select id="loginCountryCode" style="padding:0.7rem 0.5rem;border:1px solid var(--border-dark);border-radius:var(--radius-sm);font-size:0.9rem;background:var(--white);outline:none;flex-shrink:0;">
+                        <option value="+260">+260 (ZM)</option>
+                        <option value="+1">+1 (US)</option>
+                        <option value="+44">+44 (UK)</option>
+                        <option value="+27">+27 (ZA)</option>
+                    </select>
+                    <input type="tel" id="loginPhone" placeholder="Phone number" style="flex:1;min-width:120px;" />
+                    <button type="button" onclick="startLoginPhoneVerification()" id="loginSendSmsBtn" style="padding:0.6rem 1.2rem;background:var(--primary);color:#fff;border:none;border-radius:30px;font-weight:600;font-size:0.85rem;cursor:pointer;transition:0.3s;white-space:nowrap;flex-shrink:0;">
+                        <i class="fa-solid fa-paper-plane"></i> SMS Login
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group" id="loginSmsVerifyGroup" style="display:none;animation:slideDown 0.3s ease;">
+                <label>Enter SMS Code <span class="required">*</span></label>
+                <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                    <input type="text" id="loginSmsCode" placeholder="123456" maxlength="6" style="flex:1;min-width:120px;letter-spacing:0.15em;text-align:center;font-weight:700;font-size:1.1rem;" />
+                    <button type="button" onclick="verifyLoginPhoneCode()" id="loginVerifySmsBtn" style="padding:0.6rem 1.2rem;background:#27ae60;color:#fff;border:none;border-radius:30px;font-weight:600;font-size:0.85rem;cursor:pointer;transition:0.3s;flex-shrink:0;">
+                        <i class="fa-solid fa-check"></i> Verify
+                    </button>
+                </div>
+            </div>
+
+            <div id="loginSmsStatus" style="font-size:0.8rem;font-weight:600;margin-bottom:0.5rem;"></div>
             <div class="form-group">
                 <label>Password</label>
                 <input type="password" id="loginPassword" placeholder="Enter your password" required />
@@ -449,6 +478,114 @@
             document.querySelectorAll('.cart-count').forEach(el => el.textContent = '0');
         }
     }
+
+    // ─── SMS / PHONE LOGIN (Firebase Phone Auth - Production) ───
+    let confirmationResultLoginSMS = null;
+
+    window.startLoginPhoneVerification = async function() {
+        const phoneInput = document.getElementById('loginPhone');
+        const countrySelect = document.getElementById('loginCountryCode');
+        const btn = document.getElementById('loginSendSmsBtn');
+        const statusDiv = document.getElementById('loginSmsStatus');
+        const smsGroup = document.getElementById('loginSmsVerifyGroup');
+
+        const rawPhone = phoneInput.value.trim();
+        const countryCode = countrySelect.value;
+        const fullNumber = countryCode + rawPhone;
+
+        if (!rawPhone || rawPhone.length < 7) {
+            showToast('❌ Please enter a valid phone number', 'error');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+        statusDiv.textContent = 'Sending SMS verification...';
+        statusDiv.style.color = '#2980b9';
+
+        try {
+            if (!document.getElementById('recaptcha-login')) {
+                const rec = document.createElement('div');
+                rec.id = 'recaptcha-login';
+                rec.style.display = 'none';
+                document.body.appendChild(rec);
+            }
+            const recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-login', {
+                'size': 'invisible',
+                'callback': function() { console.log('reCAPTCHA solved'); }
+            });
+            confirmationResultLoginSMS = await auth.signInWithPhoneNumber(fullNumber, recaptchaVerifier);
+            smsGroup.style.display = 'block';
+            statusDiv.textContent = '✅ SMS sent! Enter the verification code.';
+            statusDiv.style.color = '#27ae60';
+            document.getElementById('loginSmsCode').focus();
+            showToast('✅ SMS verification code sent!', 'success');
+        } catch (err) {
+            console.error(err);
+            let msg = err.message || 'Failed';
+            if (msg.includes('quota')) msg = 'Quota exceeded. Try later.';
+            if (msg.includes('invalid')) msg = 'Invalid phone number.';
+            statusDiv.textContent = '❌ ' + msg;
+            statusDiv.style.color = '#c0392b';
+            showToast('❌ ' + msg, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> SMS Login';
+        }
+    };
+
+    window.verifyLoginPhoneCode = async function() {
+        const code = document.getElementById('loginSmsCode').value.trim();
+        const btn = document.getElementById('loginVerifySmsBtn');
+        const statusDiv = document.getElementById('loginSmsStatus');
+
+        if (!code || code.length !== 6) {
+            showToast('❌ Enter 6-digit code', 'error');
+            return;
+        }
+        if (!confirmationResultLoginSMS) {
+            showToast('❌ Request SMS first', 'error');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+        statusDiv.textContent = 'Verifying...';
+        statusDiv.style.color = '#2980b9';
+
+        try {
+            const result = await confirmationResultLoginSMS.confirm(code);
+            const user = result.user;
+            const doc = await db.collection('users').doc(user.uid).get();
+            const data = doc.exists ? doc.data() : {};
+            localStorage.setItem('pilot_user', JSON.stringify({
+                id: user.uid,
+                email: user.phoneNumber || user.email,
+                full_name: data.full_name || user.displayName || '',
+                role: data.role || 'buyer'
+            }));
+            updateAuthUI();
+            statusDiv.textContent = '✅ Phone verified! Welcome!';
+            statusDiv.style.color = '#27ae60';
+            showToast('✅ SMS login successful!', 'success');
+            setTimeout(() => {
+                const u = getCurrentUser();
+                if (u && u.role === 'admin') window.location.href = '/admin-dashboard';
+                else if (u && u.role === 'seller') window.location.href = '/seller-dashboard';
+                else window.location.href = '/home';
+            }, 1500);
+        } catch (err) {
+            console.error(err);
+            let msg = err.message || 'Failed';
+            if (msg.includes('invalid') || msg.includes('session')) msg = 'Invalid/expired code. Try again.';
+            statusDiv.textContent = '❌ ' + msg;
+            statusDiv.style.color = '#c0392b';
+            showToast('❌ Verification failed', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Verify';
+        }
+    };
 
     // ─── KEYBOARD SHORTCUTS ───
     document.addEventListener('keydown', function(e) {

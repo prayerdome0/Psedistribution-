@@ -14,6 +14,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="main.js"></script>
+    <!-- Firebase Phone Auth for SMS verification -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <link rel="stylesheet" href="/style.css">
     
     <style>
@@ -145,6 +147,42 @@
                 <label>Email Address <span class="required">*</span></label>
                 <input type="email" id="regEmail" placeholder="you@example.com" required />
             </div>
+
+            <!-- SMS / Phone Verification -->
+            <div class="form-group">
+                <label>Phone Number (for SMS verification) <span class="required">*</span></label>
+                <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                    <select id="countryCode" style="padding:0.7rem 0.5rem;border:1px solid var(--border-dark);border-radius:var(--radius-sm);font-size:0.9rem;background:var(--white);outline:none;flex-shrink:0;">
+                        <option value="+260">+260 (ZM)</option>
+                        <option value="+1">+1 (US)</option>
+                        <option value="+44">+44 (UK)</option>
+                        <option value="+27">+27 (ZA)</option>
+                        <option value="+234">+234 (NG)</option>
+                        <option value="+91">+91 (IN)</option>
+                    </select>
+                    <input type="tel" id="regPhone" placeholder="970123456" required style="flex:1;min-width:120px;" />
+                    <button type="button" onclick="startPhoneVerification()" id="sendSmsBtn" style="padding:0.6rem 1.2rem;background:var(--primary);color:#fff;border:none;border-radius:30px;font-weight:600;font-size:0.85rem;cursor:pointer;transition:0.3s;white-space:nowrap;flex-shrink:0;">
+                        <i class="fa-solid fa-paper-plane"></i> Send SMS
+                    </button>
+                </div>
+                <div id="phoneHint" style="font-size:0.7rem;color:var(--text-light);margin-top:0.2rem;">We will send a verification code to confirm your number (free).</div>
+            </div>
+
+            <div class="form-group" id="smsVerifyGroup" style="display:none;animation:slideDown 0.3s ease;">
+                <label>Enter SMS Verification Code <span class="required">*</span></label>
+                <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                    <input type="text" id="smsCode" placeholder="123456" required style="flex:1;min-width:120px;letter-spacing:0.15em;text-align:center;font-weight:700;font-size:1.1rem;" maxlength="6" />
+                    <button type="button" onclick="verifyPhoneCode()" id="verifySmsBtn" style="padding:0.6rem 1.2rem;background:#27ae60;color:#fff;border:none;border-radius:30px;font-weight:600;font-size:0.85rem;cursor:pointer;transition:0.3s;white-space:nowrap;flex-shrink:0;">
+                        <i class="fa-solid fa-check"></i> Verify
+                    </button>
+                    <button type="button" onclick="startPhoneVerification()" id="resendSmsBtn" style="padding:0.6rem 1rem;background:transparent;color:var(--primary);border:1px solid var(--primary);border-radius:30px;font-weight:600;font-size:0.8rem;cursor:pointer;transition:0.3s;white-space:nowrap;flex-shrink:0;">
+                        <i class="fa-solid fa-rotate"></i> Resend
+                    </button>
+                </div>
+                <div id="smsHint" style="font-size:0.7rem;color:var(--text-light);margin-top:0.2rem;">Didn't receive it? Check spam or click Resend (free).</div>
+            </div>
+
+            <div id="verificationStatus" style="font-size:0.8rem;font-weight:600;margin-bottom:0.5rem;"></div>
 
             <div class="form-group">
                 <label>Password <span class="required">*</span></label>
@@ -508,6 +546,108 @@
         initFirebase();
         document.getElementById('year').textContent = new Date().getFullYear();
     });
+
+    // ─── SMS / PHONE VERIFICATION (Firebase Phone Auth - Production, Free Tier) ───
+    let confirmationResultSMS = null;
+
+    window.startPhoneVerification = async function() {
+        const phoneInput = document.getElementById('regPhone');
+        const countrySelect = document.getElementById('countryCode');
+        const btn = document.getElementById('sendSmsBtn');
+        const statusDiv = document.getElementById('verificationStatus');
+        const smsGroup = document.getElementById('smsVerifyGroup');
+
+        const rawPhone = phoneInput.value.trim();
+        const countryCode = countrySelect.value;
+        const fullNumber = countryCode + rawPhone;
+
+        if (!rawPhone || rawPhone.length < 7) {
+            showToast('❌ Please enter a valid phone number', 'error');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+        statusDiv.textContent = 'Sending SMS verification code...';
+        statusDiv.style.color = '#2980b9';
+
+        try {
+            // Setup invisible reCAPTCHA
+            if (!document.getElementById('recaptcha-container')) {
+                const recaptchaContainer = document.createElement('div');
+                recaptchaContainer.id = 'recaptcha-container';
+                recaptchaContainer.style.display = 'none';
+                document.body.appendChild(recaptchaContainer);
+            }
+
+            const recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                'size': 'invisible',
+                'callback': function() { console.log('reCAPTCHA solved'); }
+            });
+
+            confirmationResultSMS = await auth.signInWithPhoneNumber(fullNumber, recaptchaVerifier);
+            smsGroup.style.display = 'block';
+            statusDiv.textContent = '✅ SMS sent! Check your messages and enter the code below.';
+            statusDiv.style.color = '#27ae60';
+            document.getElementById('smsCode').focus();
+            showToast('✅ SMS verification code sent!', 'success');
+        } catch (error) {
+            console.error('SMS error:', error);
+            let msg = error.message || 'Failed to send SMS';
+            if (msg.includes('quota')) msg = 'SMS quota exceeded. Try again later.';
+            if (msg.includes('invalid-phone-number')) msg = 'Invalid phone number format.';
+            statusDiv.textContent = '❌ ' + msg;
+            statusDiv.style.color = '#c0392b';
+            showToast('❌ ' + msg, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send SMS';
+        }
+    };
+
+    window.verifyPhoneCode = async function() {
+        const code = document.getElementById('smsCode').value.trim();
+        const btn = document.getElementById('verifySmsBtn');
+        const statusDiv = document.getElementById('verificationStatus');
+
+        if (!code || code.length !== 6) {
+            showToast('❌ Please enter the 6-digit code', 'error');
+            return;
+        }
+
+        if (!confirmationResultSMS) {
+            showToast('❌ Please request a new SMS code first', 'error');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+        statusDiv.textContent = 'Verifying code...';
+        statusDiv.style.color = '#2980b9';
+
+        try {
+            const result = await confirmationResultSMS.confirm(code);
+            const user = result.user;
+            statusDiv.textContent = '✅ Phone number verified successfully!';
+            statusDiv.style.color = '#27ae60';
+            showToast('✅ SMS verification completed!', 'success');
+            document.getElementById('smsVerifyGroup').style.display = 'none';
+            document.getElementById('regPhone').readOnly = true;
+            document.getElementById('smsCode').readOnly = true;
+        } catch (error) {
+            console.error('Verification error:', error);
+            let msg = error.message || 'Verification failed';
+            if (msg.includes('invalid-verification-code') || msg.includes('session-expired')) {
+                msg = 'Invalid or expired code. Please request a new one.';
+            }
+            statusDiv.textContent = '❌ ' + msg;
+            statusDiv.style.color = '#c0392b';
+            showToast('❌ Verification failed', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Verify';
+        }
+    };
 
     // ─── EXPOSE ───
     window.showToast = showToast;

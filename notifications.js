@@ -1,12 +1,6 @@
 // ============================================
 // NOTIFICATIONS.JS - Pilot Sales Distribution
-// In-app notification center + browser push-style
-// notifications. No server, no API key.
-// - Adds a bell to the page header (or floating)
-// - Unread badge, dropdown panel, mark-as-read
-// - localStorage persistence + cross-tab sync
-// - Wraps showToast() so every site toast also
-//   becomes an in-app notification
+// In-app notification center + browser notifications.
 // ============================================
 (function () {
     'use strict';
@@ -347,5 +341,5 @@
     window.PSENotifications = {
         push: push, markAllRead: markAllRead, clearAll: clearAll, getUnread: getUnread
     };
-    console.log('✅ notifications.js loaded (no API key needed)');
+    console.log('✅ notifications.js loaded');
 })();
