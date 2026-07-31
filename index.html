@@ -37,6 +37,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="main.js"></script>
     
     <style>
         :root {
@@ -610,10 +611,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
-            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="/seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -621,8 +622,8 @@
 <!-- HEADER -->
 <header class="header">
     <div class="container">
-        <a href="home" class="logo">
-            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+        <a href="/home" class="logo">
+            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -641,12 +642,12 @@
                 <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="cart" class="icon-btn">
+            <a href="/cart" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
             </a>
-            <a href="account" class="icon-btn" id="accountBtn">
+            <a href="/account" class="icon-btn" id="accountBtn">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
@@ -657,13 +658,13 @@
 <!-- NAVIGATION TABS -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="home" class="nav-tab active"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="rfq" class="nav-tab"><i class="fa-regular fa-file-lines"></i> RFQ</a>
-        <a href="about" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/home" class="nav-tab active"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/products" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="/rfq" class="nav-tab"><i class="fa-regular fa-file-lines"></i> RFQ</a>
+        <a href="/about" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="/contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="/help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="/become-seller" class="nav-tab wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -678,8 +679,8 @@
                 <h2>Premium Products at <span>Wholesale Prices</span></h2>
                 <p>12,000+ products from 580+ verified suppliers. Quality guaranteed.</p>
                 <div class="buttons">
-                    <a href="products" class="btn-primary"><i class="fa-solid fa-cart-plus"></i> Shop Now</a>
-                    <a href="about" class="btn-outline-light">Learn More</a>
+                    <a href="/products" class="btn-primary"><i class="fa-solid fa-cart-plus"></i> Shop Now</a>
+                    <a href="/about" class="btn-outline-light">Learn More</a>
                 </div>
             </div>
             <div class="slide-image">
@@ -692,8 +693,8 @@
                 <h2>Fast & Reliable <span>Delivery</span></h2>
                 <p>Free shipping on orders over $250. Track your order in real-time.</p>
                 <div class="buttons">
-                    <a href="products" class="btn-primary"><i class="fa-solid fa-truck"></i> Browse Products</a>
-                    <a href="track-order" class="btn-outline-light">Track Order</a>
+                    <a href="/products" class="btn-primary"><i class="fa-solid fa-truck"></i> Browse Products</a>
+                    <a href="/track-order" class="btn-outline-light">Track Order</a>
                 </div>
             </div>
             <div class="slide-image">
@@ -706,8 +707,8 @@
                 <h2>Trusted <span>Suppliers</span></h2>
                 <p>Connect with verified suppliers worldwide. Quality products guaranteed.</p>
                 <div class="buttons">
-                    <a href="become-seller" class="btn-primary"><i class="fa-regular fa-store"></i> Become a Supplier</a>
-                    <a href="about" class="btn-outline-light">About Us</a>
+                    <a href="/become-seller" class="btn-primary"><i class="fa-regular fa-store"></i> Become a Supplier</a>
+                    <a href="/about" class="btn-outline-light">About Us</a>
                 </div>
             </div>
             <div class="slide-image">
@@ -756,27 +757,27 @@
         <p>Find the products you need at wholesale prices</p>
     </div>
     <div class="category-grid animate-on-scroll">
-        <div class="category-item" onclick="window.location.href='products?category=electronics'">
+        <div class="category-item" onclick="window.location.href='/products?category=electronics'">
             <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=200&h=200&q=80" alt="Electronics" loading="lazy" />
             <span>Electronics</span>
         </div>
-        <div class="category-item" onclick="window.location.href='products?category=fashion'">
+        <div class="category-item" onclick="window.location.href='/products?category=fashion'">
             <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=200&h=200&q=80" alt="Fashion" loading="lazy" />
             <span>Fashion</span>
         </div>
-        <div class="category-item" onclick="window.location.href='products?category=home'">
+        <div class="category-item" onclick="window.location.href='/products?category=home'">
             <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=200&h=200&q=80" alt="Home" loading="lazy" />
             <span>Home</span>
         </div>
-        <div class="category-item" onclick="window.location.href='products?category=beauty'">
+        <div class="category-item" onclick="window.location.href='/products?category=beauty'">
             <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=200&h=200&q=80" alt="Beauty" loading="lazy" />
             <span>Beauty</span>
         </div>
-        <div class="category-item" onclick="window.location.href='products?category=sports'">
+        <div class="category-item" onclick="window.location.href='/products?category=sports'">
             <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=200&h=200&q=80" alt="Sports" loading="lazy" />
             <span>Sports</span>
         </div>
-        <div class="category-item" onclick="window.location.href='products?category=automotive'">
+        <div class="category-item" onclick="window.location.href='/products?category=automotive'">
             <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=200&h=200&q=80" alt="Automotive" loading="lazy" />
             <span>Automotive</span>
         </div>
@@ -802,13 +803,13 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about">About</a>
-                <a href="contact">Contact</a>
-                <a href="help-center">Help</a>
-                <a href="privacy">Privacy Policy</a>
-                <a href="terms">Terms &amp; Conditions</a>
-                <a href="become-seller">Become a Seller</a>
-                <a href="supplier-verification">Supplier Verification</a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/help-center">Help</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms &amp; Conditions</a>
+                <a href="/become-seller">Become a Seller</a>
+                <a href="/supplier-verification">Supplier Verification</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -1115,7 +1116,7 @@
         const user = getCurrentUser();
         if (!user) {
             showToast('Please login first', 'error');
-            setTimeout(() => window.location.href = 'login', 1500);
+            setTimeout(() => window.location.href = '/login', 1500);
             return;
         }
 
@@ -1376,10 +1377,10 @@
         const user = getCurrentUser();
         if (!user) {
             showToast('Please login to view wishlist', 'error');
-            setTimeout(() => window.location.href = 'login', 1500);
+            setTimeout(() => window.location.href = '/login', 1500);
             return;
         }
-        window.location.href = 'wishlist';
+        window.location.href = '/wishlist';
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -1405,5 +1406,8 @@
     window.showToast = showToast;
     window.getCurrentUser = getCurrentUser;
 </script>
+    <script src="email.js"></script>
+    <script src="ai-assistant.js"></script>
+    <script src="notifications.js"></script>
 </body>
 </html>

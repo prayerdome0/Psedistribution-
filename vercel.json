@@ -11,7 +11,15 @@
       "destination": "/products.html"
     },
     {
-      "source": "/product/:slug",
+      "source": "/product",
+      "destination": "/product-detail.html"
+    },
+    {
+      "source": "/product/:path*",
+      "destination": "/product-detail.html"
+    },
+    {
+      "source": "/product-detail",
       "destination": "/product-detail.html"
     },
     {
@@ -125,6 +133,74 @@
     {
       "source": "/supplier-verification",
       "destination": "/supplier-verification.html"
+    },
+    {
+      "source": "/supplier-verification/:path*",
+      "destination": "/supplier-verification.html"
+    },
+    {
+      "source": "/about/:path*",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/contact/:path*",
+      "destination": "/contact.html"
+    },
+    {
+      "source": "/help-center/:path*",
+      "destination": "/help-center.html"
+    },
+    {
+      "source": "/cart/:path*",
+      "destination": "/cart.html"
+    },
+    {
+      "source": "/checkout/:path*",
+      "destination": "/checkout.html"
+    },
+    {
+      "source": "/wishlist/:path*",
+      "destination": "/wishlist.html"
+    },
+    {
+      "source": "/login/:path*",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/register/:path*",
+      "destination": "/register.html"
+    },
+    {
+      "source": "/account/:path*",
+      "destination": "/account.html"
+    },
+    {
+      "source": "/become-seller/:path*",
+      "destination": "/become-seller.html"
+    },
+    {
+      "source": "/privacy/:path*",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/terms/:path*",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/buyer-dashboard/:path*",
+      "destination": "/buyer-dashboard.html"
+    },
+    {
+      "source": "/seller-dashboard/:path*",
+      "destination": "/seller-dashboard.html"
+    },
+    {
+      "source": "/admin-dashboard/:path*",
+      "destination": "/admin-dashboard.html"
+    },
+    {
+      "source": "/notifications/:path*",
+      "destination": "/index.html"
     }
   ],
   "redirects": [

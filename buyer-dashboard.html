@@ -13,6 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="main.js"></script>
     
     <style>
         :root {
@@ -325,10 +326,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
-            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="/seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -336,8 +337,8 @@
 <!-- HEADER -->
 <header class="header">
     <div class="container">
-        <a href="home" class="logo">
-            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+        <a href="/home" class="logo">
+            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -354,12 +355,12 @@
                 <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="cart" class="icon-btn">
+            <a href="/cart" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
             </a>
-            <a href="account" class="icon-btn" id="accountBtn">
+            <a href="/account" class="icon-btn" id="accountBtn">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
@@ -370,12 +371,12 @@
 <!-- NAVIGATION -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="home"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/home"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/products"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="/about"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="/become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -435,22 +436,22 @@
         </div>
 
         <div class="quick-actions animate-on-scroll">
-            <div class="quick-action" onclick="window.location.href='products'">
+            <div class="quick-action" onclick="window.location.href='/products'">
                 <i class="fa-regular fa-box"></i>
                 <h4>Browse Products</h4>
                 <p>Explore our wholesale catalog</p>
             </div>
-            <div class="quick-action" onclick="window.location.href='rfq'">
+            <div class="quick-action" onclick="window.location.href='/rfq'">
                 <i class="fa-regular fa-file-lines"></i>
                 <h4>Request Quote</h4>
                 <p>Submit an RFQ for custom pricing</p>
             </div>
-            <div class="quick-action" onclick="window.location.href='cart'">
+            <div class="quick-action" onclick="window.location.href='/cart'">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <h4>View Cart</h4>
                 <p>Check your shopping cart</p>
             </div>
-            <div class="quick-action" onclick="window.location.href='track-order'">
+            <div class="quick-action" onclick="window.location.href='/track-order'">
                 <i class="fa-regular fa-truck"></i>
                 <h4>Track Order</h4>
                 <p>Check your order status</p>
@@ -464,13 +465,13 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about">About</a>
-                <a href="contact">Contact</a>
-                <a href="help-center">Help</a>
-                <a href="privacy">Privacy Policy</a>
-                <a href="terms">Terms &amp; Conditions</a>
-                <a href="become-seller">Become a Seller</a>
-                <a href="supplier-verification">Supplier Verification</a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/help-center">Help</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms &amp; Conditions</a>
+                <a href="/become-seller">Become a Seller</a>
+                <a href="/supplier-verification">Supplier Verification</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -575,7 +576,7 @@
         const user = getCurrentUser();
         if (!user) {
             showToast('Please login to access your dashboard', 'error');
-            setTimeout(() => window.location.href = 'login', 1500);
+            setTimeout(() => window.location.href = '/login', 1500);
             return false;
         }
         return true;
@@ -596,7 +597,7 @@
             const orders = [];
             snapshot.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
             if (orders.length === 0) {
-                container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-receipt"></i><h3>No Orders Yet</h3><p>You haven't placed any orders yet.</p><a href="products" style="color:var(--primary);font-weight:600;">Start Shopping →</a></div>`;
+                container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-receipt"></i><h3>No Orders Yet</h3><p>You haven't placed any orders yet.</p><a href="/products" style="color:var(--primary);font-weight:600;">Start Shopping →</a></div>`;
                 return;
             }
             const pending = orders.filter(o => o.status === 'pending' || o.status === 'processing');
@@ -637,7 +638,7 @@
             snapshot.forEach(doc => rfqs.push({ id: doc.id, ...doc.data() }));
             document.getElementById('statRFQs').textContent = rfqs.length;
             if (rfqs.length === 0) {
-                container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-file-lines"></i><h3>No RFQ Requests</h3><p>You haven't submitted any RFQ requests yet.</p><a href="rfq" style="color:var(--primary);font-weight:600;">Submit RFQ →</a></div>`;
+                container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-file-lines"></i><h3>No RFQ Requests</h3><p>You haven't submitted any RFQ requests yet.</p><a href="/rfq" style="color:var(--primary);font-weight:600;">Submit RFQ →</a></div>`;
                 return;
             }
             const statusLabels = { pending: 'Pending', reviewing: 'Reviewing', quoted: 'Quoted', closed: 'Closed' };
@@ -674,7 +675,7 @@
             snapshot.forEach(doc => wishlistItems.push({ id: doc.id, ...doc.data() }));
             document.getElementById('statWishlist').textContent = wishlistItems.length;
             if (wishlistItems.length === 0) {
-                grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fa-regular fa-heart"></i><h3>Empty Wishlist</h3><p>You haven't saved any products yet.</p><a href="products" style="color:var(--primary);font-weight:600;">Browse Products →</a></div>`;
+                grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fa-regular fa-heart"></i><h3>Empty Wishlist</h3><p>You haven't saved any products yet.</p><a href="/products" style="color:var(--primary);font-weight:600;">Browse Products →</a></div>`;
                 return;
             }
             const products = [];
@@ -784,8 +785,8 @@
 
     function toggleWishlist() {
         const user = getCurrentUser();
-        if (!user) { showToast('Please login to view wishlist', 'error'); setTimeout(() => window.location.href = 'login', 1500); return; }
-        window.location.href = 'wishlist';
+        if (!user) { showToast('Please login to view wishlist', 'error'); setTimeout(() => window.location.href = '/login', 1500); return; }
+        window.location.href = '/wishlist';
     }
 
     async function handleSearch(event) {
@@ -856,5 +857,8 @@
     window.handleSearch = handleSearch;
     window.showToast = showToast;
 </script>
+    <script src="email.js"></script>
+    <script src="ai-assistant.js"></script>
+    <script src="notifications.js"></script>
 </body>
 </html>

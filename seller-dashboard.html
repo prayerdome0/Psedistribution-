@@ -13,6 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="main.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     
     <style>
@@ -467,7 +468,7 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="home"><i class="fa-regular fa-house"></i> Home</a>
+            <a href="/home"><i class="fa-regular fa-house"></i> Home</a>
             <a href="#" onclick="logoutSeller()"><i class="fa-regular fa-right-from-bracket"></i> Logout</a>
         </div>
     </div>
@@ -476,8 +477,8 @@
 <!-- HEADER -->
 <header class="header">
     <div class="container">
-        <a href="home" class="logo">
-            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+        <a href="/home" class="logo">
+            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">Pilot <span>Distribution</span></span>
                 <span class="sub">Seller Panel</span>
@@ -495,12 +496,12 @@
 <!-- NAVIGATION -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="home"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/home"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/products"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="/about"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="/become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -793,13 +794,13 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about">About</a>
-                <a href="contact">Contact</a>
-                <a href="help-center">Help</a>
-                <a href="privacy">Privacy Policy</a>
-                <a href="terms">Terms &amp; Conditions</a>
-                <a href="become-seller">Become a Seller</a>
-                <a href="supplier-verification">Supplier Verification</a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/help-center">Help</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms &amp; Conditions</a>
+                <a href="/become-seller">Become a Seller</a>
+                <a href="/supplier-verification">Supplier Verification</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -864,13 +865,13 @@
                             startRealTimeListeners();
                         } else {
                             showToast('Seller access required', 'error');
-                            setTimeout(() => window.location.href = 'home', 1500);
+                            setTimeout(() => window.location.href = '/home', 1500);
                         }
                     }
                 });
             } else {
                 showToast('Please login as seller', 'error');
-                setTimeout(() => window.location.href = 'login', 1500);
+                setTimeout(() => window.location.href = '/login', 1500);
             }
         });
         
@@ -1345,7 +1346,7 @@
             auth.signOut().then(() => {
                 localStorage.removeItem('pilot_user');
                 showToast('Logged out', 'info');
-                setTimeout(() => window.location.href = 'home', 1000);
+                setTimeout(() => window.location.href = '/home', 1000);
             });
         }
     }
@@ -1377,5 +1378,8 @@
     window.logoutSeller = logoutSeller;
     window.showToast = showToast;
 </script>
+    <script src="email.js"></script>
+    <script src="ai-assistant.js"></script>
+    <script src="notifications.js"></script>
 </body>
 </html>

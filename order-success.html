@@ -13,6 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="main.js"></script>
     
     <style>
         :root {
@@ -274,10 +275,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
-            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="/seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -285,8 +286,8 @@
 <!-- HEADER -->
 <header class="header">
     <div class="container">
-        <a href="home" class="logo">
-            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+        <a href="/home" class="logo">
+            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -303,12 +304,12 @@
                 <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="cart" class="icon-btn">
+            <a href="/cart" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
             </a>
-            <a href="account" class="icon-btn" id="accountBtn">
+            <a href="/account" class="icon-btn" id="accountBtn">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
@@ -319,12 +320,12 @@
 <!-- NAVIGATION -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="home"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/home"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/products"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="/about"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="/become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -367,8 +368,8 @@
             </a>
 
             <div class="btn-group">
-                <a href="home" class="btn-primary-custom"><i class="fa-regular fa-house"></i> Continue Shopping</a>
-                <a href="track-order" class="btn-outline-custom"><i class="fa-regular fa-truck"></i> Track Order</a>
+                <a href="/home" class="btn-primary-custom"><i class="fa-regular fa-house"></i> Continue Shopping</a>
+                <a href="/track-order" class="btn-outline-custom"><i class="fa-regular fa-truck"></i> Track Order</a>
             </div>
 
             <div class="secure-note"><i class="fa-solid fa-lock"></i> Your information is secure. We'll never share your data.</div>
@@ -381,13 +382,13 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about">About</a>
-                <a href="contact">Contact</a>
-                <a href="help-center">Help</a>
-                <a href="privacy">Privacy Policy</a>
-                <a href="terms">Terms &amp; Conditions</a>
-                <a href="become-seller">Become a Seller</a>
-                <a href="supplier-verification">Supplier Verification</a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/help-center">Help</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms &amp; Conditions</a>
+                <a href="/become-seller">Become a Seller</a>
+                <a href="/supplier-verification">Supplier Verification</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -517,6 +518,18 @@
             document.getElementById('orderShipping').textContent = totals.shipping === 0 ? 'FREE' : `$${(totals.shipping || 0).toFixed(2)}`;
             document.getElementById('orderTax').textContent = `$${(totals.tax || 0).toFixed(2)}`;
             document.getElementById('orderTotal').textContent = `$${(totals.total || 0).toFixed(2)}`;
+
+            // Notification upgrade: on-site + (optional) browser notification
+            if (typeof window.pushNotification === 'function') {
+                window.pushNotification('Order placed 🎉', `Order #${order.quoteNumber || order.orderNumber || 'N/A'} confirmed — total $${(totals.total || 0).toFixed(2)}. We'll email you the details.`, { icon: 'fa-circle-check', url: '/track-order?order=' + (order.quoteNumber || order.orderNumber || ''), tag: 'order' });
+            }
+
+            // Email upgrade: send order confirmation (Resend → free FormSubmit → mailto)
+            try {
+                if (typeof window.sendOrderConfirmation === 'function') {
+                    window.sendOrderConfirmation(order).catch(() => {});
+                }
+            } catch (e) {}
         }
     }
 
@@ -565,8 +578,8 @@
 
     function toggleWishlist() {
         const user = getCurrentUser();
-        if (!user) { showToast('Please login to view wishlist', 'error'); setTimeout(() => window.location.href = 'login', 1500); return; }
-        window.location.href = 'wishlist';
+        if (!user) { showToast('Please login to view wishlist', 'error'); setTimeout(() => window.location.href = '/login', 1500); return; }
+        window.location.href = '/wishlist';
     }
 
     async function handleSearch(event) {
@@ -628,5 +641,8 @@
     window.handleSearch = handleSearch;
     window.showToast = showToast;
 </script>
+    <script src="email.js"></script>
+    <script src="ai-assistant.js"></script>
+    <script src="notifications.js"></script>
 </body>
 </html>

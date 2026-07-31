@@ -13,6 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="main.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     
     <style>
@@ -366,10 +367,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
-            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="/seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -377,8 +378,8 @@
 <!-- HEADER -->
 <header class="header">
     <div class="container">
-        <a href="home" class="logo">
-            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+        <a href="/home" class="logo">
+            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -395,12 +396,12 @@
                 <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="cart" class="icon-btn">
+            <a href="/cart" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
             </a>
-            <a href="account" class="icon-btn active">
+            <a href="/account" class="icon-btn active">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
@@ -411,12 +412,12 @@
 <!-- NAVIGATION -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="home"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/home"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/products"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="/about"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="/become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -650,13 +651,13 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about">About</a>
-                <a href="contact">Contact</a>
-                <a href="help-center">Help</a>
-                <a href="privacy">Privacy Policy</a>
-                <a href="terms">Terms &amp; Conditions</a>
-                <a href="become-seller">Become a Seller</a>
-                <a href="supplier-verification">Supplier Verification</a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/help-center">Help</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms &amp; Conditions</a>
+                <a href="/become-seller">Become a Seller</a>
+                <a href="/supplier-verification">Supplier Verification</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -764,7 +765,7 @@
         }
         // Check if user is admin
         if (user.role === 'admin') {
-            window.location.href = 'admin-dashboard';
+            window.location.href = '/admin-dashboard';
         } else {
             showToast('Admin access required', 'error');
         }
@@ -823,7 +824,7 @@
         const user = getCurrentUser();
         if (!user) {
             showToast('Please login to access your account', 'error');
-            setTimeout(() => window.location.href = 'login', 1500);
+            setTimeout(() => window.location.href = '/login', 1500);
             return false;
         }
         return true;
@@ -1060,7 +1061,7 @@
             });
             
             if (orders.length === 0) {
-                container.innerHTML = `<div class="no-orders"><i class="fa-regular fa-box"></i><p>You haven't placed any orders yet.</p><a href="products" style="color:var(--primary); font-weight:600;">Start shopping →</a></div>`;
+                container.innerHTML = `<div class="no-orders"><i class="fa-regular fa-box"></i><p>You haven't placed any orders yet.</p><a href="/products" style="color:var(--primary); font-weight:600;">Start shopping →</a></div>`;
                 return;
             }
             
@@ -1102,7 +1103,7 @@
             document.getElementById('wishlistBadge').textContent = wishlistItems.length;
             
             if (wishlistItems.length === 0) {
-                grid.innerHTML = `<div class="no-orders" style="grid-column:1/-1;"><i class="fa-regular fa-heart" style="font-size:2rem; color:var(--primary);"></i><p>Your wishlist is empty.</p><a href="products" style="color:var(--primary); font-weight:600;">Browse products →</a></div>`;
+                grid.innerHTML = `<div class="no-orders" style="grid-column:1/-1;"><i class="fa-regular fa-heart" style="font-size:2rem; color:var(--primary);"></i><p>Your wishlist is empty.</p><a href="/products" style="color:var(--primary); font-weight:600;">Browse products →</a></div>`;
                 return;
             }
             
@@ -1383,10 +1384,10 @@
         const user = getCurrentUser();
         if (!user) {
             showToast('Please login to view wishlist', 'error');
-            setTimeout(() => window.location.href = 'login', 1500);
+            setTimeout(() => window.location.href = '/login', 1500);
             return;
         }
-        window.location.href = 'wishlist';
+        window.location.href = '/wishlist';
     }
 
     // ─── LOGOUT ───
@@ -1396,7 +1397,7 @@
                 localStorage.removeItem('pilot_user');
                 localStorage.removeItem('pilot_cart');
                 showToast('Logged out', 'info');
-                setTimeout(() => window.location.href = 'home', 1000);
+                setTimeout(() => window.location.href = '/home', 1000);
             });
         }
     }
@@ -1491,5 +1492,8 @@
     window.getCurrentUser = getCurrentUser;
     window.goToAdminDashboard = goToAdminDashboard;
 </script>
+    <script src="email.js"></script>
+    <script src="ai-assistant.js"></script>
+    <script src="notifications.js"></script>
 </body>
 </html>

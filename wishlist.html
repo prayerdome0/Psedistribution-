@@ -13,6 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="main.js"></script>
     
     <style>
         :root {
@@ -308,10 +309,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
-            <a href="login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
+            <a href="/seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
+            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -319,8 +320,8 @@
 <!-- HEADER -->
 <header class="header">
     <div class="container">
-        <a href="home" class="logo">
-            <img src="logo.jpg" alt="Pilot Sales Distribution" />
+        <a href="/home" class="logo">
+            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -337,12 +338,12 @@
                 <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="cart" class="icon-btn">
+            <a href="/cart" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
             </a>
-            <a href="account" class="icon-btn" id="accountBtn">
+            <a href="/account" class="icon-btn" id="accountBtn">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
@@ -353,12 +354,12 @@
 <!-- NAVIGATION -->
 <nav class="nav-categories">
     <div class="container">
-        <a href="home"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="products"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="about"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="contact"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/home"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/products"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="/about"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="/become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -381,13 +382,13 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="about">About</a>
-                <a href="contact">Contact</a>
-                <a href="help-center">Help</a>
-                <a href="privacy">Privacy Policy</a>
-                <a href="terms">Terms &amp; Conditions</a>
-                <a href="become-seller">Become a Seller</a>
-                <a href="supplier-verification">Supplier Verification</a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/help-center">Help</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms &amp; Conditions</a>
+                <a href="/become-seller">Become a Seller</a>
+                <a href="/supplier-verification">Supplier Verification</a>
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -489,7 +490,7 @@
         const grid = document.getElementById('wishlistGrid');
         const user = getCurrentUser();
         if (!user) {
-            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);"><i class="fa-regular fa-heart" style="font-size:2rem; color:var(--primary);"></i><p style="margin-top:0.5rem;">Please login to view your wishlist</p><a href="login" style="color:var(--primary); font-weight:600;">Login →</a></div>`;
+            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);"><i class="fa-regular fa-heart" style="font-size:2rem; color:var(--primary);"></i><p style="margin-top:0.5rem;">Please login to view your wishlist</p><a href="/login" style="color:var(--primary); font-weight:600;">Login →</a></div>`;
             return;
         }
         try {
@@ -497,7 +498,7 @@
             const wishlistItems = [];
             snapshot.forEach(doc => wishlistItems.push({ id: doc.id, ...doc.data() }));
             if (wishlistItems.length === 0) {
-                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);"><i class="fa-regular fa-heart" style="font-size:2rem; color:var(--primary);"></i><p style="margin-top:0.5rem;">Your wishlist is empty.</p><a href="products" style="color:var(--primary); font-weight:600;">Browse products →</a></div>`;
+                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);"><i class="fa-regular fa-heart" style="font-size:2rem; color:var(--primary);"></i><p style="margin-top:0.5rem;">Your wishlist is empty.</p><a href="/products" style="color:var(--primary); font-weight:600;">Browse products →</a></div>`;
                 return;
             }
             const products = [];
@@ -666,8 +667,8 @@
 
     function toggleWishlist() {
         const user = getCurrentUser();
-        if (!user) { showToast('Please login to view wishlist', 'error'); setTimeout(() => window.location.href = 'login', 1500); return; }
-        window.location.href = 'wishlist';
+        if (!user) { showToast('Please login to view wishlist', 'error'); setTimeout(() => window.location.href = '/login', 1500); return; }
+        window.location.href = '/wishlist';
     }
 
     async function handleSearch(event) {
@@ -732,5 +733,8 @@
     window.handleSearch = handleSearch;
     window.showToast = showToast;
 </script>
+    <script src="email.js"></script>
+    <script src="ai-assistant.js"></script>
+    <script src="notifications.js"></script>
 </body>
 </html>
