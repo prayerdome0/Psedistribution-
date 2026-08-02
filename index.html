@@ -628,8 +628,8 @@
         </a>
 
         <div class="search-bar" id="searchBar">
-            <input type="text" id="searchInput" placeholder="Search wholesale products..." onkeyup="handleSearch(event)" autocomplete="off" />
-            <button onclick="handleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <input type="text" id="searchInput" placeholder="Search wholesale products..." autocomplete="off" />
+            <button><i class="fa-solid fa-magnifying-glass"></i></button>
             <div class="search-results" id="searchResults"></div>
         </div>
 
@@ -1397,77 +1397,6 @@
         });
     }
 
-    async function handleSearch(event) {
-        const input = document.getElementById('searchInput');
-        const query = input.value.trim();
-
-        if (event && event.key === 'Enter' && query) {
-            window.location.href = `/products?search=${encodeURIComponent(query)}`;
-            return;
-        }
-
-        if (query.length < 2) {
-            document.getElementById('searchResults').classList.remove('show');
-            return;
-        }
-
-        try {
-            const snapshot = await db.collection('products')
-                .where('status', 'in', ['active', 'approved'])
-                .limit(5)
-                .get();
-
-            const products = [];
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                if (data.title && data.title.toLowerCase().includes(query.toLowerCase())) {
-                    products.push({
-                        id: doc.id,
-                        title: data.title,
-                        price: data.price,
-                        image_url: data.image_url || data.images?.[0] || '',
-                        slug: data.slug || generateSlug(data.title)
-                    });
-                }
-            });
-
-            const resultsDiv = document.getElementById('searchResults');
-            if (products.length === 0) {
-                resultsDiv.innerHTML = `<div style="padding:1rem; text-align:center; color:var(--text-light);">No products found for "${query}"</div>`;
-                resultsDiv.classList.add('show');
-                return;
-            }
-
-            resultsDiv.innerHTML = products.map(p => `
-                <div class="result-item" onclick="window.location.href='/product/${p.slug}'">
-                    <img src="${p.image_url || 'https://via.placeholder.com/40'}" alt="${p.title}" />
-                    <div class="info">
-                        <div class="title">${p.title}</div>
-                        <div class="price">$${(p.price || 0).toFixed(2)}</div>
-                    </div>
-                </div>
-            `).join('') + `
-                <div style="padding:0.5rem 1rem; text-align:center; border-top:1px solid var(--border);">
-                    <a href="/products?search=${encodeURIComponent(query)}" style="color:var(--primary); font-weight:600; font-size:0.8rem;">
-                        See all results for "${query}" →
-                    </a>
-                </div>
-            `;
-
-            resultsDiv.classList.add('show');
-
-        } catch (error) {
-            console.error('Search error:', error);
-        }
-    }
-
-    document.addEventListener('click', function(e) {
-        const searchBar = document.getElementById('searchBar');
-        if (!searchBar || !searchBar.contains(e.target)) {
-            document.getElementById('searchResults').classList.remove('show');
-        }
-    });
-
     function toggleWishlist() {
         const user = getCurrentUser();
         if (!user) {
@@ -1559,7 +1488,6 @@
     window.goToSlide = goToSlide;
     window.nextSlide = nextSlide;
     window.prevSlide = prevSlide;
-    window.handleSearch = handleSearch;
     window.showToast = showToast;
     window.getCurrentUser = getCurrentUser;
 </script>
@@ -1745,5 +1673,6 @@
     <script src="holiday-engine.js"></script>
     <script src="ai-assistant.js"></script>
     <script src="notifications.js"></script>
+    <script src="/search-pro.js"></script>
 </body>
 </html>

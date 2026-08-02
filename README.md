@@ -38,7 +38,8 @@ Key routes (clean URLs on Vercel):
 ## Features
 
 - Landing image carousel — full-width promo images that auto-scroll horizontally (arrows, dots, swipe, pause-on-hover); no text banner
-- Featured products, category browsing, live search
+- Featured products, category browsing
+- **🔎 Pro Search suggestions** — the header search bar on every page is a professional suggestion engine: instant debounced results as you type (no Enter needed), ranked by prefix/word/substring relevance, rich product previews (thumbnail, brand, ★ rating, price, stock, ✓ Verified badge), category & brand chips, recent searches (clearable) and popular searches, full keyboard navigation (↑/↓/Enter/Esc, ARIA listbox), match highlighting, and a "See all N results" footer. Catalog is cached for 10 minutes (sessionStorage), loaded once from Firestore, and works offline via an embedded fallback catalog. Powered by the shared `search-pro.js` — no API keys, no server
 - Email/password + Google sign-up and login (no SMS/phone verification)
 - Guest cart (localStorage) that merges on login
 - Wishlist, RFQ, order tracking, WhatsApp quote checkout
@@ -80,6 +81,7 @@ Email sending uses Resend — set a valid key in `email.js` for production; othe
 ├── admin-dashboard.html / seller-dashboard.html / buyer-dashboard.html
 ├── style.css               # Shared stylesheet (v7)
 ├── main.js                 # Shared core (Firebase init, toast, counters) — guarded
+├── search-pro.js           # Pro Search suggestions engine (header search on every page)
 ├── ai-assistant.js         # AI assistant + live support widget (no API key)
 ├── notifications.js        # Notification center (bell, badge, browser notifs)
 ├── email.js                # Email helpers (+ festival & admin-message templates)
