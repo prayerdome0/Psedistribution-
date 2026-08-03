@@ -476,6 +476,141 @@
     }
 
     // ════════════════════════════════════════════
+    // SUPPLIER QUOTE PDF (admin's priced response to an RFQ)
+    // ════════════════════════════════════════════
+    // rfq:   { id, title, quantity, category, purchase_order_number }
+    // quote: { quote_ref, unit_price, moq, lead_time_days, valid_days, notes, total, quoted_at }
+    // user:  buyer { full_name, email, id }
+    function buildSupplierQuotePdf(rfq, quote, user) {
+        var doc = newDoc();
+        if (!doc || !rfq || !quote) return null;
+
+        var ref = quote.quote_ref || ('SQ-PSE-' + String(rfq.id || 'DRAFT').slice(0, 8).toUpperCase());
+        var y = drawTopBand(doc, 'PILOT SALES DISTRIBUTION', 'OFFICIAL SUPPLIER QUOTATION', 'Quote Ref: ', ref, fmtDate(quote.quoted_at));
+
+        // ─── Parties ───
+        y = drawPartyBoxes(doc, y,
+            'QUOTED BY',
+            ['Pilot Sales Distribution', 'Verified Wholesale Suppliers Network', 'Email: support@pilotsalesdistribution.com', 'WhatsApp: +1 (909) 938-4682'],
+            'QUOTED FOR (COMMERCIAL BUYER)',
+            [(user && user.full_name) || 'B2B Commercial Buyer', 'Email: ' + ((user && user.email) || 'N/A'), 'Buyer ID: ' + truncate((user && user.id) || 'N/A', 30), rfq.purchase_order_number ? 'Corporate PO #: ' + rfq.purchase_order_number : '']);
+
+        // ─── Meta strip ───
+        y += 12;
+        var validUntil = '';
+        try {
+            var vd = new Date(quote.quoted_at || Date.now());
+            vd.setDate(vd.getDate() + (Number(quote.valid_days) || 14));
+            validUntil = fmtDate(vd.toISOString());
+        } catch (e) { validUntil = 'N/A'; }
+        doc.setFillColor(232, 245, 240);
+        doc.roundedRect(MARGIN, y, CONTENT_W, 34, 5, 5, 'F');
+        var meta = [
+            ['IN RESPONSE TO', 'RFQ-PSE-' + String(rfq.id || '').slice(0, 8).toUpperCase()],
+            ['MIN. ORDER QTY', String(quote.moq || 1) + ' units'],
+            ['LEAD TIME', (Number(quote.lead_time_days) || 0) + ' days'],
+            ['VALID UNTIL', validUntil]
+        ];
+        var colW = CONTENT_W / 4;
+        meta.forEach(function (m, i) {
+            var x = MARGIN + i * colW + 10;
+            doc.setTextColor.apply(doc, TEAL_DARK);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(6.5);
+            doc.text(m[0], x, y + 13);
+            doc.setTextColor.apply(doc, DARK_TXT);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.8);
+            doc.text(truncate(m[1], 30), x, y + 26);
+        });
+
+        // ─── Pricing table ───
+        y += 52;
+        doc.setFillColor.apply(doc, NAVY);
+        doc.rect(MARGIN, y, CONTENT_W, 20, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7);
+        doc.text('QUOTED ITEM', MARGIN + 4, y + 13);
+        doc.text('QTY', MARGIN + 355, y + 13, { align: 'center' });
+        doc.text('UNIT PRICE', MARGIN + 420, y + 13, { align: 'right' });
+        doc.text('LINE TOTAL', PAGE_W - MARGIN - 4, y + 13, { align: 'right' });
+        doc.setTextColor.apply(doc, DARK_TXT);
+        y += 20;
+
+        var qty = Number(rfq.quantity) || 1;
+        var unit = Number(quote.unit_price) || 0;
+        var lineTitle = doc.splitTextToSize(safe(rfq.title || 'Quoted Item'), 260);
+        var rowH = Math.max(20, lineTitle.length * 10 + 10);
+        doc.setFillColor.apply(doc, ROW_ALT);
+        doc.rect(MARGIN, y, CONTENT_W, rowH, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.text(lineTitle, MARGIN + 4, y + 13);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.text(String(qty) + ' units', MARGIN + 355, y + 13, { align: 'center' });
+        doc.text(money(unit), MARGIN + 420, y + 13, { align: 'right' });
+        doc.setFont('helvetica', 'bold');
+        doc.text(money(unit * qty), PAGE_W - MARGIN - 4, y + 13, { align: 'right' });
+        y += rowH + 14;
+
+        // ─── Total box ───
+        doc.setFillColor.apply(doc, TEAL);
+        doc.roundedRect(MARGIN + 280, y, CONTENT_W - 280, 24, 4, 4, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text('QUOTED TOTAL', MARGIN + 290, y + 16);
+        doc.text(money(unit * qty), PAGE_W - MARGIN - 10, y + 16, { align: 'right' });
+        doc.setTextColor.apply(doc, DARK_TXT);
+        y += 36;
+
+        // ─── Supplier notes ───
+        if (quote.notes) {
+            var noteLines = paragraphsToLines(doc, quote.notes, CONTENT_W - 24);
+            var noteH = noteLines.length * 10 + 24;
+            if (y + noteH > PAGE_H - 150) { doc.addPage(); y = 60; }
+            doc.setFillColor.apply(doc, LIGHT);
+            doc.setDrawColor(220, 227, 233);
+            doc.roundedRect(MARGIN, y, CONTENT_W, noteH, 5, 5, 'FD');
+            doc.setTextColor.apply(doc, NAVY);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(7.5);
+            doc.text('SUPPLIER TERMS & NOTES', MARGIN + 10, y + 14);
+            doc.setTextColor.apply(doc, GRAY_TXT);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.text(noteLines, MARGIN + 10, y + 26);
+            y += noteH + 12;
+        }
+
+        // ─── How to proceed ───
+        if (y + 70 > PAGE_H - 60) { doc.addPage(); y = 60; }
+        doc.setFillColor(232, 245, 240);
+        doc.setDrawColor.apply(doc, TEAL);
+        doc.rect(MARGIN, y, 3, 62, 'F');
+        doc.rect(MARGIN, y, CONTENT_W, 62, 'F');
+        doc.setTextColor.apply(doc, TEAL_DARK);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.text('HOW TO PROCEED', MARGIN + 12, y + 15);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.8);
+        doc.text('1. Accept this quotation on your RFQ page (or reply on WhatsApp quoting the reference above).', MARGIN + 12, y + 29);
+        doc.text('2. A pro-forma invoice is issued with Escrow Trade Assurance payment terms.', MARGIN + 12, y + 41);
+        doc.text('3. Funds are held in escrow and released only after inspection & confirmed delivery.', MARGIN + 12, y + 53);
+        y += 74;
+
+        doc.setTextColor.apply(doc, MUTED);
+        doc.setFontSize(7);
+        doc.text('This supplier quotation is firm until the validity date stated above. E&OE. (C) ' + new Date().getFullYear() + ' Pilot Sales Distribution.', MARGIN, y);
+
+        drawFooter(doc);
+        return doc;
+    }
+
+    // ════════════════════════════════════════════
     // WHATSAPP DELIVERY
     // WhatsApp cannot receive file attachments through wa.me links (platform
     // limitation). Strategy:
@@ -522,6 +657,7 @@
         available: available,
         buildQuotePdf: buildQuotePdf,
         buildRfqPdf: buildRfqPdf,
+        buildSupplierQuotePdf: buildSupplierQuotePdf,
         shareViaWhatsApp: shareViaWhatsApp
     };
 })();

@@ -12,6 +12,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="quote-pdf.js"></script>
     <script src="main.js"></script>
     <script src="search-pro.js"></script>
     <script src="bulk-import.js"></script>
@@ -1633,6 +1635,44 @@
     </div>
 </div>
 
+<!-- RFQ SUPPLIER QUOTE MODAL -->
+<div class="modal-overlay" id="rfqQuoteModal">
+    <div class="modal-box" style="max-width:560px;">
+        <h3><i class="fa-solid fa-file-invoice-dollar" style="color:#2ecc71;"></i> Send Supplier Quote</h3>
+        <div id="rfqQuoteSummary" style="background:var(--light);border-radius:8px;padding:0.7rem 0.9rem;font-size:0.8rem;color:var(--text);margin-bottom:1rem;"></div>
+        <input type="hidden" id="sqRfqId" />
+        <div class="form-row">
+            <div class="form-group">
+                <label>Unit Price (USD) *</label>
+                <input type="number" id="sqUnitPrice" min="0.01" step="0.01" placeholder="e.g. 12.50" oninput="updateQuoteEstimate()" />
+            </div>
+            <div class="form-group">
+                <label>Min. Order Qty (MOQ)</label>
+                <input type="number" id="sqMoq" min="1" step="1" placeholder="e.g. 200" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Lead Time (days)</label>
+                <input type="number" id="sqLeadTime" min="1" step="1" placeholder="e.g. 21" />
+            </div>
+            <div class="form-group">
+                <label>Quote Valid (days)</label>
+                <input type="number" id="sqValidDays" min="1" step="1" value="14" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Terms &amp; Notes for the Buyer</label>
+            <textarea id="sqNotes" placeholder="e.g. Includes free logo printing. FOB Shenzhen. Sample available on request."></textarea>
+        </div>
+        <div id="sqEstimated" style="font-size:0.85rem;color:var(--primary);font-weight:700;margin-bottom:0.4rem;"></div>
+        <div class="btn-group">
+            <button class="btn-submit" id="sqSubmitBtn" onclick="submitRFQQuote()"><i class="fa-regular fa-paper-plane"></i> Send Quote to Buyer</button>
+            <button class="btn-close" onclick="closeQuoteModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <!-- CSV IMPORT MODAL -->
 <div class="modal-overlay" id="csvImportModal">
     <div class="modal-box" style="max-width:550px;">
@@ -2087,6 +2127,7 @@
                         </div>
                         <div style="display:flex; gap:0.3rem; margin-top:0.5rem; flex-wrap:wrap;">
                             <button class="btn-action view" onclick="viewOrder('${o.id}')"><i class="fa-regular fa-eye"></i> View</button>
+                            ${o.customer?.phone ? `<button class="btn-action" style="background:#25D366;color:#fff;" onclick="notifyOrderWhatsApp('${o.id}')" title="Send order status update to buyer on WhatsApp"><i class="fa-brands fa-whatsapp"></i> Notify</button>` : ''}
                             ${status === 'pending' ? `<button class="btn-action process" onclick="updateOrderStatus('${o.id}', 'processing')"><i class="fa-regular fa-gear"></i> Process</button>` : ''}
                             ${status === 'processing' ? `<button class="btn-action ship" onclick="updateOrderStatus('${o.id}', 'shipped')"><i class="fa-regular fa-truck"></i> Ship</button>` : ''}
                             ${status === 'shipped' ? `<button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'delivered')"><i class="fa-regular fa-circle-check"></i> Deliver</button>` : ''}
@@ -2292,12 +2333,17 @@
                             <span class="status-badge ${rfq.status || 'pending'}">${rfq.status || 'Pending'}</span>
                         </div>
                         <div style="font-size:0.8rem; color:var(--text-light);">Category: ${rfq.category || 'N/A'}${rfq.budget ? ` | Budget: $${rfq.budget}` : ''}</div>
+                        ${rfq.quote ? `<div style="margin-top:0.35rem;background:#e8f5f0;border:1px solid #1a7b6b33;border-radius:6px;padding:0.35rem 0.6rem;font-size:0.78rem;color:#0f4f43;"><i class="fa-solid fa-file-invoice-dollar" style="color:#2ecc71;"></i> Quoted: <strong>$${Number(rfq.quote.unit_price || 0).toFixed(2)}/unit</strong> × ${rfq.quantity || 0} units = <strong>$${(Number(rfq.quote.unit_price || 0) * (rfq.quantity || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> • Lead: ${rfq.quote.lead_time_days || '—'} days</div>` : ''}
                         <div class="msg-preview-text">${rfq.description || 'No description'}</div>
                     </div>
                     <div style="display:flex; gap:0.3rem; margin-top:0.5rem; flex-wrap:wrap;">
                         <button class="btn-action view" onclick="viewRFQ('${rfq.id}')"><i class="fa-regular fa-eye"></i> View</button>
-                        ${rfq.status === 'pending' ? `<button class="btn-action approve" onclick="updateRFQStatus('${rfq.id}', 'reviewing')"><i class="fa-regular fa-check"></i> Review</button>` : ''}
-                        ${rfq.status === 'reviewing' ? `<button class="btn-action approve" onclick="updateRFQStatus('${rfq.id}', 'quoted')"><i class="fa-regular fa-file-lines"></i> Quote</button>` : ''}
+                        ${rfq.status === 'pending' ? `<button class="btn-action" style="background:#3498db;color:#fff;" onclick="updateRFQStatus('${rfq.id}', 'reviewing')"><i class="fa-regular fa-check"></i> Review</button>` : ''}
+                        ${['pending', 'reviewing'].includes(rfq.status || 'pending') ? `<button class="btn-action approve" onclick="openQuoteModal('${rfq.id}')"><i class="fa-solid fa-file-invoice-dollar"></i> Quote</button>` : ''}
+                        ${rfq.quote ? `
+                            <button class="btn-action" style="background:var(--secondary);color:#fff;" onclick="openQuoteModal('${rfq.id}')" title="Edit & re-send quote"><i class="fa-regular fa-pen-to-square"></i> Re-quote</button>
+                            <button class="btn-action" style="background:#c0392b;color:#fff;" onclick="downloadSupplierQuote('${rfq.id}')" title="Download supplier quote PDF"><i class="fa-solid fa-file-pdf"></i> Quote PDF</button>
+                        ` : ''}
                     </div>
                 </div>
             `).join('');
@@ -2321,6 +2367,126 @@
             loadRFQs();
             updateStats();
         } catch (error) { showToast('Failed', 'error'); }
+    }
+
+    // ─── SUPPLIER QUOTE RESPONSE (closes the RFQ loop) ───
+    function openQuoteModal(rfqId) {
+        const rfq = allRFQs.find(r => r.id === rfqId);
+        if (!rfq) { showToast('RFQ not loaded', 'error'); return; }
+        const escHtml = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        document.getElementById('sqRfqId').value = rfqId;
+        document.getElementById('rfqQuoteSummary').innerHTML =
+            `<strong>${escHtml(rfq.title || 'Untitled RFQ')}</strong><br />` +
+            `👤 Buyer: ${escHtml(rfq.user_email || 'N/A')} • 🔢 ${rfq.quantity || 0} units requested • 📂 ${escHtml(rfq.category || 'N/A')}` +
+            (rfq.budget ? ` • 💰 Target budget: $${Number(rfq.budget).toLocaleString('en-US')}` : '');
+        const q = rfq.quote || {};
+        document.getElementById('sqUnitPrice').value = q.unit_price || '';
+        document.getElementById('sqMoq').value = q.moq || rfq.quantity || '';
+        document.getElementById('sqLeadTime').value = q.lead_time_days || 21;
+        document.getElementById('sqValidDays').value = q.valid_days || 14;
+        document.getElementById('sqNotes').value = q.notes || '';
+        updateQuoteEstimate();
+        document.getElementById('rfqQuoteModal').classList.add('show');
+    }
+
+    function closeQuoteModal() {
+        document.getElementById('rfqQuoteModal').classList.remove('show');
+    }
+
+    function updateQuoteEstimate() {
+        const rfqId = document.getElementById('sqRfqId').value;
+        const rfq = allRFQs.find(r => r.id === rfqId);
+        const unitPrice = parseFloat(document.getElementById('sqUnitPrice').value);
+        const el = document.getElementById('sqEstimated');
+        if (rfq && unitPrice > 0) {
+            el.textContent = `💰 Estimated quote total: $${(unitPrice * (rfq.quantity || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} for ${rfq.quantity} units`;
+        } else {
+            el.textContent = '';
+        }
+    }
+
+    async function submitRFQQuote() {
+        const rfqId = document.getElementById('sqRfqId').value;
+        const rfq = allRFQs.find(r => r.id === rfqId);
+        if (!rfq) { showToast('RFQ not loaded', 'error'); return; }
+        const unitPrice = parseFloat(document.getElementById('sqUnitPrice').value);
+        const moq = parseInt(document.getElementById('sqMoq').value) || (rfq.quantity || 1);
+        const leadTime = parseInt(document.getElementById('sqLeadTime').value) || 21;
+        const validDays = parseInt(document.getElementById('sqValidDays').value) || 14;
+        const notes = document.getElementById('sqNotes').value.trim();
+        if (!unitPrice || unitPrice <= 0) { showToast('Enter a valid unit price', 'error'); return; }
+
+        const btn = document.getElementById('sqSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+        try {
+            const quote = {
+                quote_ref: 'SQ-PSE-' + String(rfqId).slice(0, 8).toUpperCase(),
+                unit_price: unitPrice,
+                moq,
+                lead_time_days: leadTime,
+                valid_days: validDays,
+                total: +(unitPrice * (rfq.quantity || 1)).toFixed(2),
+                notes,
+                quoted_at: new Date().toISOString(),
+                quoted_by: 'PSE Procurement'
+            };
+            await db.collection('rfqs').doc(rfqId).update({
+                quote,
+                status: 'quoted',
+                status_updated_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            });
+            showToast(`✅ Quote sent to ${rfq.user_email || 'buyer'} — they can now view, download & accept it`, 'success');
+            closeQuoteModal();
+            loadRFQs();
+            updateStats();
+        } catch (error) {
+            showToast('❌ Failed to send quote', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Send Quote to Buyer';
+        }
+    }
+
+    // Download the buyer-facing supplier quote as a branded PDF (for records / WhatsApp)
+    function downloadSupplierQuote(rfqId) {
+        const rfq = allRFQs.find(r => r.id === rfqId);
+        if (!rfq || !rfq.quote) { showToast('No quote on this RFQ yet', 'error'); return; }
+        if (!window.PSE_QUOTE_PDF || !window.PSE_QUOTE_PDF.available()) { showToast('PDF engine unavailable', 'error'); return; }
+        const doc = window.PSE_QUOTE_PDF.buildSupplierQuotePdf(rfq, rfq.quote, {
+            full_name: rfq.user_email || 'B2B Commercial Buyer',
+            email: rfq.user_email || 'N/A',
+            id: rfq.user_id || 'N/A'
+        });
+        if (doc) {
+            doc.save((rfq.quote.quote_ref || 'SQ-PSE') + '-Supplier-Quote.pdf');
+            showToast('📄 Supplier quote PDF downloaded', 'success');
+        }
+    }
+
+    // ─── WHATSAPP ORDER STATUS NOTIFICATION (admin → buyer) ───
+    function notifyOrderWhatsApp(orderId) {
+        const o = allOrders.find(x => x.id === orderId);
+        if (!o || !o.customer || !o.customer.phone) { showToast('No phone number on this order', 'error'); return; }
+        const statusMap = {
+            pending:    { icon: '📋', label: 'RECEIVED',   line: 'We received your order and our wholesale team is reviewing it now.' },
+            processing: { icon: '⚙️', label: 'PROCESSING', line: 'Your order is being prepared — sourcing & quality checks are underway.' },
+            shipped:    { icon: '🚢', label: 'SHIPPED',    line: 'Great news — your order has shipped and is on its way to you!' },
+            delivered:  { icon: '✅', label: 'DELIVERED',  line: 'Your order has been delivered. Please confirm receipt so escrow funds can be released to the supplier.' },
+            cancelled:  { icon: '❌', label: 'CANCELLED',  line: 'Your order was cancelled. Reply to this message if you have any questions.' }
+        };
+        const st = statusMap[o.status || 'pending'] || statusMap.pending;
+        let msg = `${st.icon} *PSE Distribution — Order Update*\n`;
+        msg += `📄 *Quote #:* ${o.quoteNumber || 'N/A'}\n`;
+        msg += `📌 *Status:* ${st.label}\n\n`;
+        msg += `${st.line}\n\n`;
+        msg += `💰 Order Total: $${((o.totals && o.totals.total) || 0).toFixed(2)}\n`;
+        msg += `🔍 Track: ${location.origin}/track-order\n\n`;
+        msg += `🛡️ PSE Distribution Trade Assurance`;
+        const digits = String(o.customer.phone).replace(/[^0-9]/g, '');
+        window.open(`https://wa.me/${digits}?text=${encodeURIComponent(msg)}`, '_blank');
+        showToast(`📲 WhatsApp update opened for ${o.customer.firstName || 'buyer'}`, 'success');
     }
 
     // ─── LOAD SELLERS ───
@@ -2920,6 +3086,12 @@
     window.deleteProduct = deleteProduct;
     window.updateOrderStatus = updateOrderStatus;
     window.updateRFQStatus = updateRFQStatus;
+    window.openQuoteModal = openQuoteModal;
+    window.closeQuoteModal = closeQuoteModal;
+    window.updateQuoteEstimate = updateQuoteEstimate;
+    window.submitRFQQuote = submitRFQQuote;
+    window.downloadSupplierQuote = downloadSupplierQuote;
+    window.notifyOrderWhatsApp = notifyOrderWhatsApp;
     window.approveSeller = approveSeller;
     window.loadSellerApplications = loadSellerApplications;
     window.approveApplication = approveApplication;

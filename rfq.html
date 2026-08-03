@@ -210,6 +210,7 @@
         .rfq-list .rfq-item .rfq-header .status.pending { background: #fff3cd; color: #856404; }
         .rfq-list .rfq-item .rfq-header .status.reviewing { background: #cce5ff; color: #004085; }
         .rfq-list .rfq-item .rfq-header .status.quoted { background: #d4edda; color: #155724; }
+        .rfq-list .rfq-item .rfq-header .status.accepted { background: var(--primary); color: #fff; }
         .rfq-list .rfq-item .rfq-header .status.closed { background: #f8d7da; color: #721c24; }
         .rfq-list .rfq-item .rfq-details { font-size: 0.85rem; color: var(--text-light); margin-top: 0.3rem; }
         .rfq-list .empty-state { text-align: center; padding: 2rem; color: var(--text-light); }
@@ -646,7 +647,7 @@
                 container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-file-lines"></i><p>You haven't submitted any RFQ requests yet.</p></div>`;
                 return;
             }
-            const statusLabels = { pending: 'Pending', reviewing: 'Reviewing', quoted: 'Quoted', closed: 'Closed' };
+            const statusLabels = { pending: 'Pending', reviewing: 'Reviewing', quoted: 'Quoted', accepted: 'Accepted', closed: 'Closed' };
             container.innerHTML = rfqs.map(rfq => `
                 <div class="rfq-item">
                     <div class="rfq-header">
@@ -662,6 +663,7 @@
                     <div class="rfq-details" style="margin-top:0.3rem; color:var(--text);">
                         ${esc(rfq.description.substring(0, 150))}${rfq.description.length > 150 ? '...' : ''}
                     </div>
+                    ${rfq.quote ? rfqQuoteCard(rfq) : ''}
                     <div style="margin-top:0.8rem;display:flex;justify-content:flex-end;gap:0.5rem;flex-wrap:wrap;">
                         <button type="button" class="btn-submit" style="background:var(--secondary);color:#fff;padding:0.4rem 1rem;font-size:0.8rem;border-radius:6px;width:auto;" onclick="downloadRFQPdf('${rfq.id}')">
                             <i class="fa-solid fa-file-pdf" style="color:#f1c40f;"></i> Download PDF
@@ -729,6 +731,77 @@
 
     window.downloadRFQPdf = downloadRFQPdf;
     window.shareRFQWhatsApp = shareRFQWhatsApp;
+
+    // ─── SUPPLIER QUOTE CARD (buyer side — closes the RFQ loop) ───
+    function rfqQuoteCard(rfq) {
+        const q = rfq.quote || {};
+        const qty = rfq.quantity || 1;
+        const unit = Number(q.unit_price || 0);
+        const total = unit * qty;
+        let validUntil = '';
+        try {
+            const vd = new Date(q.quoted_at || Date.now());
+            vd.setDate(vd.getDate() + (Number(q.valid_days) || 14));
+            validUntil = vd.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        } catch (e) { validUntil = ''; }
+        return `
+        <div style="margin-top:0.7rem;background:#e8f5f0;border:1px solid #1a7b6b;border-radius:10px;padding:0.9rem 1.1rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.4rem;">
+                <span style="font-weight:700;color:#0f4f43;font-size:0.85rem;"><i class="fa-solid fa-file-invoice-dollar" style="color:#1a7b6b;"></i> SUPPLIER QUOTE RECEIVED${q.quote_ref ? ' • ' + esc(q.quote_ref) : ''}</span>
+                ${validUntil ? `<span style="font-size:0.72rem;color:#0f4f43;">Valid until ${validUntil}</span>` : ''}
+            </div>
+            <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:0.4rem;font-size:0.85rem;color:#0b2a3b;">
+                <span>💲 <strong>$${unit.toFixed(2)}</strong>/unit</span>
+                <span>📦 ${qty} units → <strong>$${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></span>
+                <span>🛒 MOQ: ${q.moq || qty}</span>
+                <span>⏱️ Lead time: ${q.lead_time_days || '—'} days</span>
+            </div>
+            ${q.notes ? `<div style="margin-top:0.4rem;font-size:0.78rem;color:#0f4f43;white-space:pre-line;">📝 ${esc(q.notes)}</div>` : ''}
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.7rem;">
+                <button type="button" class="btn-submit" style="background:var(--secondary);color:#fff;padding:0.4rem 1rem;font-size:0.78rem;border-radius:6px;width:auto;" onclick="downloadSupplierQuotePdf('${rfq.id}')">
+                    <i class="fa-solid fa-file-pdf" style="color:#f1c40f;"></i> Download Quote PDF
+                </button>
+                ${rfq.status === 'quoted' ? `
+                <button type="button" class="btn-submit" style="background:#1a7b6b;color:#fff;padding:0.4rem 1rem;font-size:0.78rem;border-radius:6px;width:auto;" onclick="acceptRFQQuote('${rfq.id}')">
+                    <i class="fa-solid fa-circle-check"></i> Accept Quote
+                </button>` : ''}
+                ${rfq.status === 'accepted' ? `<span style="font-size:0.78rem;color:#0f4f43;font-weight:700;align-self:center;">✅ Quote accepted — our team will finalize your order shortly</span>` : ''}
+            </div>
+        </div>`;
+    }
+
+    function downloadSupplierQuotePdf(rfqId) {
+        const rfq = userRFQsCache.find(r => r.id === rfqId);
+        if (!rfq || !rfq.quote) { showToast('Quote not found', 'error'); return; }
+        if (!window.PSE_QUOTE_PDF || !window.PSE_QUOTE_PDF.available()) { showToast('PDF engine unavailable — please try again in a moment', 'error'); return; }
+        const doc = window.PSE_QUOTE_PDF.buildSupplierQuotePdf(rfq, rfq.quote, getCurrentUser());
+        if (doc) {
+            doc.save((rfq.quote.quote_ref || 'SQ-PSE') + '-Supplier-Quote.pdf');
+            showToast('📄 Supplier quote downloaded (PDF)', 'success');
+        }
+    }
+
+    async function acceptRFQQuote(rfqId) {
+        const user = getCurrentUser();
+        if (!user) { showToast('Please login to accept a quote', 'error'); return; }
+        try {
+            await db.collection('rfqs').doc(rfqId).update({
+                status: 'accepted',
+                accepted_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            });
+            showToast('✅ Quote accepted! Our team will contact you to finalize the order.', 'success');
+            if (typeof window.pushNotification === 'function') {
+                window.pushNotification('Quote accepted ✅', 'Your supplier quote was accepted. We will contact you shortly to finalize the order.', { icon: 'fa-circle-check', url: '/rfq', tag: 'rfq' });
+            }
+            loadUserRFQs();
+        } catch (e) {
+            showToast('❌ Failed to accept quote', 'error');
+        }
+    }
+
+    window.downloadSupplierQuotePdf = downloadSupplierQuotePdf;
+    window.acceptRFQQuote = acceptRFQQuote;
 
     async function loadCartCount() {
         const user = getCurrentUser();

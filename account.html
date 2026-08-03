@@ -1550,10 +1550,13 @@
             '<p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1.4rem;">💡 Earn <strong>' + ppd + ' point per $1</strong> on every order, multiplied by your tier. Admins can credit your wallet for refunds &amp; bonuses.</p>' +
             '<div class="referral-box">' +
                 '<div><div style="font-size:0.78rem;text-transform:uppercase;opacity:.85;letter-spacing:.08em;">🎁 Refer &amp; Earn ' + (c.referral_bonus_points || 500) + ' pts</div>' +
-                '<div style="font-size:1.05rem;margin-top:0.3rem;">Share your code — friends get ' + (c.referral_invitee_points || 200) + ' pts!</div></div>' +
-                '<div style="display:flex;align-items:center;gap:0.7rem;flex-wrap:wrap;">' +
+                '<div style="font-size:1.05rem;margin-top:0.3rem;">Share your link — friends get ' + (c.referral_invitee_points || 200) + ' pts at signup!</div>' +
+                '<div style="font-size:0.75rem;opacity:.85;margin-top:0.4rem;word-break:break-all;" id="userReferralLink">' + (refCode ? (location.origin + '/register?ref=' + refCode) : '—') + '</div></div>' +
+                '<div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">' +
                     '<span class="ref-code" id="userReferralCode">' + (refCode || '—') + '</span>' +
-                    '<button onclick="copyReferralCode()"><i class="fa-regular fa-copy"></i> Copy</button>' +
+                    '<button onclick="copyReferralCode()" title="Copy code"><i class="fa-regular fa-copy"></i> Code</button>' +
+                    '<button onclick="copyReferralLink()" title="Copy invite link" style="background:#0b2a3b;color:#fff;"><i class="fa-solid fa-link"></i> Link</button>' +
+                    '<button onclick="shareReferralWhatsApp()" title="Share on WhatsApp" style="background:#25D366;color:#fff;"><i class="fa-brands fa-whatsapp"></i> Share</button>' +
                 '</div>' +
             '</div>';
     }
@@ -1565,6 +1568,29 @@
         try {
             navigator.clipboard.writeText(code).then(function () { showToast('📋 Referral code copied: ' + code, 'success'); }, function () { showToast('Code: ' + code, 'info'); });
         } catch (e) { showToast('Referral code: ' + code, 'info'); }
+    }
+
+    function copyReferralLink() {
+        const elc = document.getElementById('userReferralCode');
+        if (!elc) return;
+        const code = elc.textContent.trim();
+        if (!code || code === '—') { showToast('Referral code not ready yet', 'info'); return; }
+        const link = location.origin + '/register?ref=' + encodeURIComponent(code);
+        try {
+            navigator.clipboard.writeText(link).then(
+                function () { showToast('🔗 Invite link copied — share it anywhere!', 'success'); },
+                function () { showToast('Invite link: ' + link, 'info'); });
+        } catch (e) { showToast('Invite link: ' + link, 'info'); }
+    }
+
+    function shareReferralWhatsApp() {
+        const elc = document.getElementById('userReferralCode');
+        if (!elc) return;
+        const code = elc.textContent.trim();
+        if (!code || code === '—') { showToast('Referral code not ready yet', 'info'); return; }
+        const link = location.origin + '/register?ref=' + encodeURIComponent(code);
+        const text = '🛒 Join *Pilot Sales Distribution* — premium B2B wholesale marketplace!\n\nSign up with my referral code *' + code + '* and we both earn bonus reward points 🎁\n👉 ' + link;
+        window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
     }
 
     // ─── TOGGLE WISHLIST ───
@@ -1670,6 +1696,8 @@
     window.goToAdminDashboard = goToAdminDashboard;
     window.loadRewards = loadRewards;
     window.copyReferralCode = copyReferralCode;
+    window.copyReferralLink = copyReferralLink;
+    window.shareReferralWhatsApp = shareReferralWhatsApp;
     window.applyAdminRole = applyAdminRole;
 </script>
     <script src="email.js"></script>

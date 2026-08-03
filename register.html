@@ -130,6 +130,8 @@
             <p>Join Pilot Sales Distribution wholesale marketplace</p>
         </div>
 
+        <div id="referralBanner" style="display:none;background:linear-gradient(135deg,#8e44ad,#9b59b6);color:#fff;border-radius:var(--radius-sm);padding:0.7rem 1rem;font-size:0.8rem;margin-bottom:1rem;"></div>
+
         <form id="registerForm">
             <div class="form-row">
                 <div class="form-group">
@@ -263,6 +265,35 @@
 
     let auth, db, googleProvider;
     let selectedRole = 'buyer';
+    let referredByCode = '';
+
+    // ─── REFERRAL / PROMO URL PARAMS (?ref=CODE&promo=CODE) ───
+    // ?ref=CODE   → referral link from account.html (points for both sides)
+    // ?promo=CODE → prefill the promo-code field (coupon validated on blur)
+    (function captureUrlPromos() {
+        try {
+            const params = new URLSearchParams(location.search);
+            const ref = (params.get('ref') || '').trim();
+            const promo = (params.get('promo') || '').trim();
+            document.addEventListener('DOMContentLoaded', function () {
+                if (ref) {
+                    referredByCode = ref.toUpperCase();
+                    const banner = document.getElementById('referralBanner');
+                    if (banner) {
+                        banner.innerHTML = `🎁 You were invited with referral code <strong>${referredByCode}</strong> — you'll both earn bonus reward points!`;
+                        banner.style.display = 'block';
+                    }
+                }
+                if (promo) {
+                    const input = document.getElementById('regPromoCode');
+                    if (input && !input.value) {
+                        input.value = promo.toUpperCase();
+                        setTimeout(validatePromoField, 1500); // wait for PSE_PREMIUM + Firestore
+                    }
+                }
+            });
+        } catch (e) {}
+    })();
 
     // ─── INITIALIZE ───
     function initFirebase() {
@@ -494,6 +525,8 @@
 
             const userCredential = await auth.createUserWithEmailAndPassword(email, password);
             const user = userCredential.user;
+            // Email verification is best-effort — never blocks registration
+            try { await user.sendEmailVerification(); } catch (verifyErr) { console.log('Verification email skipped', verifyErr); }
             await db.collection('users').doc(user.uid).set({
                 email: email,
                 full_name: `${firstName} ${lastName}`,
@@ -509,6 +542,13 @@
                 signup_promo: signupPromo || null
             });
             storeSignupPromo(signupPromo);
+            // Referral attribution — one-time, guarded in premium.js
+            try {
+                if (referredByCode && window.PSE_PREMIUM && typeof window.PSE_PREMIUM.maybeApplyReferral === 'function') {
+                    await window.PSE_PREMIUM.maybeApplyReferral(user.uid, referredByCode);
+                    showToast('🎁 Referral applied — bonus points are on their way!', 'success');
+                }
+            } catch (e) {}
             try {
                 if (signupPromo && window.PSE_PREMIUM && typeof window.PSE_PREMIUM.logAudit === 'function') {
                     window.PSE_PREMIUM.logAudit('promo.signup_claim', signupPromo.code + ' claimed by ' + email).catch(() => {});
@@ -536,8 +576,8 @@
                 return;
             }
             showToast(signupPromo
-                ? `✅ Welcome ${firstName}! Promo ${signupPromo.code} locked in for your first order!`
-                : `✅ Welcome ${firstName}! Account created!`, 'success');
+                ? `✅ Welcome ${firstName}! Promo ${signupPromo.code} locked in — verification email sent!`
+                : `✅ Welcome ${firstName}! Account created — verification email sent!`, 'success');
             setTimeout(() => { window.location.href = '/home'; }, 1500);
         } catch (error) {
             let msg = error.message;
@@ -574,6 +614,9 @@
                     signup_promo: signupPromo || null
                 });
                 storeSignupPromo(signupPromo);
+                if (referredByCode && window.PSE_PREMIUM && typeof window.PSE_PREMIUM.maybeApplyReferral === 'function') {
+                    await window.PSE_PREMIUM.maybeApplyReferral(user.uid, referredByCode).catch(() => {});
+                }
                 if (signupPromo) showToast(`🎉 Promo ${signupPromo.code} will be applied to your first order!`, 'success');
             }
             const data = doc.exists ? doc.data() : {};
