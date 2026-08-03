@@ -367,7 +367,10 @@
                 <i class="fa-brands fa-whatsapp"></i> Contact us on WhatsApp
             </a>
 
-            <div class="btn-group">
+            <div class="btn-group" style="display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1.2rem;">
+                <button type="button" class="btn-primary-custom" onclick="downloadFormalInvoicePDF()" style="background:#0b2a3b;color:#fff;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-weight:600;">
+                    <i class="fa-solid fa-file-pdf" style="color:#f1c40f;"></i> Download Official Commercial Invoice (PDF)
+                </button>
                 <a href="/home" class="btn-primary-custom"><i class="fa-regular fa-house"></i> Continue Shopping</a>
                 <a href="/track-order" class="btn-outline-custom"><i class="fa-regular fa-truck"></i> Track Order</a>
             </div>
@@ -418,6 +421,7 @@
     };
 
     let auth, db;
+    let currentOrderObj = null;
 
     function initFirebase() {
         if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
@@ -511,6 +515,7 @@
         }
 
         if (order) {
+            currentOrderObj = order;
             const items = order.items || [];
             const totals = order.totals || {};
             document.getElementById('orderItemsCount').textContent = items.length || 0;
@@ -531,6 +536,140 @@
                 }
             } catch (e) {}
         }
+    }
+
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    function downloadFormalInvoicePDF() {
+        if (!currentOrderObj) {
+            showToast('Loading order details...', 'info');
+            return;
+        }
+        const o = currentOrderObj;
+        const invNum = 'INV-PSE-' + (o.quoteNumber || o.orderNumber || Date.now().toString().slice(-6));
+        const dateStr = new Date(o.created_at || Date.now()).toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+        const items = o.items || [];
+        const totals = o.totals || {};
+
+        const itemsHtml = items.map(item => `
+            <tr>
+                <td style="padding:10px;border-bottom:1px solid #ddd;">
+                    <div style="font-weight:600;">${esc(item.title || 'Product')}</div>
+                    ${item.brand ? `<div style="font-size:0.8rem;color:#666;">Brand: ${esc(item.brand)}</div>` : ''}
+                </td>
+                <td style="padding:10px;border-bottom:1px solid #ddd;text-align:center;">${item.moq || 1}</td>
+                <td style="padding:10px;border-bottom:1px solid #ddd;text-align:center;">${item.quantity || 1}</td>
+                <td style="padding:10px;border-bottom:1px solid #ddd;text-align:right;">$${Number(item.price || 0).toFixed(2)}</td>
+                <td style="padding:10px;border-bottom:1px solid #ddd;text-align:right;font-weight:700;">$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</td>
+            </tr>
+        `).join('');
+
+        const win = window.open('', '_blank');
+        win.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>${invNum} - Commercial Invoice</title>
+                <style>
+                    body { font-family: 'Segoe UI', system-ui, sans-serif; color:#222; padding:30px; max-width:850px; margin:0 auto; }
+                    .header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #1a7b6b; padding-bottom:20px; margin-bottom:25px; }
+                    .header h1 { color:#1a7b6b; margin:0; font-size:24px; }
+                    .header .meta { text-align:right; font-size:14px; color:#555; }
+                    .parties { display:flex; justify-content:space-between; margin-bottom:30px; font-size:14px; }
+                    .party-box { width:47%; background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #e9edf2; }
+                    .party-box h4 { margin:0 0 8px; color:#0b2a3b; text-transform:uppercase; font-size:12px; letter-spacing:0.5px; }
+                    table { width:100%; border-collapse:collapse; margin-bottom:30px; font-size:14px; }
+                    th { background:#0b2a3b; color:#fff; padding:12px 10px; text-align:left; font-size:13px; text-transform:uppercase; }
+                    .totals { width:320px; margin-left:auto; border-top:2px solid #0b2a3b; padding-top:10px; }
+                    .total-row { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; }
+                    .total-row.grand { font-weight:800; font-size:18px; color:#1a7b6b; border-top:1px solid #ccc; padding-top:12px; }
+                    .footer { margin-top:40px; padding-top:20px; border-top:1px solid #ddd; font-size:12px; color:#666; text-align:center; }
+                    .badge { display:inline-block; background:#e8f5f0; color:#1a7b6b; border:1px solid #1a7b6b; font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; margin-top:6px; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div>
+                        <h1>PILOT SALES DISTRIBUTION</h1>
+                        <div style="font-size:13px;color:#666;">B2B Wholesale Marketplace &amp; Trade Assurance</div>
+                        <div class="badge">✓ OFFICIAL COMMERCIAL INVOICE</div>
+                    </div>
+                    <div class="meta">
+                        <strong style="font-size:16px;color:#0b2a3b;">INVOICE #: ${invNum}</strong><br />
+                        Date: ${dateStr}<br />
+                        Payment Term: 30 Days Net / Escrow Trade Assurance
+                    </div>
+                </div>
+
+                <div class="parties">
+                    <div class="party-box">
+                        <h4>SELLER / SUPPLIER DETAILS</h4>
+                        <strong>Pilot Sales Distribution Verified Suppliers</strong><br />
+                        Global B2B Wholesale Distribution<br />
+                        Email: support@pilotsalesdistribution.com<br />
+                        WhatsApp: +1 (909) 938-4682
+                    </div>
+                    <div class="party-box">
+                        <h4>BILL TO / BUYER DETAILS</h4>
+                        <strong>${esc(o.customer?.firstName || 'Valued')} ${esc(o.customer?.lastName || 'Customer')}</strong><br />
+                        Company: ${esc(o.customer?.company || 'B2B Commercial Buyer')}<br />
+                        Email: ${esc(o.customer?.email || 'N/A')}<br />
+                        Address: ${esc(o.customer?.address?.address || 'N/A')}, ${esc(o.customer?.address?.city || '')}
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item Description</th>
+                            <th style="text-align:center;">MOQ</th>
+                            <th style="text-align:center;">Qty</th>
+                            <th style="text-align:right;">Unit Price</th>
+                            <th style="text-align:right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                </table>
+
+                <div class="totals">
+                    <div class="total-row">
+                        <span>Subtotal:</span>
+                        <strong>$${Number(totals.subtotal || 0).toFixed(2)}</strong>
+                    </div>
+                    <div class="total-row">
+                        <span>Shipping &amp; Handling:</span>
+                        <strong>${totals.shipping === 0 ? 'FREE' : '$' + Number(totals.shipping || 0).toFixed(2)}</strong>
+                    </div>
+                    <div class="total-row">
+                        <span>Tax / Duties:</span>
+                        <strong>$${Number(totals.tax || 0).toFixed(2)}</strong>
+                    </div>
+                    <div class="total-row grand">
+                        <span>TOTAL DUE (USD):</span>
+                        <span>$${Number(totals.total || 0).toFixed(2)}</span>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <p><strong>PSE Distribution Trade Assurance</strong> — Payment is held securely in escrow until goods are delivered and inspected.</p>
+                    <p>&copy; ${new Date().getFullYear()} Pilot Sales Distribution. All rights reserved.</p>
+                </div>
+
+                <' + 'script>
+                    window.onload = function() { setTimeout(function() { window.print(); }, 500); };
+                <' + '/script>
+            </body>
+            </html>
+        `);
+        win.document.close();
     }
 
     async function loadCartCount() {

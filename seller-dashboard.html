@@ -531,6 +531,9 @@
             <div class="nav-item" onclick="showTab('settings')">
                 <i class="fa-regular fa-gear"></i> Settings
             </div>
+            <div class="nav-item" onclick="showTab('membership')">
+                <i class="fa-solid fa-crown" style="color:#f1c40f;"></i> VIP Membership &amp; Ads
+            </div>
 
             <div class="logout-btn" onclick="logoutSeller()">
                 <i class="fa-regular fa-right-from-bracket"></i> Logout
@@ -711,6 +714,62 @@
                 </form>
             </div>
 
+            <!-- VIP MEMBERSHIP & SPONSORED ADS TAB -->
+            <div class="tab-content" id="tab-membership">
+                <div class="page-header">
+                    <h2><i class="fa-solid fa-crown" style="color:#f1c40f;"></i> VIP Membership &amp; Sponsored Ads</h2>
+                    <button class="btn-add-product" onclick="openUpgradeModal()" style="background:linear-gradient(135deg,#f39c12,#d35400);">
+                        <i class="fa-solid fa-arrow-up-right-dots"></i> Upgrade Plan
+                    </button>
+                </div>
+
+                <!-- Current Membership Card -->
+                <div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:1.5rem;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+                    <div>
+                        <div style="font-size:0.8rem;text-transform:uppercase;color:var(--text-light);font-weight:700;margin-bottom:0.3rem;">Current Membership Tier</div>
+                        <div style="font-size:1.5rem;font-weight:800;color:var(--text-dark);display:flex;align-items:center;gap:8px;" id="currentTierTitle">
+                            Basic Supplier <span style="font-size:0.75rem;padding:4px 10px;border-radius:20px;background:var(--bg-main);color:var(--text-light);font-weight:600;">10% Commission</span>
+                        </div>
+                        <p style="color:var(--text-light);font-size:0.9rem;margin-top:0.4rem;" id="currentTierDesc">
+                            You are on the standard basic supplier plan ($0/mo, 10% commission). Upgrade to Gold or Platinum to lower your commission and earn the VIP badge.
+                        </p>
+                    </div>
+                    <div>
+                        <button class="btn-add-product" onclick="openUpgradeModal()" style="background:var(--primary);">
+                            <i class="fa-solid fa-crown"></i> Change Membership Tier
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sponsored Listings Section -->
+                <div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:1.5rem;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:1rem;">
+                        <div>
+                            <h3 style="margin-bottom:0.3rem;font-size:1.2rem;"><i class="fa-solid fa-rocket" style="color:#d35400;"></i> Sponsored Products (Featured Ads)</h3>
+                            <p style="color:var(--text-light);font-size:0.9rem;">Sponsoring a product boosts it to the #1 spot in Category Browsing and Pro Search suggestions.</p>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                    <th>Promotion Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sponsoredTableBody">
+                                <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-light);"><i class="fa-solid fa-spinner fa-spin"></i> Loading products...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
@@ -804,6 +863,105 @@
     </div>
 </div>
 
+<!-- UPGRADE MEMBERSHIP MODAL -->
+<div class="modal-overlay" id="upgradeModal">
+    <div class="modal-box" style="max-width:700px;">
+        <h3><i class="fa-solid fa-crown" style="color:#f1c40f;"></i> Select Membership Plan</h3>
+        <p style="color:var(--text-light);font-size:0.9rem;margin-bottom:1.5rem;">Choose a VIP supplier plan to increase your visibility, lower commission fees, and earn the Gold/Platinum badge.</p>
+        
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem;">
+            <!-- Basic Plan -->
+            <div class="tier-option-card" onclick="selectUpgradeTier('basic')" id="tierCard-basic" style="border:2px solid var(--border-light);border-radius:12px;padding:1.2rem;cursor:pointer;transition:all 0.2s ease;">
+                <div style="font-weight:700;font-size:1.1rem;">Basic</div>
+                <div style="font-size:1.4rem;font-weight:800;color:var(--primary);margin:0.4rem 0;">$0 <span style="font-size:0.8rem;font-weight:500;color:var(--text-light);">/ mo</span></div>
+                <ul style="list-style:none;padding:0;margin:0.8rem 0 0;font-size:0.85rem;color:var(--text-light);display:flex;flex-direction:column;gap:0.4rem;">
+                    <li>✓ 10 products max</li>
+                    <li>✓ 10% commission</li>
+                </ul>
+            </div>
+            <!-- Gold Plan -->
+            <div class="tier-option-card" onclick="selectUpgradeTier('gold')" id="tierCard-gold" style="border:2px solid #f39c12;border-radius:12px;padding:1.2rem;cursor:pointer;background:rgba(243,156,18,0.05);transition:all 0.2s ease;">
+                <div style="font-weight:700;font-size:1.1rem;color:#d35400;">👑 Gold Supplier</div>
+                <div style="font-size:1.4rem;font-weight:800;color:#d35400;margin:0.4rem 0;">$299 <span style="font-size:0.8rem;font-weight:500;color:var(--text-light);">/ mo</span></div>
+                <ul style="list-style:none;padding:0;margin:0.8rem 0 0;font-size:0.85rem;color:var(--text-light);display:flex;flex-direction:column;gap:0.4rem;">
+                    <li>✓ <strong>Unlimited</strong> products</li>
+                    <li>✓ <strong>5%</strong> commission</li>
+                    <li>✓ <strong>👑 Gold</strong> badge</li>
+                    <li>✓ Priority ranking</li>
+                </ul>
+            </div>
+            <!-- Platinum Plan -->
+            <div class="tier-option-card" onclick="selectUpgradeTier('platinum')" id="tierCard-platinum" style="border:2px solid #8e44ad;border-radius:12px;padding:1.2rem;cursor:pointer;background:rgba(142,68,173,0.05);transition:all 0.2s ease;">
+                <div style="font-weight:700;font-size:1.1rem;color:#8e44ad;">👑 Platinum Supplier</div>
+                <div style="font-size:1.4rem;font-weight:800;color:#8e44ad;margin:0.4rem 0;">$799 <span style="font-size:0.8rem;font-weight:500;color:var(--text-light);">/ mo</span></div>
+                <ul style="list-style:none;padding:0;margin:0.8rem 0 0;font-size:0.85rem;color:var(--text-light);display:flex;flex-direction:column;gap:0.4rem;">
+                    <li>✓ <strong>0% Commission</strong></li>
+                    <li>✓ <strong>👑 Platinum</strong> badge</li>
+                    <li>✓ Top featured spot</li>
+                    <li>✓ Dedicated manager</li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:0.8rem;">
+            <button type="button" class="btn-cancel" onclick="closeUpgradeModal()">Cancel</button>
+            <button type="button" class="btn-add-product" id="confirmUpgradeBtn" onclick="confirmTierUpgrade()" style="background:var(--primary);">
+                Confirm &amp; Activate Plan
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- SPONSOR PRODUCT MODAL -->
+<div class="modal-overlay" id="sponsorModal">
+    <div class="modal-box" style="max-width:500px;">
+        <h3><i class="fa-solid fa-rocket" style="color:#d35400;"></i> Sponsor <span id="sponsorProductTitle">Product</span></h3>
+        <p style="color:var(--text-light);font-size:0.9rem;margin-bottom:1.2rem;">Sponsoring your product promotes it to the top #1 spot across category pages, home deals, and Pro Search.</p>
+        
+        <input type="hidden" id="sponsorProductId" />
+
+        <div style="display:flex;flex-direction:column;gap:0.8rem;margin-bottom:1.5rem;">
+            <label class="tier-card" style="border:1px solid var(--border-light);border-radius:8px;padding:1rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:0.6rem;">
+                    <input type="radio" name="sponsorDuration" value="7" checked />
+                    <div>
+                        <strong style="display:block;">7-Day Sponsor Boost</strong>
+                        <span style="font-size:0.8rem;color:var(--text-light);">Top placement for 1 week</span>
+                    </div>
+                </div>
+                <strong style="color:var(--primary);font-size:1.1rem;">$49</strong>
+            </label>
+            <label class="tier-card" style="border:1px solid #f39c12;border-radius:8px;padding:1rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:rgba(243,156,18,0.04);">
+                <div style="display:flex;align-items:center;gap:0.6rem;">
+                    <input type="radio" name="sponsorDuration" value="30" />
+                    <div>
+                        <strong style="display:block;">30-Day Sponsor Boost (Most Popular)</strong>
+                        <span style="font-size:0.8rem;color:var(--text-light);">Top placement for 1 full month</span>
+                    </div>
+                </div>
+                <strong style="color:#d35400;font-size:1.1rem;">$149</strong>
+            </label>
+            <label class="tier-card" style="border:1px solid #8e44ad;border-radius:8px;padding:1rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:0.6rem;">
+                    <input type="radio" name="sponsorDuration" value="90" />
+                    <div>
+                        <strong style="display:block;">90-Day Enterprise Sponsor</strong>
+                        <span style="font-size:0.8rem;color:var(--text-light);">Quarter-long premium featured spot</span>
+                    </div>
+                </div>
+                <strong style="color:#8e44ad;font-size:1.1rem;">$399</strong>
+            </label>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:0.8rem;">
+            <button type="button" class="btn-cancel" onclick="closeSponsorModal()">Cancel</button>
+            <button type="button" class="btn-add-product" onclick="confirmSponsorProduct()" style="background:#d35400;">
+                <i class="fa-solid fa-rocket"></i> Activate Promotion
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- FOOTER -->
 <footer class="footer">
     <div class="container">
@@ -876,6 +1034,7 @@
                             document.getElementById('sellerName').textContent = displayName;
                             // ─── UPDATED: Use user's email, fallback to support email ───
                             document.getElementById('sellerEmail').textContent = user.email || SUPPORT_EMAIL;
+                            updateMembershipTierUI(data.membership_tier || data.supplier_tier || 'basic');
                             loadAllData();
                             startRealTimeListeners();
                         } else {
@@ -1174,10 +1333,38 @@
                         <td>
                             <button class="btn-action edit" onclick="openAddProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
                             <button class="btn-action delete" onclick="deleteProduct('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
+                            <button class="btn-action" style="background:rgba(211,84,0,0.1);color:#d35400;margin-left:4px;" title="Sponsor Listing" onclick="openSponsorModal('${p.id}', '${esc(p.title || 'Product')}')"><i class="fa-solid fa-rocket"></i></button>
                         </td>
                     </tr>
                 `;
             }).join('');
+
+            // Also update the Sponsored Listings table inside VIP Membership tab
+            const sponsorBody = document.getElementById('sponsoredTableBody');
+            if (sponsorBody) {
+                if (allProducts.length === 0) {
+                    sponsorBody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:2rem;">No products found. Add products first to sponsor them!</td></tr>`;
+                } else {
+                    sponsorBody.innerHTML = allProducts.map(p => {
+                        const statusText = p.sponsored ?
+                            `<span style="color:#d35400;font-weight:700;"><i class="fa-solid fa-rocket"></i> Sponsored Active</span>` :
+                            `<span style="color:var(--text-light);">Standard Listing</span>`;
+                        const actionBtn = p.sponsored ?
+                            `<button class="btn-action" style="background:#2ecc71;color:#fff;padding:4px 10px;border-radius:20px;font-size:0.75rem;" disabled><i class="fa-solid fa-check"></i> Sponsored</button>` :
+                            `<button class="btn-add-product" style="background:#d35400;padding:6px 14px;font-size:0.8rem;" onclick="openSponsorModal('${p.id}', '${esc(p.title || 'Product')}')"><i class="fa-solid fa-rocket"></i> Sponsor</button>`;
+                        return `
+                            <tr>
+                                <td><strong>${esc(p.title || 'Untitled')}</strong></td>
+                                <td>$${(p.price || 0).toFixed(2)}</td>
+                                <td>${p.stock || 0}</td>
+                                <td><span class="status-badge active">${p.status || 'active'}</span></td>
+                                <td>${statusText}</td>
+                                <td>${actionBtn}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            }
 
         } catch (error) {
             console.error('Error loading products:', error);
@@ -1398,6 +1585,115 @@
                 document.getElementById('storeCategory').value = settings.storeCategory || '';
             }
         } catch (e) {}
+    }
+
+    // ─── MEMBERSHIP TIER MANAGEMENT ───
+    let currentMembershipTier = 'basic';
+
+    function updateMembershipTierUI(tier) {
+        currentMembershipTier = tier || 'basic';
+        const titleEl = document.getElementById('currentTierTitle');
+        const descEl = document.getElementById('currentTierDesc');
+        if (!titleEl) return;
+
+        if (currentMembershipTier === 'platinum') {
+            titleEl.innerHTML = `👑 Platinum Supplier <span style="font-size:0.75rem;padding:4px 10px;border-radius:20px;background:#8e44ad;color:#fff;font-weight:600;">0% Commission</span>`;
+            descEl.textContent = `You are on the VIP Platinum Enterprise tier ($799/mo). Your listings enjoy 0% commission, the Platinum badge, and priority top-ranking in Pro Search.`;
+        } else if (currentMembershipTier === 'gold') {
+            titleEl.innerHTML = `👑 Gold Supplier <span style="font-size:0.75rem;padding:4px 10px;border-radius:20px;background:#f39c12;color:#fff;font-weight:600;">5% Commission</span>`;
+            descEl.textContent = `You are on the VIP Gold Supplier tier ($299/mo). Your listings get the Gold badge, reduced 5% commission, and search boost.`;
+        } else {
+            titleEl.innerHTML = `Basic Supplier <span style="font-size:0.75rem;padding:4px 10px;border-radius:20px;background:var(--bg-main);color:var(--text-light);font-weight:600;">10% Commission</span>`;
+            descEl.textContent = `You are on the standard basic supplier plan ($0/mo, 10% commission). Upgrade to Gold or Platinum to lower your commission and earn the VIP badge.`;
+        }
+    }
+
+    function openUpgradeModal() {
+        const modal = document.getElementById('upgradeModal');
+        if (modal) modal.classList.add('show');
+        selectUpgradeTier(currentMembershipTier || 'basic');
+    }
+    function closeUpgradeModal() {
+        const modal = document.getElementById('upgradeModal');
+        if (modal) modal.classList.remove('show');
+    }
+
+    let selectedUpgradeTier = 'basic';
+    function selectUpgradeTier(tier) {
+        selectedUpgradeTier = tier;
+        document.querySelectorAll('.tier-option-card').forEach(el => {
+            el.style.boxShadow = 'none';
+            el.style.transform = 'scale(1)';
+        });
+        const card = document.getElementById('tierCard-' + tier);
+        if (card) {
+            card.style.boxShadow = '0 0 0 3px var(--primary)';
+            card.style.transform = 'scale(1.02)';
+        }
+    }
+
+    async function confirmTierUpgrade() {
+        const user = auth.currentUser;
+        if (!user) return;
+        const btn = document.getElementById('confirmUpgradeBtn');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Activating...'; }
+        try {
+            await db.collection('users').doc(user.uid).set({
+                membership_tier: selectedUpgradeTier,
+                supplier_tier: selectedUpgradeTier,
+                updated_at: new Date().toISOString()
+            }, { merge: true });
+
+            // Also update tier on seller's products so search and catalog show badges instantly
+            const snap = await db.collection('products').where('supplier_id', '==', user.uid).get();
+            const batch = db.batch();
+            snap.forEach(doc => {
+                batch.update(doc.ref, { supplier_tier: selectedUpgradeTier });
+            });
+            await batch.commit().catch(()=>{});
+
+            updateMembershipTierUI(selectedUpgradeTier);
+            closeUpgradeModal();
+            showToast(`🎉 Tier upgraded to ${selectedUpgradeTier.toUpperCase()} Supplier successfully!`, 'success');
+        } catch (e) {
+            console.error('Upgrade error:', e);
+            showToast('Failed to update membership tier', 'error');
+        } finally {
+            if (btn) { btn.disabled = false; btn.innerHTML = 'Confirm &amp; Activate Plan'; }
+        }
+    }
+
+    // ─── SPONSOR PRODUCT MANAGEMENT ───
+    function openSponsorModal(productId, title) {
+        document.getElementById('sponsorProductId').value = productId;
+        document.getElementById('sponsorProductTitle').textContent = title || 'Product';
+        const modal = document.getElementById('sponsorModal');
+        if (modal) modal.classList.add('show');
+    }
+    function closeSponsorModal() {
+        const modal = document.getElementById('sponsorModal');
+        if (modal) modal.classList.remove('show');
+    }
+
+    async function confirmSponsorProduct() {
+        const productId = document.getElementById('sponsorProductId').value;
+        const durationEl = document.querySelector('input[name="sponsorDuration"]:checked');
+        const days = parseInt(durationEl ? durationEl.value : '7') || 7;
+        if (!productId) return;
+        try {
+            const until = new Date(Date.now() + days * 86400000).toISOString();
+            await db.collection('products').doc(productId).update({
+                sponsored: true,
+                sponsored_until: until,
+                updated_at: new Date().toISOString()
+            });
+            closeSponsorModal();
+            showToast(`🚀 Product sponsored for ${days} days! Priority #1 ranking active.`, 'success');
+            loadProducts(); // refresh tables
+        } catch (e) {
+            console.error('Sponsor error:', e);
+            showToast('Failed to activate sponsored listing', 'error');
+        }
     }
 
     // ─── LOGOUT ───

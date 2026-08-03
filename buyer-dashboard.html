@@ -501,6 +501,8 @@
     };
 
     let auth, db;
+    let userOrdersCache = [];
+    let userRFQsCache = [];
 
     function initFirebase() {
         if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
@@ -603,6 +605,7 @@
             const pending = orders.filter(o => o.status === 'pending' || o.status === 'processing');
             document.getElementById('statOrders').textContent = orders.length;
             document.getElementById('statPending').textContent = pending.length;
+            userOrdersCache = orders;
 
             container.innerHTML = orders.map(order => `
                 <div class="order-item">
@@ -614,7 +617,12 @@
                         <span>${new Date(order.created_at || order.date).toLocaleDateString()}</span>
                         <span> | ${order.items?.length || 0} items</span>
                     </div>
-                    <div class="order-total">Total: $${(order.totals?.total || 0).toFixed(2)}</div>
+                    <div class="order-total" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                        <span>Total: <strong>$${(order.totals?.total || 0).toFixed(2)}</strong></span>
+                        <button type="button" class="btn-submit" style="background:#0b2a3b;color:#fff;padding:0.4rem 1rem;font-size:0.78rem;border-radius:6px;width:auto;border:none;cursor:pointer;" onclick="downloadOrderInvoicePdf('${order.id}')">
+                            <i class="fa-solid fa-file-pdf" style="color:#f1c40f;"></i> Commercial Invoice (PDF)
+                        </button>
+                    </div>
                 </div>
             `).join('');
         } catch (error) {
@@ -641,20 +649,26 @@
                 container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-file-lines"></i><h3>No RFQ Requests</h3><p>You haven't submitted any RFQ requests yet.</p><a href="/rfq" style="color:var(--primary);font-weight:600;">Submit RFQ →</a></div>`;
                 return;
             }
+            userRFQsCache = rfqs;
             const statusLabels = { pending: 'Pending', reviewing: 'Reviewing', quoted: 'Quoted', closed: 'Closed' };
             container.innerHTML = rfqs.map(rfq => `
                 <div class="rfq-item">
                     <div class="rfq-header">
-                        <span class="rfq-title">${rfq.title}</span>
+                        <span class="rfq-title">${esc(rfq.title)}</span>
                         <span class="rfq-status ${rfq.status || 'pending'}">${statusLabels[rfq.status] || rfq.status || 'Pending'}</span>
                     </div>
                     <div class="rfq-details">
                         <span><strong>Quantity:</strong> ${rfq.quantity} units</span>
-                        <span> | <strong>Category:</strong> ${rfq.category}</span>
+                        <span> | <strong>Category:</strong> ${esc(rfq.category)}</span>
                         <span> | <strong>Date:</strong> ${new Date(rfq.created_at).toLocaleDateString()}</span>
                         ${rfq.budget ? `<span> | <strong>Budget:</strong> $${rfq.budget}</span>` : ''}
                     </div>
-                    <div class="rfq-details" style="margin-top:0.3rem;color:var(--text);">${rfq.description.substring(0, 120)}${rfq.description.length > 120 ? '...' : ''}</div>
+                    <div class="rfq-details" style="margin-top:0.3rem;color:var(--text);">${esc(rfq.description.substring(0, 120))}${rfq.description.length > 120 ? '...' : ''}</div>
+                    <div style="margin-top:0.6rem;display:flex;justify-content:flex-end;">
+                        <button type="button" class="btn-submit" style="background:var(--secondary);color:#fff;padding:0.35rem 0.9rem;font-size:0.78rem;border-radius:6px;width:auto;border:none;cursor:pointer;" onclick="downloadRFQPdf('${rfq.id}')">
+                            <i class="fa-solid fa-file-pdf" style="color:#f1c40f;"></i> RFQ Document (PDF)
+                        </button>
+                    </div>
                 </div>
             `).join('');
         } catch (error) {
@@ -802,6 +816,242 @@
         document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
     });
 
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    function downloadOrderInvoicePdf(orderId) {
+        const order = userOrdersCache.find(o => o.id === orderId);
+        if (!order) { showToast('Order details not found', 'error'); return; }
+        const invNum = 'INV-PSE-' + (order.quoteNumber || order.orderNumber || orderId.slice(0, 8).toUpperCase());
+        const dateStr = new Date(order.created_at || order.date || Date.now()).toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+        const items = order.items || [];
+        const totals = order.totals || {};
+
+        const itemsHtml = items.map(item => `
+            <tr>
+                <td style="padding:10px;border-bottom:1px solid #ddd;">
+                    <div style="font-weight:600;">${esc(item.title || 'Product')}</div>
+                    ${item.brand ? `<div style="font-size:0.8rem;color:#666;">Brand: ${esc(item.brand)}</div>` : ''}
+                </td>
+                <td style="padding:10px;border-bottom:1px solid #ddd;text-align:center;">${item.moq || 1}</td>
+                <td style="padding:10px;border-bottom:1px solid #ddd;text-align:center;">${item.quantity || 1}</td>
+                <td style="padding:10px;border-bottom:1px solid #ddd;text-align:right;">$${Number(item.price || 0).toFixed(2)}</td>
+                <td style="padding:10px;border-bottom:1px solid #ddd;text-align:right;font-weight:700;">$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</td>
+            </tr>
+        `).join('');
+
+        const win = window.open('', '_blank');
+        win.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>${invNum} - Commercial Invoice</title>
+                <style>
+                    body { font-family: 'Segoe UI', system-ui, sans-serif; color:#222; padding:30px; max-width:850px; margin:0 auto; }
+                    .header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #1a7b6b; padding-bottom:20px; margin-bottom:25px; }
+                    .header h1 { color:#1a7b6b; margin:0; font-size:24px; }
+                    .header .meta { text-align:right; font-size:14px; color:#555; }
+                    .parties { display:flex; justify-content:space-between; margin-bottom:30px; font-size:14px; }
+                    .party-box { width:47%; background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #e9edf2; }
+                    .party-box h4 { margin:0 0 8px; color:#0b2a3b; text-transform:uppercase; font-size:12px; letter-spacing:0.5px; }
+                    table { width:100%; border-collapse:collapse; margin-bottom:30px; font-size:14px; }
+                    th { background:#0b2a3b; color:#fff; padding:12px 10px; text-align:left; font-size:13px; text-transform:uppercase; }
+                    .totals { width:320px; margin-left:auto; border-top:2px solid #0b2a3b; padding-top:10px; }
+                    .total-row { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; }
+                    .total-row.grand { font-weight:800; font-size:18px; color:#1a7b6b; border-top:1px solid #ccc; padding-top:12px; }
+                    .footer { margin-top:40px; padding-top:20px; border-top:1px solid #ddd; font-size:12px; color:#666; text-align:center; }
+                    .badge { display:inline-block; background:#e8f5f0; color:#1a7b6b; border:1px solid #1a7b6b; font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; margin-top:6px; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div>
+                        <h1>PILOT SALES DISTRIBUTION</h1>
+                        <div style="font-size:13px;color:#666;">B2B Wholesale Marketplace &amp; Trade Assurance</div>
+                        <div class="badge">✓ OFFICIAL COMMERCIAL INVOICE</div>
+                    </div>
+                    <div class="meta">
+                        <strong style="font-size:16px;color:#0b2a3b;">INVOICE #: ${invNum}</strong><br />
+                        Date: ${dateStr}<br />
+                        Payment Term: 30 Days Net / Escrow Trade Assurance
+                    </div>
+                </div>
+
+                <div class="parties">
+                    <div class="party-box">
+                        <h4>SELLER / SUPPLIER DETAILS</h4>
+                        <strong>Pilot Sales Distribution Verified Suppliers</strong><br />
+                        Global B2B Wholesale Distribution<br />
+                        Email: support@pilotsalesdistribution.com<br />
+                        WhatsApp: +1 (909) 938-4682
+                    </div>
+                    <div class="party-box">
+                        <h4>BILL TO / BUYER DETAILS</h4>
+                        <strong>${esc(order.customer?.firstName || 'Valued')} ${esc(order.customer?.lastName || 'Customer')}</strong><br />
+                        Company: ${esc(order.customer?.company || 'B2B Commercial Buyer')}<br />
+                        Email: ${esc(order.customer?.email || 'N/A')}<br />
+                        Address: ${esc(order.customer?.address?.address || 'N/A')}, ${esc(order.customer?.address?.city || '')}
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item Description</th>
+                            <th style="text-align:center;">MOQ</th>
+                            <th style="text-align:center;">Qty</th>
+                            <th style="text-align:right;">Unit Price</th>
+                            <th style="text-align:right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                </table>
+
+                <div class="totals">
+                    <div class="total-row">
+                        <span>Subtotal:</span>
+                        <strong>$${Number(totals.subtotal || 0).toFixed(2)}</strong>
+                    </div>
+                    <div class="total-row">
+                        <span>Shipping &amp; Handling:</span>
+                        <strong>${totals.shipping === 0 ? 'FREE' : '$' + Number(totals.shipping || 0).toFixed(2)}</strong>
+                    </div>
+                    <div class="total-row">
+                        <span>Tax / Duties:</span>
+                        <strong>$${Number(totals.tax || 0).toFixed(2)}</strong>
+                    </div>
+                    <div class="total-row grand">
+                        <span>TOTAL DUE (USD):</span>
+                        <span>$${Number(totals.total || 0).toFixed(2)}</span>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <p><strong>PSE Distribution Trade Assurance</strong> — Payment is held securely in escrow until goods are delivered and inspected.</p>
+                    <p>&copy; ${new Date().getFullYear()} Pilot Sales Distribution. All rights reserved.</p>
+                </div>
+
+                <' + 'script>
+                    window.onload = function() { setTimeout(function() { window.print(); }, 500); };
+                <' + '/script>
+            </body>
+            </html>
+        `);
+        win.document.close();
+    }
+
+    function downloadRFQPdf(rfqId) {
+        const rfq = userRFQsCache.find(r => r.id === rfqId);
+        if (!rfq) { showToast('RFQ details not loaded', 'error'); return; }
+        const user = getCurrentUser();
+        const rfqNum = 'RFQ-PSE-' + rfq.id.slice(0, 8).toUpperCase();
+        const dateStr = new Date(rfq.created_at || Date.now()).toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        const win = window.open('', '_blank');
+        win.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>${rfqNum} - Request For Quotation</title>
+                <style>
+                    body { font-family: 'Segoe UI', system-ui, sans-serif; color:#222; padding:30px; max-width:850px; margin:0 auto; }
+                    .header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #1a7b6b; padding-bottom:20px; margin-bottom:25px; }
+                    .header h1 { color:#1a7b6b; margin:0; font-size:24px; }
+                    .header .meta { text-align:right; font-size:14px; color:#555; }
+                    .parties { display:flex; justify-content:space-between; margin-bottom:30px; font-size:14px; }
+                    .party-box { width:47%; background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #e9edf2; }
+                    .party-box h4 { margin:0 0 8px; color:#0b2a3b; text-transform:uppercase; font-size:12px; letter-spacing:0.5px; }
+                    .spec-table { width:100%; border-collapse:collapse; margin-bottom:30px; font-size:14px; }
+                    .spec-table th { background:#0b2a3b; color:#fff; padding:12px 10px; text-align:left; font-size:13px; text-transform:uppercase; }
+                    .spec-table td { padding:12px 10px; border-bottom:1px solid #ddd; }
+                    .desc-box { background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #e9edf2; margin-bottom:30px; }
+                    .footer { margin-top:40px; padding-top:20px; border-top:1px solid #ddd; font-size:12px; color:#666; text-align:center; }
+                    .badge { display:inline-block; background:#e8f5f0; color:#1a7b6b; border:1px solid #1a7b6b; font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; margin-top:6px; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div>
+                        <h1>PILOT SALES DISTRIBUTION</h1>
+                        <div style="font-size:13px;color:#666;">Global B2B Wholesale Marketplace &amp; Procurement</div>
+                        <div class="badge">✓ OFFICIAL REQUEST FOR QUOTATION (RFQ)</div>
+                    </div>
+                    <div class="meta">
+                        <strong style="font-size:16px;color:#0b2a3b;">RFQ #: ${rfqNum}</strong><br />
+                        Date Issued: ${dateStr}<br />
+                        Status: ${rfq.status ? rfq.status.toUpperCase() : 'PENDING'}
+                    </div>
+                </div>
+
+                <div class="parties">
+                    <div class="party-box">
+                        <h4>ISSUED TO VERIFIED SUPPLIERS</h4>
+                        <strong>Pilot Sales Distribution Network</strong><br />
+                        Verified Wholesale Manufacturers &amp; Suppliers<br />
+                        Email: support@pilotsalesdistribution.com<br />
+                        WhatsApp: +1 (909) 938-4682
+                    </div>
+                    <div class="party-box">
+                        <h4>ISSUED BY COMMERCIAL BUYER</h4>
+                        <strong>${esc(user?.full_name || 'B2B Commercial Buyer')}</strong><br />
+                        Email: ${esc(user?.email || 'N/A')}<br />
+                        Buyer ID: ${esc(user?.id || 'N/A')}
+                    </div>
+                </div>
+
+                <table class="spec-table">
+                    <thead>
+                        <tr>
+                            <th>Requested Item / Project Title</th>
+                            <th>Category</th>
+                            <th style="text-align:center;">Target Quantity</th>
+                            <th style="text-align:right;">Target Unit Budget</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>${esc(rfq.title)}</strong></td>
+                            <td>${esc(rfq.category)}</td>
+                            <td style="text-align:center;"><strong>${rfq.quantity} units</strong></td>
+                            <td style="text-align:right;">${rfq.budget ? '$' + Number(rfq.budget).toFixed(2) : 'Open Quote'}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="desc-box">
+                    <h4 style="margin:0 0 8px;color:#0b2a3b;font-size:12px;text-transform:uppercase;">DETAILED PROCUREMENT SPECIFICATIONS</h4>
+                    <p style="white-space:pre-line;margin:0;font-size:14px;line-height:1.6;">${esc(rfq.description || 'No additional details provided.')}</p>
+                </div>
+
+                <div style="background:#e8f5f0;border-left:4px solid #1a7b6b;padding:15px;border-radius:4px;font-size:13px;color:#0f4f43;">
+                    <strong>Notice to Responding Suppliers:</strong> Quoted prices must include estimated lead times, Minimum Order Quantity (MOQ) breakdown, and trade assurance delivery terms.
+                </div>
+
+                <div class="footer">
+                    <p><strong>PSE Distribution Trade Assurance</strong> — Verified suppliers submit sealed bids with 100% escrow buyer protection.</p>
+                    <p>&copy; ${new Date().getFullYear()} Pilot Sales Distribution. All rights reserved.</p>
+                </div>
+
+                <' + 'script>
+                    window.onload = function() { setTimeout(function() { window.print(); }, 500); };
+                <' + '/script>
+            </body>
+            </html>
+        `);
+        win.document.close();
+    }
+
+    window.downloadOrderInvoicePdf = downloadOrderInvoicePdf;
+    window.downloadRFQPdf = downloadRFQPdf;
     window.switchTab = switchTab;
     window.loadOrders = loadOrders;
     window.loadRFQs = loadRFQs;

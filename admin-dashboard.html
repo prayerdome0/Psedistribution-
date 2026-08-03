@@ -2158,9 +2158,15 @@
                 }
             });
 
-            tbody.innerHTML = sellers.slice(0, 20).map(s => `
+            tbody.innerHTML = sellers.slice(0, 20).map(s => {
+                const tierChip = s.membership_tier === 'platinum' || s.supplier_tier === 'platinum' ?
+                    `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#8e44ad;color:#fff;font-size:0.7rem;font-weight:700;margin-left:6px;"><i class="fa-solid fa-crown"></i> Platinum (0%)</span>` :
+                    s.membership_tier === 'gold' || s.supplier_tier === 'gold' ?
+                    `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#f39c12;color:#fff;font-size:0.7rem;font-weight:700;margin-left:6px;"><i class="fa-solid fa-crown"></i> Gold (5%)</span>` :
+                    `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:var(--bg-main);color:var(--text-light);font-size:0.7rem;font-weight:600;margin-left:6px;">Basic (10%)</span>`;
+                return `
                 <tr>
-                    <td><strong>${s.verified ? '✓ ' : ''}${s.company || s.full_name || 'N/A'}</strong></td>
+                    <td><strong>${s.verified ? '✓ ' : ''}${s.company || s.full_name || 'N/A'}</strong> ${tierChip}</td>
                     <td>${s.full_name || ''}</td>
                     <td>${productCounts[s.id] || 0}</td>
                     <td><span class="status-badge ${s.status === 'approved' ? 'active' : s.status === 'suspended' ? 'suspended' : 'pending'}">${s.status || 'pending'}</span></td>
@@ -2178,7 +2184,8 @@
                         ${s.status === 'approved' ? `<button class="btn-action ban" onclick="suspendUser('${s.id}')" title="Suspend"><i class="fa-regular fa-ban"></i></button>` : ''}
                     </td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
 
         } catch (error) {
             tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading sellers</p></div></td></tr>`;

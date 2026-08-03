@@ -1260,7 +1260,13 @@
     function renderProduct(product) {
         document.getElementById('breadcrumbProduct').textContent = product.title || 'Product';
         document.getElementById('productTitle').textContent = product.title || 'Product';
-        document.getElementById('productBrand').innerHTML = `by <a href="/products?brand=${encodeURIComponent(product.brand || '')}">${product.brand || 'Pilot Distribution'}</a>`;
+        const tierBadge = product.supplier_tier === 'platinum' || product.membership_tier === 'platinum' ?
+            `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#8e44ad;color:#fff;font-weight:700;margin-left:8px;"><i class="fa-solid fa-crown"></i> Platinum Supplier</span>` :
+            product.supplier_tier === 'gold' || product.membership_tier === 'gold' ?
+            `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#f39c12;color:#fff;font-weight:700;margin-left:8px;"><i class="fa-solid fa-crown"></i> Gold Supplier</span>` : '';
+        const sponsorBadge = product.sponsored ?
+            `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#d35400;color:#fff;font-weight:700;margin-left:8px;"><i class="fa-solid fa-rocket"></i> Sponsored Deal</span>` : '';
+        document.getElementById('productBrand').innerHTML = `by <a href="/products?brand=${encodeURIComponent(product.brand || '')}">${product.brand || 'Pilot Distribution'}</a> ${tierBadge} ${sponsorBadge}`;
 
         // Rating
         const rating = product.rating || 0;

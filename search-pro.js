@@ -83,6 +83,8 @@
             stock: num(p.stock),
             moq: num(p.moq),
             supplier_verified: !!p.supplier_verified,
+            supplier_tier: String(p.supplier_tier || p.membership_tier || 'basic'),
+            sponsored: !!p.sponsored,
             sku: p.sku ? String(p.sku) : ''
         };
     }
@@ -209,6 +211,9 @@
 
         // slight tie-breaker — only boosts products that already matched
         if (score > 0 && p.supplier_verified) score += 3;
+        if (score > 0 && p.sponsored) score += 20;
+        if (score > 0 && p.supplier_tier === 'platinum') score += 10;
+        else if (score > 0 && p.supplier_tier === 'gold') score += 5;
         return score;
     }
 
@@ -303,8 +308,10 @@
             stock = '<span class="pse-suggest__stock ' + cls + '">' +
                 (p.stock <= 20 ? 'Low stock · ' : 'In stock · ') + p.stock + '</span>';
         }
-        var badge = p.supplier_verified
-            ? '<span class="pse-suggest__badge" title="Verified seller">✓ Verified</span>' : '';
+        var badge = (p.sponsored ? '<span class="pse-suggest__badge" style="background:#d35400;color:#fff;border-color:#d35400;" title="Sponsored Listing">🚀 Sponsored</span> ' : '') +
+            (p.supplier_tier === 'platinum' ? '<span class="pse-suggest__badge" style="background:#8e44ad;color:#fff;border-color:#8e44ad;" title="Platinum Supplier">👑 Platinum</span> ' :
+             p.supplier_tier === 'gold' ? '<span class="pse-suggest__badge" style="background:#f39c12;color:#fff;border-color:#f39c12;" title="Gold Supplier">👑 Gold</span> ' :
+             p.supplier_verified ? '<span class="pse-suggest__badge" title="Verified seller">✓ Verified</span>' : '');
         return '<div class="pse-suggest__item" role="option" data-action="product" data-slug="' + esc(p.slug) + '" data-title="' + esc(p.title) + '">' +
             '<img src="' + esc(p.image_url || '') + '" alt="' + esc(p.title) + '" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
             '<div class="pse-suggest__info">' +

@@ -1361,20 +1361,30 @@
             return;
         }
 
+        // Sort sponsored listings to the top of home page featured products
+        products.sort((a, b) => (b.sponsored ? 1 : 0) - (a.sponsored ? 1 : 0));
+
         grid.innerHTML = products.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
             const slug = p.slug || generateSlug(p.title || 'product');
             const imageUrl = p.image_url || 'logo.jpg';
+            const sponsoredBadge = p.sponsored ? `<span class="product-badge" style="background:#d35400;color:#fff;top:10px;right:10px;z-index:10;font-weight:700;"><i class="fa-solid fa-rocket"></i> SPONSORED</span>` : '';
+            const vipTierBadge = p.supplier_tier === 'platinum' || p.membership_tier === 'platinum' ?
+                `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#8e44ad;margin-top:2px;"><i class="fa-solid fa-crown"></i> Platinum Supplier</div>` :
+                p.supplier_tier === 'gold' || p.membership_tier === 'gold' ?
+                `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#d35400;margin-top:2px;"><i class="fa-solid fa-crown"></i> Gold Supplier</div>` : '';
             
             return `<div class="product-card animate-on-scroll">
-                ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
-                ${discount > 0 ? `<span class="product-badge flash">-${discount}%</span>` : ''}
+                ${sponsoredBadge}
+                ${p.moq ? `<span class="product-badge wholesale" style="${p.sponsored ? 'top:38px;' : ''}">MOQ ${p.moq}</span>` : ''}
+                ${discount > 0 ? `<span class="product-badge flash" style="${p.sponsored ? 'top:66px;' : ''}">-${discount}%</span>` : ''}
                 ${p.supplier_verified ? `<span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>` : ''}
                 <div class="product-image" onclick="window.location.href='/product/${slug}'">
                     <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fa-solid fa-box\\'></i></span>'" />
                 </div>
                 <div class="product-title">${p.title || 'Product'}</div>
                 <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
+                ${vipTierBadge}
                 <div class="product-price">$${(p.price || 0).toFixed(2)}${p.old_price ? ` <span class="old">$${p.old_price.toFixed(2)}</span>` : ''}</div>
                 <div class="product-actions">
                     <button class="btn-add" data-product-id="${p.id}" onclick="addToCart('${p.id}')"><i class="fa-solid fa-cart-plus"></i> Add</button>
