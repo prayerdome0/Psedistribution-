@@ -1454,15 +1454,18 @@
             let products = [];
             snapshot.forEach(doc => {
                 const data = doc.data();
+                const image_url = window.getProductImage ? window.getProductImage(data, '') : (data.image_url || data.images?.[0] || '');
                 products.push({
                     id: doc.id,
+                    ...data,
                     title: data.title || 'Product',
                     brand: data.brand || 'Pilot',
                     price: data.price || 0,
                     old_price: data.old_price || 0,
-                    image_url: data.image_url || '',
+                    image_url: image_url,
                     moq: data.moq || 1,
-                    supplier_verified: data.supplier_verified || false
+                    supplier_verified: data.supplier_verified || false,
+                    slug: data.slug || generateSlug(data.title || 'product')
                 });
             });
             if (products.length === 0) {
@@ -1473,21 +1476,33 @@
                 grid.style.display = 'none';
                 return;
             }
+
+            // Add these products to the featuredProductsCache so guest cart add functions correctly
+            if (typeof featuredProductsCache !== 'undefined' && Array.isArray(featuredProductsCache)) {
+                products.forEach(p => {
+                    if (!featuredProductsCache.some(item => item.id === p.id)) {
+                        featuredProductsCache.push(p);
+                    }
+                });
+            }
+
             grid.innerHTML = products.map(p => {
                 const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
+                const slug = p.slug || generateSlug(p.title || 'product');
+                const imageUrl = window.getProductImage ? window.getProductImage(p, '') : (p.image_url || 'logo.jpg');
                 return `<div class="product-card animate-on-scroll">
                     ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
                     ${discount > 0 ? `<span class="product-badge flash">-${discount}%</span>` : ''}
                     ${p.supplier_verified ? `<span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>` : ''}
-                    <div class="product-image" onclick="window.location.href='/product/${generateSlug(p.title)}'">
-                        <img src="${p.image_url || 'logo.jpg'}" alt="${p.title}" loading="lazy" />
+                    <div class="product-image" onclick="window.location.href='/product/${slug}'">
+                        <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.jpg'" />
                     </div>
                     <div class="product-title">${p.title || 'Product'}</div>
                     <div class="product-brand">${p.brand || 'Pilot'}</div>
                     <div class="product-price">$${(p.price || 0).toFixed(2)}${p.old_price ? ` <span class="old">$${p.old_price.toFixed(2)}</span>` : ''}</div>
                     <div class="product-actions">
-                        <button class="btn-add" onclick="addToCart('${p.id}')"><i class="fa-solid fa-cart-plus"></i> Add</button>
-                        <button class="btn-wish" onclick="toggleWishlist('${p.id}')"><i class="fa-regular fa-heart"></i></button>
+                        <button class="btn-add" data-product-id="${p.id}" onclick="addToCart('${p.id}')"><i class="fa-solid fa-cart-plus"></i> Add</button>
+                        <button class="btn-wish" data-wishlist-id="${p.id}" onclick="toggleWishlist('${p.id}')"><i class="fa-regular fa-heart"></i></button>
                     </div>
                 </div>`;
             }).join('');
