@@ -13,6 +13,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="quote-pdf.js"></script>
     <script src="main.js"></script>
     
     <style>
@@ -660,9 +662,12 @@
                     <div class="rfq-details" style="margin-top:0.3rem; color:var(--text);">
                         ${esc(rfq.description.substring(0, 150))}${rfq.description.length > 150 ? '...' : ''}
                     </div>
-                    <div style="margin-top:0.8rem;display:flex;justify-content:flex-end;">
+                    <div style="margin-top:0.8rem;display:flex;justify-content:flex-end;gap:0.5rem;flex-wrap:wrap;">
                         <button type="button" class="btn-submit" style="background:var(--secondary);color:#fff;padding:0.4rem 1rem;font-size:0.8rem;border-radius:6px;width:auto;" onclick="downloadRFQPdf('${rfq.id}')">
-                            <i class="fa-solid fa-file-pdf" style="color:#f1c40f;"></i> Download RFQ Document (PDF)
+                            <i class="fa-solid fa-file-pdf" style="color:#f1c40f;"></i> Download PDF
+                        </button>
+                        <button type="button" class="btn-submit" style="background:#25D366;color:#fff;padding:0.4rem 1rem;font-size:0.8rem;border-radius:6px;width:auto;" onclick="shareRFQWhatsApp('${rfq.id}')">
+                            <i class="fa-brands fa-whatsapp"></i> Send via WhatsApp (PDF)
                         </button>
                     </div>
                 </div>
@@ -678,112 +683,52 @@
         });
     }
 
-    function downloadRFQPdf(rfqId) {
+    // ─── RFQ PDF (real file download, quote-pdf.js) ───
+    function buildRfqPdfFor(rfqId) {
         const rfq = userRFQsCache.find(r => r.id === rfqId);
         if (!rfq) {
             showToast('RFQ details not loaded yet', 'error');
-            return;
+            return null;
         }
-        const user = getCurrentUser();
-        const rfqNum = 'RFQ-PSE-' + rfq.id.slice(0, 8).toUpperCase();
-        const dateStr = new Date(rfq.created_at || Date.now()).toLocaleDateString('en-US', {
-            year: 'numeric', month: 'long', day: 'numeric'
-        });
-
-        const win = window.open('', '_blank');
-        win.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>${rfqNum} - Request For Quotation</title>
-                <style>
-                    body { font-family: 'Segoe UI', system-ui, sans-serif; color:#222; padding:30px; max-width:850px; margin:0 auto; }
-                    .header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #1a7b6b; padding-bottom:20px; margin-bottom:25px; }
-                    .header h1 { color:#1a7b6b; margin:0; font-size:24px; }
-                    .header .meta { text-align:right; font-size:14px; color:#555; }
-                    .parties { display:flex; justify-content:space-between; margin-bottom:30px; font-size:14px; }
-                    .party-box { width:47%; background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #e9edf2; }
-                    .party-box h4 { margin:0 0 8px; color:#0b2a3b; text-transform:uppercase; font-size:12px; letter-spacing:0.5px; }
-                    .spec-table { width:100%; border-collapse:collapse; margin-bottom:30px; font-size:14px; }
-                    .spec-table th { background:#0b2a3b; color:#fff; padding:12px 10px; text-align:left; font-size:13px; text-transform:uppercase; }
-                    .spec-table td { padding:12px 10px; border-bottom:1px solid #ddd; }
-                    .desc-box { background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #e9edf2; margin-bottom:30px; }
-                    .footer { margin-top:40px; padding-top:20px; border-top:1px solid #ddd; font-size:12px; color:#666; text-align:center; }
-                    .badge { display:inline-block; background:#e8f5f0; color:#1a7b6b; border:1px solid #1a7b6b; font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; margin-top:6px; }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <div>
-                        <h1>PILOT SALES DISTRIBUTION</h1>
-                        <div style="font-size:13px;color:#666;">Global B2B Wholesale Marketplace &amp; Procurement</div>
-                        <div class="badge">✓ OFFICIAL REQUEST FOR QUOTATION (RFQ)</div>
-                    </div>
-                    <div class="meta">
-                        <strong style="font-size:16px;color:#0b2a3b;">RFQ #: ${rfqNum}</strong><br />
-                        Date Issued: ${dateStr}<br />
-                        ${rfq.purchase_order_number ? `<strong style="color:#1a7b6b;">CORPORATE PO #: ${esc(rfq.purchase_order_number)}</strong><br />` : ''}
-                        Status: ${rfq.status ? rfq.status.toUpperCase() : 'PENDING'}
-                    </div>
-                </div>
-
-                <div class="parties">
-                    <div class="party-box">
-                        <h4>ISSUED TO VERIFIED SUPPLIERS</h4>
-                        <strong>Pilot Sales Distribution Network</strong><br />
-                        Verified Wholesale Manufacturers &amp; Suppliers<br />
-                        Email: support@pilotsalesdistribution.com<br />
-                        WhatsApp: +1 (909) 938-4682
-                    </div>
-                    <div class="party-box">
-                        <h4>ISSUED BY COMMERCIAL BUYER</h4>
-                        <strong>${esc(user?.full_name || 'B2B Commercial Buyer')}</strong><br />
-                        Email: ${esc(user?.email || 'N/A')}<br />
-                        Buyer ID: ${esc(user?.id || 'N/A')}
-                    </div>
-                </div>
-
-                <table class="spec-table">
-                    <thead>
-                        <tr>
-                            <th>Requested Item / Project Title</th>
-                            <th>Category</th>
-                            <th style="text-align:center;">Target Quantity</th>
-                            <th style="text-align:right;">Target Unit Budget</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>${esc(rfq.title)}</strong></td>
-                            <td>${esc(rfq.category)}</td>
-                            <td style="text-align:center;"><strong>${rfq.quantity} units</strong></td>
-                            <td style="text-align:right;">${rfq.budget ? '$' + Number(rfq.budget).toFixed(2) : 'Open Quote'}</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="desc-box">
-                    <h4 style="margin:0 0 8px;color:#0b2a3b;font-size:12px;text-transform:uppercase;">DETAILED PROCUREMENT SPECIFICATIONS</h4>
-                    <p style="white-space:pre-line;margin:0;font-size:14px;line-height:1.6;">${esc(rfq.description || 'No additional details provided.')}</p>
-                </div>
-
-                <div style="background:#e8f5f0;border-left:4px solid #1a7b6b;padding:15px;border-radius:4px;font-size:13px;color:#0f4f43;">
-                    <strong>Notice to Responding Suppliers:</strong> Quoted prices must include estimated lead times, Minimum Order Quantity (MOQ) breakdown, and trade assurance delivery terms.
-                </div>
-
-                <div class="footer">
-                    <p><strong>PSE Distribution Trade Assurance</strong> — Verified suppliers submit sealed bids with 100% escrow buyer protection.</p>
-                    <p>&copy; ${new Date().getFullYear()} Pilot Sales Distribution. All rights reserved.</p>
-                </div>
-
-                <' + 'script>
-                    window.onload = function() { setTimeout(function() { window.print(); }, 500); };
-                <' + '/script>
-            </body>
-            </html>
-        `);
-        win.document.close();
+        if (!window.PSE_QUOTE_PDF || !window.PSE_QUOTE_PDF.available()) {
+            showToast('PDF engine unavailable — please try again in a moment', 'error');
+            return null;
+        }
+        return window.PSE_QUOTE_PDF.buildRfqPdf(rfq, getCurrentUser());
     }
+
+    function downloadRFQPdf(rfqId) {
+        const doc = buildRfqPdfFor(rfqId);
+        if (!doc) return;
+        const rfq = userRFQsCache.find(r => r.id === rfqId);
+        const rfqNum = 'RFQ-PSE-' + String(rfq.id).slice(0, 8).toUpperCase();
+        doc.save(rfqNum + '-PSE-RFQ.pdf');
+        showToast('📄 RFQ document downloaded (PDF)', 'success');
+    }
+
+    // ─── SEND RFQ TO WHATSAPP (PDF attached on mobile, download+chat on desktop) ───
+    async function shareRFQWhatsApp(rfqId) {
+        const doc = buildRfqPdfFor(rfqId);
+        if (!doc) return;
+        const rfq = userRFQsCache.find(r => r.id === rfqId);
+        const rfqNum = 'RFQ-PSE-' + String(rfq.id).slice(0, 8).toUpperCase();
+        const fileName = rfqNum + '-PSE-RFQ.pdf';
+        let message = `📋 *OFFICIAL REQUEST FOR QUOTATION — Pilot Sales Distribution*\n`;
+        message += `📄 *RFQ #:* ${rfqNum}\n`;
+        message += `📦 *Item:* ${rfq.title}\n`;
+        message += `🔢 *Quantity:* ${rfq.quantity} units  •  *Category:* ${rfq.category}\n`;
+        if (rfq.budget) {
+            message += `💰 *Target Budget:* $${Number(rfq.budget).toLocaleString('en-US', { minimumFractionDigits: 2 })}\n`;
+        }
+        message += `\n📎 The RFQ document PDF (*${fileName}*) has been downloaded to this device — please attach it to this chat so our team can prepare supplier quotes.`;
+        const result = await window.PSE_QUOTE_PDF.shareViaWhatsApp(doc, fileName, message, '+19099384682');
+        if (result === 'downloaded') {
+            showToast('📄 RFQ PDF downloaded — attach it in the WhatsApp chat that just opened.', 'success');
+        }
+    }
+
+    window.downloadRFQPdf = downloadRFQPdf;
+    window.shareRFQWhatsApp = shareRFQWhatsApp;
 
     async function loadCartCount() {
         const user = getCurrentUser();

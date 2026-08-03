@@ -155,6 +155,25 @@
         try { await d.collection('coupons').doc(couponId).set({ used: firebase.firestore.FieldValue.increment(1) }, { merge: true }); } catch (e) {}
     }
 
+    // Subtotal-independent coupon check — used by the registration promo-code
+    // field to pre-verify a code before the buyer's first checkout.
+    // Returns { valid, message, coupon } where message describes the reward.
+    async function lookupCoupon(code) {
+        if (!config.coupons_enabled) return { valid: false, message: 'Coupons are currently disabled.', coupon: null };
+        code = String(code || '').trim().toUpperCase();
+        if (!code) return { valid: false, message: 'Enter a coupon code.', coupon: null };
+        var list = await getCoupons();
+        var c = list.find(function (x) { return String(x.code || '').toUpperCase() === code; });
+        if (!c) return { valid: false, message: 'Coupon "' + code + '" not found.', coupon: null };
+        if (!c.active) return { valid: false, message: 'This coupon is no longer active.', coupon: c };
+        if (c.start_at && new Date(c.start_at).getTime() > Date.now()) return { valid: false, message: 'This coupon is not valid yet.', coupon: c };
+        if (c.expires_at && new Date(c.expires_at).getTime() < Date.now()) return { valid: false, message: 'This coupon has expired.', coupon: c };
+        if (c.max_uses && Number(c.used || 0) >= Number(c.max_uses)) return { valid: false, message: 'This coupon has reached its usage limit.', coupon: c };
+        var label = c.type === 'percent' ? (Number(c.value) || 0) + '% off' : fmtMoney(c.value) + ' off';
+        if (c.min_spend) label += ' on orders of ' + fmtMoney(c.min_spend) + '+';
+        return { valid: true, message: label, coupon: c };
+    }
+
     // ════════════════════════════════════════════
     // PROMO BANNERS
     // ════════════════════════════════════════════
@@ -343,6 +362,7 @@
         computeTier: computeTier,
         getCoupons: getCoupons,
         validateCoupon: validateCoupon,
+        lookupCoupon: lookupCoupon,
         redeemCoupon: redeemCoupon,
         getActiveBanners: getActiveBanners,
         getActiveFlashSale: getActiveFlashSale,

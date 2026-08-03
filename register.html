@@ -160,6 +160,13 @@
                 <div id="passwordMatchHint" style="font-size:0.7rem; margin-top:0.2rem;"></div>
             </div>
 
+            <div class="form-group">
+                <label>Promo / Referral Code <span style="color:var(--text-light); font-weight:400; font-size:0.72rem;">(optional)</span></label>
+                <input type="text" id="regPromoCode" placeholder="e.g. WELCOME10" autocomplete="off" style="text-transform:uppercase;" />
+                <div id="promoHint" style="font-size:0.72rem; margin-top:0.3rem; min-height:0.9rem;"></div>
+                <div class="password-hint"><i class="fa-solid fa-ticket" style="color:var(--primary); margin-right:0.2rem;"></i> Have a promo code? Enter it here — it will be applied automatically to your first order.</div>
+            </div>
+
             <label style="font-size:0.85rem; font-weight:600; color:var(--secondary);">I want to register as:</label>
             <div class="role-selector">
                 <div class="role active" onclick="selectRole(this)" data-role="buyer">
@@ -265,7 +272,7 @@
             console.log('✅ Firebase initialized');
         }
         auth = firebase.auth();
-        db = firebase.firestore();
+        db = firebase.firestore(); window.db = db;
         googleProvider = new firebase.auth.GoogleAuthProvider();
         setupAuthListener();
         loadCartCount();
@@ -372,6 +379,76 @@
         else { hint.textContent = '❌ Passwords do not match'; hint.style.color = '#c0392b'; }
     });
 
+    // ─── PROMO / REFERRAL CODE ───
+    // Codes are managed by admin in the Coupons tab (premium.js) and redeemed
+    // at checkout. Registration stores a validated code so the buyer's first
+    // order picks it up automatically.
+    let promoDebounce = null;
+    const promoInput = document.getElementById('regPromoCode');
+    const promoHint = document.getElementById('promoHint');
+
+    promoInput.addEventListener('input', function() {
+        this.value = this.value.toUpperCase();
+        clearTimeout(promoDebounce);
+        const code = this.value.trim();
+        if (!code) { promoHint.textContent = ''; return; }
+        promoHint.textContent = '⏳ Checking promo code…';
+        promoHint.style.color = '#7f8c8d';
+        promoDebounce = setTimeout(validatePromoField, 500);
+    });
+    promoInput.addEventListener('blur', function() { if (this.value.trim()) validatePromoField(); });
+
+    // Returns a sanitized promo object { code, type, value, min_spend } or null.
+    // Never throws — promo codes must never block account creation.
+    async function validatePromoCode(code) {
+        code = String(code || '').trim().toUpperCase();
+        if (!code) return null;
+        try {
+            if (!window.PSE_PREMIUM || typeof window.PSE_PREMIUM.lookupCoupon !== 'function') return null;
+            const res = await window.PSE_PREMIUM.lookupCoupon(code);
+            if (!res.valid || !res.coupon) return null;
+            return {
+                code: code,
+                type: res.coupon.type === 'percent' ? 'percent' : 'fixed',
+                value: Number(res.coupon.value) || 0,
+                min_spend: Number(res.coupon.min_spend) || 0,
+                label: res.message,
+                claimed_at: new Date().toISOString()
+            };
+        } catch (e) { return null; }
+    }
+
+    async function validatePromoField() {
+        const code = promoInput.value.trim();
+        if (!code) { promoHint.textContent = ''; return; }
+        try {
+            if (!window.PSE_PREMIUM || typeof window.PSE_PREMIUM.lookupCoupon !== 'function') {
+                promoHint.textContent = 'Promo validation unavailable right now — you can still enter it at checkout.';
+                promoHint.style.color = '#7f8c8d';
+                return;
+            }
+            const res = await window.PSE_PREMIUM.lookupCoupon(code);
+            if (res.valid) {
+                promoHint.innerHTML = `🎉 <strong>${code.toUpperCase()}</strong> is valid — ${res.message}! Applied automatically to your first order.`;
+                promoHint.style.color = '#27ae60';
+            } else {
+                promoHint.textContent = '❌ ' + res.message;
+                promoHint.style.color = '#c0392b';
+            }
+        } catch (e) {
+            promoHint.textContent = 'Could not verify the code right now — you can also apply it at checkout.';
+            promoHint.style.color = '#7f8c8d';
+        }
+    }
+
+    // Persist a validated signup promo so checkout can auto-apply it.
+    function storeSignupPromo(promo) {
+        try {
+            if (promo && promo.code) localStorage.setItem('pse_signup_promo', promo.code);
+            else localStorage.removeItem('pse_signup_promo');
+        } catch (e) {}
+    }
+
     // ─── REGISTER ───
     document.getElementById('registerForm').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -405,6 +482,16 @@
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account...';
 
         try {
+            // Validate the optional promo code (never blocks registration)
+            let signupPromo = null;
+            const promoRaw = document.getElementById('regPromoCode').value.trim();
+            if (promoRaw) {
+                signupPromo = await validatePromoCode(promoRaw);
+                if (!signupPromo) {
+                    showToast(`⚠️ Promo code "${promoRaw.toUpperCase()}" wasn't recognized — you can try again at checkout.`, 'info');
+                }
+            }
+
             const userCredential = await auth.createUserWithEmailAndPassword(email, password);
             const user = userCredential.user;
             await db.collection('users').doc(user.uid).set({
@@ -418,8 +505,15 @@
                 created_at: new Date().toISOString(),
                 status: 'active',
                 verification_status: 'pending',
-                seller_application: selectedRole === 'seller' ? 'pending' : 'none'
+                seller_application: selectedRole === 'seller' ? 'pending' : 'none',
+                signup_promo: signupPromo || null
             });
+            storeSignupPromo(signupPromo);
+            try {
+                if (signupPromo && window.PSE_PREMIUM && typeof window.PSE_PREMIUM.logAudit === 'function') {
+                    window.PSE_PREMIUM.logAudit('promo.signup_claim', signupPromo.code + ' claimed by ' + email).catch(() => {});
+                }
+            } catch (e) {}
             localStorage.setItem('pilot_user', JSON.stringify({
                 id: user.uid,
                 email: email,
@@ -441,7 +535,9 @@
                 setTimeout(() => { window.location.href = '/become-seller'; }, 1500);
                 return;
             }
-            showToast(`✅ Welcome ${firstName}! Account created!`, 'success');
+            showToast(signupPromo
+                ? `✅ Welcome ${firstName}! Promo ${signupPromo.code} locked in for your first order!`
+                : `✅ Welcome ${firstName}! Account created!`, 'success');
             setTimeout(() => { window.location.href = '/home'; }, 1500);
         } catch (error) {
             let msg = error.message;
@@ -460,17 +556,25 @@
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
         try {
+            // Honor a promo code typed before using Google sign-up
+            let signupPromo = null;
+            const promoRaw = document.getElementById('regPromoCode').value.trim();
+
             const result = await auth.signInWithPopup(googleProvider);
             const user = result.user;
             const doc = await db.collection('users').doc(user.uid).get();
             if (!doc.exists) {
+                if (promoRaw) signupPromo = await validatePromoCode(promoRaw);
                 await db.collection('users').doc(user.uid).set({
                     email: user.email,
                     full_name: user.displayName || '',
                     role: 'buyer',
                     created_at: new Date().toISOString(),
-                    status: 'active'
+                    status: 'active',
+                    signup_promo: signupPromo || null
                 });
+                storeSignupPromo(signupPromo);
+                if (signupPromo) showToast(`🎉 Promo ${signupPromo.code} will be applied to your first order!`, 'success');
             }
             const data = doc.exists ? doc.data() : {};
             localStorage.setItem('pilot_user', JSON.stringify({
