@@ -737,7 +737,7 @@ async function loadCartCount() {
 function protectChat() {
     const user = getCurrentUser();
     if (!user) {
-        showToast('Please login to access messages', 'error');
+        window.showToast('Please login to access messages', 'error');
         setTimeout(() => window.location.href = '/login', 1500);
         return false;
     }
@@ -869,7 +869,7 @@ async function loadChatList() {
 async function selectChat(chatId) {
     const chat = allChats.find(c => c.id === chatId);
     if (!chat) {
-        showToast('Chat not found', 'error');
+        window.showToast('Chat not found', 'error');
         return;
     }
 
@@ -1017,13 +1017,13 @@ async function sendMessage() {
     
     if (!message) return;
     if (!currentChatId || !currentReceiverId) {
-        showToast('Select a conversation first', 'error');
+        window.showToast('Select a conversation first', 'error');
         return;
     }
 
     const user = getCurrentUser();
     if (!user) {
-        showToast('Please login to send messages', 'error');
+        window.showToast('Please login to send messages', 'error');
         return;
     }
 
@@ -1055,7 +1055,7 @@ async function sendMessage() {
 
     } catch (error) {
         console.error('Error sending message:', error);
-        showToast('Failed to send message', 'error');
+        window.showToast('Failed to send message', 'error');
     }
 
     input.disabled = false;
@@ -1133,12 +1133,12 @@ async function searchSellers(query) {
 async function startChatWithSeller(sellerId) {
     const user = getCurrentUser();
     if (!user) {
-        showToast('Please login to chat', 'error');
+        window.showToast('Please login to chat', 'error');
         return;
     }
 
     if (user.id === sellerId) {
-        showToast('You cannot chat with yourself', 'error');
+        window.showToast('You cannot chat with yourself', 'error');
         return;
     }
 
@@ -1186,7 +1186,7 @@ async function startChatWithSeller(sellerId) {
 
     } catch (error) {
         console.error('Error starting chat:', error);
-        showToast('Failed to start chat', 'error');
+        window.showToast('Failed to start chat', 'error');
     }
 }
 
