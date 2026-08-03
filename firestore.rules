@@ -82,8 +82,14 @@ service cloud.firestore {
         || (!isSignedIn() && request.resource.data.get('user_id', '') == ''
             && request.resource.data.get('guest', false) == true);
       allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
-      // Fulfillment status moves are admin-only.
-      allow update: if isAdmin();
+      // Fulfillment status moves are admin-only — EXCEPT a buyer may cancel
+      // their own order while it is still pending (nothing else may change).
+      allow update: if isAdmin()
+        || (isSignedIn() && resource.data.user_id == request.auth.uid
+            && resource.data.status == 'pending'
+            && request.resource.data.status == 'cancelled'
+            && request.resource.data.diff(resource.data).affectedKeys()
+                 .hasOnly(['status', 'updated_at', 'status_updated_at', 'cancelled_at']));
       allow delete: if isAdmin();
     }
 

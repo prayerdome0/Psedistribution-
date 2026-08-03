@@ -597,7 +597,11 @@
                         </div>
                     </div>
                     <div id="addAddressForm" style="display:none; margin-top:1rem; padding:1rem; background:var(--light); border-radius:var(--radius-sm);">
-                        <h4 style="margin-bottom:0.5rem;">Add New Address</h4>
+                        <h4 style="margin-bottom:0.5rem;" id="addressFormTitle">Add New Address</h4>
+                        <div class="form-group">
+                            <label>Label <span style="color:var(--text-light);font-weight:400;">(optional — e.g. Head Office, Warehouse B)</span></label>
+                            <input type="text" id="addrLabel" placeholder="Head Office" />
+                        </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Address Line 1</label>
@@ -640,6 +644,9 @@
                                 </select>
                             </div>
                         </div>
+                        <label style="display:flex;align-items:center;gap:0.45rem;font-size:0.8rem;margin-bottom:0.6rem;cursor:pointer;">
+                            <input type="checkbox" id="addrIsDefault" /> ⭐ Set as my default checkout address
+                        </label>
                         <button onclick="saveAddress()" style="background:var(--primary); color:#fff; border:none; padding:0.6rem 2rem; border-radius:50px; font-weight:600; cursor:pointer; transition:var(--transition);">
                             <i class="fa-regular fa-floppy-disk"></i> Save Address
                         </button>
@@ -1342,31 +1349,80 @@
                 return;
             }
             
+            addresses.sort((a, b) => (b.is_default ? 1 : 0) - (a.is_default ? 1 : 0));
             container.innerHTML = addresses.map(addr => `
-                <div style="border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem; margin-bottom:0.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                <div style="border:1.5px solid ${addr.is_default ? 'var(--primary)' : 'var(--border)'}; border-radius:var(--radius-sm); padding:1rem; margin-bottom:0.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;${addr.is_default ? 'background:var(--primary-light);' : ''}">
                     <div>
-                        <strong>${addr.line1}</strong>
+                        ${addr.is_default ? '<span style="background:var(--primary);color:#fff;font-size:0.62rem;font-weight:700;padding:0.12rem 0.55rem;border-radius:20px;letter-spacing:0.4px;">⭐ DEFAULT</span> ' : ''}
+                        <strong>${addr.label ? addr.label + ' — ' : ''}${addr.line1}</strong>
                         ${addr.line2 ? `<br>${addr.line2}` : ''}
                         <br>${addr.city}, ${addr.state} ${addr.zip}
                         <br>${addr.country || 'United States'}
                     </div>
-                    <div>
+                    <div style="display:flex;gap:0.9rem;flex-wrap:wrap;">
+                        ${!addr.is_default ? `<button onclick="setDefaultAddress('${addr.id}')" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:0.8rem;" title="Use this address first at checkout">
+                            <i class="fa-regular fa-star"></i> Set default
+                        </button>` : ''}
+                        <button onclick="editAddress('${addr.id}')" style="background:none; border:none; color:var(--secondary); cursor:pointer; font-size:0.8rem;">
+                            <i class="fa-regular fa-pen"></i> Edit
+                        </button>
                         <button onclick="deleteAddress('${addr.id}')" style="background:none; border:none; color:#c0392b; cursor:pointer; font-size:0.8rem;">
                             <i class="fa-regular fa-trash-can"></i> Remove
                         </button>
                     </div>
                 </div>
             `).join('');
+            accountAddressesCache = addresses;
         } catch (error) { console.error('Error loading addresses:', error); }
     }
 
-    // ─── ADD ADDRESS ───
+    // ─── ADD / EDIT ADDRESS ───
+    let editingAddressId = null;
+
     function showAddAddress() {
+        editingAddressId = null;
+        document.getElementById('addressFormTitle').textContent = 'Add New Address';
         document.getElementById('addAddressForm').style.display = 'block';
+        document.getElementById('addAddressForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function editAddress(id) {
+        const addr = (accountAddressesCache || []).find(a => a.id === id);
+        if (!addr) return;
+        editingAddressId = id;
+        document.getElementById('addressFormTitle').textContent = 'Edit Address';
+        document.getElementById('addrLabel').value = addr.label || '';
+        document.getElementById('addrLine1').value = addr.line1 || '';
+        document.getElementById('addrLine2').value = addr.line2 || '';
+        document.getElementById('addrCity').value = addr.city || '';
+        document.getElementById('addrState').value = addr.state || '';
+        document.getElementById('addrZip').value = addr.zip || '';
+        document.getElementById('addrCountry').value = addr.country || 'US';
+        document.getElementById('addrIsDefault').checked = !!addr.is_default;
+        document.getElementById('addAddressForm').style.display = 'block';
+        document.getElementById('addAddressForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function setDefaultAddress(id) {
+        const user = getCurrentUser();
+        if (!user) return;
+        try {
+            const snap = await db.collection('addresses').where('user_id', '==', user.id).get();
+            const batch = db.batch();
+            snap.forEach(doc => batch.update(doc.ref, { is_default: doc.id === id }));
+            await batch.commit();
+            showToast('⭐ Default address updated', 'success');
+            loadAddresses();
+        } catch (error) {
+            showToast('Failed to update default address', 'error');
+        }
     }
 
     function hideAddAddress() {
+        editingAddressId = null;
         document.getElementById('addAddressForm').style.display = 'none';
+        document.getElementById('addrLabel').value = '';
+        document.getElementById('addrIsDefault').checked = false;
         document.getElementById('addrLine1').value = '';
         document.getElementById('addrLine2').value = '';
         document.getElementById('addrCity').value = '';
@@ -1385,23 +1441,36 @@
         const zip = document.getElementById('addrZip').value.trim();
         const country = document.getElementById('addrCountry').value;
 
+        const label = document.getElementById('addrLabel').value.trim();
+        const isDefault = document.getElementById('addrIsDefault').checked;
         if (!line1 || !city || !state || !zip) {
             showToast('Please fill in all required fields', 'error');
             return;
         }
 
+        const base = {
+            user_id: user.id,
+            label: label,
+            line1: line1,
+            line2: line2,
+            city: city,
+            state: state,
+            zip: zip,
+            country: country,
+            updated_at: new Date().toISOString()
+        };
         try {
-            await db.collection('addresses').add({
-                user_id: user.id,
-                line1: line1,
-                line2: line2,
-                city: city,
-                state: state,
-                zip: zip,
-                country: country,
-                created_at: new Date().toISOString()
-            });
-            showToast('✅ Address saved!', 'success');
+            let savedId = editingAddressId;
+            if (editingAddressId) {
+                await db.collection('addresses').doc(editingAddressId).set(base, { merge: true });
+            } else {
+                base.is_default = isDefault;
+                base.created_at = new Date().toISOString();
+                const ref = await db.collection('addresses').add(base);
+                savedId = ref.id;
+            }
+            if (isDefault) await setDefaultAddress(savedId);
+            showToast(editingAddressId ? '✅ Address updated!' : '✅ Address saved!', 'success');
             hideAddAddress();
             loadAddresses();
         } catch (error) {

@@ -1164,8 +1164,9 @@
             const select = document.getElementById('savedAddressSelect');
             const addresses = [];
             snap.forEach(doc => addresses.push({ id: doc.id, ...doc.data() }));
+            addresses.sort((a, b) => (b.is_default ? 1 : 0) - (a.is_default ? 1 : 0));
             select.innerHTML = '<option value="">— Select a saved address —</option>' + addresses.map((a, i) =>
-                `<option value="${i}">${(a.label || a.line1 || 'Address')} — ${a.line1 || ''}, ${a.city || ''}</option>`).join('');
+                `<option value="${i}">${a.is_default ? '⭐ ' : ''}${(a.label || a.line1 || 'Address')} — ${a.line1 || ''}, ${a.city || ''}</option>`).join('');
             group.style.display = 'block';
             select.onchange = function () {
                 const a = addresses[parseInt(this.value, 10)];
@@ -1182,6 +1183,12 @@
                 }
                 showToast('📍 Saved address applied', 'success');
             };
+            // Auto-apply the ⭐ default address so checkout is pre-filled on arrival
+            const defaultIdx = addresses.findIndex(a => a.is_default);
+            if (defaultIdx > -1) {
+                select.value = String(defaultIdx);
+                select.onchange();
+            }
         } catch (e) { /* saved addresses optional */ }
     }
 

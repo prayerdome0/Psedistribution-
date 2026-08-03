@@ -6,7 +6,7 @@
 //   • Offline fallback shell
 // Bump CACHE_VERSION on deploys to invalidate old caches.
 // ============================================
-const CACHE_VERSION = 'pse-v1';
+const CACHE_VERSION = 'pse-v2';
 const STATIC_CACHE = CACHE_VERSION + '-static';
 const PAGE_CACHE = CACHE_VERSION + '-pages';
 
@@ -15,6 +15,7 @@ const PRECACHE = [
     '/style.css',
     '/main.js',
     '/logo.webp',
+    '/offline.html',
     '/manifest.json',
     '/favicon.ico'
 ];
@@ -62,7 +63,7 @@ self.addEventListener('fetch', (event) => {
                     return res;
                 })
                 .catch(() =>
-                    caches.match(req).then((cached) => cached || caches.match('/index.html'))
+                    caches.match(req).then((cached) => cached || caches.match('/offline.html'))
                 )
         );
         return;

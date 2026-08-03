@@ -328,6 +328,18 @@
         });
     }
 
+    // ─── 1b. KEYBOARD SHORTCUT: "/" focuses the header search ───
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+        const t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+        const search = document.getElementById('searchInput') || document.querySelector('.search-bar input[type="text"], input[name="search"], input[placeholder*="Search"]');
+        if (search) {
+            e.preventDefault();
+            search.focus();
+        }
+    });
+
     // ─── 2. CLIENT ERROR MONITORING → Firestore error_log ───
     // Throttled (max 3/session, deduped per message) so a broken page can't
     // spam the log, and flushed lazily once window.db becomes available.

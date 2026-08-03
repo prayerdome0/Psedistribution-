@@ -742,6 +742,20 @@
                 <div class="product-moq" id="productMoq">
                     <i class="fa-regular fa-box"></i> Minimum Order Quantity: <span id="moqValue">0</span> units
                 </div>
+                <div id="deliveryEstimateLine" style="font-size:0.78rem;color:var(--text-light);margin-top:0.25rem;display:none;"></div>
+
+                <div id="productShareBar" style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-top:0.5rem;">
+                    <span style="font-size:0.68rem;font-weight:800;letter-spacing:0.6px;color:var(--text-light);">SHARE:</span>
+                    <button type="button" onclick="shareProductWhatsApp()" title="Share on WhatsApp" style="background:#e7f9ef;border:1px solid #bfe8d0;color:#075e54;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:0.9rem;">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </button>
+                    <button type="button" onclick="shareProductEmail()" title="Share by email" style="background:#eef2f6;border:1px solid var(--border-dark);color:var(--secondary);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:0.85rem;">
+                        <i class="fa-regular fa-envelope"></i>
+                    </button>
+                    <button type="button" onclick="copyProductLink()" title="Copy product link" style="background:#eef2f6;border:1px solid var(--border-dark);color:var(--secondary);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:0.85rem;">
+                        <i class="fa-regular fa-link"></i>
+                    </button>
+                </div>
 
                 <div class="product-description" id="productDescription">Loading product description...</div>
 
@@ -1433,9 +1447,66 @@
             currentImageIndex = 0;
         }
 
-        // Stock/price alerts + SEO structured data
+        // Delivery estimate (lead time + transit buffer)
+        const estEl = document.getElementById('deliveryEstimateLine');
+        if (estEl) {
+            const leadDays = parseInt(product.lead_time_days || product.lead_time || 14, 10) || 14;
+            const est = new Date();
+            est.setDate(est.getDate() + leadDays + 7);
+            estEl.innerHTML = `<i class="fa-solid fa-truck-fast" style="color:var(--primary);"></i> Ships within ${leadDays} days · Est. arrival <strong style="color:var(--secondary);">${est.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</strong>`;
+            estEl.style.display = 'block';
+        }
+
+        // Stock/price alerts + SEO structured data + recently-viewed tracking
         try { checkProductAlerts(product); } catch (e) { /* non-blocking */ }
         try { injectProductJsonLd(product); } catch (e) { /* non-blocking */ }
+        try { trackRecentView(product); } catch (e) { /* non-blocking */ }
+    }
+
+    // ─── SHARE PRODUCT ───
+    function shareProductWhatsApp() {
+        const title = currentProduct?.title || 'Wholesale product';
+        const price = currentProduct?.price ? `$${(currentProduct.price).toFixed(2)}` : '';
+        const text = `${title} ${price} — bulk wholesale on Pilot Sales Distribution\n${location.href}`;
+        window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+    }
+
+    function shareProductEmail() {
+        const title = currentProduct?.title || 'Wholesale product';
+        const body = `I found this on Pilot Sales Distribution (global B2B wholesale):\n\n${title}\n${location.href}\n\nBulk pricing tiers and trade-assurance escrow available.`;
+        window.location.href = `mailto:?subject=${encodeURIComponent('Wholesale product: ' + title)}&body=${encodeURIComponent(body)}`;
+    }
+
+    async function copyProductLink() {
+        try {
+            await navigator.clipboard.writeText(location.href);
+            showToast('🔗 Product link copied', 'success');
+        } catch (e) {
+            const inp = document.createElement('input');
+            inp.value = location.href;
+            document.body.appendChild(inp);
+            inp.select();
+            document.execCommand('copy');
+            document.body.removeChild(inp);
+            showToast('🔗 Product link copied', 'success');
+        }
+    }
+
+    // ─── RECENTLY VIEWED TRACKING (localStorage, powers home-page rail) ───
+    function trackRecentView(product) {
+        const list = JSON.parse(localStorage.getItem('pse_recent_views') || '[]');
+        const slug = product.slug || (typeof generateSlug === 'function' ? generateSlug(product.title || 'product') : '');
+        const item = {
+            id: currentProductId,
+            slug: slug,
+            title: product.title || 'Product',
+            brand: product.brand || 'Pilot Distribution',
+            price: product.price || 0,
+            image: (productImages && productImages[0]) || product.image_url || '',
+            ts: Date.now()
+        };
+        const next = [item, ...list.filter(x => x.id !== item.id)].slice(0, 12);
+        localStorage.setItem('pse_recent_views', JSON.stringify(next));
     }
 
     // ─── RENDER THUMBNAILS ───

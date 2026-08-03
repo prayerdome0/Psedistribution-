@@ -834,6 +834,151 @@
         return 'downloaded';
     }
 
+    // ════════════════════════════════════════════
+    // WAREHOUSE PACKING SLIP PDF (no pricing — fulfilment document)
+    // ════════════════════════════════════════════
+    function buildPackingSlipPdf(order) {
+        var doc = newDoc();
+        if (!doc || !order) return null;
+
+        var ref = order.quoteNumber || order.orderNumber || ('ORD-' + Date.now());
+        var c = order.customer || {};
+        var items = order.items || [];
+        var y = drawTopBand(doc, 'PILOT SALES DISTRIBUTION', 'PACKING SLIP', 'Order #: ', ref, fmtDate(order.created_at || order.date));
+
+        var shipTo = [((c.firstName || '') + ' ' + (c.lastName || '')).trim() || 'Commercial Buyer'];
+        if (c.company) shipTo.push(c.company);
+        shipTo.push([c.address, c.city, c.state, c.zip].filter(Boolean).join(', ') || 'N/A');
+        shipTo.push(c.country || '');
+        shipTo.push('Phone: ' + (c.phone || 'N/A'));
+
+        y = drawPartyBoxes(doc, y,
+            'SHIP FROM',
+            ['Pilot Sales Distribution', 'Verified Wholesale Suppliers Network', 'Email: support@pilotsalesdistribution.com', 'WhatsApp: +1 (909) 938-4682', ''],
+            'SHIP TO',
+            shipTo);
+
+        // Meta strip
+        y += 12;
+        var totalUnits = items.reduce(function (s, it) { return s + (it.quantity || 1); }, 0);
+        doc.setFillColor(232, 245, 240);
+        doc.roundedRect(MARGIN, y, CONTENT_W, 34, 5, 5, 'F');
+        var meta = [
+            ['ORDER REF', truncate(ref, 16)],
+            ['STATUS', String(order.status || 'pending').toUpperCase()],
+            ['LINE ITEMS', String(items.length)],
+            ['TOTAL UNITS', String(totalUnits)]
+        ];
+        var colW = CONTENT_W / 4;
+        doc.setFontSize(6.8);
+        meta.forEach(function (pair, i) {
+            var x = MARGIN + i * colW;
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor.apply(doc, MUTED);
+            doc.text(pair[0], x + 12, y + 12);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor.apply(doc, DARK_TXT);
+            doc.setFontSize(9.5);
+            doc.text(pair[1], x + 12, y + 26);
+            doc.setFontSize(6.8);
+        });
+        y += 48;
+
+        // Pick table
+        var cols = [
+            { label: '#', x: MARGIN, w: 26, align: 'left' },
+            { label: 'PRODUCT / SKU', x: MARGIN + 26, w: 212, align: 'left' },
+            { label: 'BRAND', x: MARGIN + 238, w: 85, align: 'left' },
+            { label: 'MOQ', x: MARGIN + 323, w: 42, align: 'center' },
+            { label: 'ORDER QTY', x: MARGIN + 365, w: 68, align: 'center' },
+            { label: 'PICKED', x: MARGIN + 433, w: 41, align: 'center' },
+            { label: 'PACKED', x: MARGIN + 474, w: 41, align: 'center' }
+        ];
+
+        function drawHeader() {
+            doc.setFillColor.apply(doc, NAVY);
+            doc.rect(MARGIN, y, CONTENT_W, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(7);
+            cols.forEach(function (col) {
+                var tx = col.align === 'center' ? col.x + col.w / 2 : col.x + 4;
+                doc.text(col.label, tx, y + 13, { align: col.align });
+            });
+            doc.setTextColor.apply(doc, DARK_TXT);
+            y += 20;
+        }
+
+        function checkbox(x, w) {
+            doc.setDrawColor(120, 130, 140);
+            doc.rect(x + w / 2 - 4, y + 8, 8, 8);
+        }
+
+        drawHeader();
+        items.forEach(function (it, i) {
+            if (y + 24 > PAGE_H - 150) { doc.addPage(); y = 60; drawHeader(); }
+            if (i % 2 === 0) {
+                doc.setFillColor.apply(doc, ROW_ALT);
+                doc.rect(MARGIN, y, CONTENT_W, 24, 'F');
+            }
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.5);
+            doc.text(String(i + 1), cols[0].x + 4, y + 16);
+            doc.setFont('helvetica', 'bold');
+            doc.text(truncate(it.title || 'Item', 38), cols[1].x + 4, y + 10);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor.apply(doc, MUTED);
+            doc.setFontSize(6.3);
+            doc.text('SKU: ' + truncate(it.sku || it.id || 'N/A', 30), cols[1].x + 4, y + 19);
+            doc.setFontSize(7.5);
+            doc.setTextColor.apply(doc, DARK_TXT);
+            doc.text(truncate(it.brand || 'Pilot Distribution', 14), cols[2].x + 4, y + 16);
+            doc.text(String(it.moq || 1), cols[3].x + cols[3].w / 2, y + 16, { align: 'center' });
+            doc.setFont('helvetica', 'bold');
+            doc.text(String(it.quantity || 1), cols[4].x + cols[4].w / 2, y + 16, { align: 'center' });
+            doc.setFont('helvetica', 'normal');
+            checkbox(cols[5].x, cols[5].w);
+            checkbox(cols[6].x, cols[6].w);
+            y += 24;
+        });
+
+        // Buyer notes
+        if (order.notes) {
+            y += 10;
+            if (y + 42 > PAGE_H - 130) { doc.addPage(); y = 60; }
+            doc.setFillColor(248, 250, 252);
+            doc.roundedRect(MARGIN, y, CONTENT_W, 36, 5, 5, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(7.5);
+            doc.setTextColor.apply(doc, MUTED);
+            doc.text('BUYER NOTES', MARGIN + 10, y + 13);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor.apply(doc, DARK_TXT);
+            doc.text(truncate(order.notes, 120), MARGIN + 10, y + 26);
+            y += 46;
+        }
+
+        // Signature strip
+        y += 18;
+        if (y + 42 > PAGE_H - 120) { doc.addPage(); y = 60; }
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor.apply(doc, MUTED);
+        var labels = ['Picked by', 'Packed by', 'Quality check', 'Date'];
+        var seg = CONTENT_W / 4;
+        labels.forEach(function (l, i) {
+            var x = MARGIN + i * seg;
+            doc.text(l + ':', x, y);
+            doc.setDrawColor(150, 160, 170);
+            doc.line(x + 42, y + 1, x + seg - 10, y + 1);
+        });
+
+        addVerification(doc, ref);
+        drawFooter(doc);
+        return doc;
+    }
+
     // ─── PUBLIC API ───
     window.PSE_QUOTE_PDF = {
         available: available,
@@ -841,6 +986,7 @@
         buildRfqPdf: buildRfqPdf,
         buildSupplierQuotePdf: buildSupplierQuotePdf,
         buildStatementPdf: buildStatementPdf,
+        buildPackingSlipPdf: buildPackingSlipPdf,
         shareViaWhatsApp: shareViaWhatsApp
     };
 })();

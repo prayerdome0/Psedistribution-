@@ -381,6 +381,8 @@
         .btn-action.edit { background: #cce5ff; color: #004085; }
         .btn-action.ship { background: #cce5ff; color: #004085; }
         .btn-action.process { background: #cce5ff; color: #004085; }
+        .order-chip { border: 1.5px solid transparent; font-size: 0.75rem; }
+        .order-chip.active { border-color: #0b2a3b; box-shadow: 0 0 0 2px rgba(11,42,59,0.15); font-weight: 800; }
 
         /* ─── MODAL ─── */
         .modal-overlay {
@@ -968,6 +970,10 @@
                     <h2><i class="fa-regular fa-users"></i> Customers</h2>
                     <span class="time" id="customerCount">0 users</span>
                 </div>
+                <div id="topBuyersCard" style="display:none;background:#fff;border:1px solid #e5ebef;border-radius:12px;padding:0.9rem 1.2rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(11,42,59,0.06);">
+                    <h3 style="font-size:0.88rem;color:var(--secondary);margin:0 0 0.6rem;"><i class="fa-solid fa-trophy" style="color:#f1c40f;"></i> Top Buyers by Revenue</h3>
+                    <div id="topBuyersList" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:0.5rem;"></div>
+                </div>
                 <div class="table-container">
                     <table>
                         <thead>
@@ -1007,6 +1013,17 @@
                         <button type="button" class="btn-action process" onclick="exportOrdersCSV()" title="Download all orders as CSV"><i class="fa-regular fa-file-excel"></i> Export CSV</button>
                     </div>
                 </div>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-bottom:0.8rem;">
+                    <input type="text" id="orderSearchInput" placeholder="🔍 Search ref, customer, email…" oninput="setOrderQuery(this.value)" style="flex:1;min-width:180px;padding:0.45rem 0.9rem;border:1.5px solid #dbe4ea;border-radius:30px;font-size:0.8rem;font-family:'Inter',sans-serif;" />
+                    <div style="display:flex;gap:0.35rem;flex-wrap:wrap;" id="orderStatusChips">
+                        <button class="btn-action process order-chip active" data-status="all" onclick="setOrderStatusFilter('all')">All</button>
+                        <button class="btn-action order-chip" data-status="pending" onclick="setOrderStatusFilter('pending')" style="background:#fff4e5;color:#d35400;">Pending</button>
+                        <button class="btn-action order-chip" data-status="processing" onclick="setOrderStatusFilter('processing')">Processing</button>
+                        <button class="btn-action order-chip ship" data-status="shipped" onclick="setOrderStatusFilter('shipped')">Shipped</button>
+                        <button class="btn-action order-chip approve" data-status="delivered" onclick="setOrderStatusFilter('delivered')">Delivered</button>
+                        <button class="btn-action order-chip delete" data-status="cancelled" onclick="setOrderStatusFilter('cancelled')">Cancelled</button>
+                    </div>
+                </div>
                 <div id="orderList">
                     <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading orders...</p></div>
                 </div>
@@ -1018,6 +1035,7 @@
                     <div>
                         <h2><i class="fa-regular fa-box"></i> Products</h2>
                         <span class="time" id="productCount">0 products</span>
+                        <span class="time" id="inventoryValue" style="margin-left:0.8rem;color:var(--primary);font-weight:700;" title="Total on-hand inventory value (stock × price)"></span>
                     </div>
                     <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
                         <button type="button" class="btn-add-product" onclick="downloadCSVTemplate()" style="background:var(--secondary);font-size:0.82rem;padding:0.5rem 1rem;">
@@ -1033,6 +1051,13 @@
                             <i class="fa-regular fa-plus"></i> Add Product
                         </button>
                     </div>
+                </div>
+                <div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-bottom:0.7rem;" id="productFilterChips">
+                    <button class="btn-action process order-chip product-chip active" data-filter="all" onclick="setProductFilter('all')">All</button>
+                    <button class="btn-action approve order-chip product-chip" data-filter="active" onclick="setProductFilter('active')">Active</button>
+                    <button class="btn-action order-chip product-chip" data-filter="pending" onclick="setProductFilter('pending')" style="background:#fff4e5;color:#d35400;">Pending</button>
+                    <button class="btn-action order-chip product-chip" data-filter="low" onclick="setProductFilter('low')" style="background:#fdecea;color:#c0392b;"><i class="fa-solid fa-triangle-exclamation"></i> Low Stock</button>
+                    <button class="btn-action delete order-chip product-chip" data-filter="out" onclick="setProductFilter('out')">Out of Stock</button>
                 </div>
                 <div class="table-container">
                     <table>
@@ -2119,7 +2144,31 @@
                 return;
             }
 
-            container.innerHTML = allOrders.slice(0, 20).map(o => {
+            renderOrdersList();
+            try { renderTopBuyers(); } catch (e) { /* optional */ }
+        } catch (error) {
+            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading orders</p></div>`;
+        }
+    }
+
+    function renderOrdersList() {
+            const container = document.getElementById('orderList');
+            const q = (orderFilter.query || '').trim().toLowerCase();
+            let list = allOrders;
+            if (orderFilter.status !== 'all') list = list.filter(o => (o.status || 'pending') === orderFilter.status);
+            if (q) {
+                list = list.filter(o => {
+                    const hay = [o.quoteNumber, o.orderNumber, o.customer?.firstName, o.customer?.lastName, o.customer?.email, o.customer?.phone].join(' ').toLowerCase();
+                    return hay.includes(q);
+                });
+            }
+            const countEl = document.getElementById('orderCount');
+            if (countEl) countEl.textContent = orderFilter.status === 'all' && !q ? `${allOrders.length} orders` : `${list.length} of ${allOrders.length} orders`;
+            if (list.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-magnifying-glass"></i><p>No orders match this filter</p></div>`;
+                return;
+            }
+            container.innerHTML = list.slice(0, 20).map(o => {
                 const status = o.status || 'pending';
                 const statusLabels = {
                     pending: 'Pending',
@@ -2143,6 +2192,7 @@
                         </div>
                         <div style="display:flex; gap:0.3rem; margin-top:0.5rem; flex-wrap:wrap;">
                             <button class="btn-action view" onclick="viewOrder('${o.id}')"><i class="fa-regular fa-eye"></i> View</button>
+                            ${(status === 'processing' || status === 'shipped') ? `<button class="btn-action" style="background:#eef2f6;color:#0b2a3b;border:1px solid #d5dee6;" onclick="downloadPackingSlip('${o.id}')" title="Printable warehouse packing slip — no prices"><i class="fa-solid fa-box-open"></i> Slip</button>` : ''}
                             ${o.customer?.phone ? `<button class="btn-action" style="background:#25D366;color:#fff;" onclick="notifyOrderWhatsApp('${o.id}')" title="Send order status update to buyer on WhatsApp"><i class="fa-brands fa-whatsapp"></i> Notify</button>` : ''}
                             ${status === 'pending' ? `<button class="btn-action process" onclick="updateOrderStatus('${o.id}', 'processing')"><i class="fa-regular fa-gear"></i> Process</button>` : ''}
                             ${status === 'processing' ? `<button class="btn-action ship" onclick="updateOrderStatus('${o.id}', 'shipped')"><i class="fa-regular fa-truck"></i> Ship</button>` : ''}
@@ -2151,10 +2201,62 @@
                     </div>
                 `;
             }).join('');
+    }
 
-        } catch (error) {
-            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading orders</p></div>`;
+    // ─── TOP BUYERS BY REVENUE (customers tab, from cached orders) ───
+    function renderTopBuyers() {
+        const card = document.getElementById('topBuyersCard');
+        const list = document.getElementById('topBuyersList');
+        if (!card || !list || !allOrders || allOrders.length === 0) return;
+        const totals = {};
+        allOrders.forEach(o => {
+            if (o.status === 'cancelled') return;
+            const key = (o.user_id || (o.customer && o.customer.email) || 'guest').toLowerCase();
+            const name = ((o.customer && o.customer.firstName) ? (o.customer.firstName + ' ' + (o.customer.lastName || '')).trim() : '') || (o.customer && o.customer.email) || 'Guest buyer';
+            const cur = totals[key] || { name, spend: 0, orders: 0 };
+            cur.spend += ((o.totals && o.totals.total) || o.total || 0);
+            cur.orders += 1;
+            cur.name = cur.name || name;
+            totals[key] = cur;
+        });
+        const top = Object.values(totals).sort((a, b) => b.spend - a.spend).slice(0, 5);
+        if (!top.length) return;
+        const medals = ['🥇', '🥈', '🥉', '4.', '5.'];
+        list.innerHTML = top.map((b, i) => `
+            <div style="border:1px solid #eef2f6;border-radius:10px;padding:0.6rem 0.8rem;display:flex;align-items:center;gap:0.6rem;">
+                <span style="font-size:1.1rem;width:1.6rem;text-align:center;">${medals[i]}</span>
+                <div style="min-width:0;">
+                    <div style="font-weight:700;font-size:0.8rem;color:var(--secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${b.name}</div>
+                    <div style="font-size:0.7rem;color:var(--text-light);">${b.orders} order${b.orders === 1 ? '' : 's'} · <span style="color:var(--primary);font-weight:700;">$${b.spend.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span></div>
+                </div>
+            </div>`).join('');
+        card.style.display = 'block';
+    }
+
+    // ─── WAREHOUSE PACKING SLIP (PDF — no prices) ───
+    function downloadPackingSlip(orderId) {
+        const order = allOrders.find(o => o.id === orderId);
+        if (!order) return;
+        if (!window.PSE_QUOTE_PDF || !window.PSE_QUOTE_PDF.buildPackingSlipPdf) { showToast('PDF engine unavailable', 'error'); return; }
+        const doc = window.PSE_QUOTE_PDF.buildPackingSlipPdf(order);
+        if (doc) {
+            doc.save((order.quoteNumber || orderId) + '-Packing-Slip.pdf');
+            showToast('📦 Packing slip downloaded', 'success');
         }
+    }
+
+    // ─── ORDER FILTER STATE + SETTERS ───
+    let orderFilter = { status: 'all', query: '' };
+
+    function setOrderStatusFilter(status) {
+        orderFilter.status = status;
+        document.querySelectorAll('.order-chip').forEach(c => c.classList.toggle('active', c.dataset.status === status));
+        if (allOrders.length) renderOrdersList();
+    }
+
+    function setOrderQuery(query) {
+        orderFilter.query = query;
+        if (allOrders.length) renderOrdersList();
     }
 
     function viewOrder(orderId) {
@@ -2307,16 +2409,47 @@
             const snapshot = await db.collection('products').get();
             const products = [];
             snapshot.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
+            allAdminProducts = products;
 
             document.getElementById('productBadge').textContent = products.length;
             document.getElementById('productCount').textContent = `${products.length} products`;
+            const inv = products.reduce((s, p) => s + (p.stock || 0) * (p.price || 0), 0);
+            const invEl = document.getElementById('inventoryValue');
+            if (invEl) invEl.textContent = '📦 $' + inv.toLocaleString('en-US', { maximumFractionDigits: 0 }) + ' on hand';
 
             if (products.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-box"></i><p>No products added yet</p></div></td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = products.slice(0, 20).map(p => `
+            renderAdminProducts();
+        } catch (error) {
+            tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading products</p></div></td></tr>`;
+        }
+    }
+
+    // ─── PRODUCT FILTER STATE + RENDER ───
+    let allAdminProducts = [];
+    let productFilter = 'all';
+
+    function setProductFilter(filter) {
+        productFilter = filter;
+        document.querySelectorAll('.product-chip').forEach(c => c.classList.toggle('active', c.dataset.filter === filter));
+        if (allAdminProducts.length) renderAdminProducts();
+    }
+
+    function renderAdminProducts() {
+            const tbody = document.getElementById('productTableBody');
+            let list = allAdminProducts || [];
+            if (productFilter === 'active') list = list.filter(p => p.status === 'active' || p.status === 'approved');
+            else if (productFilter === 'pending') list = list.filter(p => !p.status || p.status === 'pending');
+            else if (productFilter === 'low') list = list.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= (p.moq || 10));
+            else if (productFilter === 'out') list = list.filter(p => (p.stock || 0) <= 0);
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-magnifying-glass"></i><p>No products match this filter</p></div></td></tr>`;
+                return;
+            }
+            tbody.innerHTML = list.slice(0, 20).map(p => `
                 <tr>
                     <td>
                         <div style="display:flex; align-items:center; gap:0.5rem;">
@@ -2325,7 +2458,7 @@
                         </div>
                     </td>
                     <td>$${(p.price || 0).toFixed(2)}</td>
-                    <td>${p.stock || 0}</td>
+                    <td>${(p.stock || 0) <= 0 ? '<span style="background:#fdecea;color:#c0392b;border-radius:12px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;">0 — Out</span>' : (p.stock || 0) <= (p.moq || 10) ? `<span style="background:#fff4e5;color:#d35400;border-radius:12px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;" title="At or below MOQ (${p.moq || 10})">${p.stock} — Low</span>` : (p.stock || 0)}</td>
                     <td><span class="status-badge ${p.status === 'active' || p.status === 'approved' ? 'active' : 'inactive'}">${p.status || 'pending'}</span></td>
                     <td>
                         <button class="btn-action edit" onclick="openAddProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
@@ -2333,10 +2466,6 @@
                     </td>
                 </tr>
             `).join('');
-
-        } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading products</p></div></td></tr>`;
-        }
     }
 
     async function deleteProduct(productId) {
@@ -3209,6 +3338,10 @@
 
     window.updateOrderStatus = updateOrderStatus;
     window.exportOrdersCSV = exportOrdersCSV;
+    window.setOrderStatusFilter = setOrderStatusFilter;
+    window.setOrderQuery = setOrderQuery;
+    window.setProductFilter = setProductFilter;
+    window.downloadPackingSlip = downloadPackingSlip;
     window.updateRFQStatus = updateRFQStatus;
     window.openQuoteModal = openQuoteModal;
     window.closeQuoteModal = closeQuoteModal;

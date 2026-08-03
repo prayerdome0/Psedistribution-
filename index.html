@@ -725,6 +725,20 @@
         <!-- Products loaded by JavaScript -->
     </div>
 
+    <!-- 3b. RECENTLY VIEWED -->
+    <div id="recentViewsSection" style="display:none;">
+        <div class="section-title animate-on-scroll" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:0.5rem;">
+            <div>
+                <h2>Recently <span>Viewed</span></h2>
+                <p>Pick up where you left off</p>
+            </div>
+            <button type="button" onclick="clearRecentViews()" style="background:none;border:1.5px solid var(--border-dark);color:var(--text-light);padding:0.3rem 0.9rem;border-radius:30px;font-size:0.72rem;font-weight:700;cursor:pointer;">
+                <i class="fa-regular fa-trash-can"></i> Clear
+            </button>
+        </div>
+        <div class="product-grid" id="recentViewsGrid"></div>
+    </div>
+
     <!-- 4. SHOP BY CATEGORY -->
     <div class="section-title animate-on-scroll" style="margin-top: 3rem;">
         <h2>Shop by <span>Category</span></h2>
@@ -1370,7 +1384,7 @@
         grid.innerHTML = products.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
             const slug = p.slug || generateSlug(p.title || 'product');
-            const imageUrl = window.getProductImage ? window.getProductImage(p) : (p.image_url || 'logo.jpg');
+            const imageUrl = window.getProductImage ? window.getProductImage(p) : (p.image_url || 'logo.webp');
             const sponsoredBadge = p.sponsored ? `<span class="product-badge" style="background:#d35400;color:#fff;top:10px;right:10px;z-index:10;font-weight:700;"><i class="fa-solid fa-rocket"></i> SPONSORED</span>` : '';
             const vipTierBadge = p.supplier_tier === 'platinum' || p.membership_tier === 'platinum' ?
                 `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#8e44ad;margin-top:2px;"><i class="fa-solid fa-crown"></i> Platinum Supplier</div>` :
@@ -1383,7 +1397,7 @@
                 ${discount > 0 ? `<span class="product-badge flash" style="${p.sponsored ? 'top:66px;' : ''}">-${discount}%</span>` : ''}
                 ${p.supplier_verified ? `<span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>` : ''}
                 <div class="product-image" onclick="window.location.href='/product/${slug}'">
-                    <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.jpg'" />
+                    <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'" />
                 </div>
                 <div class="product-title">${p.title || 'Product'}</div>
                 <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
@@ -1419,6 +1433,7 @@
         initBanner();
         initFlashTimer();
         renderExtraProducts();
+        renderRecentViews();
         document.getElementById('year').textContent = new Date().getFullYear();
 
         const observer = new IntersectionObserver((entries) => {
@@ -1430,6 +1445,37 @@
         }, { threshold: 0.1 });
         document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
     });
+
+    // ─── RECENTLY VIEWED RAIL (localStorage, written by product-detail pages) ───
+    function renderRecentViews() {
+        const section = document.getElementById('recentViewsSection');
+        const grid = document.getElementById('recentViewsGrid');
+        if (!section || !grid) return;
+        let list = [];
+        try { list = JSON.parse(localStorage.getItem('pse_recent_views') || '[]'); } catch (e) {}
+        if (!list.length) return;
+        grid.innerHTML = list.slice(0, 4).map(p => `
+            <div class="product-card animate-on-scroll">
+                <div class="product-image" onclick="window.location.href='/product/${p.slug || p.id}'" style="cursor:pointer;">
+                    ${p.image ? `<img src="${p.image}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'" />` : `<span class="placeholder"><i class="fa-solid fa-box"></i></span>`}
+                </div>
+                <div class="product-title">${p.title || 'Product'}</div>
+                <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
+                <div class="product-price">$${(p.price || 0).toFixed(2)}</div>
+                <div class="product-actions">
+                    <button class="btn-add" onclick="window.location.href='/product/${p.slug || p.id}'"><i class="fa-regular fa-eye"></i> View</button>
+                </div>
+            </div>
+        `).join('');
+        section.style.display = 'block';
+        section.querySelectorAll('.animate-on-scroll').forEach(el => el.classList.add('visible'));
+    }
+
+    function clearRecentViews() {
+        localStorage.removeItem('pse_recent_views');
+        document.getElementById('recentViewsSection').style.display = 'none';
+        if (typeof showToast === 'function') showToast('Recently viewed cleared', 'info');
+    }
 
     // Flash timer countdown
     function initFlashTimer() {
@@ -1489,13 +1535,13 @@
             grid.innerHTML = products.map(p => {
                 const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
                 const slug = p.slug || generateSlug(p.title || 'product');
-                const imageUrl = window.getProductImage ? window.getProductImage(p, '') : (p.image_url || 'logo.jpg');
+                const imageUrl = window.getProductImage ? window.getProductImage(p, '') : (p.image_url || 'logo.webp');
                 return `<div class="product-card animate-on-scroll">
                     ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
                     ${discount > 0 ? `<span class="product-badge flash">-${discount}%</span>` : ''}
                     ${p.supplier_verified ? `<span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>` : ''}
                     <div class="product-image" onclick="window.location.href='/product/${slug}'">
-                        <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.jpg'" />
+                        <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'" />
                     </div>
                     <div class="product-title">${p.title || 'Product'}</div>
                     <div class="product-brand">${p.brand || 'Pilot'}</div>

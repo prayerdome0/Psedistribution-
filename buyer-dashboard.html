@@ -421,6 +421,24 @@
         </div>
 
         <div class="tab-content active" id="tab-orders">
+            <div id="buyerSpendStats" style="display:none;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.7rem;margin-bottom:0.9rem;">
+                <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;">
+                    <div style="font-size:0.68rem;color:var(--text-light);text-transform:uppercase;letter-spacing:0.5px;">Total Spent</div>
+                    <div id="statTotalSpent" style="font-size:1.25rem;font-weight:800;color:var(--primary);">$0.00</div>
+                </div>
+                <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;">
+                    <div style="font-size:0.68rem;color:var(--text-light);text-transform:uppercase;letter-spacing:0.5px;">Orders</div>
+                    <div id="statOrderCount" style="font-size:1.25rem;font-weight:800;color:var(--secondary);">0</div>
+                </div>
+                <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;">
+                    <div style="font-size:0.68rem;color:var(--text-light);text-transform:uppercase;letter-spacing:0.5px;">Avg. Order</div>
+                    <div id="statAvgOrder" style="font-size:1.25rem;font-weight:800;color:var(--secondary);">$0.00</div>
+                </div>
+                <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;">
+                    <div style="font-size:0.68rem;color:var(--text-light);text-transform:uppercase;letter-spacing:0.5px;">In Progress</div>
+                    <div id="statInProgress" style="font-size:1.25rem;font-weight:800;color:#e67e22;">0</div>
+                </div>
+            </div>
             <div style="display:flex;justify-content:flex-end;margin-bottom:0.6rem;">
                 <button type="button" onclick="downloadStatementPdf()" style="background:var(--secondary);color:#fff;border:none;padding:0.45rem 1.1rem;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;" title="Download a statement of all quotes & orders for your accounting">
                     <i class="fa-solid fa-file-invoice-dollar" style="color:#f1c40f;"></i> Statement of Account (PDF)
@@ -628,6 +646,7 @@
             document.getElementById('statOrders').textContent = orders.length;
             document.getElementById('statPending').textContent = pending.length;
             userOrdersCache = orders;
+            renderSpendStats(orders);
 
             container.innerHTML = orders.map(order => `
                 <div class="order-item">
@@ -648,6 +667,10 @@
                             <button type="button" class="btn-submit" style="background:#0b2a3b;color:#fff;padding:0.4rem 0.9rem;font-size:0.78rem;border-radius:6px;width:auto;border:none;cursor:pointer;" onclick="downloadOrderInvoicePdf('${order.id}')">
                                 <i class="fa-solid fa-file-pdf" style="color:#f1c40f;"></i> Invoice (PDF)
                             </button>
+                            ${(order.status || 'pending') === 'pending' ? `
+                            <button type="button" class="btn-submit" style="background:#fff;color:#c0392b;padding:0.4rem 0.9rem;font-size:0.78rem;border-radius:6px;width:auto;border:1.5px solid #e8b4b0;cursor:pointer;" onclick="cancelMyOrder('${order.id}')" title="Cancel this order while it is still pending">
+                                <i class="fa-regular fa-circle-xmark"></i> Cancel
+                            </button>` : ''}
                         </div>
                     </div>
                 </div>
@@ -1260,7 +1283,51 @@
     window.openBuyerQuotesModal = openBuyerQuotesModal;
     window.closeBuyerQuotesModal = closeBuyerQuotesModal;
     window.acceptRfqQuote = acceptRfqQuote;
+    // ─── SPEND INSIGHTS (from cached orders) ───
+    function renderSpendStats(orders) {
+        const strip = document.getElementById('buyerSpendStats');
+        if (!strip) return;
+        const active = orders.filter(o => (o.status || 'pending') !== 'cancelled');
+        const spent = active.reduce((s, o) => s + ((o.totals && o.totals.total) || o.total || 0), 0);
+        const inProgress = orders.filter(o => ['pending', 'processing', 'shipped'].includes(o.status || 'pending')).length;
+        document.getElementById('statTotalSpent').textContent = '$' + spent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('statOrderCount').textContent = orders.length;
+        document.getElementById('statAvgOrder').textContent = active.length ? '$' + (spent / active.length).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$0.00';
+        document.getElementById('statInProgress').textContent = inProgress;
+        strip.style.display = 'grid';
+    }
+
+    // ─── BUYER SELF-SERVICE ORDER CANCELLATION (pending orders only) ───
+    async function cancelMyOrder(orderId) {
+        const order = userOrdersCache.find(o => o.id === orderId);
+        if (!order) return;
+        if ((order.status || 'pending') !== 'pending') {
+            showToast('Only pending orders can be cancelled — contact support for help', 'info');
+            return;
+        }
+        if (!confirm(`Cancel order ${order.quoteNumber || orderId}?\n\nThis cannot be undone.`)) return;
+        try {
+            const nowIso = new Date().toISOString();
+            await db.collection('orders').doc(orderId).update({
+                status: 'cancelled',
+                status_updated_at: nowIso,
+                updated_at: nowIso,
+                cancelled_at: nowIso
+            });
+            if (order.quoteNumber) {
+                db.collection('verifications').doc(order.quoteNumber)
+                    .set({ status: 'cancelled', updated_at: nowIso }, { merge: true }).catch(() => {});
+            }
+            showToast('✅ Order cancelled', 'success');
+            loadOrders();
+        } catch (error) {
+            console.error('Cancel order error:', error);
+            showToast('❌ Could not cancel this order — please contact support', 'error');
+        }
+    }
+
     window.quickReorder = quickReorder;
+    window.cancelMyOrder = cancelMyOrder;
     window.downloadRFQPdf = downloadRFQPdf;
     window.switchTab = switchTab;
     window.loadOrders = loadOrders;
