@@ -636,13 +636,15 @@
                         items.push({
                             id: item.id,
                             product_id: item.product_id,
-                            title: product.title,
-                            price: product.price,
+                            title: item.title || product.title,
+                            price: item.price !== undefined ? item.price : product.price,
                             old_price: product.old_price,
                             image: product.image_url,
                             brand: product.brand || 'Pilot Distribution',
                             moq: product.moq || 1,
-                            quantity: item.quantity || 1
+                            quantity: item.quantity || 1,
+                            is_sample: !!item.is_sample,
+                            tier_label: item.tier_label || ''
                         });
                     }
                 }
@@ -657,7 +659,9 @@
                     image: item.image_url || '',
                     brand: item.brand || 'Pilot Distribution',
                     moq: item.moq || 1,
-                    quantity: item.quantity || 1
+                    quantity: item.quantity || 1,
+                    is_sample: !!item.is_sample,
+                    tier_label: item.tier_label || ''
                 }));
             }
             
@@ -714,11 +718,13 @@
                             ${item.old_price ? ` <span class="old">$${item.old_price.toFixed(2)}</span>` : ''}
                         </div>
                         ${item.brand ? `<div style="font-size:0.7rem; color:var(--text-light);">${item.brand}</div>` : ''}
+                        ${item.is_sample ? `<div style="font-size:0.75rem;font-weight:700;color:#f39c12;margin-top:2px;"><i class="fa-solid fa-flask"></i> Evaluation Sample (MOQ Bypassed)</div>` : ''}
+                        ${!item.is_sample && item.tier_label ? `<div style="font-size:0.75rem;font-weight:700;color:#27ae60;margin-top:2px;"><i class="fa-solid fa-bolt"></i> ${item.tier_label}</div>` : ''}
                     </div>
                     <div class="item-actions">
                         <div class="qty-control">
                             <button onclick="updateQuantity(${index}, -1)">−</button>
-                            <input type="number" id="qty_${index}" value="${item.quantity || 1}" min="${item.moq || 1}" onchange="updateQuantityInput(${index}, this.value)" />
+                            <input type="number" id="qty_${index}" value="${item.quantity || 1}" min="${item.is_sample ? 1 : (item.moq || 1)}" onchange="updateQuantityInput(${index}, this.value)" />
                             <button onclick="updateQuantity(${index}, 1)">+</button>
                         </div>
                         <div class="item-total">$${itemTotal.toFixed(2)}</div>

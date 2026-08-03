@@ -752,23 +752,57 @@
                     </table>
                 </div>
 
+                <!-- Interactive Tier Summary Badge -->
+                <div id="activeTierSummary" style="background:var(--primary-light);border:1px solid var(--primary);border-radius:8px;padding:0.7rem 1rem;font-size:0.85rem;color:var(--primary-dark);margin-top:-0.8rem;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between;font-weight:600;flex-wrap:wrap;gap:8px;">
+                    <span><i class="fa-solid fa-bolt"></i> Wholesale Rate: <strong id="tierSummaryRate">$0.00/unit</strong></span>
+                    <span>Total: <strong id="tierSummaryTotal">$0.00</strong></span>
+                </div>
+
+                <!-- Incoterms Trade Terms Selector -->
+                <div style="background:var(--light);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1.1rem;margin-bottom:1.4rem;font-size:0.85rem;">
+                    <div style="font-weight:700;color:var(--secondary);margin-bottom:0.4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+                        <span><i class="fa-solid fa-globe" style="color:var(--primary);"></i> Global Trade Incoterms &amp; Lead Time</span>
+                        <span style="font-size:0.75rem;color:var(--primary);font-weight:700;">100% Escrow Protection</span>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.5rem;margin-top:0.5rem;">
+                        <label style="background:#fff;border:1px solid var(--border-dark);border-radius:6px;padding:0.5rem;cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600;">
+                            <input type="radio" name="pdpIncoterm" value="DDP" checked onchange="updateIncotermUI()" />
+                            <span>DDP <small style="display:block;font-weight:400;color:var(--text-light);font-size:0.72rem;">Delivered Duty Paid</small></span>
+                        </label>
+                        <label style="background:#fff;border:1px solid var(--border-dark);border-radius:6px;padding:0.5rem;cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600;">
+                            <input type="radio" name="pdpIncoterm" value="FOB" onchange="updateIncotermUI()" />
+                            <span>FOB <small style="display:block;font-weight:400;color:var(--text-light);font-size:0.72rem;">Free On Board Port</small></span>
+                        </label>
+                        <label style="background:#fff;border:1px solid var(--border-dark);border-radius:6px;padding:0.5rem;cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600;">
+                            <input type="radio" name="pdpIncoterm" value="EXW" onchange="updateIncotermUI()" />
+                            <span>EXW <small style="display:block;font-weight:400;color:var(--text-light);font-size:0.72rem;">Ex Works Factory</small></span>
+                        </label>
+                    </div>
+                    <div id="incotermExplanation" style="margin-top:0.5rem;font-size:0.78rem;color:var(--text-light);">
+                        <strong>DDP (Delivered Duty Paid):</strong> Supplier covers freight, import duties, and door-to-door delivery. Est. lead time: 10–14 days.
+                    </div>
+                </div>
+
                 <!-- Quantity -->
                 <div class="quantity-section">
                     <label for="qtyInput">Quantity:</label>
                     <div class="qty-control">
                         <button onclick="updateQty(-1)">−</button>
-                        <input type="number" id="qtyInput" value="1" min="1" />
+                        <input type="number" id="qtyInput" value="1" min="1" oninput="updateTierSummary()" />
                         <button onclick="updateQty(1)">+</button>
                     </div>
                 </div>
 
                 <!-- Actions -->
-                <div class="action-buttons">
+                <div class="action-buttons" style="flex-wrap:wrap;gap:0.6rem;">
                     <button class="btn-add-cart" onclick="addToCartFromDetail()" id="addToCartBtn">
                         <i class="fa-solid fa-cart-plus"></i> Add to Cart
                     </button>
                     <button class="btn-buy-now" onclick="buyNow()">
                         <i class="fa-solid fa-bolt"></i> Buy Now
+                    </button>
+                    <button type="button" class="btn-add-cart" onclick="orderEvaluationSample()" style="background:#0b2a3b;color:#fff;border:1px solid #1a4b5e;" title="Order 1 sample at retail rate for quality evaluation without MOQ">
+                        <i class="fa-solid fa-flask" style="color:#f1c40f;"></i> Order 1 Sample ($35)
                     </button>
                     <button class="btn-wishlist" onclick="toggleWishlistFromDetail()" id="wishlistBtn">
                         <i class="fa-regular fa-heart"></i>
@@ -1266,7 +1300,9 @@
             `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#f39c12;color:#fff;font-weight:700;margin-left:8px;"><i class="fa-solid fa-crown"></i> Gold Supplier</span>` : '';
         const sponsorBadge = product.sponsored ?
             `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#d35400;color:#fff;font-weight:700;margin-left:8px;"><i class="fa-solid fa-rocket"></i> Sponsored Deal</span>` : '';
-        document.getElementById('productBrand').innerHTML = `by <a href="/products?brand=${encodeURIComponent(product.brand || '')}">${product.brand || 'Pilot Distribution'}</a> ${tierBadge} ${sponsorBadge}`;
+        const trustBadge = product.supplier_verified ?
+            `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#e8f8f0;color:#27ae60;font-weight:700;margin-left:8px;"><i class="fa-solid fa-shield-halved"></i> 100% Escrow Trade Assurance</span>` : '';
+        document.getElementById('productBrand').innerHTML = `by <a href="/products?brand=${encodeURIComponent(product.brand || '')}">${product.brand || 'Pilot Distribution'}</a> ${tierBadge} ${sponsorBadge} ${trustBadge}`;
 
         // Rating
         const rating = product.rating || 0;
@@ -1377,24 +1413,122 @@
     }
 
     // ─── RENDER BULK PRICING ───
-    function renderBulkPricing(product) {
-        const tbody = document.getElementById('bulkPricingBody');
+    function getProductTiers(product) {
         const price = product.price || 0;
         const moq = product.moq || 1;
-        const tiers = [
-            { min: moq, max: 49, discount: 0 },
-            { min: 50, max: 99, discount: 0.10 },
-            { min: 100, max: 499, discount: 0.20 },
-            { min: 500, max: null, discount: 0.30 }
+        return [
+            { min: moq, max: 49, discount: 0, label: 'Standard MOQ' },
+            { min: 50, max: 199, discount: 0.07, label: 'Bulk Rate (Save 7%)' },
+            { min: 200, max: 499, discount: 0.15, label: 'Wholesale Rate (Save 15%)' },
+            { min: 500, max: null, discount: 0.25, label: 'Enterprise Rate (Save 25%)' }
         ];
+    }
+
+    function computeTierPrice(product, qty) {
+        const tiers = getProductTiers(product);
+        let bestTier = tiers[0];
+        tiers.forEach(t => { if (qty >= t.min) bestTier = t; });
+        return {
+            unitPrice: (product.price || 0) * (1 - bestTier.discount),
+            discount: bestTier.discount,
+            label: bestTier.label,
+            tierObj: bestTier
+        };
+    }
+
+    function renderBulkPricing(product) {
+        const tbody = document.getElementById('bulkPricingBody');
+        if (!tbody) return;
+        const price = product.price || 0;
+        const tiers = getProductTiers(product);
         tbody.innerHTML = tiers.map((tier, index) => {
             const tierPrice = price * (1 - tier.discount);
-            return `<tr class="${index === tiers.length - 1 ? 'best-value' : ''}">
-                <td>${tier.min}${tier.max ? ` – ${tier.max}` : '+'} units</td>
-                <td>$${tierPrice.toFixed(2)}</td>
-                <td>${tier.max ? `Save $${(price - tierPrice).toFixed(2)}` : 'Best value'}</td>
+            return `<tr id="tierRow-${index}" class="${index === tiers.length - 1 ? 'best-value' : ''}" style="transition:all 0.2s ease;">
+                <td><strong>${tier.min}${tier.max ? ` – ${tier.max}` : '+'} units</strong></td>
+                <td><strong>$${tierPrice.toFixed(2)}</strong></td>
+                <td>${tier.discount > 0 ? `<span style="color:#27ae60;font-weight:700;">Save ${Math.round(tier.discount * 100)}%</span>` : 'Base price'}</td>
             </tr>`;
         }).join('');
+        updateTierSummary();
+    }
+
+    function updateTierSummary() {
+        const input = document.getElementById('qtyInput');
+        if (!input || !currentProduct) return;
+        const qty = parseInt(input.value) || (currentProduct.moq || 1);
+        const calc = computeTierPrice(currentProduct, qty);
+        const tiers = getProductTiers(currentProduct);
+
+        tiers.forEach((t, index) => {
+            const row = document.getElementById(`tierRow-${index}`);
+            if (row) {
+                if (qty >= t.min && (!t.max || qty <= t.max)) {
+                    row.style.background = 'rgba(26,123,107,0.12)';
+                    row.style.outline = '2px solid var(--primary)';
+                } else {
+                    row.style.background = '';
+                    row.style.outline = 'none';
+                }
+            }
+        });
+
+        const rateEl = document.getElementById('tierSummaryRate');
+        const totalEl = document.getElementById('tierSummaryTotal');
+        if (rateEl && totalEl) {
+            rateEl.textContent = `$${calc.unitPrice.toFixed(2)}/unit (${calc.label})`;
+            totalEl.textContent = `$${(calc.unitPrice * qty).toFixed(2)}`;
+        }
+    }
+
+    function updateIncotermUI() {
+        const sel = document.querySelector('input[name="pdpIncoterm"]:checked')?.value || 'DDP';
+        const expEl = document.getElementById('incotermExplanation');
+        if (!expEl) return;
+        if (sel === 'DDP') {
+            expEl.innerHTML = `<strong>DDP (Delivered Duty Paid):</strong> Supplier covers freight, import duties, and door-to-door delivery. Est. lead time: 10–14 days.`;
+        } else if (sel === 'FOB') {
+            expEl.innerHTML = `<strong>FOB (Free On Board Port):</strong> Supplier delivers to departure port; buyer handles international freight. Est. lead time: 7–10 days.`;
+        } else {
+            expEl.innerHTML = `<strong>EXW (Ex Works Factory):</strong> Buyer arranges own carrier pickup directly from verified factory warehouse. Ready for pickup: 3–5 days.`;
+        }
+    }
+
+    function orderEvaluationSample() {
+        if (!currentProduct) return;
+        const samplePrice = currentProduct.price || 0;
+        const user = getCurrentUser();
+        const sampleItem = {
+            product_id: currentProduct.id,
+            title: `[EVALUATION SAMPLE] ${currentProduct.title || 'Product'}`,
+            price: samplePrice,
+            old_price: currentProduct.old_price || 0,
+            image_url: currentProduct.image_url || '',
+            brand: currentProduct.brand || 'Pilot Distribution',
+            moq: 1,
+            quantity: 1,
+            is_sample: true
+        };
+        if (!user) {
+            const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+            const existingIndex = cart.findIndex(i => i.product_id === currentProduct.id && i.is_sample);
+            if (existingIndex > -1) {
+                showToast('🧪 Evaluation Sample is already in your cart!', 'info');
+                return;
+            }
+            cart.push(sampleItem);
+            localStorage.setItem('pilot_cart', JSON.stringify(cart));
+            loadCartCount();
+            showToast('🧪 Evaluation Sample added to cart (MOQ bypassed for quality testing)!', 'success');
+        } else {
+            db.collection('cart').add({
+                ...sampleItem,
+                user_id: user.id,
+                created_at: new Date().toISOString()
+            }).then(() => {
+                loadCartCount();
+                showToast('🧪 Evaluation Sample added to cart (MOQ bypassed for quality testing)!', 'success');
+            }).catch(() => showToast('Failed to add sample to cart', 'error'));
+        }
     }
 
     // ─── UPDATE QUANTITY ───
@@ -1404,6 +1538,7 @@
         const min = parseInt(input.min) || 1;
         val = Math.max(min, val + change);
         input.value = val;
+        updateTierSummary();
     }
 
     // ─── ADD TO CART ───
@@ -1411,15 +1546,21 @@
         const user = getCurrentUser();
         if (!user) {
             const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
-            const existingIndex = cart.findIndex(item => item.product_id === productId);
+            const existingIndex = cart.findIndex(item => item.product_id === productId && !item.is_sample);
             if (existingIndex > -1) {
-                cart[existingIndex].quantity = (cart[existingIndex].quantity || 1) + quantity;
+                const newQty = (cart[existingIndex].quantity || 1) + quantity;
+                const tierCalc = computeTierPrice(currentProduct || cart[existingIndex], newQty);
+                cart[existingIndex].quantity = newQty;
+                cart[existingIndex].price = tierCalc.unitPrice;
+                cart[existingIndex].tier_label = tierCalc.label;
             } else {
                 const product = currentProduct || await fetchProductById(productId);
+                const tierCalc = computeTierPrice(product || {}, quantity);
                 cart.push({
                     product_id: productId,
                     title: product?.title || 'Product',
-                    price: product?.price || 0,
+                    price: tierCalc.unitPrice,
+                    tier_label: tierCalc.label,
                     old_price: product?.old_price || 0,
                     image_url: product?.image_url || '',
                     brand: product?.brand || 'Pilot Distribution',
@@ -1445,14 +1586,27 @@
             if (!snapshot.empty) {
                 const docRef = snapshot.docs[0].ref;
                 const currentQty = snapshot.docs[0].data().quantity || 1;
+                const newQty = currentQty + quantity;
+                const tierCalc = computeTierPrice(currentProduct || {}, newQty);
                 await docRef.update({
-                    quantity: currentQty + quantity,
+                    quantity: newQty,
+                    price: tierCalc.unitPrice,
+                    tier_label: tierCalc.label,
                     updated_at: new Date().toISOString()
                 });
             } else {
+                const product = currentProduct || await fetchProductById(productId);
+                const tierCalc = computeTierPrice(product || {}, quantity);
                 await db.collection('cart').add({
                     user_id: user.id,
                     product_id: productId,
+                    title: product?.title || 'Product',
+                    price: tierCalc.unitPrice,
+                    tier_label: tierCalc.label,
+                    old_price: product?.old_price || 0,
+                    image_url: product?.image_url || '',
+                    brand: product?.brand || 'Pilot Distribution',
+                    moq: product?.moq || 1,
                     quantity: quantity,
                     created_at: new Date().toISOString()
                 });
