@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Document Authenticity - Pilot Sales Distribution</title>
+    <meta name="description" content="Verify that a PSE Distribution quotation, RFQ or invoice is genuine." />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="main.js"></script>
+    <style>
+        :root {
+            --primary: #1a7b6b; --primary-dark: #0f4f43; --primary-light: #e8f5f0;
+            --secondary: #0b2a3b; --secondary-light: #1a4b5e; --accent: #f1c40f;
+            --text-light: #6a889a; --border: #e9edf2; --border-dark: #dce3e9;
+            --light: #f0f4f8; --white: #ffffff; --radius: 1.2rem; --radius-sm: 0.8rem;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--light); color: #0b1a2a; line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
+        a { text-decoration: none; color: inherit; }
+        .verify-page { max-width: 620px; margin: 3rem auto; padding: 0 1rem; flex: 1; width: 100%; }
+        .verify-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 2.2rem; box-shadow: 0 20px 50px -10px rgba(0,20,30,0.08); }
+        .verify-header { text-align: center; margin-bottom: 1.6rem; }
+        .verify-header img { height: 52px; margin: 0 auto 0.8rem; border-radius: 8px; }
+        .verify-header h1 { font-size: 1.5rem; color: var(--secondary); font-weight: 800; }
+        .verify-header h1 span { color: var(--primary); }
+        .verify-header p { color: var(--text-light); font-size: 0.88rem; margin-top: 0.3rem; }
+        .ref-form { display: flex; gap: 0.5rem; }
+        .ref-form input { flex: 1; padding: 0.75rem 0.9rem; border: 1.5px solid var(--border-dark); border-radius: var(--radius-sm); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .ref-form input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(26,123,107,0.12); }
+        .ref-form button { background: var(--primary); color: #fff; border: none; padding: 0 1.4rem; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
+        .ref-form button:hover { background: var(--primary-dark); }
+        .result { margin-top: 1.6rem; display: none; border-radius: var(--radius-sm); padding: 1.3rem; border: 2px solid; }
+        .result.show { display: block; animation: fadeIn 0.35s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .result.genuine { border-color: var(--primary); background: var(--primary-light); }
+        .result.unknown { border-color: #c0392b; background: #fdf0ef; }
+        .result .verdict { display: flex; align-items: center; gap: 0.7rem; font-weight: 800; font-size: 1.05rem; margin-bottom: 0.6rem; }
+        .result.genuine .verdict { color: var(--primary-dark); }
+        .result.unknown .verdict { color: #c0392b; }
+        .result .verdict i { font-size: 1.5rem; }
+        .result dl { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 1rem; font-size: 0.85rem; margin-top: 0.6rem; }
+        .result dt { color: var(--text-light); font-weight: 600; }
+        .result dd { color: var(--secondary); font-weight: 600; }
+        .status-pill { display: inline-block; padding: 0.1rem 0.7rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; background: var(--secondary); color: #fff; text-transform: capitalize; }
+        .safety-note { margin-top: 1.2rem; font-size: 0.76rem; color: var(--text-light); text-align: center; }
+        .safety-note a { color: var(--primary); font-weight: 600; }
+        .footer-mini { text-align: center; padding: 1.5rem 1rem; font-size: 0.78rem; color: var(--text-light); }
+        .footer-mini a { color: var(--primary); font-weight: 600; }
+        .loading { display: none; text-align: center; padding: 1rem; color: var(--text-light); }
+        .loading.show { display: block; }
+    </style>
+</head>
+<body>
+
+<div class="verify-page">
+    <div class="verify-card">
+        <div class="verify-header">
+            <a href="/home"><img src="/logo.webp" alt="Pilot Sales Distribution" /></a>
+            <h1>Verify <span>Document</span></h1>
+            <p>Confirm a quotation, RFQ, supplier quote or invoice is genuine — enter the reference printed on the document or scan its QR code.</p>
+        </div>
+
+        <form class="ref-form" id="verifyForm">
+            <input type="text" id="refInput" placeholder="e.g. QTE-12345678-ABC / RFQ-PSE-XXXXXXXX / SQ-PSE-XXXXXXXX" autocomplete="off" required />
+            <button type="submit"><i class="fa-solid fa-shield-halved"></i> Verify</button>
+        </form>
+
+        <div class="loading" id="loading"><i class="fa-solid fa-spinner fa-spin"></i> Checking the authenticity registry...</div>
+
+        <div class="result" id="result">
+            <div class="verdict" id="verdict"></div>
+            <div id="verdictBody"></div>
+        </div>
+
+        <p class="safety-note">
+            🛡️ Documents issued by Pilot Sales Distribution always carry a verification QR &amp; reference.
+            If a document fails this check it may be forged — <a href="https://wa.me/19099384682" target="_blank" rel="noopener">report it on WhatsApp</a> immediately.
+        </p>
+    </div>
+</div>
+
+<div class="footer-mini">
+    &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong> • <a href="/home">Back to Marketplace</a>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
+        authDomain: "pilot-sales-distribution.firebaseapp.com",
+        projectId: "pilot-sales-distribution",
+        storageBucket: "pilot-sales-distribution.firebasestorage.app",
+        messagingSenderId: "729127273727",
+        appId: "1:729127273727:web:402d67be8346257755f8ca"
+    };
+
+    let db;
+    function initFirebase() {
+        if (typeof firebase === 'undefined') { setTimeout(initFirebase, 400); return; }
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        // Auto-verify when arriving from a QR scan (?ref=...)
+        const params = new URLSearchParams(location.search);
+        const ref = (params.get('ref') || '').trim();
+        if (ref) {
+            document.getElementById('refInput').value = ref;
+            runVerification(ref);
+        }
+    }
+
+    const TYPE_LABELS = { order: 'Official Quotation', rfq: 'Request for Quotation (RFQ)', supplier_quote: 'Supplier Quotation' };
+    const STATUS_LABELS = { pending: 'Issued — awaiting review', issued: 'Issued', submitted: 'Submitted', reviewing: 'Under review', quoted: 'Quoted to buyer', accepted: 'Accepted', processing: 'Processing', shipped: 'Shipped', delivered: 'Delivered / completed', cancelled: 'Cancelled' };
+
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    async function lookupRef(ref) {
+        // 1) Public registry (issued by checkout / RFQ / admin quote flows)
+        try { if (db) {
+            const doc = await db.collection('verifications').doc(ref).get();
+            if (doc.exists) return { found: true, data: { id: doc.id, ...doc.data() } };
+        } } catch (e) {}
+        return { found: false };
+    }
+
+    async function runVerification(ref) {
+        const result = document.getElementById('result');
+        const verdict = document.getElementById('verdict');
+        const body = document.getElementById('verdictBody');
+        const loading = document.getElementById('loading');
+        result.classList.remove('show', 'genuine', 'unknown');
+        loading.classList.add('show');
+
+        try {
+            const res = await lookupRef(ref);
+            loading.classList.remove('show');
+
+            if (res.found) {
+                const d = res.data;
+                const issued = d.issued_at ? new Date(d.issued_at).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
+                const status = STATUS_LABELS[(d.status || '').toLowerCase()] || (d.status || 'Issued');
+                verdict.innerHTML = '<i class="fa-solid fa-circle-check"></i> GENUINE — issued by Pilot Sales Distribution';
+                body.innerHTML = '<dl>' +
+                    `<dt>Reference</dt><dd>${esc(d.ref || ref)}</dd>` +
+                    `<dt>Document type</dt><dd>${esc(TYPE_LABELS[d.type] || 'Official Document')}</dd>` +
+                    `<dt>Status</dt><dd><span class="status-pill">${esc(status)}</span></dd>` +
+                    `<dt>Date issued</dt><dd>${esc(issued)}</dd>` +
+                    (d.items_count ? `<dt>Line items</dt><dd>${esc(d.items_count)}</dd>` : '') +
+                    (typeof d.total === 'number' ? `<dt>Document value</dt><dd>$${Number(d.total).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</dd>` : '') +
+                    '</dl>' +
+                    '<p style="font-size:0.75rem;color:var(--text-light);margin-top:0.7rem;">Match these details against your document. Any mismatch means the document may have been altered.</p>';
+                result.classList.add('genuine');
+            } else {
+                verdict.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> NOT FOUND — could not be verified';
+                body.innerHTML = `<p style="font-size:0.85rem;color:#7b2c24;">No official PSE Distribution document exists with reference <strong>${esc(ref)}</strong>.</p>` +
+                    '<ul style="font-size:0.8rem;color:#7b2c24;margin:0.6rem 0 0 1.1rem;">' +
+                    '<li>Double-check the reference for typos (letters vs numbers).</li>' +
+                    '<li>Documents issued before this registry launched verify by <a href="https://wa.me/19099384682" target="_blank" style="color:#1a7b6b;font-weight:700;">WhatsApp</a> only.</li>' +
+                    '<li>If you received this document from an unverified third party, <strong>do not pay</strong>.</li></ul>';
+                result.classList.add('unknown');
+            }
+            result.classList.add('show');
+        } catch (error) {
+            loading.classList.remove('show');
+            verdict.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Verification temporarily unavailable';
+            body.innerHTML = '<p style="font-size:0.85rem;">Please try again in a moment, or confirm manually via <a href="https://wa.me/19099384682" target="_blank" style="color:#1a7b6b;font-weight:700;">WhatsApp</a>.</p>';
+            result.classList.add('unknown', 'show');
+        }
+    }
+
+    document.getElementById('verifyForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const ref = document.getElementById('refInput').value.trim();
+        if (!ref) return;
+        runVerification(ref.toUpperCase().startsWith('RFQ-PSE-') || ref.toUpperCase().startsWith('SQ-PSE-') || ref.toUpperCase().startsWith('QTE-') ? ref.toUpperCase() : ref);
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initFirebase();
+        document.getElementById('year').textContent = new Date().getFullYear();
+    });
+</script>
+    <script src="ai-assistant.js"></script>
+    <script src="notifications.js"></script>
+</body>
+</html>

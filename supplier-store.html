@@ -189,7 +189,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -237,7 +237,7 @@
     <div class="store-hero animate-on-scroll" id="storeHero">
         <div class="store-hero-info">
             <div class="store-logo-box" id="storeLogoBox">
-                <img src="logo.jpg" alt="Supplier Logo" id="storeLogoImg" />
+                <img src="logo.webp" alt="Supplier Logo" id="storeLogoImg" />
             </div>
             <div class="store-title">
                 <div class="badges" id="storeBadges">
@@ -441,7 +441,7 @@
         let tier = 'gold';
         let location = 'Global Wholesale';
         let years = 'Verified Partner';
-        let profileImage = 'logo.jpg';
+        let profileImage = 'logo.webp';
 
         if (currentStoreId && db) {
             try {
@@ -453,7 +453,7 @@
                     tier = data.membership_tier || data.supplier_tier || 'gold';
                     location = data.location || data.address || location;
                     years = data.years_in_business ? data.years_in_business + ' yrs in business' : 'Verified Partner';
-                    profileImage = data.profileImage || data.avatar || 'logo.jpg';
+                    profileImage = data.profileImage || data.avatar || 'logo.webp';
                     currentSupplierInfo.whatsapp = data.whatsapp || data.phone || '';
                     currentSupplierInfo.phone = data.phone || '';
                     currentSupplierInfo.email = data.contactEmail || data.email || '';
@@ -500,7 +500,7 @@
                     products.push({
                         id: doc.id,
                         ...data,
-                        image_url: data.image_url || data.images?.[0] || 'logo.jpg',
+                        image_url: data.image_url || data.images?.[0] || 'logo.webp',
                         slug: data.slug || generateSlug(data.title || 'product'),
                         title: data.title || 'Product',
                         price: data.price || 0,
@@ -547,7 +547,7 @@
         grid.innerHTML = products.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
             const slug = p.slug || generateSlug(p.title || 'product');
-            const imageUrl = window.getProductImage ? window.getProductImage(p) : (p.image_url || 'logo.jpg');
+            const imageUrl = window.getProductImage ? window.getProductImage(p) : (p.image_url || 'logo.webp');
             const sponsoredBadge = p.sponsored ? `<span class="product-badge" style="background:#d35400;color:#fff;top:10px;right:10px;z-index:10;font-weight:700;"><i class="fa-solid fa-rocket"></i> SPONSORED</span>` : '';
             const vipTierBadge = p.supplier_tier === 'platinum' ?
                 `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#8e44ad;margin-top:2px;"><i class="fa-solid fa-crown"></i> Platinum Supplier</div>` :

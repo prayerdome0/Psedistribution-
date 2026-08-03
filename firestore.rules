@@ -1,0 +1,232 @@
+rules_version = '2';
+
+// ═══════════════════════════════════════════════════════════════════
+// Pilot Sales Distribution — Firestore Security Rules (v1)
+// ═══════════════════════════════════════════════════════════════════
+// Deploy with:  firebase deploy --only firestore:rules
+//
+// ROLE MODEL
+//   • guest          — browse products, subscribe, contact, view banners
+//   • signed-in user — cart/wishlist/orders/RFQs/reviews/messages/referrals
+//   • seller         — additionally writes own products & seller applications
+//   • admin          — full management access
+//
+// NOTE: a few cross-user writes (referral point bonus, coupon usage
+// counters) are intentionally permissive and marked ⚠️ below — move them
+// to Cloud Functions for fully atomic, cheat-proof execution at scale.
+// ═══════════════════════════════════════════════════════════════════
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── HELPERS ───
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    function role() {
+      return isSignedIn() && userDoc().exists ? userDoc().data.get('role', 'buyer') : 'guest';
+    }
+    function isAdmin() {
+      return role() == 'admin';
+    }
+    function isSeller() {
+      return role() == 'seller' || isAdmin();
+    }
+
+    // ─── USERS ───
+    match /users/{userId} {
+      allow read: if isAdmin() || request.auth.uid == userId;
+      // Registration creates the doc; further edits restricted to own profile.
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      // ⚠️ Referral bonus increments another user's loyalty_points client-side.
+      //    Allow only when ONLY loyalty_points/updated_at change.
+      allow update: if request.auth.uid == userId
+        || isAdmin()
+        || (isSignedIn()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['loyalty_points', 'updated_at']));
+      allow delete: if isAdmin();
+    }
+
+    // ─── PRODUCTS (public catalog) ───
+    match /products/{productId} {
+      allow read: if true;
+      // Sellers manage their own listings; admins manage all.
+      allow create: if isSeller();
+      allow update, delete: if isAdmin()
+        || (isSeller() && resource.data.get('seller_id', '') == request.auth.uid)
+        || (isSeller() && resource.data.get('user_id', '') == request.auth.uid);
+    }
+
+    // ─── CART & WISHLIST (owner-only) ───
+    match /cart/{docId} {
+      allow read, write: if isSignedIn()
+        && (request.resource.data.get('user_id', resource.data.get('user_id', null)) == request.auth.uid || isAdmin());
+    }
+    match /wishlist/{docId} {
+      allow read, write: if isSignedIn()
+        && (request.resource.data.get('user_id', resource.data.get('user_id', null)) == request.auth.uid || isAdmin());
+    }
+    match /addresses/{docId} {
+      allow read, write: if isSignedIn()
+        && (request.resource.data.get('user_id', resource.data.get('user_id', null)) == request.auth.uid || isAdmin());
+    }
+
+    // ─── ORDERS / QUOTATIONS ───
+    match /orders/{orderId} {
+      // Signed-in buyers own their orders; guests create guest-flagged quotes
+      // (lookup happens via the privacy-safe `verifications` registry below).
+      allow create: if (isSignedIn() && request.resource.data.user_id == request.auth.uid)
+        || (!isSignedIn() && request.resource.data.get('user_id', '') == ''
+            && request.resource.data.get('guest', false) == true);
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      // Fulfillment status moves are admin-only — EXCEPT a buyer may cancel
+      // their own order while it is still pending (nothing else may change).
+      allow update: if isAdmin()
+        || (isSignedIn() && resource.data.user_id == request.auth.uid
+            && resource.data.status == 'pending'
+            && request.resource.data.status == 'cancelled'
+            && request.resource.data.diff(resource.data).affectedKeys()
+                 .hasOnly(['status', 'updated_at', 'status_updated_at', 'cancelled_at']));
+      allow delete: if isAdmin();
+    }
+
+    // ─── DOCUMENT VERIFICATION REGISTRY (public, privacy-safe) ───
+    // Minimal authenticity records for /verify?ref=… lookups + guest order
+    // tracking — no item-level detail is stored here.
+    match /verifications/{docId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ─── PRICE / STOCK ALERTS ───
+    match /price_alerts/{docId} {
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow update: if isAdmin()
+        || (isSignedIn() && resource.data.user_id == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['active', 'notified_at', 'updated_at']));
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+    }
+
+    // ─── CLIENT ERROR LOG ───
+    match /error_log/{docId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ─── RFQs (buyer requests; admin quotes back) ───
+    match /rfqs/{rfqId} {
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      // Admins attach supplier quotes & move status; buyers may only accept a quote.
+      allow update: if isAdmin()
+        || (isSignedIn() && resource.data.user_id == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'accepted_at', 'updated_at'])
+            && request.resource.data.status == 'accepted'
+            && resource.data.status == 'quoted');
+      allow delete: if isAdmin();
+    }
+
+    // ─── REVIEWS ───
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin()
+        || (isSignedIn() && resource.data.get('user_id', '') == request.auth.uid);
+    }
+
+    // ─── MESSAGING ───
+    match /messages/{docId} {              // contact-form inbox (admin)
+      allow create: if true;               // guests may contact the store
+      allow read, update, delete: if isAdmin();
+    }
+    match /support_messages/{docId} {      // live-support thread messages
+      allow create: if isSignedIn();
+      allow read: if isAdmin() || (isSignedIn() && resource.data.get('userId', resource.data.get('user_id', '')) == request.auth.uid);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    match /chats/{docId} {                 // buyer ↔ seller chat threads
+      allow read, create, update: if isSignedIn();
+      allow delete: if isAdmin();
+    }
+
+    // ─── PROMOTIONS (admin-managed; read for site rendering/validation) ───
+    match /coupons/{couponId} {
+      allow read: if isSignedIn();         // registration + checkout validation
+      allow write: if isAdmin();
+    }
+    match /promo_banners/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /flash_sales/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /holidays/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /config/{docId} {                // premium suite site config
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── LOYALTY / REFERRALS ───
+    match /referrals/{docId} {
+      allow create: if isSignedIn();
+      allow read: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+    match /point_ledger/{docId} {
+      allow create: if isSignedIn();
+      allow read: if isAdmin() || (isSignedIn() && resource.data.get('user_id', '') == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    // ─── SELLER PIPELINE ───
+    match /seller_applications/{docId} {
+      allow create: if isSignedIn();
+      allow read: if isAdmin() || (isSignedIn() && resource.data.get('userId', resource.data.get('user_id', '')) == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+    match /trade_credit_applications/{docId} {
+      allow create: if isSignedIn();
+      allow read: if isAdmin() || (isSignedIn() && resource.data.get('user_id', '') == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    // ─── OPS / LOGGING ───
+    match /reports/{docId} {               // product reports from buyers
+      allow create: if isSignedIn();
+      allow read, update, delete: if isAdmin();
+    }
+    match /audit_log/{docId} {             // client-side audit trail
+      allow create: if isSignedIn();
+      allow read, update, delete: if isAdmin();
+    }
+    match /email_log/{docId} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if isAdmin();
+    }
+    match /subscribers/{docId} {           // newsletter signups
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    match /festival_runs/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── DEFAULT: deny everything else ───
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

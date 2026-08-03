@@ -321,7 +321,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -530,13 +530,13 @@
         grid.innerHTML = products.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
             const slug = p.slug || generateSlug(p.title || 'product');
-            const imageUrl = window.getProductImage ? window.getProductImage(p) : (p.image_url || 'logo.jpg');
+            const imageUrl = window.getProductImage ? window.getProductImage(p) : (p.image_url || 'logo.webp');
             return `
                 <div class="product-card animate-on-scroll">
                     ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
                     ${discount > 0 ? `<span class="product-badge flash">-${discount}%</span>` : ''}
                     <div class="product-image" onclick="window.location.href='/product/${slug}'">
-                        <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.jpg'" />
+                        <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'" />
                     </div>
                     <div class="product-title">${p.title || 'Product'}</div>
                     <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>

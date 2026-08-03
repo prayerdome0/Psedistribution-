@@ -645,7 +645,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="" />
+            <img src="/logo.webp" alt="" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -728,10 +728,33 @@
                     <span class="meta-item"><i class="fa-regular fa-box"></i> SKU: <span id="productSku">N/A</span></span>
                     <span class="meta-item"><i class="fa-regular fa-tag"></i> Category: <span id="productCategory">N/A</span></span>
                     <span class="meta-item"><i class="fa-regular fa-circle-check"></i> Status: <span id="productStockStatus" class="stock-in">In Stock</span></span>
+                    <span class="meta-item" id="alertMetaItem" style="display:none;"></span>
+                </div>
+                <div id="productAlertBar" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.4rem;">
+                    <button type="button" onclick="createProductAlert('stock')" title="Get notified when this item is back in stock" style="background:var(--light);border:1.5px solid var(--border-dark);color:var(--secondary);padding:0.35rem 0.9rem;border-radius:30px;font-size:0.75rem;font-weight:700;cursor:pointer;">
+                        <i class="fa-regular fa-bell" style="color:var(--primary);"></i> Stock Alert
+                    </button>
+                    <button type="button" onclick="createProductAlert('price')" title="Get notified when the price drops to your target" style="background:var(--light);border:1.5px solid var(--border-dark);color:var(--secondary);padding:0.35rem 0.9rem;border-radius:30px;font-size:0.75rem;font-weight:700;cursor:pointer;">
+                        <i class="fa-solid fa-bullseye" style="color:#e67e22;"></i> Price Watch
+                    </button>
                 </div>
 
                 <div class="product-moq" id="productMoq">
                     <i class="fa-regular fa-box"></i> Minimum Order Quantity: <span id="moqValue">0</span> units
+                </div>
+                <div id="deliveryEstimateLine" style="font-size:0.78rem;color:var(--text-light);margin-top:0.25rem;display:none;"></div>
+
+                <div id="productShareBar" style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-top:0.5rem;">
+                    <span style="font-size:0.68rem;font-weight:800;letter-spacing:0.6px;color:var(--text-light);">SHARE:</span>
+                    <button type="button" onclick="shareProductWhatsApp()" title="Share on WhatsApp" style="background:#e7f9ef;border:1px solid #bfe8d0;color:#075e54;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:0.9rem;">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </button>
+                    <button type="button" onclick="shareProductEmail()" title="Share by email" style="background:#eef2f6;border:1px solid var(--border-dark);color:var(--secondary);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:0.85rem;">
+                        <i class="fa-regular fa-envelope"></i>
+                    </button>
+                    <button type="button" onclick="copyProductLink()" title="Copy product link" style="background:#eef2f6;border:1px solid var(--border-dark);color:var(--secondary);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:0.85rem;">
+                        <i class="fa-regular fa-link"></i>
+                    </button>
                 </div>
 
                 <div class="product-description" id="productDescription">Loading product description...</div>
@@ -1418,11 +1441,72 @@
         if (productImages.length > 0) {
             const container = document.getElementById('mainImageContainer');
             container.innerHTML = `
-                <img src="${productImages[0]}" alt="${product.title}" id="mainImage" onerror="this.onerror=null;this.src='/logo.jpg'" />
+                <img src="${productImages[0]}" alt="${product.title}" id="mainImage" onerror="this.onerror=null;this.src='/logo.webp'" />
                 <div class="zoom-icon"><i class="fa-solid fa-expand"></i> Click to zoom</div>
             `;
             currentImageIndex = 0;
         }
+
+        // Delivery estimate (lead time + transit buffer)
+        const estEl = document.getElementById('deliveryEstimateLine');
+        if (estEl) {
+            const leadDays = parseInt(product.lead_time_days || product.lead_time || 14, 10) || 14;
+            const est = new Date();
+            est.setDate(est.getDate() + leadDays + 7);
+            estEl.innerHTML = `<i class="fa-solid fa-truck-fast" style="color:var(--primary);"></i> Ships within ${leadDays} days · Est. arrival <strong style="color:var(--secondary);">${est.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</strong>`;
+            estEl.style.display = 'block';
+        }
+
+        // Stock/price alerts + SEO structured data + recently-viewed tracking
+        try { checkProductAlerts(product); } catch (e) { /* non-blocking */ }
+        try { injectProductJsonLd(product); } catch (e) { /* non-blocking */ }
+        try { trackRecentView(product); } catch (e) { /* non-blocking */ }
+    }
+
+    // ─── SHARE PRODUCT ───
+    function shareProductWhatsApp() {
+        const title = currentProduct?.title || 'Wholesale product';
+        const price = currentProduct?.price ? `$${(currentProduct.price).toFixed(2)}` : '';
+        const text = `${title} ${price} — bulk wholesale on Pilot Sales Distribution\n${location.href}`;
+        window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+    }
+
+    function shareProductEmail() {
+        const title = currentProduct?.title || 'Wholesale product';
+        const body = `I found this on Pilot Sales Distribution (global B2B wholesale):\n\n${title}\n${location.href}\n\nBulk pricing tiers and trade-assurance escrow available.`;
+        window.location.href = `mailto:?subject=${encodeURIComponent('Wholesale product: ' + title)}&body=${encodeURIComponent(body)}`;
+    }
+
+    async function copyProductLink() {
+        try {
+            await navigator.clipboard.writeText(location.href);
+            showToast('🔗 Product link copied', 'success');
+        } catch (e) {
+            const inp = document.createElement('input');
+            inp.value = location.href;
+            document.body.appendChild(inp);
+            inp.select();
+            document.execCommand('copy');
+            document.body.removeChild(inp);
+            showToast('🔗 Product link copied', 'success');
+        }
+    }
+
+    // ─── RECENTLY VIEWED TRACKING (localStorage, powers home-page rail) ───
+    function trackRecentView(product) {
+        const list = JSON.parse(localStorage.getItem('pse_recent_views') || '[]');
+        const slug = product.slug || (typeof generateSlug === 'function' ? generateSlug(product.title || 'product') : '');
+        const item = {
+            id: currentProductId,
+            slug: slug,
+            title: product.title || 'Product',
+            brand: product.brand || 'Pilot Distribution',
+            price: product.price || 0,
+            image: (productImages && productImages[0]) || product.image_url || '',
+            ts: Date.now()
+        };
+        const next = [item, ...list.filter(x => x.id !== item.id)].slice(0, 12);
+        localStorage.setItem('pse_recent_views', JSON.stringify(next));
     }
 
     // ─── RENDER THUMBNAILS ───
@@ -1434,7 +1518,7 @@
         }
         grid.innerHTML = productImages.map((img, index) => `
             <div class="thumb ${index === 0 ? 'active' : ''}" onclick="goToImage(${index})">
-                <img src="${img}" alt="Product image ${index + 1}" loading="lazy" onerror="this.onerror=null;this.src='/logo.jpg'" />
+                <img src="${img}" alt="Product image ${index + 1}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'" />
             </div>
         `).join('');
     }
@@ -1445,7 +1529,7 @@
         currentImageIndex = index;
         const container = document.getElementById('mainImageContainer');
         container.innerHTML = `
-            <img src="${productImages[index]}" alt="${currentProduct?.title || 'Product'}" onerror="this.onerror=null;this.src='/logo.jpg'" />
+            <img src="${productImages[index]}" alt="${currentProduct?.title || 'Product'}" onerror="this.onerror=null;this.src='/logo.webp'" />
             <div class="zoom-icon"><i class="fa-solid fa-expand"></i> Click to zoom</div>
         `;
         document.querySelectorAll('.thumbnail-grid .thumb').forEach((thumb, i) => {
@@ -1982,7 +2066,7 @@
                 <div class="related-card" onclick="window.location.href='/product/${p.slug || generateSlug(p.title)}'">
                     <div class="related-image">
                         ${p.image_url ? 
-                            `<img src="${p.image_url}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.jpg'" />` :
+                            `<img src="${p.image_url}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'" />` :
                             `<i class="fa-solid fa-box"></i>`
                         }
                     </div>
@@ -2205,6 +2289,112 @@
     // ─── EXPOSE GLOBALS ───
     window.addToCartFromDetail = addToCartFromDetail;
     window.buyNow = buyNow;
+
+    // ─── STOCK / PRICE ALERTS ───
+    window.createProductAlert = async function (kind) {
+        const user = getCurrentUser();
+        if (!user) {
+            showToast('Please login to set alerts', 'error');
+            setTimeout(() => window.location.href = '/login', 1200);
+            return;
+        }
+        if (!currentProduct) { showToast('Product still loading…', 'info'); return; }
+        let target = null;
+        if (kind === 'price') {
+            const cur = Number(currentProduct.price || 0);
+            const v = prompt(`Current price: $${cur.toFixed(2)}/unit.\nAlert me when the unit price drops to:`);
+            if (v === null) return;
+            target = parseFloat(v);
+            if (!target || target <= 0) { showToast('Enter a valid target price', 'error'); return; }
+            if (cur > 0 && target >= cur) { showToast('Target is already at/below the current price 🎉', 'info'); return; }
+        }
+        try {
+            await db.collection('price_alerts').add({
+                user_id: user.id,
+                email: (user.email || '').toLowerCase(),
+                product_id: currentProductId,
+                product_title: currentProduct.title || 'Product',
+                kind: kind,
+                target_price: target,
+                price_at_create: Number(currentProduct.price || 0),
+                active: true,
+                created_at: new Date().toISOString()
+            });
+            showToast(kind === 'stock' ? '🔔 Stock alert set — we\'ll flag you here when it\'s back!' : `🎯 Watching for $${target.toFixed(2)}/unit — we\'ll flag you here when it hits!`, 'success');
+            if (typeof window.pushNotification === 'function') {
+                window.pushNotification(kind === 'stock' ? 'Stock alert set 🔔' : 'Price watch active 🎯',
+                    (currentProduct.title || 'Product') + (kind === 'price' ? ` — target $${target.toFixed(2)}` : ''), { icon: 'fa-bell', tag: 'alert' });
+            }
+        } catch (e) {
+            showToast('❌ Could not save the alert', 'error');
+        }
+    };
+
+    // Fire any matching alerts for this product (stock replenished / price at target)
+    async function checkProductAlerts(product) {
+        const user = getCurrentUser();
+        if (!user || !product) return;
+        try {
+            const snap = await db.collection('price_alerts')
+                .where('user_id', '==', user.id)
+                .where('product_id', '==', currentProductId)
+                .where('active', '==', true)
+                .get();
+            if (snap.empty) return;
+            const hits = [];
+            snap.forEach(docSnap => {
+                const a = docSnap.data();
+                const stockHit = a.kind === 'stock' && Number(product.stock || 0) > 0;
+                const priceHit = a.kind === 'price' && a.target_price && Number(product.price || Infinity) <= Number(a.target_price);
+                if (stockHit || priceHit) hits.push({ ref: docSnap.ref, hit: stockHit ? '🔔 Back in stock!' : `🎯 Price target hit — now $${Number(product.price || 0).toFixed(2)}!` });
+            });
+            if (!hits.length) return;
+            const meta = document.getElementById('alertMetaItem');
+            if (meta) {
+                meta.style.display = 'inline';
+                meta.innerHTML = `<i class="fa-solid fa-bell" style="color:#e67e22;"></i> ${hits[0].hit}`;
+            }
+            showToast(hits[0].hit, 'success');
+            if (typeof window.pushNotification === 'function') {
+                window.pushNotification(hits[0].hit, product.title || 'Product', { icon: 'fa-bell', url: location.pathname + location.search, tag: 'alert-hit' });
+            }
+            for (const h of hits) {
+                try { await h.ref.update({ active: false, notified_at: new Date().toISOString(), updated_at: new Date().toISOString() }); } catch (e) {}
+            }
+        } catch (e) { /* alerts optional */ }
+    }
+
+    // ─── SEO JSON-LD (Product structured data) ───
+    function injectProductJsonLd(product) {
+        try {
+            const old = document.getElementById('productJsonLd');
+            if (old) old.remove();
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.id = 'productJsonLd';
+            const avg = (product.rating_avg || product.rating || 0);
+            script.textContent = JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'Product',
+                name: product.title || '',
+                description: (product.description || '').substring(0, 300),
+                sku: product.sku || currentProductId || '',
+                brand: { '@type': 'Brand', name: product.brand || 'Pilot Distribution' },
+                image: window.getProductImage ? [window.getProductImage(product, '')] : undefined,
+                aggregateRating: avg > 0 ? { '@type': 'AggregateRating', ratingValue: Number(avg).toFixed(1), reviewCount: Number(product.rating_count || product.reviews_count || 1) } : undefined,
+                offers: {
+                    '@type': 'Offer',
+                    url: location.origin + '/product/' + (currentProductId || ''),
+                    priceCurrency: 'USD',
+                    price: Number(product.price || 0).toFixed(2),
+                    availability: (product.stock || 0) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+                    businessFunction: 'http://purl.org/goodrelations/v1#Sell'
+                }
+            });
+            document.head.appendChild(script);
+        } catch (e) { /* SEO optional */ }
+    }
+
     window.toggleWishlistFromDetail = toggleWishlistFromDetail;
     window.updateQty = updateQty;
     window.goToImage = goToImage;

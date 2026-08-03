@@ -12,6 +12,11 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="quote-pdf.js"></script>
+    <script src="email.js"></script>
     <script src="main.js"></script>
     <script src="search-pro.js"></script>
     <script src="bulk-import.js"></script>
@@ -376,6 +381,8 @@
         .btn-action.edit { background: #cce5ff; color: #004085; }
         .btn-action.ship { background: #cce5ff; color: #004085; }
         .btn-action.process { background: #cce5ff; color: #004085; }
+        .order-chip { border: 1.5px solid transparent; font-size: 0.75rem; }
+        .order-chip.active { border-color: #0b2a3b; box-shadow: 0 0 0 2px rgba(11,42,59,0.15); font-weight: 800; }
 
         /* ─── MODAL ─── */
         .modal-overlay {
@@ -716,7 +723,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">Pilot <span>Distribution</span></span>
                 <span class="sub">Admin Panel</span>
@@ -917,6 +924,14 @@
                     </div>
                 </div>
 
+                <div style="background:#fff;border:1px solid #e5ebef;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;box-shadow:0 1px 3px rgba(11,42,59,0.06);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+                        <h3 style="font-size:0.95rem;color:var(--secondary);margin:0;"><i class="fa-regular fa-chart-line" style="color:var(--primary);"></i> Revenue — Last 30 Days</h3>
+                        <span id="revenueChartTotal" style="font-size:0.8rem;color:var(--text-light);"></span>
+                    </div>
+                    <div style="position:relative;height:220px;"><canvas id="revenueChart"></canvas></div>
+                </div>
+
                 <h3 style="font-size:0.85rem; color:var(--secondary); margin-bottom:0.5rem;">Quick Actions</h3>
                 <div class="quick-actions">
                     <div class="action-btn" onclick="openAddProduct()">
@@ -955,6 +970,10 @@
                     <h2><i class="fa-regular fa-users"></i> Customers</h2>
                     <span class="time" id="customerCount">0 users</span>
                 </div>
+                <div id="topBuyersCard" style="display:none;background:#fff;border:1px solid #e5ebef;border-radius:12px;padding:0.9rem 1.2rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(11,42,59,0.06);">
+                    <h3 style="font-size:0.88rem;color:var(--secondary);margin:0 0 0.6rem;"><i class="fa-solid fa-trophy" style="color:#f1c40f;"></i> Top Buyers by Revenue</h3>
+                    <div id="topBuyersList" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:0.5rem;"></div>
+                </div>
                 <div class="table-container">
                     <table>
                         <thead>
@@ -987,9 +1006,23 @@
 
             <!-- ORDERS -->
             <div class="tab-content" id="tab-orders">
-                <div class="page-header">
+                <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.6rem;">
                     <h2><i class="fa-regular fa-receipt"></i> Orders</h2>
-                    <span class="time" id="orderCount">0 orders</span>
+                    <div style="display:flex;align-items:center;gap:0.6rem;">
+                        <span class="time" id="orderCount">0 orders</span>
+                        <button type="button" class="btn-action process" onclick="exportOrdersCSV()" title="Download all orders as CSV"><i class="fa-regular fa-file-excel"></i> Export CSV</button>
+                    </div>
+                </div>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-bottom:0.8rem;">
+                    <input type="text" id="orderSearchInput" placeholder="🔍 Search ref, customer, email…" oninput="setOrderQuery(this.value)" style="flex:1;min-width:180px;padding:0.45rem 0.9rem;border:1.5px solid #dbe4ea;border-radius:30px;font-size:0.8rem;font-family:'Inter',sans-serif;" />
+                    <div style="display:flex;gap:0.35rem;flex-wrap:wrap;" id="orderStatusChips">
+                        <button class="btn-action process order-chip active" data-status="all" onclick="setOrderStatusFilter('all')">All</button>
+                        <button class="btn-action order-chip" data-status="pending" onclick="setOrderStatusFilter('pending')" style="background:#fff4e5;color:#d35400;">Pending</button>
+                        <button class="btn-action order-chip" data-status="processing" onclick="setOrderStatusFilter('processing')">Processing</button>
+                        <button class="btn-action order-chip ship" data-status="shipped" onclick="setOrderStatusFilter('shipped')">Shipped</button>
+                        <button class="btn-action order-chip approve" data-status="delivered" onclick="setOrderStatusFilter('delivered')">Delivered</button>
+                        <button class="btn-action order-chip delete" data-status="cancelled" onclick="setOrderStatusFilter('cancelled')">Cancelled</button>
+                    </div>
                 </div>
                 <div id="orderList">
                     <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading orders...</p></div>
@@ -1002,6 +1035,7 @@
                     <div>
                         <h2><i class="fa-regular fa-box"></i> Products</h2>
                         <span class="time" id="productCount">0 products</span>
+                        <span class="time" id="inventoryValue" style="margin-left:0.8rem;color:var(--primary);font-weight:700;" title="Total on-hand inventory value (stock × price)"></span>
                     </div>
                     <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
                         <button type="button" class="btn-add-product" onclick="downloadCSVTemplate()" style="background:var(--secondary);font-size:0.82rem;padding:0.5rem 1rem;">
@@ -1017,6 +1051,13 @@
                             <i class="fa-regular fa-plus"></i> Add Product
                         </button>
                     </div>
+                </div>
+                <div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-bottom:0.7rem;" id="productFilterChips">
+                    <button class="btn-action process order-chip product-chip active" data-filter="all" onclick="setProductFilter('all')">All</button>
+                    <button class="btn-action approve order-chip product-chip" data-filter="active" onclick="setProductFilter('active')">Active</button>
+                    <button class="btn-action order-chip product-chip" data-filter="pending" onclick="setProductFilter('pending')" style="background:#fff4e5;color:#d35400;">Pending</button>
+                    <button class="btn-action order-chip product-chip" data-filter="low" onclick="setProductFilter('low')" style="background:#fdecea;color:#c0392b;"><i class="fa-solid fa-triangle-exclamation"></i> Low Stock</button>
+                    <button class="btn-action delete order-chip product-chip" data-filter="out" onclick="setProductFilter('out')">Out of Stock</button>
                 </div>
                 <div class="table-container">
                     <table>
@@ -1633,6 +1674,44 @@
     </div>
 </div>
 
+<!-- RFQ SUPPLIER QUOTE MODAL -->
+<div class="modal-overlay" id="rfqQuoteModal">
+    <div class="modal-box" style="max-width:560px;">
+        <h3><i class="fa-solid fa-file-invoice-dollar" style="color:#2ecc71;"></i> Send Supplier Quote</h3>
+        <div id="rfqQuoteSummary" style="background:var(--light);border-radius:8px;padding:0.7rem 0.9rem;font-size:0.8rem;color:var(--text);margin-bottom:1rem;"></div>
+        <input type="hidden" id="sqRfqId" />
+        <div class="form-row">
+            <div class="form-group">
+                <label>Unit Price (USD) *</label>
+                <input type="number" id="sqUnitPrice" min="0.01" step="0.01" placeholder="e.g. 12.50" oninput="updateQuoteEstimate()" />
+            </div>
+            <div class="form-group">
+                <label>Min. Order Qty (MOQ)</label>
+                <input type="number" id="sqMoq" min="1" step="1" placeholder="e.g. 200" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Lead Time (days)</label>
+                <input type="number" id="sqLeadTime" min="1" step="1" placeholder="e.g. 21" />
+            </div>
+            <div class="form-group">
+                <label>Quote Valid (days)</label>
+                <input type="number" id="sqValidDays" min="1" step="1" value="14" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Terms &amp; Notes for the Buyer</label>
+            <textarea id="sqNotes" placeholder="e.g. Includes free logo printing. FOB Shenzhen. Sample available on request."></textarea>
+        </div>
+        <div id="sqEstimated" style="font-size:0.85rem;color:var(--primary);font-weight:700;margin-bottom:0.4rem;"></div>
+        <div class="btn-group">
+            <button class="btn-submit" id="sqSubmitBtn" onclick="submitRFQQuote()"><i class="fa-regular fa-paper-plane"></i> Send Quote to Buyer</button>
+            <button class="btn-close" onclick="closeQuoteModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <!-- CSV IMPORT MODAL -->
 <div class="modal-overlay" id="csvImportModal">
     <div class="modal-box" style="max-width:550px;">
@@ -2058,12 +2137,38 @@
             document.getElementById('orderBadge').textContent = pending.length;
             document.getElementById('orderCount').textContent = `${allOrders.length} orders`;
 
+            try { renderRevenueChart(); } catch (e) { /* chart is optional */ }
+
             if (allOrders.length === 0) {
                 container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-receipt"></i><p>No orders placed yet</p></div>`;
                 return;
             }
 
-            container.innerHTML = allOrders.slice(0, 20).map(o => {
+            renderOrdersList();
+            try { renderTopBuyers(); } catch (e) { /* optional */ }
+        } catch (error) {
+            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading orders</p></div>`;
+        }
+    }
+
+    function renderOrdersList() {
+            const container = document.getElementById('orderList');
+            const q = (orderFilter.query || '').trim().toLowerCase();
+            let list = allOrders;
+            if (orderFilter.status !== 'all') list = list.filter(o => (o.status || 'pending') === orderFilter.status);
+            if (q) {
+                list = list.filter(o => {
+                    const hay = [o.quoteNumber, o.orderNumber, o.customer?.firstName, o.customer?.lastName, o.customer?.email, o.customer?.phone].join(' ').toLowerCase();
+                    return hay.includes(q);
+                });
+            }
+            const countEl = document.getElementById('orderCount');
+            if (countEl) countEl.textContent = orderFilter.status === 'all' && !q ? `${allOrders.length} orders` : `${list.length} of ${allOrders.length} orders`;
+            if (list.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-magnifying-glass"></i><p>No orders match this filter</p></div>`;
+                return;
+            }
+            container.innerHTML = list.slice(0, 20).map(o => {
                 const status = o.status || 'pending';
                 const statusLabels = {
                     pending: 'Pending',
@@ -2087,6 +2192,8 @@
                         </div>
                         <div style="display:flex; gap:0.3rem; margin-top:0.5rem; flex-wrap:wrap;">
                             <button class="btn-action view" onclick="viewOrder('${o.id}')"><i class="fa-regular fa-eye"></i> View</button>
+                            ${(status === 'processing' || status === 'shipped') ? `<button class="btn-action" style="background:#eef2f6;color:#0b2a3b;border:1px solid #d5dee6;" onclick="downloadPackingSlip('${o.id}')" title="Printable warehouse packing slip — no prices"><i class="fa-solid fa-box-open"></i> Slip</button>` : ''}
+                            ${o.customer?.phone ? `<button class="btn-action" style="background:#25D366;color:#fff;" onclick="notifyOrderWhatsApp('${o.id}')" title="Send order status update to buyer on WhatsApp"><i class="fa-brands fa-whatsapp"></i> Notify</button>` : ''}
                             ${status === 'pending' ? `<button class="btn-action process" onclick="updateOrderStatus('${o.id}', 'processing')"><i class="fa-regular fa-gear"></i> Process</button>` : ''}
                             ${status === 'processing' ? `<button class="btn-action ship" onclick="updateOrderStatus('${o.id}', 'shipped')"><i class="fa-regular fa-truck"></i> Ship</button>` : ''}
                             ${status === 'shipped' ? `<button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'delivered')"><i class="fa-regular fa-circle-check"></i> Deliver</button>` : ''}
@@ -2094,10 +2201,62 @@
                     </div>
                 `;
             }).join('');
+    }
 
-        } catch (error) {
-            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading orders</p></div>`;
+    // ─── TOP BUYERS BY REVENUE (customers tab, from cached orders) ───
+    function renderTopBuyers() {
+        const card = document.getElementById('topBuyersCard');
+        const list = document.getElementById('topBuyersList');
+        if (!card || !list || !allOrders || allOrders.length === 0) return;
+        const totals = {};
+        allOrders.forEach(o => {
+            if (o.status === 'cancelled') return;
+            const key = (o.user_id || (o.customer && o.customer.email) || 'guest').toLowerCase();
+            const name = ((o.customer && o.customer.firstName) ? (o.customer.firstName + ' ' + (o.customer.lastName || '')).trim() : '') || (o.customer && o.customer.email) || 'Guest buyer';
+            const cur = totals[key] || { name, spend: 0, orders: 0 };
+            cur.spend += ((o.totals && o.totals.total) || o.total || 0);
+            cur.orders += 1;
+            cur.name = cur.name || name;
+            totals[key] = cur;
+        });
+        const top = Object.values(totals).sort((a, b) => b.spend - a.spend).slice(0, 5);
+        if (!top.length) return;
+        const medals = ['🥇', '🥈', '🥉', '4.', '5.'];
+        list.innerHTML = top.map((b, i) => `
+            <div style="border:1px solid #eef2f6;border-radius:10px;padding:0.6rem 0.8rem;display:flex;align-items:center;gap:0.6rem;">
+                <span style="font-size:1.1rem;width:1.6rem;text-align:center;">${medals[i]}</span>
+                <div style="min-width:0;">
+                    <div style="font-weight:700;font-size:0.8rem;color:var(--secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${b.name}</div>
+                    <div style="font-size:0.7rem;color:var(--text-light);">${b.orders} order${b.orders === 1 ? '' : 's'} · <span style="color:var(--primary);font-weight:700;">$${b.spend.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span></div>
+                </div>
+            </div>`).join('');
+        card.style.display = 'block';
+    }
+
+    // ─── WAREHOUSE PACKING SLIP (PDF — no prices) ───
+    function downloadPackingSlip(orderId) {
+        const order = allOrders.find(o => o.id === orderId);
+        if (!order) return;
+        if (!window.PSE_QUOTE_PDF || !window.PSE_QUOTE_PDF.buildPackingSlipPdf) { showToast('PDF engine unavailable', 'error'); return; }
+        const doc = window.PSE_QUOTE_PDF.buildPackingSlipPdf(order);
+        if (doc) {
+            doc.save((order.quoteNumber || orderId) + '-Packing-Slip.pdf');
+            showToast('📦 Packing slip downloaded', 'success');
         }
+    }
+
+    // ─── ORDER FILTER STATE + SETTERS ───
+    let orderFilter = { status: 'all', query: '' };
+
+    function setOrderStatusFilter(status) {
+        orderFilter.status = status;
+        document.querySelectorAll('.order-chip').forEach(c => c.classList.toggle('active', c.dataset.status === status));
+        if (allOrders.length) renderOrdersList();
+    }
+
+    function setOrderQuery(query) {
+        orderFilter.query = query;
+        if (allOrders.length) renderOrdersList();
     }
 
     function viewOrder(orderId) {
@@ -2209,6 +2368,35 @@
                 status_updated_at: new Date().toISOString()
             });
             showToast(`✅ Order status updated to ${status}`, 'success');
+
+            // Sync public verification registry (guest track-order / verify page)
+            const order = allOrders.find(o => o.id === orderId);
+            if (order && order.quoteNumber) {
+                db.collection('verifications').doc(order.quoteNumber)
+                    .set({ status, updated_at: new Date().toISOString() }, { merge: true })
+                    .catch(() => {});
+            }
+
+            // Email the buyer about the new status (non-blocking)
+            if (order && order.customer && order.customer.email) {
+                const name = `${order.customer.firstName || ''} ${order.customer.lastName || ''}`.trim() || 'Valued Customer';
+                const ref = order.quoteNumber || orderId;
+                try {
+                    if (status === 'shipped' && typeof sendShippingUpdate === 'function') {
+                        sendShippingUpdate(order.customer.email, name, ref, order.tracking_number || 'Assigned on dispatch', 'PSE Logistics Partner', '3-7 business days').catch(() => {});
+                    } else if (typeof sendNotificationEmail === 'function') {
+                        const msgs = {
+                            processing: 'Your order is confirmed and being prepared by our fulfilment team.',
+                            delivered: 'Your order has been delivered. Thank you for choosing Pilot Sales Distribution!',
+                            cancelled: 'Your order has been cancelled. If this is unexpected, please contact our support team.'
+                        };
+                        if (msgs[status]) {
+                            sendNotificationEmail(order.customer.email, name, `Order ${ref} — ${status.charAt(0).toUpperCase() + status.slice(1)}`, msgs[status], 'Track Order', 'https://pilotsalesdistribution.com/track-order').catch(() => {});
+                        }
+                    }
+                } catch (e) { /* email is best-effort */ }
+            }
+
             loadOrders();
             updateStats();
         } catch (error) { showToast('Failed', 'error'); }
@@ -2221,16 +2409,47 @@
             const snapshot = await db.collection('products').get();
             const products = [];
             snapshot.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
+            allAdminProducts = products;
 
             document.getElementById('productBadge').textContent = products.length;
             document.getElementById('productCount').textContent = `${products.length} products`;
+            const inv = products.reduce((s, p) => s + (p.stock || 0) * (p.price || 0), 0);
+            const invEl = document.getElementById('inventoryValue');
+            if (invEl) invEl.textContent = '📦 $' + inv.toLocaleString('en-US', { maximumFractionDigits: 0 }) + ' on hand';
 
             if (products.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-box"></i><p>No products added yet</p></div></td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = products.slice(0, 20).map(p => `
+            renderAdminProducts();
+        } catch (error) {
+            tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading products</p></div></td></tr>`;
+        }
+    }
+
+    // ─── PRODUCT FILTER STATE + RENDER ───
+    let allAdminProducts = [];
+    let productFilter = 'all';
+
+    function setProductFilter(filter) {
+        productFilter = filter;
+        document.querySelectorAll('.product-chip').forEach(c => c.classList.toggle('active', c.dataset.filter === filter));
+        if (allAdminProducts.length) renderAdminProducts();
+    }
+
+    function renderAdminProducts() {
+            const tbody = document.getElementById('productTableBody');
+            let list = allAdminProducts || [];
+            if (productFilter === 'active') list = list.filter(p => p.status === 'active' || p.status === 'approved');
+            else if (productFilter === 'pending') list = list.filter(p => !p.status || p.status === 'pending');
+            else if (productFilter === 'low') list = list.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= (p.moq || 10));
+            else if (productFilter === 'out') list = list.filter(p => (p.stock || 0) <= 0);
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-magnifying-glass"></i><p>No products match this filter</p></div></td></tr>`;
+                return;
+            }
+            tbody.innerHTML = list.slice(0, 20).map(p => `
                 <tr>
                     <td>
                         <div style="display:flex; align-items:center; gap:0.5rem;">
@@ -2239,7 +2458,7 @@
                         </div>
                     </td>
                     <td>$${(p.price || 0).toFixed(2)}</td>
-                    <td>${p.stock || 0}</td>
+                    <td>${(p.stock || 0) <= 0 ? '<span style="background:#fdecea;color:#c0392b;border-radius:12px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;">0 — Out</span>' : (p.stock || 0) <= (p.moq || 10) ? `<span style="background:#fff4e5;color:#d35400;border-radius:12px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;" title="At or below MOQ (${p.moq || 10})">${p.stock} — Low</span>` : (p.stock || 0)}</td>
                     <td><span class="status-badge ${p.status === 'active' || p.status === 'approved' ? 'active' : 'inactive'}">${p.status || 'pending'}</span></td>
                     <td>
                         <button class="btn-action edit" onclick="openAddProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
@@ -2247,10 +2466,6 @@
                     </td>
                 </tr>
             `).join('');
-
-        } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading products</p></div></td></tr>`;
-        }
     }
 
     async function deleteProduct(productId) {
@@ -2292,12 +2507,17 @@
                             <span class="status-badge ${rfq.status || 'pending'}">${rfq.status || 'Pending'}</span>
                         </div>
                         <div style="font-size:0.8rem; color:var(--text-light);">Category: ${rfq.category || 'N/A'}${rfq.budget ? ` | Budget: $${rfq.budget}` : ''}</div>
+                        ${rfq.quote ? `<div style="margin-top:0.35rem;background:#e8f5f0;border:1px solid #1a7b6b33;border-radius:6px;padding:0.35rem 0.6rem;font-size:0.78rem;color:#0f4f43;"><i class="fa-solid fa-file-invoice-dollar" style="color:#2ecc71;"></i> Quoted: <strong>$${Number(rfq.quote.unit_price || 0).toFixed(2)}/unit</strong> × ${rfq.quantity || 0} units = <strong>$${(Number(rfq.quote.unit_price || 0) * (rfq.quantity || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> • Lead: ${rfq.quote.lead_time_days || '—'} days</div>` : ''}
                         <div class="msg-preview-text">${rfq.description || 'No description'}</div>
                     </div>
                     <div style="display:flex; gap:0.3rem; margin-top:0.5rem; flex-wrap:wrap;">
                         <button class="btn-action view" onclick="viewRFQ('${rfq.id}')"><i class="fa-regular fa-eye"></i> View</button>
-                        ${rfq.status === 'pending' ? `<button class="btn-action approve" onclick="updateRFQStatus('${rfq.id}', 'reviewing')"><i class="fa-regular fa-check"></i> Review</button>` : ''}
-                        ${rfq.status === 'reviewing' ? `<button class="btn-action approve" onclick="updateRFQStatus('${rfq.id}', 'quoted')"><i class="fa-regular fa-file-lines"></i> Quote</button>` : ''}
+                        ${rfq.status === 'pending' ? `<button class="btn-action" style="background:#3498db;color:#fff;" onclick="updateRFQStatus('${rfq.id}', 'reviewing')"><i class="fa-regular fa-check"></i> Review</button>` : ''}
+                        ${['pending', 'reviewing'].includes(rfq.status || 'pending') ? `<button class="btn-action approve" onclick="openQuoteModal('${rfq.id}')"><i class="fa-solid fa-file-invoice-dollar"></i> Quote</button>` : ''}
+                        ${rfq.quote ? `
+                            <button class="btn-action" style="background:var(--secondary);color:#fff;" onclick="openQuoteModal('${rfq.id}')" title="Edit & re-send quote"><i class="fa-regular fa-pen-to-square"></i> Re-quote</button>
+                            <button class="btn-action" style="background:#c0392b;color:#fff;" onclick="downloadSupplierQuote('${rfq.id}')" title="Download supplier quote PDF"><i class="fa-solid fa-file-pdf"></i> Quote PDF</button>
+                        ` : ''}
                     </div>
                 </div>
             `).join('');
@@ -2321,6 +2541,143 @@
             loadRFQs();
             updateStats();
         } catch (error) { showToast('Failed', 'error'); }
+    }
+
+    // ─── SUPPLIER QUOTE RESPONSE (closes the RFQ loop) ───
+    function openQuoteModal(rfqId) {
+        const rfq = allRFQs.find(r => r.id === rfqId);
+        if (!rfq) { showToast('RFQ not loaded', 'error'); return; }
+        const escHtml = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        document.getElementById('sqRfqId').value = rfqId;
+        document.getElementById('rfqQuoteSummary').innerHTML =
+            `<strong>${escHtml(rfq.title || 'Untitled RFQ')}</strong><br />` +
+            `👤 Buyer: ${escHtml(rfq.user_email || 'N/A')} • 🔢 ${rfq.quantity || 0} units requested • 📂 ${escHtml(rfq.category || 'N/A')}` +
+            (rfq.budget ? ` • 💰 Target budget: $${Number(rfq.budget).toLocaleString('en-US')}` : '');
+        const q = rfq.quote || {};
+        document.getElementById('sqUnitPrice').value = q.unit_price || '';
+        document.getElementById('sqMoq').value = q.moq || rfq.quantity || '';
+        document.getElementById('sqLeadTime').value = q.lead_time_days || 21;
+        document.getElementById('sqValidDays').value = q.valid_days || 14;
+        document.getElementById('sqNotes').value = q.notes || '';
+        updateQuoteEstimate();
+        document.getElementById('rfqQuoteModal').classList.add('show');
+    }
+
+    function closeQuoteModal() {
+        document.getElementById('rfqQuoteModal').classList.remove('show');
+    }
+
+    function updateQuoteEstimate() {
+        const rfqId = document.getElementById('sqRfqId').value;
+        const rfq = allRFQs.find(r => r.id === rfqId);
+        const unitPrice = parseFloat(document.getElementById('sqUnitPrice').value);
+        const el = document.getElementById('sqEstimated');
+        if (rfq && unitPrice > 0) {
+            el.textContent = `💰 Estimated quote total: $${(unitPrice * (rfq.quantity || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} for ${rfq.quantity} units`;
+        } else {
+            el.textContent = '';
+        }
+    }
+
+    async function submitRFQQuote() {
+        const rfqId = document.getElementById('sqRfqId').value;
+        const rfq = allRFQs.find(r => r.id === rfqId);
+        if (!rfq) { showToast('RFQ not loaded', 'error'); return; }
+        const unitPrice = parseFloat(document.getElementById('sqUnitPrice').value);
+        const moq = parseInt(document.getElementById('sqMoq').value) || (rfq.quantity || 1);
+        const leadTime = parseInt(document.getElementById('sqLeadTime').value) || 21;
+        const validDays = parseInt(document.getElementById('sqValidDays').value) || 14;
+        const notes = document.getElementById('sqNotes').value.trim();
+        if (!unitPrice || unitPrice <= 0) { showToast('Enter a valid unit price', 'error'); return; }
+
+        const btn = document.getElementById('sqSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+        try {
+            const quote = {
+                quote_ref: 'SQ-PSE-' + String(rfqId).slice(0, 8).toUpperCase(),
+                unit_price: unitPrice,
+                moq,
+                lead_time_days: leadTime,
+                valid_days: validDays,
+                total: +(unitPrice * (rfq.quantity || 1)).toFixed(2),
+                notes,
+                quoted_at: new Date().toISOString(),
+                quoted_by: 'PSE Procurement'
+            };
+            await db.collection('rfqs').doc(rfqId).update({
+                quote,
+                status: 'quoted',
+                status_updated_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            });
+
+            // Register quote in the public verification registry + bump the RFQ ref
+            const nowIso = new Date().toISOString();
+            db.collection('verifications').doc(quote.quote_ref).set({
+                ref: quote.quote_ref,
+                type: 'supplier_quote',
+                status: 'quoted',
+                email: (rfq.user_email || '').toLowerCase(),
+                title: rfq.product_name || rfq.title || 'Bulk RFQ',
+                items_count: 1,
+                total: quote.total,
+                issued_at: nowIso,
+                updated_at: nowIso
+            }, { merge: true }).catch(() => {});
+            db.collection('verifications').doc('RFQ-PSE-' + String(rfqId).slice(0, 8).toUpperCase())
+                .set({ status: 'quoted', updated_at: nowIso }, { merge: true }).catch(() => {});
+
+            showToast(`✅ Quote sent to ${rfq.user_email || 'buyer'} — they can now view, download & accept it`, 'success');
+            closeQuoteModal();
+            loadRFQs();
+            updateStats();
+        } catch (error) {
+            showToast('❌ Failed to send quote', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Send Quote to Buyer';
+        }
+    }
+
+    // Download the buyer-facing supplier quote as a branded PDF (for records / WhatsApp)
+    function downloadSupplierQuote(rfqId) {
+        const rfq = allRFQs.find(r => r.id === rfqId);
+        if (!rfq || !rfq.quote) { showToast('No quote on this RFQ yet', 'error'); return; }
+        if (!window.PSE_QUOTE_PDF || !window.PSE_QUOTE_PDF.available()) { showToast('PDF engine unavailable', 'error'); return; }
+        const doc = window.PSE_QUOTE_PDF.buildSupplierQuotePdf(rfq, rfq.quote, {
+            full_name: rfq.user_email || 'B2B Commercial Buyer',
+            email: rfq.user_email || 'N/A',
+            id: rfq.user_id || 'N/A'
+        });
+        if (doc) {
+            doc.save((rfq.quote.quote_ref || 'SQ-PSE') + '-Supplier-Quote.pdf');
+            showToast('📄 Supplier quote PDF downloaded', 'success');
+        }
+    }
+
+    // ─── WHATSAPP ORDER STATUS NOTIFICATION (admin → buyer) ───
+    function notifyOrderWhatsApp(orderId) {
+        const o = allOrders.find(x => x.id === orderId);
+        if (!o || !o.customer || !o.customer.phone) { showToast('No phone number on this order', 'error'); return; }
+        const statusMap = {
+            pending:    { icon: '📋', label: 'RECEIVED',   line: 'We received your order and our wholesale team is reviewing it now.' },
+            processing: { icon: '⚙️', label: 'PROCESSING', line: 'Your order is being prepared — sourcing & quality checks are underway.' },
+            shipped:    { icon: '🚢', label: 'SHIPPED',    line: 'Great news — your order has shipped and is on its way to you!' },
+            delivered:  { icon: '✅', label: 'DELIVERED',  line: 'Your order has been delivered. Please confirm receipt so escrow funds can be released to the supplier.' },
+            cancelled:  { icon: '❌', label: 'CANCELLED',  line: 'Your order was cancelled. Reply to this message if you have any questions.' }
+        };
+        const st = statusMap[o.status || 'pending'] || statusMap.pending;
+        let msg = `${st.icon} *PSE Distribution — Order Update*\n`;
+        msg += `📄 *Quote #:* ${o.quoteNumber || 'N/A'}\n`;
+        msg += `📌 *Status:* ${st.label}\n\n`;
+        msg += `${st.line}\n\n`;
+        msg += `💰 Order Total: $${((o.totals && o.totals.total) || 0).toFixed(2)}\n`;
+        msg += `🔍 Track: ${location.origin}/track-order\n\n`;
+        msg += `🛡️ PSE Distribution Trade Assurance`;
+        const digits = String(o.customer.phone).replace(/[^0-9]/g, '');
+        window.open(`https://wa.me/${digits}?text=${encodeURIComponent(msg)}`, '_blank');
+        showToast(`📲 WhatsApp update opened for ${o.customer.firstName || 'buyer'}`, 'success');
     }
 
     // ─── LOAD SELLERS ───
@@ -2918,8 +3275,80 @@
     window.handleImagePreview = handleImagePreview;
     window.removePreviewImage = removePreviewImage;
     window.deleteProduct = deleteProduct;
+    // ─── REVENUE CHART (Chart.js, last 30 days) ───
+    let revenueChartInstance = null;
+    function renderRevenueChart() {
+        const canvas = document.getElementById('revenueChart');
+        if (!canvas || typeof Chart === 'undefined') return;
+        const days = [];
+        const totals = [];
+        const dayMap = {};
+        for (let i = 29; i >= 0; i--) {
+            const d = new Date(); d.setDate(d.getDate() - i);
+            const key = d.toISOString().slice(0, 10);
+            dayMap[key] = 0;
+            days.push(key);
+        }
+        (allOrders || []).forEach(o => {
+            if (o.status === 'cancelled') return;
+            const raw = o.date || o.created_at || '';
+            const key = String(raw).slice(0, 10);
+            if (key in dayMap) dayMap[key] += (o.totals && o.totals.total) || o.total || 0;
+        });
+        days.forEach(k => totals.push(+dayMap[k].toFixed(2)));
+        const labels = days.map(k => new Date(k + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        const sum = totals.reduce((a, b) => a + b, 0);
+        const totalEl = document.getElementById('revenueChartTotal');
+        if (totalEl) totalEl.textContent = `$${sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} total`;
+        if (revenueChartInstance) { revenueChartInstance.destroy(); revenueChartInstance = null; }
+        revenueChartInstance = new Chart(canvas.getContext('2d'), {
+            type: 'line',
+            data: { labels, datasets: [{ label: 'Revenue', data: totals, borderColor: '#1a7b6b', backgroundColor: 'rgba(26,123,107,0.12)', fill: true, tension: 0.35, pointRadius: 2, borderWidth: 2 }] },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' $' + (+c.parsed.y).toFixed(2) } } },
+                scales: { y: { beginAtZero: true, ticks: { callback: v => '$' + v } }, x: { ticks: { autoSkip: true, maxTicksLimit: 10 } } }
+            }
+        });
+    }
+
+    // ─── EXPORT ORDERS AS CSV ───
+    function exportOrdersCSV() {
+        if (!allOrders || allOrders.length === 0) { showToast('No orders to export', 'info'); return; }
+        const esc = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+        const rows = [['Order Ref', 'Date', 'Customer', 'Email', 'Phone', 'Country', 'Items', 'Subtotal', 'Shipping', 'Discount', 'Total', 'Status', 'Payment Method'].join(',')];
+        allOrders.forEach(o => {
+            const c = o.customer || {};
+            const t = o.totals || {};
+            rows.push([
+                esc(o.quoteNumber || o.id), esc(String(o.date || o.created_at || '').slice(0, 19).replace('T', ' ')),
+                esc(((c.firstName || '') + ' ' + (c.lastName || '')).trim()), esc(c.email), esc(c.phone), esc(c.country),
+                (o.items || []).length, t.subtotal || 0, t.shipping || 0, t.discount || 0, t.total || o.total || 0,
+                esc(o.status || 'pending'), esc(o.paymentMethod || o.payment_method || '')
+            ].join(','));
+        });
+        const blob = new Blob(['﻿' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'PSE-Orders-' + new Date().toISOString().slice(0, 10) + '.csv';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+        showToast('📊 Orders exported as CSV', 'success');
+    }
+
     window.updateOrderStatus = updateOrderStatus;
+    window.exportOrdersCSV = exportOrdersCSV;
+    window.setOrderStatusFilter = setOrderStatusFilter;
+    window.setOrderQuery = setOrderQuery;
+    window.setProductFilter = setProductFilter;
+    window.downloadPackingSlip = downloadPackingSlip;
     window.updateRFQStatus = updateRFQStatus;
+    window.openQuoteModal = openQuoteModal;
+    window.closeQuoteModal = closeQuoteModal;
+    window.updateQuoteEstimate = updateQuoteEstimate;
+    window.submitRFQQuote = submitRFQQuote;
+    window.downloadSupplierQuote = downloadSupplierQuote;
+    window.notifyOrderWhatsApp = notifyOrderWhatsApp;
     window.approveSeller = approveSeller;
     window.loadSellerApplications = loadSellerApplications;
     window.approveApplication = approveApplication;
@@ -3001,7 +3430,7 @@
                     stock: parseInt(values[headers.indexOf('stock')]) || 100,
                     sku: values[headers.indexOf('sku')] || '',
                     description: values[headers.indexOf('description')] || 'Wholesale product listed by admin team.',
-                    image_url: values[headers.indexOf('image_url')] || 'logo.jpg',
+                    image_url: values[headers.indexOf('image_url')] || 'logo.webp',
                     slug: generateSlug(values[headers.indexOf('title')] || values[0]),
                     supplier_id: user.uid,
                     seller_id: user.uid,

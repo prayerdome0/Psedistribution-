@@ -317,7 +317,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -373,6 +373,7 @@
                     <h2><i class="fa-solid fa-cart-shopping"></i> Your Cart</h2>
                     <span class="item-count" id="itemCount">0 items</span>
                 </div>
+                <div id="cartAgeBanner"></div>
                 <div id="cartItemsList">
                     <div class="loading-spinner">
                         <i class="fa-solid fa-spinner fa-spin"></i>
@@ -693,8 +694,72 @@
     }
 
     // ─── RENDER CART ITEMS ───
+    // ─── VOLUME-TIER NUDGES (mirrors the PDP tier ladder) ───
+    const CART_TIERS = [
+        { min: 50, discount: 0.07, label: 'Bulk Rate (7% off)' },
+        { min: 200, discount: 0.15, label: 'Wholesale Rate (15% off)' },
+        { min: 500, discount: 0.25, label: 'Enterprise Rate (25% off)' }
+    ];
+    function tierNudgeHtml(item) {
+        if (item.is_sample) return '';
+        const qty = Number(item.quantity || 1);
+        const price = Number(item.price || 0);
+        if (!price) return '';
+        const next = CART_TIERS.find(t => qty < t.min);
+        if (!next) return '';
+        const needed = next.min - qty;
+        const saving = price * next.min * next.discount;
+        return `<div style="font-size:0.72rem;font-weight:600;color:#e67e22;margin-top:3px;"><i class="fa-solid fa-arrow-trend-up"></i> Add ${needed} more to unlock <strong>${next.label}</strong> — save $${saving.toFixed(2)} on this line</div>`;
+    }
+
+    // ─── ABANDONED-CART BANNER (24h idle reminder) ───
+    function updateCartAgeBanner(items) {
+        const banner = document.getElementById('cartAgeBanner');
+        if (!banner) return;
+        if (!items.length) {
+            try { localStorage.removeItem('pilot_cart_ts'); localStorage.removeItem('pse_cart_banner_dismissed'); } catch (e) {}
+            banner.innerHTML = '';
+            return;
+        }
+        const now = Date.now();
+        let ts = 0, dismissedTs = '';
+        try {
+            ts = parseInt(localStorage.getItem('pilot_cart_ts') || '0', 10) || 0;
+            dismissedTs = localStorage.getItem('pse_cart_banner_dismissed') || '';
+        } catch (e) {}
+        if (!ts) {
+            try { localStorage.setItem('pilot_cart_ts', String(now)); } catch (e) {}
+            banner.innerHTML = '';
+            return;
+        }
+        const idleHours = (now - ts) / 3600000;
+        if (idleHours < 24 || dismissedTs === String(ts)) { banner.innerHTML = ''; return; }
+        const days = Math.floor(idleHours / 24);
+        banner.innerHTML = `
+            <div style="background:linear-gradient(135deg,#fff8e6,#fff3cd);border:1px solid #f1c40f;border-radius:12px;padding:0.9rem 1.1rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap;">
+                <span style="font-size:1.4rem;">🕐</span>
+                <div style="flex:1;min-width:200px;">
+                    <div style="font-weight:700;color:#7d6608;font-size:0.88rem;">Your wholesale cart has been waiting ${days >= 1 ? days + ' day' + (days === 1 ? '' : 's') : 'over a day'}</div>
+                    <div style="font-size:0.76rem;color:#9a7d0a;">Bulk stock &amp; tier pricing can change — lock in your rates before availability shifts.</div>
+                </div>
+                <a href="/checkout" style="background:var(--primary);color:#fff;padding:0.5rem 1.2rem;border-radius:30px;font-weight:700;font-size:0.8rem;text-decoration:none;">Checkout Now</a>
+                <a href="https://wa.me/19099384682?text=${encodeURIComponent('Hi! I have a wholesale cart saved and a question before checkout.')}" target="_blank" style="background:#25D366;color:#fff;padding:0.5rem 1.1rem;border-radius:30px;font-weight:700;font-size:0.8rem;text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Ask us</a>
+                <button onclick="dismissCartAgeBanner()" style="background:none;border:none;color:#9a7d0a;cursor:pointer;font-size:0.75rem;text-decoration:underline;">Dismiss</button>
+            </div>`;
+    }
+    function dismissCartAgeBanner() {
+        try {
+            const ts = localStorage.getItem('pilot_cart_ts') || '';
+            localStorage.setItem('pse_cart_banner_dismissed', ts);
+        } catch (e) {}
+        const banner = document.getElementById('cartAgeBanner');
+        if (banner) banner.innerHTML = '';
+    }
+    window.dismissCartAgeBanner = dismissCartAgeBanner;
+
     function renderCartItems(items) {
         const list = document.getElementById('cartItemsList');
+        updateCartAgeBanner(items);
         if (items.length === 0) {
             list.innerHTML = `
                 <div class="empty-cart">
@@ -713,7 +778,7 @@
                 <div class="cart-item" data-index="${index}">
                     <div class="item-image">
                         ${item.image ?
-                            `<img src="${item.image}" alt="${item.title}" onerror="this.onerror=null;this.src='/logo.jpg'" />` :
+                            `<img src="${item.image}" alt="${item.title}" onerror="this.onerror=null;this.src='/logo.webp'" />` :
                             `<i class="fa-solid fa-box" style="font-size:2rem;color:var(--text-light);"></i>`
                         }
                     </div>
@@ -726,6 +791,7 @@
                         ${item.brand ? `<div style="font-size:0.7rem; color:var(--text-light);">${item.brand}</div>` : ''}
                         ${item.is_sample ? `<div style="font-size:0.75rem;font-weight:700;color:#f39c12;margin-top:2px;"><i class="fa-solid fa-flask"></i> Evaluation Sample (MOQ Bypassed)</div>` : ''}
                         ${!item.is_sample && item.tier_label ? `<div style="font-size:0.75rem;font-weight:700;color:#27ae60;margin-top:2px;"><i class="fa-solid fa-bolt"></i> ${item.tier_label}</div>` : ''}
+                        ${tierNudgeHtml(item)}
                     </div>
                     <div class="item-actions">
                         <div class="qty-control">

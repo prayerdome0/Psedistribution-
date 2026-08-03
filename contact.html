@@ -319,7 +319,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -425,6 +425,11 @@
                     <div class="form-group">
                         <label>Message <span class="required">*</span></label>
                         <textarea id="contactMessage" placeholder="Describe your question or concern in detail..." required></textarea>
+                    </div>
+
+                    <!-- Honeypot: invisible to humans, bots fill it and get silently dropped -->
+                    <div style="position:absolute;left:-9999px;top:-9999px;height:1px;width:1px;overflow:hidden;" aria-hidden="true">
+                        <label>Leave this field empty<input type="text" id="contactWebsite" name="website" tabindex="-1" autocomplete="off" /></label>
                     </div>
 
                     <button type="submit" class="btn-submit" id="contactSubmitBtn">
@@ -612,9 +617,28 @@
         return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
     }
 
-    // ─── CONTACT FORM ───
+    // ─── CONTACT FORM (spam protection: honeypot + time-trap + rate limit) ───
+    const contactFormLoadedAt = Date.now();
     document.getElementById('contactForm').addEventListener('submit', function(e) {
         e.preventDefault();
+
+        // Honeypot: bots fill hidden fields — silently fake success
+        if (document.getElementById('contactWebsite').value) {
+            showToast('✅ Message sent successfully! We\'ll get back to you soon.', 'success');
+            document.getElementById('contactForm').reset();
+            return;
+        }
+        // Time-trap: humans take at least a few seconds to type a message
+        if (Date.now() - contactFormLoadedAt < 3000) {
+            showToast('Please take a moment to complete the form', 'error');
+            return;
+        }
+        // Rate limit: one message per 60 seconds per browser
+        const lastSent = parseInt(localStorage.getItem('pse_last_contact') || '0', 10);
+        if (Date.now() - lastSent < 60000) {
+            showToast('You just sent a message — please wait a minute before sending another', 'error');
+            return;
+        }
 
         const firstName = document.getElementById('contactFirstName').value.trim();
         const lastName = document.getElementById('contactLastName').value.trim();
@@ -653,6 +677,7 @@
             created_at: new Date().toISOString()
         })
         .then(async () => {
+            localStorage.setItem('pse_last_contact', String(Date.now()));
             try {
                 if (typeof sendContactMessage === 'function') {
                     await sendContactMessage({

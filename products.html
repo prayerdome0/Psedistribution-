@@ -559,7 +559,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -606,6 +606,9 @@
     <div class="page-header animate-on-scroll">
         <h1>All <span>Products</span></h1>
         <p>Browse our extensive wholesale catalog</p>
+        <button type="button" onclick="openQuickOrder()" style="margin-top:0.9rem;background:var(--secondary);color:#fff;border:none;padding:0.55rem 1.4rem;border-radius:30px;font-weight:700;font-size:0.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:0.45rem;box-shadow:0 6px 18px rgba(11,42,59,0.25);">
+            <i class="fa-solid fa-bolt" style="color:#f1c40f;"></i> Quick Order by SKU
+        </button>
     </div>
 
     <!-- Trust strip -->
@@ -720,6 +723,24 @@
 
         <div style="display:flex;justify-content:flex-end;margin-top:1.5rem;">
             <button type="button" class="btn-cancel" onclick="closeCompareModal()">Close Comparison</button>
+        </div>
+    </div>
+</div>
+
+<!-- QUICK ORDER MODAL -->
+<div id="quickOrderModal" style="display:none;position:fixed;inset:0;background:rgba(11,26,42,0.55);z-index:9999;align-items:center;justify-content:center;padding:1rem;">
+    <div style="background:#fff;border-radius:16px;max-width:540px;width:100%;padding:1.6rem;max-height:90vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,0.3);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+            <h3 style="font-size:1.1rem;color:var(--secondary);"><i class="fa-solid fa-bolt" style="color:#f1c40f;"></i> Quick Order by SKU</h3>
+            <button onclick="closeQuickOrder()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-light);"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <p style="font-size:0.78rem;color:var(--text-light);margin-bottom:0.7rem;">Paste one item per line as <strong>SKU, quantity</strong> (comma, pipe or space separated). SKUs or exact product titles both work.</p>
+        <textarea id="qoInput" rows="5" placeholder="KB-500, 100&#10;USB-C-DOCK, 40&#10;Wireless Bluetooth Keyboard, 250" style="width:100%;padding:0.7rem 0.9rem;border:1.5px solid var(--border-dark);border-radius:10px;font-size:0.85rem;font-family:monospace;resize:vertical;"></textarea>
+        <div id="qoPreview" style="margin-top:0.7rem;font-size:0.82rem;max-height:200px;overflow-y:auto;"></div>
+        <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
+            <button onclick="parseQuickOrder()" style="background:var(--light);color:var(--secondary);border:1px solid var(--border-dark);padding:0.5rem 1.1rem;border-radius:8px;font-weight:700;font-size:0.82rem;cursor:pointer;"><i class="fa-solid fa-list-check"></i> Parse &amp; Preview</button>
+            <button id="qoAddBtn" onclick="addQuickOrderToCart()" disabled style="background:var(--primary);color:#fff;border:none;padding:0.5rem 1.1rem;border-radius:8px;font-weight:700;font-size:0.82rem;cursor:pointer;opacity:0.5;"><i class="fa-solid fa-cart-plus"></i> Add All to Cart</button>
+            <button onclick="closeQuickOrder()" style="background:none;border:none;color:var(--text-light);font-size:0.82rem;cursor:pointer;margin-left:auto;">Cancel</button>
         </div>
     </div>
 </div>
@@ -1055,7 +1076,7 @@
         grid.innerHTML = pageProducts.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
             const slug = p.slug || generateSlug(p.title || 'product');
-            const imageUrl = window.getProductImage ? window.getProductImage(p) : (p.image_url || 'logo.jpg');
+            const imageUrl = window.getProductImage ? window.getProductImage(p) : (p.image_url || 'logo.webp');
             const stars = p.rating ? '★'.repeat(Math.floor(p.rating)) + (p.rating % 1 >= 0.5 ? '½' : '') : '';
             const stockStatus = p.stock > 0 ? 'In Stock' : 'Out of Stock';
             
@@ -1071,7 +1092,7 @@
                     ${discount > 0 ? `<span class="product-badge flash" style="${p.sponsored ? 'top:66px;' : ''}">-${discount}%</span>` : ''}
                     ${p.supplier_verified ? `<span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>` : ''}
                     <div class="product-image" onclick="window.location.href='/product/${slug}'">
-                        <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.jpg'" />
+                        <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'" />
                     </div>
                     <div class="product-title">${p.title || 'Product'}</div>
                     <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
@@ -1388,7 +1409,7 @@
                 <tbody>
                     <tr>
                         <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Image</td>
-                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);text-align:center;"><img src="${p.image_url || 'logo.jpg'}" style="height:65px;object-fit:contain;margin:0 auto;" /></td>`).join('')}
+                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);text-align:center;"><img src="${p.image_url || 'logo.webp'}" style="height:65px;object-fit:contain;margin:0 auto;" /></td>`).join('')}
                     </tr>
                     <tr>
                         <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Wholesale Unit Price</td>
@@ -1441,6 +1462,133 @@
 
     // ─── EXPOSE ───
     window.addToCart = addToCart;
+
+    // ─── QUICK ORDER PAD (SKU × qty bulk entry) ───
+    let qoParsed = [];
+
+    function openQuickOrder() {
+        document.getElementById('quickOrderModal').style.display = 'flex';
+        setTimeout(() => document.getElementById('qoInput').focus(), 100);
+    }
+    function closeQuickOrder() {
+        document.getElementById('quickOrderModal').style.display = 'none';
+        document.getElementById('qoInput').value = '';
+        document.getElementById('qoPreview').innerHTML = '';
+        document.getElementById('qoAddBtn').disabled = true;
+        document.getElementById('qoAddBtn').style.opacity = '0.5';
+        qoParsed = [];
+    }
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && document.getElementById('quickOrderModal').style.display === 'flex') closeQuickOrder();
+    });
+
+    function findProductByCode(code) {
+        const c = String(code || '').trim().toLowerCase();
+        if (!c) return null;
+        return allProducts.find(p =>
+            (p.sku && String(p.sku).trim().toLowerCase() === c) ||
+            p.id === code ||
+            (p.title || '').trim().toLowerCase() === c
+        ) || null;
+    }
+
+    function parseQuickOrder() {
+        const raw = document.getElementById('qoInput').value;
+        const preview = document.getElementById('qoPreview');
+        qoParsed = [];
+        const rows = [];
+        raw.split(/[\n;]+/).forEach(line => {
+            if (!line.trim()) return;
+            // "SKU, qty"  |  "SKU | qty"  |  "SKU qty"  (qty optional, default MOQ/1)
+            const m = line.match(/^\s*(.+?)\s*(?:[,|\t]\s*|\s+)(\d+)\s*$/) || line.match(/^\s*(.+?)\s*$/);
+            if (!m) return;
+            const code = (m[1] || '').trim();
+            const qty = Math.max(1, parseInt(m[2] || '1', 10) || 1);
+            const p = findProductByCode(code);
+            if (p) {
+                const effQty = Math.max(qty, p.moq || 1);
+                qoParsed.push({ product: p, qty: effQty });
+                rows.push(`<div style="display:flex;justify-content:space-between;gap:0.6rem;padding:0.35rem 0;border-bottom:1px solid var(--border);">
+                    <span style="color:#1a7b6b;">✅ ${(p.title || code).substring(0, 42)}${effQty !== qty ? ` <em style="font-style:normal;color:#e67e22;">(MOQ rounded to ${effQty})</em>` : ''}</span>
+                    <span style="font-family:monospace;white-space:nowrap;">${effQty} × $${(p.price || 0).toFixed(2)} = <strong>$${((p.price || 0) * effQty).toFixed(2)}</strong></span>
+                </div>`);
+            } else {
+                rows.push(`<div style="padding:0.35rem 0;border-bottom:1px solid var(--border);color:#c0392b;">❌ Not found: <strong>${code.substring(0, 40)}</strong> — check the SKU</div>`);
+            }
+        });
+        preview.innerHTML = rows.length ? rows.join('') : '<span style="color:var(--text-light);">Nothing parsed yet — enter items above.</span>';
+        const btn = document.getElementById('qoAddBtn');
+        const ok = qoParsed.length > 0;
+        btn.disabled = !ok;
+        btn.style.opacity = ok ? '1' : '0.5';
+        if (ok) showToast(`✅ ${qoParsed.length} item(s) parsed — review & add`, 'success');
+    }
+
+    async function addQuickOrderToCart() {
+        if (!qoParsed.length) { showToast('Nothing parsed to add', 'error'); return; }
+        const btn = document.getElementById('qoAddBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
+        const user = getCurrentUser();
+        let added = 0;
+        try {
+            if (!user) {
+                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+                qoParsed.forEach(({ product, qty }) => {
+                    const idx = cart.findIndex(item => item.product_id === product.id);
+                    if (idx > -1) cart[idx].quantity = (cart[idx].quantity || 1) + qty;
+                    else cart.push({
+                        product_id: product.id,
+                        title: product.title || 'Product',
+                        price: product.price || 0,
+                        old_price: product.old_price || 0,
+                        image_url: window.getProductImage ? window.getProductImage(product, '') : (product.image_url || ''),
+                        brand: product.brand || 'Pilot Distribution',
+                        moq: product.moq || 1,
+                        quantity: qty
+                    });
+                });
+                localStorage.setItem('pilot_cart', JSON.stringify(cart));
+                added = qoParsed.length;
+            } else {
+                for (const { product, qty } of qoParsed) {
+                    const snap = await db.collection('cart')
+                        .where('user_id', '==', user.id)
+                        .where('product_id', '==', product.id)
+                        .get();
+                    if (!snap.empty) {
+                        const ref = snap.docs[0].ref;
+                        await ref.update({ quantity: (snap.docs[0].data().quantity || 1) + qty, updated_at: new Date().toISOString() });
+                    } else {
+                        await db.collection('cart').add({
+                            user_id: user.id,
+                            product_id: product.id,
+                            quantity: qty,
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        });
+                    }
+                    added++;
+                }
+            }
+            showToast(`🛒 Added ${added} item(s) to cart!`, 'success');
+            if (typeof window.pushNotification === 'function') {
+                window.pushNotification('Quick order added ⚡', `${added} SKU(s) added to your cart — total lines ready for checkout.`, { icon: 'fa-bolt', url: '/cart', tag: 'cart' });
+            }
+            loadCartCount();
+            closeQuickOrder();
+        } catch (e) {
+            console.error('Quick order failed', e);
+            showToast('❌ Failed to add some items', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add All to Cart';
+        }
+    }
+
+    window.openQuickOrder = openQuickOrder;
+    window.closeQuickOrder = closeQuickOrder;
+    window.parseQuickOrder = parseQuickOrder;
+    window.addQuickOrderToCart = addQuickOrderToCart;
     window.toggleWishlist = toggleWishlist;
     window.applyFilters = applyFilters;
     window.clearAllFilters = clearAllFilters;

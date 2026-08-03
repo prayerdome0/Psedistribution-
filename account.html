@@ -400,7 +400,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -549,6 +549,10 @@
                             <input type="text" id="profileCompany" placeholder="Your company name" />
                         </div>
                         <div class="form-group">
+                            <label>VAT / Tax ID <span style="color:var(--text-light); font-weight:400; font-size:0.72rem;">(printed on quotes &amp; invoices)</span></label>
+                            <input type="text" id="profileVatId" placeholder="e.g. US-88-1234567" />
+                        </div>
+                        <div class="form-group">
                             <label>Bio / About Me</label>
                             <textarea id="profileBio" placeholder="Tell us about yourself or your business..." rows="3"></textarea>
                         </div>
@@ -593,7 +597,11 @@
                         </div>
                     </div>
                     <div id="addAddressForm" style="display:none; margin-top:1rem; padding:1rem; background:var(--light); border-radius:var(--radius-sm);">
-                        <h4 style="margin-bottom:0.5rem;">Add New Address</h4>
+                        <h4 style="margin-bottom:0.5rem;" id="addressFormTitle">Add New Address</h4>
+                        <div class="form-group">
+                            <label>Label <span style="color:var(--text-light);font-weight:400;">(optional — e.g. Head Office, Warehouse B)</span></label>
+                            <input type="text" id="addrLabel" placeholder="Head Office" />
+                        </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Address Line 1</label>
@@ -636,6 +644,9 @@
                                 </select>
                             </div>
                         </div>
+                        <label style="display:flex;align-items:center;gap:0.45rem;font-size:0.8rem;margin-bottom:0.6rem;cursor:pointer;">
+                            <input type="checkbox" id="addrIsDefault" /> ⭐ Set as my default checkout address
+                        </label>
                         <button onclick="saveAddress()" style="background:var(--primary); color:#fff; border:none; padding:0.6rem 2rem; border-radius:50px; font-weight:600; cursor:pointer; transition:var(--transition);">
                             <i class="fa-regular fa-floppy-disk"></i> Save Address
                         </button>
@@ -674,6 +685,19 @@
                 <!-- Trade Credit Tab -->
                 <div class="tab-content" id="tab-credit">
                     <div class="section-title"><i class="fa-solid fa-credit-card" style="color:#27ae60;"></i> Net-30 Trade Credit Application</div>
+                    <div id="net30MeterCard" style="display:none;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.4rem;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.5rem;">
+                            <span style="font-weight:700;color:var(--secondary);font-size:0.9rem;"><i class="fa-solid fa-gauge-high" style="color:var(--primary);"></i> Available Credit</span>
+                            <span id="net30MeterText" style="font-size:0.85rem;font-weight:700;color:var(--primary);"></span>
+                        </div>
+                        <div style="background:#eef2f6;border-radius:30px;height:12px;overflow:hidden;">
+                            <div id="net30MeterBar" style="height:100%;background:linear-gradient(90deg,#1a7b6b,#27ae60);border-radius:30px;transition:width .6s ease;width:0%;"></div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text-light);margin-top:0.35rem;">
+                            <span id="net30UsedText">Used: $0</span>
+                            <span>Repaid on delivery terms • Net-30</span>
+                        </div>
+                    </div>
                     <div style="background:var(--primary-light);border:1px solid var(--primary);border-radius:12px;padding:1.5rem;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
                         <div>
                             <div style="font-size:0.8rem;text-transform:uppercase;color:var(--primary-dark);font-weight:700;margin-bottom:0.3rem;">Corporate Trade Credit Status</div>
@@ -853,6 +877,7 @@
                     if (data.trade_credit_status === 'approved') {
                         const creditText = document.getElementById('tradeCreditStatusText');
                         if (creditText) creditText.innerHTML = `Approved <span style="font-size:0.75rem;padding:4px 10px;border-radius:20px;background:#e8f8f0;color:#27ae60;font-weight:600;">$${(data.trade_credit_limit || 15000).toLocaleString()} Limit</span>`;
+                        renderNet30Meter(user.uid, data.trade_credit_limit || 15000).catch(() => {});
                     } else if (data.trade_credit_status === 'pending') {
                         const creditText = document.getElementById('tradeCreditStatusText');
                         if (creditText) creditText.innerHTML = `Pending Approval <span style="font-size:0.75rem;padding:4px 10px;border-radius:20px;background:#fff;color:#d35400;font-weight:600;">$${(data.trade_credit_limit || 5000).toLocaleString()} Limit</span>`;
@@ -866,6 +891,34 @@
             }
             updateAuthUI();
         });
+    }
+
+    // ─── NET-30 CREDIT METER (approved limit − open Net-30 orders) ───
+    async function renderNet30Meter(uid, limit) {
+        try {
+            const snap = await db.collection('orders').where('user_id', '==', uid).get();
+            let used = 0;
+            snap.forEach(doc => {
+                const o = doc.data();
+                const method = String(o.paymentMethod || o.payment_method || '');
+                if (/net[-\s]?30/i.test(method) && (o.status || 'pending') !== 'cancelled') {
+                    used += ((o.totals && o.totals.total) || o.total || 0);
+                }
+            });
+            const available = Math.max(0, (limit || 0) - used);
+            const pct = limit > 0 ? Math.min(100, Math.round((available / limit) * 100)) : 0;
+            const card = document.getElementById('net30MeterCard');
+            if (card) card.style.display = 'block';
+            const bar = document.getElementById('net30MeterBar');
+            if (bar) {
+                bar.style.width = pct + '%';
+                bar.style.background = pct > 40 ? 'linear-gradient(90deg,#1a7b6b,#27ae60)' : (pct > 15 ? 'linear-gradient(90deg,#e67e22,#f39c12)' : 'linear-gradient(90deg,#c0392b,#e74c3c)');
+            }
+            const meterText = document.getElementById('net30MeterText');
+            if (meterText) meterText.textContent = `$${available.toLocaleString('en-US', { minimumFractionDigits: 2 })} of $${(limit || 0).toLocaleString('en-US')} available`;
+            const usedText = document.getElementById('net30UsedText');
+            if (usedText) usedText.textContent = `Used: $${used.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+        } catch (e) { /* meter optional */ }
     }
 
     // ─── GO TO ADMIN DASHBOARD ───
@@ -1051,6 +1104,8 @@
                 document.getElementById('profileEmail').value = user.email || '';
                 document.getElementById('profilePhone').value = data.phone || '';
                 document.getElementById('profileCompany').value = data.company || '';
+                const vatEl = document.getElementById('profileVatId');
+                if (vatEl) vatEl.value = data.vat_id || '';
                 document.getElementById('profileBio').value = data.bio || '';
 
                 document.getElementById('userName').textContent = data.full_name || user.full_name || 'User';
@@ -1097,6 +1152,7 @@
             const displayName = document.getElementById('profileDisplayName').value.trim();
             const phone = document.getElementById('profilePhone').value.trim();
             const company = document.getElementById('profileCompany').value.trim();
+            const vatId = (document.getElementById('profileVatId')?.value || '').trim();
             const bio = document.getElementById('profileBio').value.trim();
 
             const updateData = {
@@ -1106,6 +1162,7 @@
                 display_name: displayName || `${firstName} ${lastName}`.trim(),
                 phone: phone,
                 company: company,
+                vat_id: vatId,
                 bio: bio,
                 updated_at: new Date().toISOString()
             };
@@ -1243,7 +1300,7 @@
                 <div class="wishlist-item">
                     <button class="wishlist-remove" onclick="removeFromWishlist('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
                     <div class="wishlist-image" onclick="window.location.href='/product/${p.slug}'">
-                        <img src="${p.image_url || 'logo.jpg'}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />
+                        <img src="${p.image_url || 'logo.webp'}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />
                     </div>
                     <div class="wishlist-title" onclick="window.location.href='/product/${p.slug}'">${p.title || 'Product'}</div>
                     <div class="wishlist-price">$${(p.price || 0).toFixed(2)}</div>
@@ -1292,31 +1349,80 @@
                 return;
             }
             
+            addresses.sort((a, b) => (b.is_default ? 1 : 0) - (a.is_default ? 1 : 0));
             container.innerHTML = addresses.map(addr => `
-                <div style="border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem; margin-bottom:0.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                <div style="border:1.5px solid ${addr.is_default ? 'var(--primary)' : 'var(--border)'}; border-radius:var(--radius-sm); padding:1rem; margin-bottom:0.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;${addr.is_default ? 'background:var(--primary-light);' : ''}">
                     <div>
-                        <strong>${addr.line1}</strong>
+                        ${addr.is_default ? '<span style="background:var(--primary);color:#fff;font-size:0.62rem;font-weight:700;padding:0.12rem 0.55rem;border-radius:20px;letter-spacing:0.4px;">⭐ DEFAULT</span> ' : ''}
+                        <strong>${addr.label ? addr.label + ' — ' : ''}${addr.line1}</strong>
                         ${addr.line2 ? `<br>${addr.line2}` : ''}
                         <br>${addr.city}, ${addr.state} ${addr.zip}
                         <br>${addr.country || 'United States'}
                     </div>
-                    <div>
+                    <div style="display:flex;gap:0.9rem;flex-wrap:wrap;">
+                        ${!addr.is_default ? `<button onclick="setDefaultAddress('${addr.id}')" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:0.8rem;" title="Use this address first at checkout">
+                            <i class="fa-regular fa-star"></i> Set default
+                        </button>` : ''}
+                        <button onclick="editAddress('${addr.id}')" style="background:none; border:none; color:var(--secondary); cursor:pointer; font-size:0.8rem;">
+                            <i class="fa-regular fa-pen"></i> Edit
+                        </button>
                         <button onclick="deleteAddress('${addr.id}')" style="background:none; border:none; color:#c0392b; cursor:pointer; font-size:0.8rem;">
                             <i class="fa-regular fa-trash-can"></i> Remove
                         </button>
                     </div>
                 </div>
             `).join('');
+            accountAddressesCache = addresses;
         } catch (error) { console.error('Error loading addresses:', error); }
     }
 
-    // ─── ADD ADDRESS ───
+    // ─── ADD / EDIT ADDRESS ───
+    let editingAddressId = null;
+
     function showAddAddress() {
+        editingAddressId = null;
+        document.getElementById('addressFormTitle').textContent = 'Add New Address';
         document.getElementById('addAddressForm').style.display = 'block';
+        document.getElementById('addAddressForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function editAddress(id) {
+        const addr = (accountAddressesCache || []).find(a => a.id === id);
+        if (!addr) return;
+        editingAddressId = id;
+        document.getElementById('addressFormTitle').textContent = 'Edit Address';
+        document.getElementById('addrLabel').value = addr.label || '';
+        document.getElementById('addrLine1').value = addr.line1 || '';
+        document.getElementById('addrLine2').value = addr.line2 || '';
+        document.getElementById('addrCity').value = addr.city || '';
+        document.getElementById('addrState').value = addr.state || '';
+        document.getElementById('addrZip').value = addr.zip || '';
+        document.getElementById('addrCountry').value = addr.country || 'US';
+        document.getElementById('addrIsDefault').checked = !!addr.is_default;
+        document.getElementById('addAddressForm').style.display = 'block';
+        document.getElementById('addAddressForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function setDefaultAddress(id) {
+        const user = getCurrentUser();
+        if (!user) return;
+        try {
+            const snap = await db.collection('addresses').where('user_id', '==', user.id).get();
+            const batch = db.batch();
+            snap.forEach(doc => batch.update(doc.ref, { is_default: doc.id === id }));
+            await batch.commit();
+            showToast('⭐ Default address updated', 'success');
+            loadAddresses();
+        } catch (error) {
+            showToast('Failed to update default address', 'error');
+        }
     }
 
     function hideAddAddress() {
+        editingAddressId = null;
         document.getElementById('addAddressForm').style.display = 'none';
+        document.getElementById('addrLabel').value = '';
+        document.getElementById('addrIsDefault').checked = false;
         document.getElementById('addrLine1').value = '';
         document.getElementById('addrLine2').value = '';
         document.getElementById('addrCity').value = '';
@@ -1335,23 +1441,36 @@
         const zip = document.getElementById('addrZip').value.trim();
         const country = document.getElementById('addrCountry').value;
 
+        const label = document.getElementById('addrLabel').value.trim();
+        const isDefault = document.getElementById('addrIsDefault').checked;
         if (!line1 || !city || !state || !zip) {
             showToast('Please fill in all required fields', 'error');
             return;
         }
 
+        const base = {
+            user_id: user.id,
+            label: label,
+            line1: line1,
+            line2: line2,
+            city: city,
+            state: state,
+            zip: zip,
+            country: country,
+            updated_at: new Date().toISOString()
+        };
         try {
-            await db.collection('addresses').add({
-                user_id: user.id,
-                line1: line1,
-                line2: line2,
-                city: city,
-                state: state,
-                zip: zip,
-                country: country,
-                created_at: new Date().toISOString()
-            });
-            showToast('✅ Address saved!', 'success');
+            let savedId = editingAddressId;
+            if (editingAddressId) {
+                await db.collection('addresses').doc(editingAddressId).set(base, { merge: true });
+            } else {
+                base.is_default = isDefault;
+                base.created_at = new Date().toISOString();
+                const ref = await db.collection('addresses').add(base);
+                savedId = ref.id;
+            }
+            if (isDefault) await setDefaultAddress(savedId);
+            showToast(editingAddressId ? '✅ Address updated!' : '✅ Address saved!', 'success');
             hideAddAddress();
             loadAddresses();
         } catch (error) {
@@ -1550,10 +1669,13 @@
             '<p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1.4rem;">💡 Earn <strong>' + ppd + ' point per $1</strong> on every order, multiplied by your tier. Admins can credit your wallet for refunds &amp; bonuses.</p>' +
             '<div class="referral-box">' +
                 '<div><div style="font-size:0.78rem;text-transform:uppercase;opacity:.85;letter-spacing:.08em;">🎁 Refer &amp; Earn ' + (c.referral_bonus_points || 500) + ' pts</div>' +
-                '<div style="font-size:1.05rem;margin-top:0.3rem;">Share your code — friends get ' + (c.referral_invitee_points || 200) + ' pts!</div></div>' +
-                '<div style="display:flex;align-items:center;gap:0.7rem;flex-wrap:wrap;">' +
+                '<div style="font-size:1.05rem;margin-top:0.3rem;">Share your link — friends get ' + (c.referral_invitee_points || 200) + ' pts at signup!</div>' +
+                '<div style="font-size:0.75rem;opacity:.85;margin-top:0.4rem;word-break:break-all;" id="userReferralLink">' + (refCode ? (location.origin + '/register?ref=' + refCode) : '—') + '</div></div>' +
+                '<div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">' +
                     '<span class="ref-code" id="userReferralCode">' + (refCode || '—') + '</span>' +
-                    '<button onclick="copyReferralCode()"><i class="fa-regular fa-copy"></i> Copy</button>' +
+                    '<button onclick="copyReferralCode()" title="Copy code"><i class="fa-regular fa-copy"></i> Code</button>' +
+                    '<button onclick="copyReferralLink()" title="Copy invite link" style="background:#0b2a3b;color:#fff;"><i class="fa-solid fa-link"></i> Link</button>' +
+                    '<button onclick="shareReferralWhatsApp()" title="Share on WhatsApp" style="background:#25D366;color:#fff;"><i class="fa-brands fa-whatsapp"></i> Share</button>' +
                 '</div>' +
             '</div>';
     }
@@ -1565,6 +1687,29 @@
         try {
             navigator.clipboard.writeText(code).then(function () { showToast('📋 Referral code copied: ' + code, 'success'); }, function () { showToast('Code: ' + code, 'info'); });
         } catch (e) { showToast('Referral code: ' + code, 'info'); }
+    }
+
+    function copyReferralLink() {
+        const elc = document.getElementById('userReferralCode');
+        if (!elc) return;
+        const code = elc.textContent.trim();
+        if (!code || code === '—') { showToast('Referral code not ready yet', 'info'); return; }
+        const link = location.origin + '/register?ref=' + encodeURIComponent(code);
+        try {
+            navigator.clipboard.writeText(link).then(
+                function () { showToast('🔗 Invite link copied — share it anywhere!', 'success'); },
+                function () { showToast('Invite link: ' + link, 'info'); });
+        } catch (e) { showToast('Invite link: ' + link, 'info'); }
+    }
+
+    function shareReferralWhatsApp() {
+        const elc = document.getElementById('userReferralCode');
+        if (!elc) return;
+        const code = elc.textContent.trim();
+        if (!code || code === '—') { showToast('Referral code not ready yet', 'info'); return; }
+        const link = location.origin + '/register?ref=' + encodeURIComponent(code);
+        const text = '🛒 Join *Pilot Sales Distribution* — premium B2B wholesale marketplace!\n\nSign up with my referral code *' + code + '* and we both earn bonus reward points 🎁\n👉 ' + link;
+        window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
     }
 
     // ─── TOGGLE WISHLIST ───
@@ -1670,6 +1815,8 @@
     window.goToAdminDashboard = goToAdminDashboard;
     window.loadRewards = loadRewards;
     window.copyReferralCode = copyReferralCode;
+    window.copyReferralLink = copyReferralLink;
+    window.shareReferralWhatsApp = shareReferralWhatsApp;
     window.applyAdminRole = applyAdminRole;
 </script>
     <script src="email.js"></script>

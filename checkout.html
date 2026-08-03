@@ -13,6 +13,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="quote-pdf.js"></script>
     <script src="main.js"></script>
     
     <style>
@@ -317,7 +320,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -389,6 +392,22 @@
                     <div class="form-group">
                         <label>Phone Number <span class="required">*</span></label>
                         <input type="tel" id="phone" placeholder="(555) 123-4567" required />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Company <span style="color:var(--text-light);font-weight:400;font-size:0.72rem;">(optional — printed on quote)</span></label>
+                            <input type="text" id="company" placeholder="Your business name" />
+                        </div>
+                        <div class="form-group">
+                            <label>VAT / Tax ID <span style="color:var(--text-light);font-weight:400;font-size:0.72rem;">(optional)</span></label>
+                            <input type="text" id="vatId" placeholder="e.g. US-88-1234567" />
+                        </div>
+                    </div>
+                    <div class="form-group" id="savedAddressGroup" style="display:none;">
+                        <label><i class="fa-regular fa-bookmark" style="color:var(--primary);"></i> Use a saved address</label>
+                        <select id="savedAddressSelect" style="width:100%;padding:0.7rem 0.8rem;border:1px solid var(--border-dark);border-radius:var(--radius-sm);font-size:0.9rem;background:var(--white);">
+                            <option value="">— Select a saved address —</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Street Address <span class="required">*</span></label>
@@ -711,7 +730,7 @@
                     <div class="row total"><span>Total</span><span class="amount" id="checkoutTotal">$0.00</span></div>
                 </div>
                 <button class="btn-place-order" id="placeOrderBtn" onclick="placeOrder()">
-                    <i class="fa-brands fa-whatsapp"></i> Send Quote via WhatsApp
+                    <i class="fa-brands fa-whatsapp"></i> Send Quote PDF via WhatsApp
                 </button>
                 <div class="email-option">
                     <i class="fa-regular fa-envelope"></i> Or <a onclick="sendEmailQuote()">send via email</a>
@@ -813,11 +832,14 @@
                     if (data.last_name) document.getElementById('lastName').value = data.last_name || '';
                     if (user.email) document.getElementById('email').value = user.email || '';
                     if (data.phone) document.getElementById('phone').value = data.phone || '';
+                    if (data.company) document.getElementById('company').value = data.company || '';
+                    if (data.vat_id) document.getElementById('vatId').value = data.vat_id || '';
                     if (data.address) document.getElementById('address').value = data.address || '';
                     if (data.city) document.getElementById('city').value = data.city || '';
                     if (data.state) document.getElementById('state').value = data.state || '';
                     if (data.zip) document.getElementById('zip').value = data.zip || '';
                     if (data.country) document.getElementById('country').value = data.country || 'US';
+                    loadSavedAddresses(user.uid);
                 } catch (e) {}
             } else { 
                 localStorage.removeItem('pilot_user'); 
@@ -1068,6 +1090,8 @@
 
             updateCheckoutSummary(items);
             document.getElementById('placeOrderBtn').disabled = false;
+            // Auto-apply a welcome promo captured at registration
+            try { await autoApplySignupPromo(); } catch (e) {}
 
         } catch (error) {
             console.error('Error loading checkout:', error);
@@ -1131,6 +1155,87 @@
         document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
     }
 
+    // ─── SAVED ADDRESSES (account.html → checkout prefill) ───
+    async function loadSavedAddresses(uid) {
+        try {
+            const snap = await db.collection('addresses').where('user_id', '==', uid).get();
+            if (snap.empty) return;
+            const group = document.getElementById('savedAddressGroup');
+            const select = document.getElementById('savedAddressSelect');
+            const addresses = [];
+            snap.forEach(doc => addresses.push({ id: doc.id, ...doc.data() }));
+            addresses.sort((a, b) => (b.is_default ? 1 : 0) - (a.is_default ? 1 : 0));
+            select.innerHTML = '<option value="">— Select a saved address —</option>' + addresses.map((a, i) =>
+                `<option value="${i}">${a.is_default ? '⭐ ' : ''}${(a.label || a.line1 || 'Address')} — ${a.line1 || ''}, ${a.city || ''}</option>`).join('');
+            group.style.display = 'block';
+            select.onchange = function () {
+                const a = addresses[parseInt(this.value, 10)];
+                if (!a) return;
+                document.getElementById('address').value = a.line1 || '';
+                document.getElementById('city').value = a.city || '';
+                document.getElementById('state').value = a.state || '';
+                document.getElementById('zip').value = a.zip || '';
+                if (a.country) {
+                    const countrySelect = document.getElementById('country');
+                    const opt = Array.from(countrySelect.options).find(o =>
+                        o.value === a.country || o.textContent.trim().toLowerCase() === String(a.country).toLowerCase());
+                    if (opt) countrySelect.value = opt.value;
+                }
+                showToast('📍 Saved address applied', 'success');
+            };
+            // Auto-apply the ⭐ default address so checkout is pre-filled on arrival
+            const defaultIdx = addresses.findIndex(a => a.is_default);
+            if (defaultIdx > -1) {
+                select.value = String(defaultIdx);
+                select.onchange();
+            }
+        } catch (e) { /* saved addresses optional */ }
+    }
+
+    // ─── DOCUMENT VERIFICATION REGISTRY (public /verify + guest tracking) ───
+    async function registerVerification(ref, type, email, status, extra) {
+        if (!ref || !db) return;
+        try {
+            await db.collection('verifications').doc(String(ref)).set(Object.assign({
+                ref: String(ref),
+                type: type || 'order',
+                status: status || 'issued',
+                email: (email || '').toLowerCase(),
+                issued_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }, extra || {}));
+        } catch (e) { console.warn('verification registry skipped', e); }
+    }
+
+    // ─── AUTO-APPLY SIGNUP PROMO (captured on register.html) ───
+    async function autoApplySignupPromo() {
+        if (appliedCoupon) return;
+        let code = '';
+        try { code = (localStorage.getItem('pse_signup_promo') || '').trim(); } catch (e) { return; }
+        if (!code) return;
+        const input = document.getElementById('couponInput');
+        const msg = document.getElementById('couponMsg');
+        if (!input || !window.PSE_PREMIUM) return;
+        try {
+            const res = await window.PSE_PREMIUM.validateCoupon(code, lastSubtotal || 0);
+            if (res.valid) {
+                appliedCoupon = { coupon: res.coupon, discount: res.discount, code: code.toUpperCase() };
+                input.value = code.toUpperCase();
+                if (msg) {
+                    msg.innerHTML = '🎉 Welcome promo <strong>' + code.toUpperCase() + '</strong> applied — ' + res.message.replace(/^Coupon applied:\s*/i, '');
+                    msg.style.color = '#27ae60';
+                }
+                updateCheckoutSummary(cartItems);
+            } else if (!res.coupon) {
+                // Code no longer exists — stop retrying on future visits
+                try { localStorage.removeItem('pse_signup_promo'); } catch (e) {}
+            } else if (msg) {
+                msg.textContent = 'Signup promo ' + code.toUpperCase() + ': ' + res.message;
+                msg.style.color = '#e67e22';
+            }
+        } catch (e) { /* promo assist is best-effort */ }
+    }
+
     // ─── APPLY COUPON (Premium suite) ───
     async function applyCheckoutCoupon() {
         const input = document.getElementById('couponInput');
@@ -1155,8 +1260,42 @@
         }
     }
 
-    // ─── SEND WHATSAPP QUOTE ───
-    function sendWhatsAppQuote(orderData) {
+    // ─── SEND WHATSAPP QUOTE (PDF) ───
+    // The quotation is generated as a real branded PDF (quote-pdf.js):
+    //   • Mobile  → native share sheet attaches the PDF directly to WhatsApp
+    //   • Desktop → PDF auto-downloads and the WhatsApp chat opens with a
+    //               message prompting the buyer to attach the file
+    //   • Fallback → classic wa.me text message if the PDF engine is missing
+    // Returns 'shared' | 'cancelled' | 'downloaded' | 'legacy'.
+    async function sendWhatsAppQuote(orderData) {
+        const totals = orderData.totals || {};
+        const customer = orderData.customer || {};
+        const fileName = `${orderData.quoteNumber}-PSE-Quotation.pdf`;
+
+        let message = `📋 *OFFICIAL QUOTATION — Pilot Sales Distribution*\n`;
+        message += `📄 *Quote #:* ${orderData.quoteNumber}\n`;
+        message += `📅 *Date:* ${new Date().toLocaleString()}\n`;
+        message += `👤 ${customer.firstName || ''} ${customer.lastName || ''} • ${customer.email || ''}\n`;
+        message += `📦 ${orderData.items.length} item(s)${orderData.coupon_code ? ` • Coupon: ${orderData.coupon_code}` : ''}\n`;
+        message += `💰 *TOTAL: $${(totals.total || 0).toFixed(2)}*\n\n`;
+
+        // ─── Real PDF delivery ───
+        if (window.PSE_QUOTE_PDF && window.PSE_QUOTE_PDF.available()) {
+            try {
+                const doc = window.PSE_QUOTE_PDF.buildQuotePdf(orderData);
+                const attachMsg = message
+                    + `📎 The quotation PDF (*${fileName}*) has been downloaded to this device — please attach it to this chat so our sales team can process your order. 🙏`;
+                const result = await window.PSE_QUOTE_PDF.shareViaWhatsApp(doc, fileName, attachMsg, WHATSAPP_NUMBER);
+                if (result === 'downloaded') {
+                    showToast('📄 Quote PDF downloaded — attach it in the WhatsApp chat that just opened.', 'success');
+                }
+                return result === 'unavailable' ? 'legacy' : result;
+            } catch (pdfErr) {
+                console.warn('PDF quote delivery failed, falling back to text message', pdfErr);
+            }
+        }
+
+        // ─── Legacy text-only fallback ───
         let itemsTable = '';
         orderData.items.forEach((item, index) => {
             const num = (index + 1).toString().padStart(2);
@@ -1166,48 +1305,51 @@
             itemsTable += `│ ${num} │ ${qty.padStart(3)} │ ${title.substring(0, 25).padEnd(25)} │ ${price.padStart(10)} │\n`;
         });
 
-        let message = '📋 *QUOTE REQUEST - Pilot Sales Distribution*\n';
-        message += `📄 *Quote #:* ${orderData.quoteNumber}\n`;
-        message += `📅 *Date:* ${new Date().toLocaleString()}\n`;
-        message += '━'.repeat(50) + '\n\n';
-        
-        message += '*👤 Customer Details*\n';
-        message += `Name: ${orderData.customer.firstName} ${orderData.customer.lastName}\n`;
-        message += `Email: ${orderData.customer.email}\n`;
-        message += `Phone: ${orderData.customer.phone}\n`;
-        message += `Address: ${orderData.customer.address}, ${orderData.customer.city}, ${orderData.customer.state} ${orderData.customer.zip}\n`;
-        message += `Country: ${orderData.customer.country}\n\n`;
-        
-        message += '*📦 Order Items*\n';
-        message += '┌────┬─────────┬───────────────────────────┬────────────┐\n';
-        message += '│ #  │ Qty     │ Product Name              │ Amount     │\n';
-        message += '├────┼─────────┼───────────────────────────┼────────────┤\n';
-        message += itemsTable;
-        message += '└────┴─────────┴───────────────────────────┴────────────┘\n\n';
-        
-        message += '*💰 Summary*\n';
-        message += `Subtotal: $${(orderData.totals.subtotal || 0).toFixed(2)}\n`;
-        message += `Shipping: ${orderData.totals.shipping === 0 ? 'FREE' : '$' + orderData.totals.shipping.toFixed(2)}\n`;
-        message += `Tax (8%): $${(orderData.totals.tax || 0).toFixed(2)}\n`;
-        message += `*TOTAL: $${(orderData.totals.total || 0).toFixed(2)}*\n\n`;
-        
-        if (orderData.notes) {
-            message += `📝 *Notes:* ${orderData.notes}\n\n`;
+        let textMessage = '📋 *QUOTE REQUEST - Pilot Sales Distribution*\n';
+        textMessage += `📄 *Quote #:* ${orderData.quoteNumber}\n`;
+        textMessage += `📅 *Date:* ${new Date().toLocaleString()}\n`;
+        textMessage += '━'.repeat(50) + '\n\n';
+
+        textMessage += '*👤 Customer Details*\n';
+        textMessage += `Name: ${orderData.customer.firstName} ${orderData.customer.lastName}\n`;
+        textMessage += `Email: ${orderData.customer.email}\n`;
+        textMessage += `Phone: ${orderData.customer.phone}\n`;
+        textMessage += `Address: ${orderData.customer.address}, ${orderData.customer.city}, ${orderData.customer.state} ${orderData.customer.zip}\n`;
+        textMessage += `Country: ${orderData.customer.country}\n\n`;
+
+        textMessage += '*📦 Order Items*\n';
+        textMessage += '┌────┬─────────┬───────────────────────────┬────────────┐\n';
+        textMessage += '│ #  │ Qty     │ Product Name              │ Amount     │\n';
+        textMessage += '├────┼─────────┼───────────────────────────┼────────────┤\n';
+        textMessage += itemsTable;
+        textMessage += '└────┴─────────┴───────────────────────────┴────────────┘\n\n';
+
+        textMessage += '*💰 Summary*\n';
+        textMessage += `Subtotal: $${(totals.subtotal || 0).toFixed(2)}\n`;
+        if ((totals.discount || 0) > 0) {
+            textMessage += `Discount${orderData.coupon_code ? ' (' + orderData.coupon_code + ')' : ''}: -$${totals.discount.toFixed(2)}\n`;
         }
-        
-        message += `✅ *Next Steps:*\n`;
-        message += `1. We will review your quote request\n`;
-        message += `2. Confirm availability and pricing\n`;
-        message += `3. Send you a formal invoice\n`;
-        message += `4. Arrange delivery\n\n`;
-        
-        message += `🙏 *Thank you for choosing Pilot Sales Distribution!*\n`;
-        message += `📧 ${STORE_EMAIL}\n`;
-        message += `📞 ${WHATSAPP_NUMBER}`;
-        
-        const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace('+', '')}?text=${encodeURIComponent(message)}`;
+        textMessage += `Shipping: ${totals.shipping === 0 ? 'FREE' : '$' + (totals.shipping || 0).toFixed(2)}\n`;
+        textMessage += `Tax (8%): $${(totals.tax || 0).toFixed(2)}\n`;
+        textMessage += `*TOTAL: $${(totals.total || 0).toFixed(2)}*\n\n`;
+
+        if (orderData.notes) {
+            textMessage += `📝 *Notes:* ${orderData.notes}\n\n`;
+        }
+
+        textMessage += `✅ *Next Steps:*\n`;
+        textMessage += `1. We will review your quote request\n`;
+        textMessage += `2. Confirm availability and pricing\n`;
+        textMessage += `3. Send you a formal invoice\n`;
+        textMessage += `4. Arrange delivery\n\n`;
+
+        textMessage += `🙏 *Thank you for choosing Pilot Sales Distribution!*\n`;
+        textMessage += `📧 ${STORE_EMAIL}\n`;
+        textMessage += `📞 ${WHATSAPP_NUMBER}`;
+
+        const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace('+', '')}?text=${encodeURIComponent(textMessage)}`;
         window.open(whatsappUrl, '_blank');
-        return true;
+        return 'legacy';
     }
 
     // ─── SEND EMAIL QUOTE (FALLBACK) ───
@@ -1299,7 +1441,7 @@ Country: ${orderData.customer.country}
 ${itemsText}
 
 💰 Summary:
-Subtotal: $${(orderData.totals.subtotal || 0).toFixed(2)}
+Subtotal: $${(orderData.totals.subtotal || 0).toFixed(2)}${(orderData.totals.discount || 0) > 0 ? '\n' + "Discount" + (orderData.coupon_code ? ' (' + orderData.coupon_code + ')' : '') + ': -$' + orderData.totals.discount.toFixed(2) : ''}
 Shipping: ${orderData.totals.shipping === 0 ? 'FREE' : '$' + orderData.totals.shipping.toFixed(2)}
 Tax (8%): $${(orderData.totals.tax || 0).toFixed(2)}
 TOTAL: $${(orderData.totals.total || 0).toFixed(2)}
@@ -1308,7 +1450,17 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
 
 🙏 Thank you for choosing Pilot Sales Distribution!
 📧 ${STORE_EMAIL}
-📞 ${WHATSAPP_NUMBER}`;
+📞 ${WHATSAPP_NUMBER}
+
+📎 The quote PDF (${orderData.quoteNumber}-PSE-Quotation.pdf) was downloaded to your device — please attach it to this email.`;
+
+        // Give the buyer the branded PDF to attach to the email
+        try {
+            if (window.PSE_QUOTE_PDF && window.PSE_QUOTE_PDF.available()) {
+                const pdfDoc = window.PSE_QUOTE_PDF.buildQuotePdf(orderData);
+                if (pdfDoc) pdfDoc.save(`${orderData.quoteNumber}-PSE-Quotation.pdf`);
+            }
+        } catch (pdfSkipErr) {}
 
         // Open email client with pre-filled data
         window.location.href = `mailto:${STORE_EMAIL}?subject=Quote Request ${orderData.quoteNumber}&body=${encodeURIComponent(body)}`;
@@ -1326,6 +1478,8 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
         const state = document.getElementById('state').value.trim();
         const zip = document.getElementById('zip').value.trim();
         const country = document.getElementById('country').value;
+        const company = (document.getElementById('company')?.value || '').trim();
+        const vatId = (document.getElementById('vatId')?.value || '').trim();
         const notes = document.getElementById('notes').value.trim();
 
         if (!firstName || !lastName || !email || !phone || !address || !city || !state || !zip || !country) {
@@ -1377,6 +1531,8 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
                 lastName: lastName,
                 email: email,
                 phone: phone,
+                company: company,
+                vat_id: vatId,
                 address: address,
                 city: city,
                 state: state,
@@ -1403,6 +1559,24 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
 
         try {
+            // ─── Deliver the quotation FIRST ───
+            // navigator.share() and window.open() rely on the browser's click
+            // gesture, which expires quickly on mobile — so PDF delivery runs
+            // before any Firestore writes. The WhatsApp message/PDF carries
+            // every order detail, so the quote still reaches us even if a
+            // later write fails.
+            let whatsappResult = 'unavailable';
+            try {
+                whatsappResult = await sendWhatsAppQuote(orderData);
+            } catch (whatsappError) {
+                console.log('WhatsApp failed, using email fallback', whatsappError);
+            }
+
+            // If WhatsApp didn't work, try email
+            if (whatsappResult === 'unavailable') {
+                sendEmailQuote(orderData);
+            }
+
             const user = getCurrentUser();
             if (user) {
                 await db.collection('orders').add({
@@ -1413,24 +1587,30 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
                     updated_at: new Date().toISOString()
                 });
             } else {
+                // Guests persist server-side too — makes guest quotes trackable
+                // (via quote # + email) and visible to the admin team.
+                try {
+                    await db.collection('orders').add({
+                        ...orderData,
+                        user_id: '',
+                        guest: true,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    });
+                } catch (guestErr) { console.warn('Guest order mirrored locally only', guestErr); }
                 const orders = JSON.parse(localStorage.getItem('pilot_orders') || '[]');
                 orders.push(orderData);
                 localStorage.setItem('pilot_orders', JSON.stringify(orders));
             }
 
-            // Try WhatsApp first
-            let whatsappSuccess = false;
+            // Public authenticity + guest-lookup registry (best-effort)
             try {
-                sendWhatsAppQuote(orderData);
-                whatsappSuccess = true;
-            } catch (whatsappError) {
-                console.log('WhatsApp failed, using email fallback');
-            }
-
-            // If WhatsApp didn't work, try email
-            if (!whatsappSuccess) {
-                sendEmailQuote(orderData);
-            }
+                await registerVerification(quoteNumber, 'order', email, 'pending', {
+                    total,
+                    items_count: orderData.items.length,
+                    guest: !user
+                });
+            } catch (e) {}
 
             // Clear cart
             if (user) {
@@ -1441,10 +1621,15 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
             } else {
                 localStorage.setItem('pilot_cart', '[]');
             }
+            try { localStorage.removeItem('pilot_cart_ts'); localStorage.removeItem('pse_cart_banner_dismissed'); } catch (e) {}
             loadCartCount();
 
             // ─── Premium: redeem coupon + award loyalty points (never block the order) ───
             try {
+                if (appliedCoupon) {
+                    // A used signup promo must not auto-apply to future orders
+                    try { localStorage.removeItem('pse_signup_promo'); } catch (e) {}
+                }
                 if (window.PSE_PREMIUM) {
                     if (appliedCoupon && appliedCoupon.coupon && appliedCoupon.coupon.id) {
                         window.PSE_PREMIUM.redeemCoupon(appliedCoupon.coupon.id).catch(() => {});
@@ -1494,7 +1679,7 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
             } catch (emailError) {
                 showToast('❌ Failed to place order. Please try again.', 'error');
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Send Quote via WhatsApp';
+                btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Send Quote PDF via WhatsApp';
             }
         }
     }
