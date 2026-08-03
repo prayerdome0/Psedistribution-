@@ -547,7 +547,7 @@
         grid.innerHTML = products.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
             const slug = p.slug || generateSlug(p.title || 'product');
-            const imageUrl = p.image_url || 'logo.jpg';
+            const imageUrl = window.getProductImage ? window.getProductImage(p) : (p.image_url || 'logo.jpg');
             const sponsoredBadge = p.sponsored ? `<span class="product-badge" style="background:#d35400;color:#fff;top:10px;right:10px;z-index:10;font-weight:700;"><i class="fa-solid fa-rocket"></i> SPONSORED</span>` : '';
             const vipTierBadge = p.supplier_tier === 'platinum' ?
                 `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#8e44ad;margin-top:2px;"><i class="fa-solid fa-crown"></i> Platinum Supplier</div>` :
@@ -619,7 +619,7 @@
                     title: product.title,
                     price: product.price,
                     old_price: product.old_price || 0,
-                    image_url: product.image_url || '',
+                    image_url: window.getProductImage ? window.getProductImage(product, '') : (product.image_url || ''),
                     brand: product.brand || 'Pilot Distribution',
                     moq: product.moq || 1,
                     quantity: qty
@@ -645,7 +645,7 @@
                         title: product.title,
                         price: product.price,
                         old_price: product.old_price || 0,
-                        image_url: product.image_url || '',
+                        image_url: window.getProductImage ? window.getProductImage(product, '') : (product.image_url || ''),
                         brand: product.brand || 'Pilot Distribution',
                         moq: product.moq || 1,
                         quantity: qty,

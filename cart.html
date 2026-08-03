@@ -539,7 +539,7 @@
                 return {
                     id: doc.id,
                     ...data,
-                    image_url: data.image_url || data.images?.[0] || '',
+                    image_url: window.getProductImage ? window.getProductImage(data, '') : (data.image_url || data.images?.[0] || ''),
                     title: data.title || 'Product',
                     price: data.price || 0,
                     brand: data.brand || 'Pilot Distribution',
@@ -573,18 +573,24 @@
             const user = getCurrentUser();
             let items = [];
             
-            // Always check localStorage first for guest cart
-            const localCart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+            // A malformed or legacy local value must never make the entire cart unusable.
+            let localCart = [];
+            try {
+                const storedCart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+                localCart = Array.isArray(storedCart) ? storedCart.filter(item => item && item.product_id) : [];
+            } catch (e) {
+                localStorage.setItem('pilot_cart', '[]');
+            }
             
             if (user) {
                 // User is logged in - load from Firebase
                 const snapshot = await db.collection('cart')
                     .where('user_id', '==', user.id)
                     .get();
-                
+
                 const cartData = [];
                 snapshot.forEach(doc => cartData.push({ id: doc.id, ...doc.data() }));
-                
+
                 // If there are local cart items, merge them into Firebase
                 if (localCart.length > 0) {
                     showToast('📦 Merging your guest cart...', 'info');
@@ -596,7 +602,7 @@
                                 .where('user_id', '==', user.id)
                                 .where('product_id', '==', localItem.product_id)
                                 .get();
-                            
+
                             if (existing.empty) {
                                 await db.collection('cart').add({
                                     user_id: user.id,
@@ -615,8 +621,8 @@
                                 });
                                 mergedCount++;
                             }
-                        } catch (e) { 
-                            console.error('Merge error:', e); 
+                        } catch (e) {
+                            console.error('Merge error:', e);
                         }
                     }
                     // Clear local cart after merge
@@ -628,7 +634,7 @@
                     await loadCart();
                     return;
                 }
-                
+
                 // Load from Firebase
                 for (const item of cartData) {
                     const product = await fetchProductById(item.product_id);
@@ -656,7 +662,7 @@
                     title: item.title || 'Product',
                     price: item.price || 0,
                     old_price: item.old_price || 0,
-                    image: item.image_url || '',
+                    image: window.getProductImage ? window.getProductImage(item, '') : (item.image_url || ''),
                     brand: item.brand || 'Pilot Distribution',
                     moq: item.moq || 1,
                     quantity: item.quantity || 1,
@@ -664,14 +670,14 @@
                     tier_label: item.tier_label || ''
                 }));
             }
-            
+
             cartItems = items;
             renderCartItems(items);
             updateSummary(items);
             const totalItems = items.reduce((sum, i) => sum + (i.quantity || 1), 0);
             countEl.textContent = `${totalItems} items`;
             checkoutBtn.disabled = items.length === 0;
-            
+
         } catch (error) {
             console.error('Error loading cart:', error);
             list.innerHTML = `
@@ -706,8 +712,8 @@
             return `
                 <div class="cart-item" data-index="${index}">
                     <div class="item-image">
-                        ${item.image ? 
-                            `<img src="${item.image}" alt="${item.title}" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\' style=\\'font-size:2rem;color:var(--text-light);\\'></i>'" />` : 
+                        ${item.image ?
+                            `<img src="${item.image}" alt="${item.title}" onerror="this.onerror=null;this.src='/logo.jpg'" />` :
                             `<i class="fa-solid fa-box" style="font-size:2rem;color:var(--text-light);"></i>`
                         }
                     </div>
@@ -740,9 +746,10 @@
         const item = cartItems[index];
         if (!item) return;
         const newQty = (item.quantity || 1) + change;
-        if (newQty < (item.moq || 1)) { 
-            showToast(`Minimum quantity is ${item.moq || 1}`, 'error'); 
-            return; 
+        const minimum = item.is_sample ? 1 : (item.moq || 1);
+        if (newQty < minimum) {
+            showToast(`Minimum quantity is ${minimum}`, 'error');
+            return;
         }
         item.quantity = newQty;
         await saveCartChanges();
@@ -756,10 +763,11 @@
         const item = cartItems[index];
         if (!item) return;
         const newQty = parseInt(value) || 1;
-        if (newQty < (item.moq || 1)) { 
-            showToast(`Minimum quantity is ${item.moq || 1}`, 'error'); 
-            document.getElementById(`qty_${index}`).value = item.quantity || 1; 
-            return; 
+        const minimum = item.is_sample ? 1 : (item.moq || 1);
+        if (newQty < minimum) {
+            showToast(`Minimum quantity is ${minimum}`, 'error');
+            document.getElementById(`qty_${index}`).value = item.quantity || 1;
+            return;
         }
         item.quantity = newQty;
         await saveCartChanges();
@@ -773,9 +781,9 @@
         const item = cartItems[index];
         if (!item) return;
         if (!confirm(`Remove "${item.title}" from your cart?`)) return;
-        
+
         const user = getCurrentUser();
-        
+
         try {
             if (user && item.id && !item.id.startsWith('local_')) {
                 // Remove from Firebase if it's a server-side item
@@ -790,7 +798,7 @@
                 });
                 localStorage.setItem('pilot_cart', JSON.stringify(updatedCart));
             }
-            
+
             cartItems.splice(index, 1);
             renderCartItems(cartItems);
             updateSummary(cartItems);
@@ -809,9 +817,9 @@
         if (user) {
             for (const item of cartItems) {
                 if (item.id && !item.id.startsWith('local_')) {
-                    await db.collection('cart').doc(item.id).update({ 
-                        quantity: item.quantity, 
-                        updated_at: new Date().toISOString() 
+                    await db.collection('cart').doc(item.id).update({
+                        quantity: item.quantity,
+                        updated_at: new Date().toISOString()
                     });
                 }
             }
@@ -840,7 +848,7 @@
         const shipping = subtotal < 250 && subtotal > 0 ? 15 : 0;
         const tax = subtotal * 0.08;
         const total = subtotal + shipping + tax;
-        
+
         document.getElementById('summarySubtotal').textContent = `$${subtotal.toFixed(2)}`;
         document.getElementById('summaryShipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
         document.getElementById('summaryTax').textContent = `$${tax.toFixed(2)}`;
@@ -850,9 +858,9 @@
 
     // ─── PROCEED TO CHECKOUT ───
     function proceedToCheckout() {
-        if (cartItems.length === 0) { 
-            showToast('Your cart is empty', 'error'); 
-            return; 
+        if (cartItems.length === 0) {
+            showToast('Your cart is empty', 'error');
+            return;
         }
         window.location.href = '/checkout';
     }
@@ -882,7 +890,16 @@
         }
     }
 
-    function updateCartCount() { return loadCartCount(); }
+    function updateCartCount() {
+        const count = cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
+        document.querySelectorAll('.cart-count').forEach(el => {
+            el.textContent = count;
+            el.style.display = count > 0 ? 'inline' : 'none';
+        });
+        const itemCount = document.getElementById('itemCount');
+        if (itemCount) itemCount.textContent = `${count} item${count === 1 ? '' : 's'}`;
+        return Promise.resolve();
+    }
 
     // ─── LOAD WISHLIST COUNT ───
     async function loadWishlistCount() {
@@ -915,7 +932,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         initFirebase();
         document.getElementById('year').textContent = new Date().getFullYear();
-        
+
         // Scroll animations
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {

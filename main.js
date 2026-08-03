@@ -110,6 +110,55 @@
         }
     }
 
+    // ─── PRODUCT IMAGE NORMALIZATION ───
+    // Product records have been imported from several sources.  Those sources
+    // do not all use the same image field (and some store a Cloudinary result
+    // object instead of a string), so keep image selection in one place.
+    function productImage(product, fallback) {
+        fallback = fallback || '/logo.jpg';
+        var seen = [];
+        function find(value) {
+            if (!value || seen.indexOf(value) !== -1) return '';
+            if (typeof value === 'string') {
+                var url = value.trim();
+                // A comma-separated value is not a valid image URL. Use its
+                // first entry, which is how older CSV imports were saved.
+                if (url.indexOf(',') !== -1 && !/^data:/i.test(url)) url = url.split(',')[0].trim();
+                return url;
+            }
+            if (Array.isArray(value)) {
+                for (var i = 0; i < value.length; i++) {
+                    var result = find(value[i]);
+                    if (result) return result;
+                }
+                return '';
+            }
+            if (typeof value === 'object') {
+                seen.push(value);
+                var keys = ['secure_url', 'url', 'downloadURL', 'download_url', 'src', 'image_url', 'imageUrl'];
+                for (var j = 0; j < keys.length; j++) {
+                    var nested = find(value[keys[j]]);
+                    if (nested) return nested;
+                }
+            }
+            return '';
+        }
+        product = product || {};
+        return find(product.image_url) || find(product.imageUrl) || find(product.image) ||
+            find(product.images) || find(product.image_urls) || find(product.gallery) ||
+            find(product.photos) || fallback;
+    }
+
+    // A safe, reusable fallback for images rendered after page load.
+    function useImageFallback(img, fallback) {
+        if (!img || img.dataset.imageFallbackApplied) return;
+        img.dataset.imageFallbackApplied = 'true';
+        img.src = fallback || '/logo.jpg';
+    }
+
+    window.getProductImage = productImage;
+    window.useImageFallback = useImageFallback;
+
     // ─── CART COUNT ───
     function loadCartCount() {
         var user = getUser();

@@ -1173,10 +1173,7 @@
             const doc = await db.collection('products').doc(id).get();
             if (doc.exists) {
                 const data = doc.data();
-                let imageUrl = data.image_url || '';
-                if (!imageUrl && data.images && data.images.length > 0) {
-                    imageUrl = data.images[0];
-                }
+                const imageUrl = window.getProductImage ? window.getProductImage(data, '') : (data.image_url || data.images?.[0] || '');
                 return { 
                     id: doc.id, 
                     ...data, 
@@ -1239,11 +1236,14 @@
         currentProduct = product;
         currentProductId = product.id;
         
-        productImages = [];
-        if (product.images && product.images.length > 0) {
-            productImages = product.images;
-        } else if (product.image_url) {
-            productImages = [product.image_url];
+        // Normalize every gallery entry, not just the cover image. Imported
+        // products may contain strings or upload-result objects in `images`.
+        const rawImages = Array.isArray(product.images) ? product.images : [];
+        productImages = rawImages
+            .map(image => window.getProductImage ? window.getProductImage({ image }, '') : image)
+            .filter(Boolean);
+        if (!productImages.length && product.image_url) {
+            productImages = [window.getProductImage ? window.getProductImage(product, '') : product.image_url].filter(Boolean);
         }
         lightboxImages = productImages;
         
@@ -1418,7 +1418,7 @@
         if (productImages.length > 0) {
             const container = document.getElementById('mainImageContainer');
             container.innerHTML = `
-                <img src="${productImages[0]}" alt="${product.title}" id="mainImage" onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fa-solid fa-box\\'></i></span>'" />
+                <img src="${productImages[0]}" alt="${product.title}" id="mainImage" onerror="this.onerror=null;this.src='/logo.jpg'" />
                 <div class="zoom-icon"><i class="fa-solid fa-expand"></i> Click to zoom</div>
             `;
             currentImageIndex = 0;
@@ -1434,7 +1434,7 @@
         }
         grid.innerHTML = productImages.map((img, index) => `
             <div class="thumb ${index === 0 ? 'active' : ''}" onclick="goToImage(${index})">
-                <img src="${img}" alt="Product image ${index + 1}" loading="lazy" onerror="this.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />
+                <img src="${img}" alt="Product image ${index + 1}" loading="lazy" onerror="this.onerror=null;this.src='/logo.jpg'" />
             </div>
         `).join('');
     }
@@ -1445,7 +1445,7 @@
         currentImageIndex = index;
         const container = document.getElementById('mainImageContainer');
         container.innerHTML = `
-            <img src="${productImages[index]}" alt="${currentProduct?.title || 'Product'}" onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fa-solid fa-box\\'></i></span>'" />
+            <img src="${productImages[index]}" alt="${currentProduct?.title || 'Product'}" onerror="this.onerror=null;this.src='/logo.jpg'" />
             <div class="zoom-icon"><i class="fa-solid fa-expand"></i> Click to zoom</div>
         `;
         document.querySelectorAll('.thumbnail-grid .thumb').forEach((thumb, i) => {
@@ -1635,7 +1635,7 @@
                     price: tierCalc.unitPrice,
                     tier_label: tierCalc.label,
                     old_price: product?.old_price || 0,
-                    image_url: product?.image_url || '',
+                    image_url: window.getProductImage ? window.getProductImage(product, '') : (product?.image_url || ''),
                     brand: product?.brand || 'Pilot Distribution',
                     moq: product?.moq || 1,
                     quantity: quantity
@@ -1677,7 +1677,7 @@
                     price: tierCalc.unitPrice,
                     tier_label: tierCalc.label,
                     old_price: product?.old_price || 0,
-                    image_url: product?.image_url || '',
+                    image_url: window.getProductImage ? window.getProductImage(product, '') : (product?.image_url || ''),
                     brand: product?.brand || 'Pilot Distribution',
                     moq: product?.moq || 1,
                     quantity: quantity,
@@ -1965,7 +1965,7 @@
                     products.push({ 
                         id: doc.id, 
                         ...data, 
-                        image_url: data.image_url || data.images?.[0] || '',
+                        image_url: window.getProductImage ? window.getProductImage(data, '') : (data.image_url || data.images?.[0] || ''),
                         slug: data.slug || generateSlug(data.title || 'product'),
                         title: data.title || 'Product',
                         price: data.price || 0
@@ -1982,7 +1982,7 @@
                 <div class="related-card" onclick="window.location.href='/product/${p.slug || generateSlug(p.title)}'">
                     <div class="related-image">
                         ${p.image_url ? 
-                            `<img src="${p.image_url}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />` : 
+                            `<img src="${p.image_url}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.jpg'" />` :
                             `<i class="fa-solid fa-box"></i>`
                         }
                     </div>
