@@ -896,7 +896,7 @@
                     products.push({
                         id: doc.id,
                         ...data,
-                        image_url: data.image_url || data.images?.[0] || '',
+                        image_url: window.getProductImage ? window.getProductImage(data, '') : (data.image_url || data.images?.[0] || ''),
                         slug: data.slug || generateSlug(data.title || 'product'),
                         title: data.title || 'Product',
                         price: data.price || 0,
@@ -1055,7 +1055,7 @@
         grid.innerHTML = pageProducts.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
             const slug = p.slug || generateSlug(p.title || 'product');
-            const imageUrl = p.image_url || 'logo.jpg';
+            const imageUrl = window.getProductImage ? window.getProductImage(p) : (p.image_url || 'logo.jpg');
             const stars = p.rating ? '★'.repeat(Math.floor(p.rating)) + (p.rating % 1 >= 0.5 ? '½' : '') : '';
             const stockStatus = p.stock > 0 ? 'In Stock' : 'Out of Stock';
             
@@ -1071,7 +1071,7 @@
                     ${discount > 0 ? `<span class="product-badge flash" style="${p.sponsored ? 'top:66px;' : ''}">-${discount}%</span>` : ''}
                     ${p.supplier_verified ? `<span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>` : ''}
                     <div class="product-image" onclick="window.location.href='/product/${slug}'">
-                        <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />
+                        <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.jpg'" />
                     </div>
                     <div class="product-title">${p.title || 'Product'}</div>
                     <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
@@ -1183,7 +1183,7 @@
                     title: product?.title || 'Product',
                     price: product?.price || 0,
                     old_price: product?.old_price || 0,
-                    image_url: product?.image_url || '',
+                    image_url: window.getProductImage ? window.getProductImage(product, '') : (product?.image_url || ''),
                     brand: product?.brand || 'Pilot Distribution',
                     moq: product?.moq || 1,
                     quantity: 1
