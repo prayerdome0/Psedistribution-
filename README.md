@@ -49,6 +49,10 @@ Key routes (clean URLs on Vercel):
   - **🔄 One-Click Quick Reorder:** Repeat B2B buyers can click **"🔄 Quick Reorder"** on past purchases inside the buyer dashboard (`buyer-dashboard.html`) to instantly merge all items into their active cart and navigate to checkout.
   - **🌍 Global Incoterms Trade Basis Selector:** Buyers select international procurement trade terms (**EXW** - Ex Works, **FOB** - Free on Board, or **DDP** - Delivered Duty Paid) on checkout (`checkout.html`) and product detail pages (`product-detail.html`), which carry over directly onto the official Commercial Invoices.
   - **🏅 Supplier Trust KYC & Factory Certifications:** Supplier verification page (`supplier-verification.html`) showcases verified supplier badges (*✓ ISO 9001 Certified, ✓ Verified Manufacturer, ✓ On-Site Factory Inspected, ✓ 100% Escrow Assurance*).
+- **⚡ Ultimate B2B Wholesale Platform Upgrades (Supplier Scale & Trade Execution)**:
+  - **📥 Bulk CSV Catalog Import, Export & Template:** Sellers and admins can download a formatted CSV product template (`pse_wholesale_products_template.csv`), bulk-import hundreds of wholesale listings at once via an interactive CSV uploader modal in `seller-dashboard.html` and `admin-dashboard.html`, and export their live catalog to CSV anytime.
+  - **💬 Interactive RFQ Quote Bidding & Order Conversion Engine:** Suppliers can browse active buyer RFQs in their dashboard (`seller-dashboard.html`) and submit formal quote bids (*Unit Price, Est. Lead Time, MOQ Offered, Terms*). Buyers can compare received supplier bids inside their dashboard (`buyer-dashboard.html`) and click **"✅ Accept Quote & Convert to Order"** to instantly generate a pre-filled checkout order at the agreed negotiated rate.
+  - **🏪 Dedicated Branded Supplier Storefronts (`supplier-store.html`):** Verified suppliers get dedicated company storefront pages (`/supplier-store.html?id=<sellerId>`) displaying their company banner, logo, Gold/Platinum VIP badges, Trust KYC certifications, WhatsApp/Email contact buttons, and their full filterable product catalog.
 - **🔎 Pro Search suggestions** — the header search bar on every page is a professional suggestion engine: instant debounced results as you type (no Enter needed), ranked by prefix/word/substring relevance, rich product previews (thumbnail, brand, ★ rating, price, stock, ✓ Verified badge), category & brand chips, recent searches (clearable) and popular searches, full keyboard navigation (↑/↓/Enter/Esc, ARIA listbox), match highlighting, and a "See all N results" footer. Catalog is cached for 10 minutes (sessionStorage), loaded once from Firestore — 100% real products only, no fake or sample demo catalogs. Powered by the shared `search-pro.js` — no API keys, no server
 - **🚫 100% Real Only — No Fake or Demo Content** — all sample, demo, placeholder, and fallback products (`FALLBACK_PRODUCTS`), fake statistics (`12,000+`, `580+`, `1,234+`), and demo toast alerts have been completely removed across the catalog, search bar, AI assistant, product detail pages, and home page. The site displays honest, real-time data from Firestore with clean empty states when inventory or statistics are zero.
 - Email/password + Google sign-up and login (no SMS/phone verification)
@@ -87,6 +91,7 @@ Email sending uses Resend — set a valid key in `email.js` for production; othe
 ├── index.html              # Home
 ├── products.html           # Catalog
 ├── product-detail.html     # PDP
+├── supplier-store.html     # Branded supplier company storefront
 ├── cart.html / checkout.html / order-success.html
 ├── login.html / register.html / account.html
 ├── admin-dashboard.html / seller-dashboard.html / buyer-dashboard.html

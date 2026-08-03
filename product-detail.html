@@ -1264,11 +1264,19 @@
         const callBtn = currentSellerContact.phone
             ? `<button class="seller-contact-btn" style="background:var(--secondary);color:#fff;" onclick="contactSellerPhone()"><i class="fa-solid fa-phone"></i> Call</button>`
             : '';
-        box.innerHTML = waBtn + emailBtn + callBtn;
-        box.style.display = (wa || email || currentSellerContact.phone) ? 'flex' : 'none';
+        const storeBtn = `<button class="seller-contact-btn" style="background:#0b2a3b;color:#fff;" onclick="visitSupplierStorefront()"><i class="fa-solid fa-store"></i> Supplier Storefront</button>`;
+        box.innerHTML = waBtn + emailBtn + callBtn + storeBtn;
+        box.style.display = 'flex';
     }
 
     // --- CONTACT SELLER ACTIONS ---
+    window.visitSupplierStorefront = function () {
+        const p = currentProduct || {};
+        let url = '/supplier-store.html?';
+        if (p.supplier_id || p.seller_id) url += 'id=' + encodeURIComponent(p.supplier_id || p.seller_id);
+        else if (p.brand) url += 'brand=' + encodeURIComponent(p.brand);
+        window.location.href = url;
+    };
     window.contactSellerWhatsApp = function () {
         const wa = (currentSellerContact.whatsapp || currentSellerContact.phone || '').replace(/[^0-9]/g, '');
         if (!wa) { showToast('Seller WhatsApp not available', 'error'); return; }
@@ -1302,7 +1310,7 @@
             `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#d35400;color:#fff;font-weight:700;margin-left:8px;"><i class="fa-solid fa-rocket"></i> Sponsored Deal</span>` : '';
         const trustBadge = product.supplier_verified ?
             `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#e8f8f0;color:#27ae60;font-weight:700;margin-left:8px;"><i class="fa-solid fa-shield-halved"></i> 100% Escrow Trade Assurance</span>` : '';
-        document.getElementById('productBrand').innerHTML = `by <a href="/products?brand=${encodeURIComponent(product.brand || '')}">${product.brand || 'Pilot Distribution'}</a> ${tierBadge} ${sponsorBadge} ${trustBadge}`;
+        document.getElementById('productBrand').innerHTML = `by <a href="/supplier-store.html?brand=${encodeURIComponent(product.brand || '')}" style="font-weight:700;color:var(--primary);">${product.brand || 'Pilot Distribution'}</a> ${tierBadge} ${sponsorBadge} ${trustBadge}`;
 
         // Rating
         const rating = product.rating || 0;

@@ -460,6 +460,20 @@
     </div>
 </div>
 
+<!-- BUYER RECEIVED QUOTES MODAL -->
+<div class="modal-overlay" id="buyerQuotesModal">
+    <div class="modal-box" style="max-width:650px;">
+        <h3><i class="fa-solid fa-comments-dollar" style="color:#27ae60;"></i> Received Supplier Quotes</h3>
+        <p style="color:var(--text-light);font-size:0.88rem;margin-bottom:1.2rem;">Compare quote bids from verified suppliers. Accept the winning quote to automatically create a checkout order.</p>
+        
+        <div id="buyerQuotesListContainer" style="max-height:400px;overflow-y:auto;margin-bottom:1.5rem;"></div>
+
+        <div style="display:flex;justify-content:flex-end;">
+            <button type="button" class="btn-cancel" onclick="closeBuyerQuotesModal()">Close</button>
+        </div>
+    </div>
+</div>
+
 <!-- FOOTER -->
 <footer class="footer">
     <div class="container">
@@ -669,10 +683,18 @@
                         ${rfq.budget ? `<span> | <strong>Budget:</strong> $${rfq.budget}</span>` : ''}
                     </div>
                     <div class="rfq-details" style="margin-top:0.3rem;color:var(--text);">${esc(rfq.description.substring(0, 120))}${rfq.description.length > 120 ? '...' : ''}</div>
-                    <div style="margin-top:0.6rem;display:flex;justify-content:flex-end;">
-                        <button type="button" class="btn-submit" style="background:var(--secondary);color:#fff;padding:0.35rem 0.9rem;font-size:0.78rem;border-radius:6px;width:auto;border:none;cursor:pointer;" onclick="downloadRFQPdf('${rfq.id}')">
-                            <i class="fa-solid fa-file-pdf" style="color:#f1c40f;"></i> RFQ Document (PDF)
-                        </button>
+                    <div style="margin-top:0.6rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                        <span style="font-size:0.8rem;color:var(--text-light);"><i class="fa-solid fa-file-invoice-dollar" style="color:#27ae60;"></i> <strong style="color:var(--text-dark);">${rfq.bids ? rfq.bids.length : 0}</strong> supplier quote bid(s) received</span>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                            ${(rfq.bids && rfq.bids.length > 0) ? `
+                                <button type="button" class="btn-submit" style="background:#27ae60;color:#fff;padding:0.35rem 0.9rem;font-size:0.78rem;border-radius:6px;width:auto;border:none;cursor:pointer;" onclick="openBuyerQuotesModal('${rfq.id}')">
+                                    <i class="fa-solid fa-comments-dollar"></i> View Quotes (${rfq.bids.length})
+                                </button>
+                            ` : ''}
+                            <button type="button" class="btn-submit" style="background:var(--secondary);color:#fff;padding:0.35rem 0.9rem;font-size:0.78rem;border-radius:6px;width:auto;border:none;cursor:pointer;" onclick="downloadRFQPdf('${rfq.id}')">
+                                <i class="fa-solid fa-file-pdf" style="color:#f1c40f;"></i> RFQ Document (PDF)
+                            </button>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -1115,6 +1137,119 @@
         }
     }
 
+    function openBuyerQuotesModal(rfqId) {
+        const rfq = userRFQsCache.find(r => r.id === rfqId);
+        if (!rfq || !rfq.bids || rfq.bids.length === 0) {
+            showToast('No supplier quotes received yet for this RFQ', 'info');
+            return;
+        }
+        const container = document.getElementById('buyerQuotesListContainer');
+        if (container) {
+            container.innerHTML = rfq.bids.map((bid, index) => {
+                const totalBid = (bid.unit_price || 0) * (rfq.quantity || 1);
+                const tierChip = bid.seller_tier === 'platinum' ?
+                    `<span style="background:#8e44ad;color:#fff;padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:700;"><i class="fa-solid fa-crown"></i> Platinum Supplier</span>` :
+                    `<span style="background:#f39c12;color:#fff;padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:700;"><i class="fa-solid fa-crown"></i> Gold Supplier</span>`;
+                return `
+                    <div style="border:1px solid var(--border-light);border-radius:10px;padding:1.2rem;margin-bottom:0.8rem;background:var(--light);">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;flex-wrap:wrap;gap:8px;">
+                            <div>
+                                <strong style="font-size:1.1rem;color:var(--text-dark);">${esc(bid.seller_name || 'Verified Supplier')}</strong>
+                                ${tierChip}
+                            </div>
+                            <span style="font-size:0.8rem;color:var(--text-light);">${new Date(bid.created_at || Date.now()).toLocaleDateString()}</span>
+                        </div>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.5rem;font-size:0.85rem;margin-bottom:0.8rem;">
+                            <div>Unit Quote: <strong style="color:var(--primary);font-size:1.05rem;">$${Number(bid.unit_price || 0).toFixed(2)}</strong></div>
+                            <div>Total (${rfq.quantity} units): <strong style="color:var(--secondary);font-size:1.05rem;">$${totalBid.toFixed(2)}</strong></div>
+                            <div>Lead Time: <strong>${bid.lead_time_days || 7} Days</strong></div>
+                        </div>
+                        ${bid.notes ? `<p style="font-size:0.85rem;color:var(--text);margin:0 0 0.8rem;padding:0.6rem;background:#fff;border-radius:6px;border:1px solid var(--border-dark);">"${esc(bid.notes)}"</p>` : ''}
+                        <div style="display:flex;justify-content:flex-end;gap:8px;">
+                            <a href="/supplier-store.html?id=${encodeURIComponent(bid.seller_id || '')}" class="btn-cancel" style="font-size:0.78rem;padding:0.4rem 0.8rem;" target="_blank"><i class="fa-solid fa-store"></i> Supplier Store</a>
+                            <button type="button" class="btn-add-product" style="background:#27ae60;font-size:0.78rem;padding:0.4rem 1rem;" onclick="acceptRfqQuote('${rfq.id}', ${index})">
+                                <i class="fa-solid fa-check"></i> Accept Quote &amp; Convert to Order
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        const modal = document.getElementById('buyerQuotesModal');
+        if (modal) modal.classList.add('show');
+    }
+    function closeBuyerQuotesModal() {
+        const modal = document.getElementById('buyerQuotesModal');
+        if (modal) modal.classList.remove('show');
+    }
+
+    async function acceptRfqQuote(rfqId, bidIndex) {
+        const rfq = userRFQsCache.find(r => r.id === rfqId);
+        if (!rfq || !rfq.bids || !rfq.bids[bidIndex]) return;
+        const bid = rfq.bids[bidIndex];
+        const user = getCurrentUser();
+        if (!user) { showToast('Please login to accept quotes', 'error'); return; }
+
+        showToast('🚀 Creating checkout order from accepted quote...', 'info');
+        try {
+            const total = (bid.unit_price || 0) * (rfq.quantity || 1);
+            const orderNumber = 'ORD-' + Date.now().toString().slice(-8);
+
+            const newOrder = {
+                orderNumber: orderNumber,
+                quoteNumber: 'RFQ-' + rfq.id.slice(0, 8).toUpperCase(),
+                user_id: user.id,
+                user_email: user.email,
+                seller_id: bid.seller_id,
+                seller_name: bid.seller_name,
+                created_at: new Date().toISOString(),
+                status: 'pending',
+                milestone_step: 0,
+                incoterm: 'DDP (Delivered Duty Paid)',
+                paymentMethod: 'Escrow Trade Assurance',
+                items: [{
+                    id: rfq.id,
+                    title: `[RFQ ACCEPTED] ${rfq.title}`,
+                    price: bid.unit_price,
+                    quantity: rfq.quantity,
+                    brand: bid.seller_name,
+                    moq: rfq.quantity
+                }],
+                totals: {
+                    subtotal: total,
+                    shipping: 0,
+                    tax: total * 0.08,
+                    total: total * 1.08
+                },
+                customer: {
+                    firstName: user.full_name || 'Buyer',
+                    lastName: '',
+                    email: user.email,
+                    company: user.company || 'B2B Commercial Buyer'
+                }
+            };
+
+            await db.collection('orders').add(newOrder);
+            await db.collection('rfqs').doc(rfqId).update({
+                status: 'accepted',
+                accepted_bid: bid,
+                updated_at: new Date().toISOString()
+            });
+
+            closeBuyerQuotesModal();
+            showToast('🎉 Quote accepted! Order created at negotiated wholesale rate.', 'success');
+            loadRFQs();
+            loadOrders();
+            setTimeout(() => { window.location.href = '/track-order?order=' + orderNumber; }, 1500);
+        } catch (e) {
+            console.error('Accept error:', e);
+            showToast('Failed to convert quote to order', 'error');
+        }
+    }
+
+    window.openBuyerQuotesModal = openBuyerQuotesModal;
+    window.closeBuyerQuotesModal = closeBuyerQuotesModal;
+    window.acceptRfqQuote = acceptRfqQuote;
     window.quickReorder = quickReorder;
     window.downloadRFQPdf = downloadRFQPdf;
     window.switchTab = switchTab;

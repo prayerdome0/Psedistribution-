@@ -534,6 +534,9 @@
             <div class="nav-item" onclick="showTab('membership')">
                 <i class="fa-solid fa-crown" style="color:#f1c40f;"></i> VIP Membership &amp; Ads
             </div>
+            <div class="nav-item" onclick="showTab('rfqs')">
+                <i class="fa-solid fa-file-invoice-dollar" style="color:#27ae60;"></i> RFQ Leads &amp; Bids
+            </div>
 
             <div class="logout-btn" onclick="logoutSeller()">
                 <i class="fa-regular fa-right-from-bracket"></i> Logout
@@ -585,11 +588,22 @@
 
             <!-- PRODUCTS -->
             <div class="tab-content" id="tab-products">
-                <div class="page-header">
+                <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8rem;">
                     <h2><i class="fa-regular fa-box"></i> My Products</h2>
-                    <button class="btn-add-product" onclick="openAddProduct()">
-                        <i class="fa-regular fa-plus"></i> Add Product
-                    </button>
+                    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+                        <button type="button" class="btn-add-product" onclick="downloadCSVTemplate()" style="background:var(--secondary);font-size:0.82rem;padding:0.5rem 1rem;">
+                            <i class="fa-solid fa-file-csv"></i> Template
+                        </button>
+                        <button type="button" class="btn-add-product" onclick="openCSVImportModal()" style="background:#27ae60;font-size:0.82rem;padding:0.5rem 1rem;">
+                            <i class="fa-solid fa-upload"></i> Bulk Import (CSV)
+                        </button>
+                        <button type="button" class="btn-add-product" onclick="exportProductsCSV()" style="background:#2980b9;font-size:0.82rem;padding:0.5rem 1rem;">
+                            <i class="fa-solid fa-download"></i> Export CSV
+                        </button>
+                        <button class="btn-add-product" onclick="openAddProduct()">
+                            <i class="fa-regular fa-plus"></i> Add Product
+                        </button>
+                    </div>
                 </div>
 
                 <div class="table-container">
@@ -767,6 +781,20 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- RFQ LEADS & BIDS TAB -->
+            <div class="tab-content" id="tab-rfqs">
+                <div class="page-header">
+                    <h2><i class="fa-solid fa-file-invoice-dollar" style="color:#27ae60;"></i> Buyer RFQ Leads &amp; Bids</h2>
+                    <span class="time" id="rfqLeadCount">0 active RFQs</span>
+                </div>
+                <p style="color:var(--text-light);font-size:0.9rem;margin-bottom:1.2rem;">
+                    Commercial buyers are requesting bulk quotes. Submit formal competitive bids with your wholesale unit price and lead times to win enterprise contracts.
+                </p>
+                <div id="sellerRfqListContainer">
+                    <div style="text-align:center;padding:3rem;color:var(--text-light);"><i class="fa-solid fa-spinner fa-spin"></i> Loading buyer RFQs...</div>
                 </div>
             </div>
 
@@ -962,6 +990,65 @@
     </div>
 </div>
 
+<!-- CSV IMPORT MODAL -->
+<div class="modal-overlay" id="csvImportModal">
+    <div class="modal-box" style="max-width:550px;">
+        <h3><i class="fa-solid fa-upload" style="color:#27ae60;"></i> Bulk Import Products (CSV)</h3>
+        <p style="color:var(--text-light);font-size:0.88rem;margin-bottom:1.2rem;">Upload a CSV file to add multiple wholesale products at once. Need the format? <a href="javascript:void(0)" onclick="downloadCSVTemplate()" style="color:var(--primary);font-weight:700;">Download CSV Template</a>.</p>
+        
+        <div style="border:2px dashed var(--border-dark);border-radius:12px;padding:2rem 1rem;text-align:center;background:var(--light);margin-bottom:1.5rem;">
+            <i class="fa-solid fa-file-csv" style="font-size:2.8rem;color:var(--primary);margin-bottom:0.8rem;"></i>
+            <div style="font-weight:700;color:var(--secondary);margin-bottom:0.4rem;">Select CSV File</div>
+            <input type="file" id="csvFileInput" accept=".csv,.txt" style="margin-top:0.6rem;font-size:0.85rem;" />
+        </div>
+
+        <div id="csvImportStatus" style="font-size:0.85rem;color:var(--text-light);margin-bottom:1.2rem;display:none;"></div>
+
+        <div style="display:flex;justify-content:flex-end;gap:0.8rem;">
+            <button type="button" class="btn-cancel" onclick="closeCSVImportModal()">Cancel</button>
+            <button type="button" class="btn-add-product" id="confirmCSVImportBtn" onclick="confirmCSVImport()" style="background:#27ae60;">
+                <i class="fa-solid fa-upload"></i> Upload &amp; Import
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- SUBMIT RFQ QUOTE BID MODAL -->
+<div class="modal-overlay" id="quoteBidModal">
+    <div class="modal-box" style="max-width:550px;">
+        <h3><i class="fa-solid fa-file-invoice-dollar" style="color:#27ae60;"></i> Submit Quote Bid for RFQ</h3>
+        <p style="color:var(--text-light);font-size:0.88rem;margin-bottom:1.2rem;">Provide your best wholesale quote terms. The buyer can review and accept your bid to instantly convert it into an order.</p>
+        
+        <input type="hidden" id="quoteBidRfqId" />
+
+        <div class="form-group">
+            <label>Quoted Unit Price (USD) *</label>
+            <input type="number" id="quoteBidPrice" placeholder="0.00" step="0.01" required />
+        </div>
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
+            <div class="form-group">
+                <label>Est. Delivery Lead Time (Days) *</label>
+                <input type="number" id="quoteBidLeadTime" placeholder="7" value="7" required />
+            </div>
+            <div class="form-group">
+                <label>Minimum Order Qty (MOQ) *</label>
+                <input type="number" id="quoteBidMoq" placeholder="100" value="100" required />
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Quote Terms &amp; Notes (Optional)</label>
+            <textarea id="quoteBidNotes" rows="3" placeholder="Explain shipping terms, customization options, or warranty..."></textarea>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:0.8rem;margin-top:1rem;">
+            <button type="button" class="btn-cancel" onclick="closeQuoteBidModal()">Cancel</button>
+            <button type="button" class="btn-add-product" id="confirmQuoteBidBtn" onclick="confirmQuoteBid()" style="background:#27ae60;">
+                <i class="fa-solid fa-paper-plane"></i> Submit Formal Quote
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- FOOTER -->
 <footer class="footer">
     <div class="container">
@@ -1090,6 +1177,7 @@
         if (tab === 'orders') loadOrders();
         if (tab === 'analytics') loadAnalytics();
         if (tab === 'settings') loadSettings();
+        if (tab === 'rfqs') loadSellerRFQs();
     }
 
     // ─── IMAGE UPLOAD ───
@@ -1695,6 +1783,265 @@
             showToast('Failed to activate sponsored listing', 'error');
         }
     }
+
+    // ─── BULK CSV IMPORT / EXPORT / TEMPLATE ───
+    function downloadCSVTemplate() {
+        const headers = ['title', 'brand', 'category', 'price', 'old_price', 'moq', 'stock', 'sku', 'description', 'image_url'];
+        const sampleRow = ['"Industrial LED Floodlight 100W"', '"Philips"', '"industrial"', '45.00', '65.00', '10', '200', '"PH-FLD-100"', '"Heavy duty waterproof outdoor floodlight"', '"https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400"'];
+        const csvContent = 'data:text/csv;charset=utf-8,' + headers.join(',') + '\r\n' + sampleRow.join(',');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', 'pse_wholesale_products_template.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('📄 Downloaded CSV Template!', 'success');
+    }
+
+    function openCSVImportModal() {
+        const modal = document.getElementById('csvImportModal');
+        if (modal) modal.classList.add('show');
+    }
+    function closeCSVImportModal() {
+        const modal = document.getElementById('csvImportModal');
+        if (modal) {
+            modal.classList.remove('show');
+            const statusEl = document.getElementById('csvImportStatus');
+            if (statusEl) statusEl.style.display = 'none';
+        }
+    }
+
+    async function confirmCSVImport() {
+        const fileInput = document.getElementById('csvFileInput');
+        const file = fileInput?.files[0];
+        if (!file) { showToast('Please select a CSV file first', 'error'); return; }
+        const btn = document.getElementById('confirmCSVImportBtn');
+        const statusEl = document.getElementById('csvImportStatus');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Importing...'; }
+        if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = 'Parsing CSV file...'; }
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const text = e.target.result;
+            const lines = text.split(/\r\n|\n/).filter(l => l.trim().length > 0);
+            if (lines.length <= 1) {
+                showToast('CSV file is empty or only has headers', 'error');
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-upload"></i> Upload &amp; Import'; }
+                return;
+            }
+
+            const headers = lines[0].split(',').map(h => h.trim().replace(/^["']|["']$/g, '').toLowerCase());
+            const user = auth.currentUser;
+            if (!user) return;
+
+            let successCount = 0;
+            const batch = db.batch();
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim().replace(/^["']|["']$/g, ''));
+                if (!values[0]) continue;
+
+                const productData = {
+                    title: values[headers.indexOf('title')] || values[0] || 'Wholesale Product',
+                    brand: values[headers.indexOf('brand')] || 'Pilot Distribution',
+                    category: values[headers.indexOf('category')] || 'other',
+                    price: parseFloat(values[headers.indexOf('price')]) || 0,
+                    old_price: parseFloat(values[headers.indexOf('old_price')]) || 0,
+                    moq: parseInt(values[headers.indexOf('moq')]) || 1,
+                    stock: parseInt(values[headers.indexOf('stock')]) || 100,
+                    sku: values[headers.indexOf('sku')] || '',
+                    description: values[headers.indexOf('description')] || 'Wholesale product listed by verified supplier.',
+                    image_url: values[headers.indexOf('image_url')] || 'logo.jpg',
+                    slug: generateSlug(values[headers.indexOf('title')] || values[0]),
+                    supplier_id: user.uid,
+                    seller_id: user.uid,
+                    supplier_verified: true,
+                    status: 'active',
+                    created_at: new Date().toISOString()
+                };
+                const docRef = db.collection('products').doc();
+                batch.set(docRef, productData);
+                successCount++;
+            }
+
+            try {
+                await batch.commit();
+                showToast(`🎉 Successfully imported ${successCount} products!`, 'success');
+                closeCSVImportModal();
+                loadProducts();
+                updateStats();
+            } catch (err) {
+                console.error('CSV Import Error:', err);
+                showToast('Failed to import CSV items', 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-upload"></i> Upload &amp; Import'; }
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function exportProductsCSV() {
+        if (!allProducts || allProducts.length === 0) {
+            showToast('No products to export', 'error');
+            return;
+        }
+        const headers = ['id', 'title', 'brand', 'category', 'price', 'old_price', 'moq', 'stock', 'sku', 'status'];
+        const rows = allProducts.map(p => [
+            `"${p.id || ''}"`,
+            `"${(p.title || '').replace(/"/g, '""')}"`,
+            `"${(p.brand || '').replace(/"/g, '""')}"`,
+            `"${p.category || 'other'}"`,
+            p.price || 0,
+            p.old_price || 0,
+            p.moq || 1,
+            p.stock || 0,
+            `"${p.sku || ''}"`,
+            `"${p.status || 'active'}"`
+        ]);
+        const csvContent = 'data:text/csv;charset=utf-8,' + headers.join(',') + '\r\n' + rows.map(r => r.join(',')).join('\r\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', `pse_products_export_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('📤 Catalog exported to CSV!', 'success');
+    }
+
+    window.downloadCSVTemplate = downloadCSVTemplate;
+    window.openCSVImportModal = openCSVImportModal;
+    window.closeCSVImportModal = closeCSVImportModal;
+    window.confirmCSVImport = confirmCSVImport;
+    window.exportProductsCSV = exportProductsCSV;
+
+    // ─── RFQ LEADS & BIDDING ───
+    let allBuyerRFQs = [];
+
+    async function loadSellerRFQs() {
+        const container = document.getElementById('sellerRfqListContainer');
+        const countEl = document.getElementById('rfqLeadCount');
+        if (!container) return;
+        try {
+            const snap = await db.collection('rfqs').orderBy('created_at', 'desc').limit(30).get();
+            const rfqs = [];
+            snap.forEach(doc => {
+                const data = doc.data();
+                if (data.status !== 'closed' && data.status !== 'accepted') {
+                    rfqs.push({ id: doc.id, ...data });
+                }
+            });
+            allBuyerRFQs = rfqs;
+            if (countEl) countEl.textContent = `${rfqs.length} active RFQs`;
+
+            if (rfqs.length === 0) {
+                container.innerHTML = `<div style="text-align:center;padding:3rem;background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;color:var(--text-light);">
+                    <i class="fa-solid fa-file-lines" style="font-size:2.5rem;color:var(--primary);margin-bottom:0.8rem;display:block;"></i>
+                    <h3 style="color:var(--text-dark);">No Active RFQs</h3>
+                    <p>When buyers request bulk quotes, they will appear here for you to submit competitive bids.</p>
+                </div>`;
+                return;
+            }
+
+            container.innerHTML = rfqs.map(rfq => {
+                const bidsCount = rfq.bids ? rfq.bids.length : 0;
+                return `
+                    <div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:1.5rem;margin-bottom:1rem;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+                        <div style="max-width:650px;">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:0.4rem;flex-wrap:wrap;">
+                                <strong style="font-size:1.15rem;color:var(--text-dark);">${esc(rfq.title)}</strong>
+                                <span style="font-size:0.75rem;background:var(--primary-light);color:var(--primary);padding:3px 10px;border-radius:20px;font-weight:700;">${esc(rfq.category)}</span>
+                                <span style="font-size:0.75rem;background:#e8f4fa;color:#2980b9;padding:3px 10px;border-radius:20px;font-weight:700;">Qty: ${rfq.quantity} units</span>
+                            </div>
+                            <div style="font-size:0.85rem;color:var(--text-light);margin-bottom:0.6rem;">
+                                Budget: <strong style="color:var(--text-dark);">${rfq.budget ? '$' + Number(rfq.budget).toFixed(2) : 'Open Quote'}</strong> | 
+                                Posted: ${new Date(rfq.created_at || Date.now()).toLocaleDateString()} | 
+                                Quotes Received: <strong style="color:#27ae60;">${bidsCount} bids</strong>
+                            </div>
+                            <p style="font-size:0.9rem;color:var(--text);margin:0;line-height:1.5;">${esc(rfq.description || 'No additional details provided.')}</p>
+                        </div>
+                        <div>
+                            <button type="button" class="btn-add-product" style="background:#27ae60;" onclick="openQuoteBidModal('${rfq.id}', '${esc(rfq.title)}')">
+                                <i class="fa-solid fa-file-invoice-dollar"></i> Submit Quote Bid
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (e) {
+            console.error('Error loading seller RFQs:', e);
+            container.innerHTML = `<div style="text-align:center;padding:2rem;color:#c0392b;">Error loading buyer RFQs</div>`;
+        }
+    }
+
+    function openQuoteBidModal(rfqId, title) {
+        document.getElementById('quoteBidRfqId').value = rfqId;
+        const modal = document.getElementById('quoteBidModal');
+        if (modal) modal.classList.add('show');
+    }
+    function closeQuoteBidModal() {
+        const modal = document.getElementById('quoteBidModal');
+        if (modal) modal.classList.remove('show');
+    }
+
+    async function confirmQuoteBid() {
+        const rfqId = document.getElementById('quoteBidRfqId').value;
+        const price = parseFloat(document.getElementById('quoteBidPrice').value) || 0;
+        const leadTime = parseInt(document.getElementById('quoteBidLeadTime').value) || 7;
+        const moq = parseInt(document.getElementById('quoteBidMoq').value) || 100;
+        const notes = document.getElementById('quoteBidNotes').value.trim();
+        const user = auth.currentUser;
+        if (!rfqId || price <= 0 || !user) {
+            showToast('Please enter a valid quoted unit price', 'error');
+            return;
+        }
+
+        const btn = document.getElementById('confirmQuoteBidBtn');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...'; }
+
+        try {
+            const doc = await db.collection('users').doc(user.uid).get();
+            const sellerData = doc.exists ? doc.data() : {};
+            const sellerName = sellerData.company || sellerData.full_name || user.displayName || 'Verified Supplier';
+            const sellerTier = sellerData.membership_tier || sellerData.supplier_tier || 'gold';
+
+            const newBid = {
+                id: 'bid_' + Date.now(),
+                seller_id: user.uid,
+                seller_name: sellerName,
+                seller_tier: sellerTier,
+                unit_price: price,
+                lead_time_days: leadTime,
+                moq: moq,
+                notes: notes,
+                created_at: new Date().toISOString()
+            };
+
+            const rfqRef = db.collection('rfqs').doc(rfqId);
+            const rfqDoc = await rfqRef.get();
+            const currBids = rfqDoc.exists && rfqDoc.data().bids ? rfqDoc.data().bids : [];
+            currBids.push(newBid);
+
+            await rfqRef.update({
+                bids: currBids,
+                status: 'quoted',
+                updated_at: new Date().toISOString()
+            });
+
+            closeQuoteBidModal();
+            showToast('🎉 Formal quote bid submitted to buyer successfully!', 'success');
+            loadSellerRFQs();
+        } catch (e) {
+            console.error('Bid error:', e);
+            showToast('Failed to submit quote bid', 'error');
+        } finally {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Formal Quote'; }
+        }
+    }
+
+    window.openQuoteBidModal = openQuoteBidModal;
+    window.closeQuoteBidModal = closeQuoteBidModal;
+    window.confirmQuoteBid = confirmQuoteBid;
 
     // ─── LOGOUT ───
     function logoutSeller() {
