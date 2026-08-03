@@ -502,6 +502,47 @@
                     <textarea id="sellerReason" placeholder="Tell us about your business and why you'd like to join our marketplace..." rows="4"></textarea>
                 </div>
 
+                <!-- Supplier Membership Tier Selector -->
+                <div class="form-group" style="margin-top:1.8rem;margin-bottom:1.8rem;">
+                    <label style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:0.8rem;display:block;">Select Your Supplier Membership Tier <span class="required">*</span></label>
+                    <div class="membership-tiers" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;">
+                        <label class="tier-card" style="border:2px solid var(--border-light);border-radius:12px;padding:1.2rem;cursor:pointer;background:var(--bg-card);transition:all 0.2s ease;display:flex;flex-direction:column;position:relative;">
+                            <input type="radio" name="membershipTier" value="basic" checked style="position:absolute;top:15px;right:15px;cursor:pointer;" />
+                            <div style="font-weight:700;font-size:1.1rem;color:var(--text-dark);">Basic Supplier</div>
+                            <div style="font-size:1.4rem;font-weight:800;color:var(--primary);margin:0.4rem 0 0.8rem;">$0 <span style="font-size:0.8rem;font-weight:500;color:var(--text-light);">/ month</span></div>
+                            <ul style="list-style:none;padding:0;margin:0;font-size:0.82rem;color:var(--text-light);display:flex;flex-direction:column;gap:0.4rem;">
+                                <li><i class="fa-solid fa-check" style="color:var(--primary);margin-right:6px;"></i> Up to 10 products</li>
+                                <li><i class="fa-solid fa-check" style="color:var(--primary);margin-right:6px;"></i> Standard catalog search</li>
+                                <li><i class="fa-solid fa-check" style="color:var(--primary);margin-right:6px;"></i> 10% order commission</li>
+                            </ul>
+                        </label>
+                        <label class="tier-card" style="border:2px solid #f1c40f;border-radius:12px;padding:1.2rem;cursor:pointer;background:linear-gradient(135deg,rgba(241,196,15,0.06),rgba(243,156,18,0.08));transition:all 0.2s ease;display:flex;flex-direction:column;position:relative;">
+                            <div style="position:absolute;top:-10px;right:15px;background:#f39c12;color:#fff;font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;">Popular</div>
+                            <input type="radio" name="membershipTier" value="gold" style="position:absolute;top:15px;right:15px;cursor:pointer;" />
+                            <div style="font-weight:700;font-size:1.1rem;color:#d35400;">👑 Gold Supplier</div>
+                            <div style="font-size:1.4rem;font-weight:800;color:#d35400;margin:0.4rem 0 0.8rem;">$299 <span style="font-size:0.8rem;font-weight:500;color:var(--text-light);">/ month</span></div>
+                            <ul style="list-style:none;padding:0;margin:0;font-size:0.82rem;color:var(--text-light);display:flex;flex-direction:column;gap:0.4rem;">
+                                <li><i class="fa-solid fa-check" style="color:#f39c12;margin-right:6px;"></i> <strong>Unlimited</strong> products</li>
+                                <li><i class="fa-solid fa-check" style="color:#f39c12;margin-right:6px;"></i> <strong>"👑 Gold Supplier"</strong> badge</li>
+                                <li><i class="fa-solid fa-check" style="color:#f39c12;margin-right:6px;"></i> Priority search ranking</li>
+                                <li><i class="fa-solid fa-check" style="color:#f39c12;margin-right:6px;"></i> Reduced 5% commission</li>
+                            </ul>
+                        </label>
+                        <label class="tier-card" style="border:2px solid #8e44ad;border-radius:12px;padding:1.2rem;cursor:pointer;background:linear-gradient(135deg,rgba(142,68,173,0.06),rgba(155,89,182,0.08));transition:all 0.2s ease;display:flex;flex-direction:column;position:relative;">
+                            <div style="position:absolute;top:-10px;right:15px;background:#8e44ad;color:#fff;font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;">Enterprise</div>
+                            <input type="radio" name="membershipTier" value="platinum" style="position:absolute;top:15px;right:15px;cursor:pointer;" />
+                            <div style="font-weight:700;font-size:1.1rem;color:#8e44ad;">👑 Platinum Supplier</div>
+                            <div style="font-size:1.4rem;font-weight:800;color:#8e44ad;margin:0.4rem 0 0.8rem;">$799 <span style="font-size:0.8rem;font-weight:500;color:var(--text-light);">/ month</span></div>
+                            <ul style="list-style:none;padding:0;margin:0;font-size:0.82rem;color:var(--text-light);display:flex;flex-direction:column;gap:0.4rem;">
+                                <li><i class="fa-solid fa-check" style="color:#8e44ad;margin-right:6px;"></i> <strong>0% Commission</strong> (Zero take-rate)</li>
+                                <li><i class="fa-solid fa-check" style="color:#8e44ad;margin-right:6px;"></i> <strong>"👑 Platinum Supplier"</strong> badge</li>
+                                <li><i class="fa-solid fa-check" style="color:#8e44ad;margin-right:6px;"></i> Featured home page banners</li>
+                                <li><i class="fa-solid fa-check" style="color:#8e44ad;margin-right:6px;"></i> Dedicated account manager</li>
+                            </ul>
+                        </label>
+                    </div>
+                </div>
+
                 <button type="submit" class="btn-submit" id="submitBtn">
                     <i class="fa-regular fa-paper-plane"></i> Submit Application
                 </button>
@@ -705,6 +746,7 @@
 
         const user = getCurrentUser();
         const fullName = firstName + ' ' + lastName;
+        const selectedTier = document.querySelector('input[name="membershipTier"]:checked')?.value || 'basic';
 
         const applicationData = {
             firstName: firstName, lastName: lastName, full_name: fullName,
@@ -713,6 +755,7 @@
             yearsInBusiness: years || '', location: location || '',
             website: website || '', categories: selectedCategories,
             reason: reason || '', profileImage: sellerProfileImageURL || '',
+            membership_tier: selectedTier,
             userId: (user && user.id) || 'guest',
             userEmail: (user && user.email) || email,
             status: 'pending', created_at: new Date().toISOString()
@@ -724,11 +767,12 @@
             // Mark the registered account as having submitted an application
             if (user && user.id) {
                 try {
-                    await db.collection('users').doc(user.id).update({
+                    await db.collection('users').doc(user.id).set({
                         seller_application: 'submitted',
                         company: businessName,
+                        membership_tier: selectedTier,
                         updated_at: new Date().toISOString()
-                    });
+                    }, { merge: true });
                 } catch (err) { /* non-fatal */ }
             }
 

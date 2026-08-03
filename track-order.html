@@ -584,14 +584,16 @@
     function renderOrder(order) {
         const content = document.getElementById('orderContent');
         const statusSteps = [
-            { key: 'pending', label: 'Order Received', icon: 'fa-regular fa-receipt' },
-            { key: 'processing', label: 'Processing', icon: 'fa-regular fa-gear' },
-            { key: 'shipped', label: 'Shipped', icon: 'fa-regular fa-truck' },
-            { key: 'delivered', label: 'Delivered', icon: 'fa-regular fa-circle-check' }
+            { key: 'pending', label: '🔒 Step 1: Escrow Secured', desc: 'Payment secured in PSE Trade Assurance account', icon: 'fa-solid fa-lock' },
+            { key: 'processing', label: '🏭 Step 2: In Production', desc: 'Verified supplier preparing bulk shipment', icon: 'fa-solid fa-industry' },
+            { key: 'inspected', label: '📋 Step 3: Inspected & Passed', desc: 'Quality check certificate verified', icon: 'fa-solid fa-clipboard-check' },
+            { key: 'shipped', label: '🚢 Step 4: In Transit / Shipped', desc: 'Shipment dispatched & en route', icon: 'fa-solid fa-ship' },
+            { key: 'delivered', label: '✅ Step 5: Escrow Released', desc: 'Goods delivered, inspected & escrow funds released', icon: 'fa-solid fa-circle-check' }
         ];
 
+        const statusMap = { 'pending': 0, 'processing': 1, 'preparing': 1, 'inspected': 2, 'shipped': 3, 'delivered': 4, 'completed': 4 };
         const currentStatus = order.status || 'pending';
-        const currentIndex = statusSteps.findIndex(s => s.key === currentStatus);
+        const currentIndex = order.milestone_step !== undefined ? order.milestone_step : (statusMap[currentStatus] !== undefined ? statusMap[currentStatus] : 0);
         const orderDate = new Date(order.created_at || order.date || Date.now());
         const items = order.items || [];
         const totals = order.totals || {};
@@ -601,16 +603,19 @@
             let statusClass = '';
             if (index < currentIndex) statusClass = 'completed';
             else if (index === currentIndex) statusClass = 'active';
+            const isDone = index <= currentIndex;
+            const isCurr = index === currentIndex;
             return `
                 <div class="timeline-step">
                     <div class="dot ${statusClass}"></div>
                     <div class="step-content">
-                        <div class="step-title ${statusClass}">
+                        <div class="step-title ${statusClass}" style="font-weight:700;">
                             <i class="${step.icon}"></i> ${step.label}
-                            ${index === currentIndex ? ' <span style="font-size:0.6rem; background:var(--accent); color:var(--secondary); padding:0.1rem 0.6rem; border-radius:30px;">Current</span>' : ''}
-                            ${index < currentIndex ? ' <span style="font-size:0.6rem; color:var(--primary);">✓</span>' : ''}
+                            ${isCurr ? ' <span style="font-size:0.6rem; background:var(--accent); color:var(--secondary); padding:0.15rem 0.6rem; border-radius:30px;font-weight:700;">ACTIVE MILESTONE</span>' : ''}
+                            ${index < currentIndex ? ' <span style="font-size:0.6rem; color:var(--primary); font-weight:700;">✓ COMPLETED</span>' : ''}
                         </div>
-                        ${index <= currentIndex ? `<div class="step-date">${orderDate.toLocaleDateString()} ${index === currentIndex ? '- In progress' : '- Completed'}</div>` : ''}
+                        <div style="font-size:0.8rem;color:var(--text-light);margin-top:2px;">${step.desc}</div>
+                        ${isDone ? `<div class="step-date">${orderDate.toLocaleDateString()} ${isCurr ? '- Currently in progress' : '- Approved'}</div>` : ''}
                     </div>
                 </div>
             `;
@@ -618,7 +623,7 @@
 
         let itemsHtml = items.map(item => `
             <div class="item-row">
-                <span class="item-name">${item.quantity || 1}x ${item.title}</span>
+                <span class="item-name">${item.quantity || 1}x ${item.title} ${item.is_sample ? '<span style="color:#f39c12;font-size:0.72rem;font-weight:700;">[SAMPLE]</span>' : ''}</span>
                 <span class="item-price">$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</span>
             </div>
         `).join('');
@@ -649,9 +654,17 @@
                         <div class="value">${customer.email || 'N/A'}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="label">Payment</div>
-                        <div class="value">${order.paymentMethod || 'WhatsApp Quote'}</div>
+                        <div class="label">Incoterms Basis</div>
+                        <div class="value" style="font-weight:700;color:var(--primary);">${order.incoterm || 'DDP (Delivered Duty Paid)'}</div>
                     </div>
+                </div>
+
+                <div style="background:var(--primary-light);border:1px solid var(--primary);border-radius:10px;padding:1rem 1.2rem;margin:1.5rem 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                    <div>
+                        <strong style="color:var(--primary-dark);font-size:0.95rem;"><i class="fa-solid fa-shield-halved"></i> 100% Escrow Trade Assurance Active</strong>
+                        <p style="color:var(--primary);font-size:0.85rem;margin:0;">Payment is held safely in escrow until milestone Step 5 is verified.</p>
+                    </div>
+                    <span style="background:var(--primary);color:#fff;font-size:0.75rem;font-weight:700;padding:4px 10px;border-radius:20px;">PROTECTED ORDER</span>
                 </div>
 
                 <div class="order-items">

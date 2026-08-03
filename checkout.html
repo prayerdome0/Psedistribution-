@@ -615,8 +615,70 @@
                     </div>
                 </div>
 
+                <!-- INCOTERMS TRADE TERMS SELECTOR -->
                 <div class="form-section">
-                    <h2><span class="step">3</span> Order Notes</h2>
+                    <h2><span class="step">3</span> Incoterms Shipping &amp; Trade Terms</h2>
+                    <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:0.8rem;">Select the international trade basis for your wholesale procurement order. Protected by 100% Escrow Trade Assurance.</p>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.8rem;">
+                        <label class="tier-card" style="border:2px solid var(--primary);border-radius:10px;padding:1rem;cursor:pointer;background:var(--primary-light);display:block;">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                                <input type="radio" name="orderIncoterm" value="DDP (Delivered Duty Paid)" checked />
+                                <strong style="color:var(--primary-dark);">DDP (Delivered Duty Paid)</strong>
+                            </div>
+                            <span style="font-size:0.78rem;color:var(--text-light);display:block;">All-inclusive freight, customs clearance &amp; door-to-door delivery.</span>
+                        </label>
+                        <label class="tier-card" style="border:2px solid var(--border-dark);border-radius:10px;padding:1rem;cursor:pointer;background:#fff;display:block;">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                                <input type="radio" name="orderIncoterm" value="FOB (Free On Board Port)" />
+                                <strong style="color:var(--secondary);">FOB (Free On Board Port)</strong>
+                            </div>
+                            <span style="font-size:0.78rem;color:var(--text-light);display:block;">Supplier delivers to shipping port; buyer arranges ocean/air freight.</span>
+                        </label>
+                        <label class="tier-card" style="border:2px solid var(--border-dark);border-radius:10px;padding:1rem;cursor:pointer;background:#fff;display:block;">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                                <input type="radio" name="orderIncoterm" value="EXW (Ex Works Factory)" />
+                                <strong style="color:var(--secondary);">EXW (Ex Works Factory)</strong>
+                            </div>
+                            <span style="font-size:0.78rem;color:var(--text-light);display:block;">Buyer arranges carrier pickup directly from verified manufacturer.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- CORPORATE PURCHASE ORDER # & PAYMENT TERMS -->
+                <div class="form-section">
+                    <h2><span class="step">4</span> Corporate PO &amp; Payment Method</h2>
+                    <div class="form-group" style="margin-bottom:1.2rem;">
+                        <label style="font-weight:700;">Corporate Purchase Order # (Optional PO Number)</label>
+                        <input type="text" id="corporatePoNumber" placeholder="e.g. PO-2026-89240 (From SAP / Oracle / NetSuite)" />
+                    </div>
+
+                    <div style="font-weight:700;color:var(--secondary);margin-bottom:0.6rem;">Select Wholesale Payment Method *</div>
+                    <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1rem;">
+                        <label style="border:1px solid var(--primary);border-radius:8px;padding:0.9rem;cursor:pointer;background:var(--primary-light);display:flex;align-items:center;justify-content:space-between;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <input type="radio" name="paymentOption" value="Escrow Trade Assurance (WhatsApp / Wire / Card)" checked />
+                                <div>
+                                    <strong style="color:var(--primary-dark);display:block;">Escrow Trade Assurance (WhatsApp / Wire / Card)</strong>
+                                    <span style="font-size:0.75rem;color:var(--text-light);">Payment secured in escrow until shipment delivery.</span>
+                                </div>
+                            </div>
+                            <span style="background:var(--primary);color:#fff;font-size:0.7rem;font-weight:700;padding:3px 8px;border-radius:20px;">STANDARD</span>
+                        </label>
+                        <label id="net30OptionLabel" style="border:1px solid var(--border-dark);border-radius:8px;padding:0.9rem;cursor:pointer;background:#fff;display:flex;align-items:center;justify-content:space-between;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <input type="radio" name="paymentOption" value="Net-30 Trade Credit Invoice" id="net30Radio" />
+                                <div>
+                                    <strong style="color:var(--secondary);display:block;">Net-30 Commercial Trade Credit Invoice</strong>
+                                    <span style="font-size:0.75rem;color:var(--text-light);" id="net30OptionStatus">Requires Approved Corporate Net-30 Account.</span>
+                                </div>
+                            </div>
+                            <span style="background:var(--secondary);color:#fff;font-size:0.7rem;font-weight:700;padding:3px 8px;border-radius:20px;">NET-30</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2><span class="step">5</span> Order Notes</h2>
                     <div class="form-group">
                         <label>Additional Notes (Optional)</label>
                         <textarea id="notes" placeholder="Special delivery instructions, order preferences, or any other notes..."></textarea>
@@ -1119,7 +1181,9 @@
                     tax: tax,
                     total: total
                 },
-                paymentMethod: 'email',
+                paymentMethod: document.querySelector('input[name="paymentOption"]:checked')?.value || 'Escrow Trade Assurance (WhatsApp / Wire / Card)',
+                purchase_order_number: document.getElementById('corporatePoNumber')?.value.trim() || '',
+                incoterm: document.querySelector('input[name="orderIncoterm"]:checked')?.value || 'DDP (Delivered Duty Paid)',
                 notes: notes,
                 status: 'pending'
             };
@@ -1234,7 +1298,9 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
                 tax: tax,
                 total: total
             },
-            paymentMethod: 'whatsapp',
+            paymentMethod: document.querySelector('input[name="paymentOption"]:checked')?.value || 'Escrow Trade Assurance (WhatsApp / Wire / Card)',
+            purchase_order_number: document.getElementById('corporatePoNumber')?.value.trim() || '',
+            incoterm: document.querySelector('input[name="orderIncoterm"]:checked')?.value || 'DDP (Delivered Duty Paid)',
             notes: notes,
             status: 'pending'
         };

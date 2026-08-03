@@ -463,6 +463,9 @@
                 <button class="nav-item" onclick="showTab('security')">
                     <i class="fa-regular fa-shield"></i> Security
                 </button>
+                <button class="nav-item" onclick="showTab('credit')">
+                    <i class="fa-solid fa-credit-card" style="color:#27ae60;"></i> Net-30 Credit
+                </button>
                 
                 <!-- ─── ADMIN DASHBOARD LINK (VISIBLE ONLY TO ADMINS) ─── -->
                 <button class="nav-item admin-nav" id="adminNavLink" style="display:none;" onclick="goToAdminDashboard()">
@@ -641,6 +644,55 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Trade Credit Tab -->
+                <div class="tab-content" id="tab-credit">
+                    <div class="section-title"><i class="fa-solid fa-credit-card" style="color:#27ae60;"></i> Net-30 Trade Credit Application</div>
+                    <div style="background:var(--primary-light);border:1px solid var(--primary);border-radius:12px;padding:1.5rem;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+                        <div>
+                            <div style="font-size:0.8rem;text-transform:uppercase;color:var(--primary-dark);font-weight:700;margin-bottom:0.3rem;">Corporate Trade Credit Status</div>
+                            <div style="font-size:1.4rem;font-weight:800;color:var(--text-dark);" id="tradeCreditStatusText">
+                                Not Applied <span style="font-size:0.75rem;padding:4px 10px;border-radius:20px;background:#fff;color:var(--text-light);font-weight:600;">$0 Limit</span>
+                            </div>
+                            <p style="color:var(--text);font-size:0.9rem;margin-top:0.4rem;" id="tradeCreditStatusDesc">
+                                Approved B2B buyers can purchase wholesale inventory on 30-day corporate trade terms.
+                            </p>
+                        </div>
+                    </div>
+
+                    <form id="tradeCreditForm" style="max-width:600px;">
+                        <div class="form-group">
+                            <label>Corporate Tax ID / Registration # *</label>
+                            <input type="text" id="creditTaxId" placeholder="e.g. EIN / TIN / Tax Registration Number" required />
+                        </div>
+                        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                            <div class="form-group">
+                                <label>Requested Credit Limit (USD) *</label>
+                                <select id="creditLimitReq" required>
+                                    <option value="5000">$5,000 (Standard Tier)</option>
+                                    <option value="15000">$15,000 (Growth Tier)</option>
+                                    <option value="30000">$30,000 (Commercial Tier)</option>
+                                    <option value="50000">$50,000 (Enterprise Tier)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Annual Procurement Volume *</label>
+                                <select id="creditVolume" required>
+                                    <option value="10k-50k">$10k – $50k / year</option>
+                                    <option value="50k-250k">$50k – $250k / year</option>
+                                    <option value="250k+">$250k+ / year</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Corporate Finance / Billing Email *</label>
+                            <input type="email" id="creditBillingEmail" placeholder="ap@company.com" required />
+                        </div>
+                        <button type="submit" class="btn-save" id="submitCreditBtn" style="background:#27ae60;margin-top:1rem;">
+                            <i class="fa-solid fa-paper-plane"></i> Submit Net-30 Application
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -744,6 +796,14 @@
                         adminNav.style.display = 'flex';
                     } else {
                         adminNav.style.display = 'none';
+                    }
+
+                    if (data.trade_credit_status === 'approved') {
+                        const creditText = document.getElementById('tradeCreditStatusText');
+                        if (creditText) creditText.innerHTML = `Approved <span style="font-size:0.75rem;padding:4px 10px;border-radius:20px;background:#e8f8f0;color:#27ae60;font-weight:600;">$${(data.trade_credit_limit || 15000).toLocaleString()} Limit</span>`;
+                    } else if (data.trade_credit_status === 'pending') {
+                        const creditText = document.getElementById('tradeCreditStatusText');
+                        if (creditText) creditText.innerHTML = `Pending Approval <span style="font-size:0.75rem;padding:4px 10px;border-radius:20px;background:#fff;color:#d35400;font-weight:600;">$${(data.trade_credit_limit || 5000).toLocaleString()} Limit</span>`;
                     }
                 } catch (e) {
                     console.error('Error loading user data:', e);
@@ -1136,7 +1196,7 @@
                 <div class="wishlist-item">
                     <button class="wishlist-remove" onclick="removeFromWishlist('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
                     <div class="wishlist-image" onclick="window.location.href='/product/${p.slug}'">
-                        <img src="${p.image_url || 'https://via.placeholder.com/200x200?text=No+Image'}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />
+                        <img src="${p.image_url || 'logo.jpg'}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />
                     </div>
                     <div class="wishlist-title" onclick="window.location.href='/product/${p.slug}'">${p.title || 'Product'}</div>
                     <div class="wishlist-price">$${(p.price || 0).toFixed(2)}</div>
@@ -1417,6 +1477,53 @@
         }, { threshold: 0.1 });
         document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
     });
+
+    // ─── NET-30 TRADE CREDIT APPLICATION ───
+    const tradeForm = document.getElementById('tradeCreditForm');
+    if (tradeForm) {
+        tradeForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const taxId = document.getElementById('creditTaxId').value.trim();
+            const limit = parseInt(document.getElementById('creditLimitReq').value) || 5000;
+            const vol = document.getElementById('creditVolume').value;
+            const email = document.getElementById('creditBillingEmail').value.trim();
+            const user = getCurrentUser();
+            if (!user || !taxId || !email) {
+                showToast('Please fill in required fields', 'error');
+                return;
+            }
+            const btn = document.getElementById('submitCreditBtn');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...'; }
+            try {
+                await db.collection('users').doc(user.id).set({
+                    trade_credit_status: 'pending',
+                    trade_credit_limit: limit,
+                    trade_credit_tax_id: taxId,
+                    updated_at: new Date().toISOString()
+                }, { merge: true });
+
+                await db.collection('trade_credit_applications').add({
+                    user_id: user.id,
+                    user_email: user.email,
+                    company: user.company || user.full_name || 'B2B Buyer',
+                    tax_id: taxId,
+                    requested_limit: limit,
+                    procurement_volume: vol,
+                    billing_email: email,
+                    status: 'pending',
+                    created_at: new Date().toISOString()
+                });
+
+                document.getElementById('tradeCreditStatusText').innerHTML = `Pending Approval <span style="font-size:0.75rem;padding:4px 10px;border-radius:20px;background:#fff;color:#d35400;font-weight:600;">$${limit.toLocaleString()} Limit</span>`;
+                showToast('✅ Net-30 Trade Credit application submitted for corporate review!', 'success');
+            } catch (err) {
+                console.error('Credit error:', err);
+                showToast('Failed to submit credit application', 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Net-30 Application'; }
+            }
+        });
+    }
 
     // ─── EXPOSE ───
     window.showTab = showTab;

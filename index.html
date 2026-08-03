@@ -696,22 +696,22 @@
     <div class="stats-section animate-on-scroll">
         <div class="stat-item">
             <div class="icon"><i class="fa-regular fa-box"></i></div>
-            <div class="number" id="statProducts"><span class="count" data-target="12000">0</span><span class="suffix">+</span></div>
+            <div class="number" id="statProducts"><span class="count" data-target="0">0</span><span class="suffix">+</span></div>
             <div class="label">Products Available</div>
         </div>
         <div class="stat-item">
             <div class="icon"><i class="fa-regular fa-handshake"></i></div>
-            <div class="number" id="statSuppliers"><span class="count" data-target="580">0</span><span class="suffix">+</span></div>
+            <div class="number" id="statSuppliers"><span class="count" data-target="0">0</span><span class="suffix">+</span></div>
             <div class="label">Verified Suppliers</div>
         </div>
         <div class="stat-item">
             <div class="icon"><i class="fa-regular fa-star"></i></div>
-            <div class="number" id="statSatisfaction"><span class="count" data-target="99.7">0</span><span class="suffix">%</span></div>
+            <div class="number" id="statSatisfaction"><span class="count" data-target="100">0</span><span class="suffix">%</span></div>
             <div class="label">Satisfaction Rate</div>
         </div>
         <div class="stat-item">
             <div class="icon"><i class="fa-regular fa-clock"></i></div>
-            <div class="number" id="statOrders"><span class="count" data-target="1234">0</span><span class="suffix">+</span></div>
+            <div class="number" id="statOrders"><span class="count" data-target="0">0</span><span class="suffix">+</span></div>
             <div class="label">Orders Completed</div>
         </div>
     </div>
@@ -897,16 +897,7 @@
         appId: "1:729127273727:web:402d67be8346257755f8ca"
     };
 
-    const FALLBACK_PRODUCTS = [
-        { id: '1', title: 'Premium Wireless Headphones', brand: 'Sony', price: 89.99, old_price: 129.99, image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&h=300&q=80', moq: 10, supplier_verified: true },
-        { id: '2', title: 'Smartphone 5G 128GB', brand: 'Samsung', price: 499.99, old_price: 599.99, image_url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&h=300&q=80', moq: 5, supplier_verified: true },
-        { id: '3', title: 'Organic Cotton T-Shirt', brand: 'Nike', price: 24.99, old_price: 34.99, image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=300&h=300&q=80', moq: 20, supplier_verified: false },
-        { id: '4', title: 'Professional Kitchen Knife Set', brand: 'Zwilling', price: 149.99, old_price: 199.99, image_url: 'https://images.unsplash.com/photo-1593618998160-e3408e6769a1?auto=format&fit=crop&w=300&h=300&q=80', moq: 6, supplier_verified: true },
-        { id: '5', title: 'LED Desk Lamp', brand: 'Philips', price: 39.99, old_price: 59.99, image_url: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=300&h=300&q=80', moq: 15, supplier_verified: true },
-        { id: '6', title: 'Fitness Tracker Watch', brand: 'Garmin', price: 129.99, old_price: 169.99, image_url: 'https://images.unsplash.com/photo-1576243345690-4e4b79b63288?auto=format&fit=crop&w=300&h=300&q=80', moq: 10, supplier_verified: true },
-        { id: '7', title: 'Leather Wallet', brand: 'Coach', price: 49.99, old_price: 69.99, image_url: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=300&h=300&q=80', moq: 12, supplier_verified: false },
-        { id: '8', title: 'Wireless Charging Pad', brand: 'Anker', price: 29.99, old_price: 39.99, image_url: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?auto=format&fit=crop&w=300&h=300&q=80', moq: 25, supplier_verified: true }
-    ];
+
 
     const COMPANY_LOGOS = [
         { name: 'Samsung', image: 'samsung.png' },
@@ -1039,9 +1030,10 @@
 
     async function loadStats() {
         try {
-            let productCount = 12000;
-            let supplierCount = 580;
-            let orderCount = 1234;
+            let productCount = 0;
+            let supplierCount = 0;
+            let orderCount = 0;
+            let satisfactionRate = 100;
             
             try {
                 const prodSnapshot = await db.collection('products').get();
@@ -1052,18 +1044,26 @@
                         activeCount++;
                     }
                 });
-                if (activeCount > 0) productCount = activeCount;
+                productCount = activeCount;
                 
                 const sellerSnapshot = await db.collection('users')
                     .where('role', '==', 'seller')
-                    .where('status', '==', 'approved')
                     .get();
-                if (sellerSnapshot.size > 0) supplierCount = sellerSnapshot.size;
+                supplierCount = sellerSnapshot.size;
                 
                 const orderSnapshot = await db.collection('orders').get();
-                if (orderSnapshot.size > 0) orderCount = orderSnapshot.size;
+                orderCount = orderSnapshot.size;
+
+                const reviewSnapshot = await db.collection('reviews').get();
+                if (reviewSnapshot.size > 0) {
+                    let totalRating = 0;
+                    reviewSnapshot.forEach(doc => {
+                        totalRating += Number(doc.data().rating || 5);
+                    });
+                    satisfactionRate = Math.round((totalRating / (reviewSnapshot.size * 5)) * 1000) / 10;
+                }
             } catch (e) {
-                console.log('Using fallback stats');
+                console.log('Error loading stats from Firestore:', e);
             }
 
             const productCounter = document.querySelector('#statProducts .count');
@@ -1086,7 +1086,7 @@
 
             if (productCounter) { productCounter.dataset.target = productCount; observer.observe(productCounter); }
             if (supplierCounter) { supplierCounter.dataset.target = supplierCount; observer.observe(supplierCounter); }
-            if (satisfactionCounter) { satisfactionCounter.dataset.target = 99.7; observer.observe(satisfactionCounter); }
+            if (satisfactionCounter) { satisfactionCounter.dataset.target = satisfactionRate; observer.observe(satisfactionCounter); }
             if (orderCounter) { orderCounter.dataset.target = orderCount; observer.observe(orderCounter); }
 
         } catch (error) {
@@ -1122,8 +1122,7 @@
             if (!user) {
                 // Guest cart via localStorage
                 const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
-                const product = featuredProductsCache.find(p => p.id === productId) ||
-                                FALLBACK_PRODUCTS.find(p => p.id === productId);
+                const product = featuredProductsCache.find(p => p.id === productId);
                 const existingIndex = cart.findIndex(item => item.product_id === productId);
                 if (existingIndex > -1) {
                     cart[existingIndex].quantity = (cart[existingIndex].quantity || 1) + 1;
@@ -1315,7 +1314,7 @@
 
         try {
             if (typeof db === 'undefined' || !db) {
-                renderProducts(FALLBACK_PRODUCTS);
+                renderProducts([]);
                 return;
             }
 
@@ -1341,16 +1340,11 @@
                 });
             });
 
-            if (products.length === 0) {
-                renderProducts(FALLBACK_PRODUCTS);
-                return;
-            }
-
             renderProducts(products);
 
         } catch (error) {
             console.error('Error loading products:', error);
-            renderProducts(FALLBACK_PRODUCTS);
+            renderProducts([]);
         }
     }
 
@@ -1367,20 +1361,30 @@
             return;
         }
 
+        // Sort sponsored listings to the top of home page featured products
+        products.sort((a, b) => (b.sponsored ? 1 : 0) - (a.sponsored ? 1 : 0));
+
         grid.innerHTML = products.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
             const slug = p.slug || generateSlug(p.title || 'product');
-            const imageUrl = p.image_url || 'https://via.placeholder.com/300x300?text=No+Image';
+            const imageUrl = p.image_url || 'logo.jpg';
+            const sponsoredBadge = p.sponsored ? `<span class="product-badge" style="background:#d35400;color:#fff;top:10px;right:10px;z-index:10;font-weight:700;"><i class="fa-solid fa-rocket"></i> SPONSORED</span>` : '';
+            const vipTierBadge = p.supplier_tier === 'platinum' || p.membership_tier === 'platinum' ?
+                `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#8e44ad;margin-top:2px;"><i class="fa-solid fa-crown"></i> Platinum Supplier</div>` :
+                p.supplier_tier === 'gold' || p.membership_tier === 'gold' ?
+                `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#d35400;margin-top:2px;"><i class="fa-solid fa-crown"></i> Gold Supplier</div>` : '';
             
             return `<div class="product-card animate-on-scroll">
-                ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
-                ${discount > 0 ? `<span class="product-badge flash">-${discount}%</span>` : ''}
+                ${sponsoredBadge}
+                ${p.moq ? `<span class="product-badge wholesale" style="${p.sponsored ? 'top:38px;' : ''}">MOQ ${p.moq}</span>` : ''}
+                ${discount > 0 ? `<span class="product-badge flash" style="${p.sponsored ? 'top:66px;' : ''}">-${discount}%</span>` : ''}
                 ${p.supplier_verified ? `<span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>` : ''}
                 <div class="product-image" onclick="window.location.href='/product/${slug}'">
                     <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fa-solid fa-box\\'></i></span>'" />
                 </div>
                 <div class="product-title">${p.title || 'Product'}</div>
                 <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
+                ${vipTierBadge}
                 <div class="product-price">$${(p.price || 0).toFixed(2)}${p.old_price ? ` <span class="old">$${p.old_price.toFixed(2)}</span>` : ''}</div>
                 <div class="product-actions">
                     <button class="btn-add" data-product-id="${p.id}" onclick="addToCart('${p.id}')"><i class="fa-solid fa-cart-plus"></i> Add</button>
@@ -1458,7 +1462,14 @@
                     supplier_verified: data.supplier_verified || false
                 });
             });
-            if (products.length === 0) products = FALLBACK_PRODUCTS.slice(0, 4);
+            if (products.length === 0) {
+                const sectionTitle = grid.previousElementSibling;
+                if (sectionTitle && sectionTitle.classList.contains('section-title')) {
+                    sectionTitle.style.display = 'none';
+                }
+                grid.style.display = 'none';
+                return;
+            }
             grid.innerHTML = products.map(p => {
                 const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
                 return `<div class="product-card animate-on-scroll">
@@ -1466,7 +1477,7 @@
                     ${discount > 0 ? `<span class="product-badge flash">-${discount}%</span>` : ''}
                     ${p.supplier_verified ? `<span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>` : ''}
                     <div class="product-image" onclick="window.location.href='/product/${generateSlug(p.title)}'">
-                        <img src="${p.image_url || 'https://via.placeholder.com/300x300?text=No+Image'}" alt="${p.title}" loading="lazy" />
+                        <img src="${p.image_url || 'logo.jpg'}" alt="${p.title}" loading="lazy" />
                     </div>
                     <div class="product-title">${p.title || 'Product'}</div>
                     <div class="product-brand">${p.brand || 'Pilot'}</div>
@@ -1479,6 +1490,11 @@
             }).join('');
         } catch (e) {
             console.error('Extra products error:', e);
+            const sectionTitle = grid.previousElementSibling;
+            if (sectionTitle && sectionTitle.classList.contains('section-title')) {
+                sectionTitle.style.display = 'none';
+            }
+            grid.style.display = 'none';
         }
     }
 

@@ -697,6 +697,33 @@
     </div>
 </div>
 
+<!-- FLOATING COMPARE BAR -->
+<div id="compareBar" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(150%);background:var(--secondary);color:#fff;padding:0.8rem 1.5rem;border-radius:50px;box-shadow:0 15px 40px rgba(0,0,0,0.35);z-index:9990;display:flex;align-items:center;gap:1.5rem;transition:transform 0.3s ease;border:2px solid var(--primary);">
+    <div style="font-weight:700;font-size:0.95rem;">
+        <i class="fa-solid fa-scale-balanced" style="color:var(--accent);"></i> Comparing: <span id="compareCount">0</span>/4 products
+    </div>
+    <div style="display:flex;gap:0.6rem;">
+        <button type="button" class="btn-add-product" style="background:var(--primary);padding:6px 16px;font-size:0.85rem;" onclick="openCompareModal()">
+            <i class="fa-solid fa-table-columns"></i> Compare Matrix
+        </button>
+        <button type="button" class="btn-cancel" style="padding:6px 12px;font-size:0.8rem;background:rgba(255,255,255,0.15);color:#fff;" onclick="clearCompare()">Clear</button>
+    </div>
+</div>
+
+<!-- COMPARE MATRIX MODAL -->
+<div class="modal-overlay" id="compareModal">
+    <div class="modal-box" style="max-width:950px;overflow-x:auto;">
+        <h3><i class="fa-solid fa-scale-balanced" style="color:var(--accent);"></i> Side-by-Side B2B Product Specs &amp; MOQ Comparison</h3>
+        <p style="color:var(--text-light);font-size:0.88rem;margin-bottom:1.2rem;">Evaluate wholesale pricing, volume discount brackets, minimum order quantities (MOQ), and supplier credentials side-by-side.</p>
+        
+        <div id="compareMatrixContainer" style="overflow-x:auto;"></div>
+
+        <div style="display:flex;justify-content:flex-end;margin-top:1.5rem;">
+            <button type="button" class="btn-cancel" onclick="closeCompareModal()">Close Comparison</button>
+        </div>
+    </div>
+</div>
+
 <!-- FOOTER -->
 <footer class="footer">
     <div class="container">
@@ -745,17 +772,7 @@
     const productsPerPage = 12;
     let db, auth;
 
-    // ─── FALLBACK PRODUCTS ───
-    const FALLBACK_PRODUCTS = [
-        { id: '1', title: 'Premium Wireless Headphones', brand: 'Sony', price: 89.99, old_price: 129.99, image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&h=300&q=80', moq: 10, supplier_verified: true, category: 'electronics', rating: 4.8, stock: 150 },
-        { id: '2', title: 'Smartphone 5G 128GB', brand: 'Samsung', price: 499.99, old_price: 599.99, image_url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&h=300&q=80', moq: 5, supplier_verified: true, category: 'electronics', rating: 4.9, stock: 85 },
-        { id: '3', title: 'Organic Cotton T-Shirt', brand: 'Nike', price: 24.99, old_price: 34.99, image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=300&h=300&q=80', moq: 20, supplier_verified: false, category: 'fashion', rating: 4.2, stock: 200 },
-        { id: '4', title: 'Professional Kitchen Knife Set', brand: 'Zwilling', price: 149.99, old_price: 199.99, image_url: 'https://images.unsplash.com/photo-1593618998160-e3408e6769a1?auto=format&fit=crop&w=300&h=300&q=80', moq: 6, supplier_verified: true, category: 'home', rating: 4.7, stock: 45 },
-        { id: '5', title: 'LED Desk Lamp', brand: 'Philips', price: 39.99, old_price: 59.99, image_url: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=300&h=300&q=80', moq: 15, supplier_verified: true, category: 'home', rating: 4.5, stock: 120 },
-        { id: '6', title: 'Fitness Tracker Watch', brand: 'Garmin', price: 129.99, old_price: 169.99, image_url: 'https://images.unsplash.com/photo-1576243345690-4e4b79b63288?auto=format&fit=crop&w=300&h=300&q=80', moq: 10, supplier_verified: true, category: 'sports', rating: 4.6, stock: 60 },
-        { id: '7', title: 'Leather Wallet', brand: 'Coach', price: 49.99, old_price: 69.99, image_url: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=300&h=300&q=80', moq: 12, supplier_verified: false, category: 'fashion', rating: 4.0, stock: 80 },
-        { id: '8', title: 'Wireless Charging Pad', brand: 'Anker', price: 29.99, old_price: 39.99, image_url: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?auto=format&fit=crop&w=300&h=300&q=80', moq: 25, supplier_verified: true, category: 'electronics', rating: 4.3, stock: 300 }
-    ];
+
 
     // ─── INIT ───
     function initFirebase() {
@@ -867,8 +884,7 @@
                     // Second try: query without status filter
                     snapshot = await db.collection('products').get();
                 } catch (error) {
-                    // Third try: use fallback
-                    products = FALLBACK_PRODUCTS;
+                    products = [];
                 }
             }
 
@@ -888,16 +904,12 @@
                         moq: data.moq || 0,
                         category: data.category || 'other',
                         supplier_verified: data.supplier_verified || false,
+                        supplier_tier: data.supplier_tier || data.membership_tier || 'basic',
+                        sponsored: !!data.sponsored,
                         rating: data.rating || 0,
                         stock: data.stock || 0
                     });
                 });
-            }
-
-            // If no products found, use fallback
-            if (products.length === 0) {
-                products = FALLBACK_PRODUCTS;
-                showToast('Showing sample products', 'info');
             }
 
             allProducts = products;
@@ -924,10 +936,9 @@
 
         } catch (error) {
             console.error('Error loading products:', error);
-            allProducts = FALLBACK_PRODUCTS;
-            filteredProducts = [...allProducts];
+            allProducts = [];
+            filteredProducts = [];
             applyFilters();
-            showToast('Using sample products', 'info');
         }
     }
 
@@ -1011,6 +1022,9 @@
                 break;
         }
 
+        // Boost Sponsored products to top
+        products.sort((a, b) => (b.sponsored ? 1 : 0) - (a.sponsored ? 1 : 0));
+
         filteredProducts = products;
         document.getElementById('resultCount').innerHTML = `Showing <strong>${products.length}</strong> products`;
         renderProductsPage(1);
@@ -1041,20 +1055,27 @@
         grid.innerHTML = pageProducts.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
             const slug = p.slug || generateSlug(p.title || 'product');
-            const imageUrl = p.image_url || 'https://via.placeholder.com/300x300?text=No+Image';
+            const imageUrl = p.image_url || 'logo.jpg';
             const stars = p.rating ? '★'.repeat(Math.floor(p.rating)) + (p.rating % 1 >= 0.5 ? '½' : '') : '';
             const stockStatus = p.stock > 0 ? 'In Stock' : 'Out of Stock';
             
+            const sponsoredBadge = p.sponsored ? `<span class="product-badge" style="background:#d35400;color:#fff;top:10px;right:10px;z-index:10;font-weight:700;"><i class="fa-solid fa-rocket"></i> SPONSORED</span>` : '';
+            const vipTierBadge = p.supplier_tier === 'platinum' ?
+                `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#8e44ad;margin-top:2px;"><i class="fa-solid fa-crown"></i> Platinum Supplier</div>` :
+                p.supplier_tier === 'gold' ?
+                `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#d35400;margin-top:2px;"><i class="fa-solid fa-crown"></i> Gold Supplier</div>` : '';
             return `
                 <div class="product-card animate-on-scroll">
-                    ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
-                    ${discount > 0 ? `<span class="product-badge flash">-${discount}%</span>` : ''}
+                    ${sponsoredBadge}
+                    ${p.moq ? `<span class="product-badge wholesale" style="${p.sponsored ? 'top:38px;' : ''}">MOQ ${p.moq}</span>` : ''}
+                    ${discount > 0 ? `<span class="product-badge flash" style="${p.sponsored ? 'top:66px;' : ''}">-${discount}%</span>` : ''}
                     ${p.supplier_verified ? `<span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>` : ''}
                     <div class="product-image" onclick="window.location.href='/product/${slug}'">
                         <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />
                     </div>
                     <div class="product-title">${p.title || 'Product'}</div>
                     <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
+                    ${vipTierBadge}
                     <div class="product-price">
                         $${(p.price || 0).toFixed(2)}
                         ${p.old_price ? `<span class="old">$${p.old_price.toFixed(2)}</span>` : ''}
@@ -1063,6 +1084,12 @@
                         ${p.rating ? `<span>${stars} ${p.rating}</span>` : ''}
                         <span class="stock">${stockStatus}</span>
                         ${p.moq ? `<span>MOQ: ${p.moq}</span>` : ''}
+                    </div>
+                    <div style="margin-top:6px;padding-top:6px;border-top:1px dashed var(--border-light);display:flex;align-items:center;justify-content:space-between;">
+                        <label style="font-size:0.75rem;font-weight:700;color:var(--secondary);cursor:pointer;display:flex;align-items:center;gap:5px;" onclick="event.stopPropagation()">
+                            <input type="checkbox" class="compare-cb" data-id="${p.id}" onchange="toggleCompareProduct('${p.id}')" />
+                            <span>⚖️ Compare Specs</span>
+                        </label>
                     </div>
                     <div class="product-actions">
                         <button class="btn-add" onclick="addToCart('${p.id}')">
@@ -1300,6 +1327,117 @@
         }, { threshold: 0.1 });
         document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
     });
+
+    // ─── SIDE-BY-SIDE PRODUCT COMPARISON MATRIX ───
+    let compareIds = [];
+
+    function toggleCompareProduct(id) {
+        const idx = compareIds.indexOf(id);
+        if (idx > -1) {
+            compareIds.splice(idx, 1);
+        } else {
+            if (compareIds.length >= 4) {
+                showToast('You can compare a maximum of 4 products at a time', 'info');
+                const cb = document.querySelector(`.compare-cb[data-id="${id}"]`);
+                if (cb) cb.checked = false;
+                return;
+            }
+            compareIds.push(id);
+        }
+        updateCompareBar();
+    }
+
+    function updateCompareBar() {
+        const bar = document.getElementById('compareBar');
+        const countEl = document.getElementById('compareCount');
+        if (!bar || !countEl) return;
+        countEl.textContent = compareIds.length;
+        if (compareIds.length > 0) {
+            bar.style.transform = 'translateX(-50%) translateY(0)';
+        } else {
+            bar.style.transform = 'translateX(-50%) translateY(150%)';
+        }
+        document.querySelectorAll('.compare-cb').forEach(cb => {
+            cb.checked = compareIds.includes(cb.dataset.id);
+        });
+    }
+
+    function clearCompare() {
+        compareIds = [];
+        updateCompareBar();
+        showToast('Comparison cleared', 'info');
+    }
+
+    function openCompareModal() {
+        if (compareIds.length < 2) {
+            showToast('Please select at least 2 products to compare', 'info');
+            return;
+        }
+        const container = document.getElementById('compareMatrixContainer');
+        if (!container) return;
+        const selected = allProducts.filter(p => compareIds.includes(p.id));
+
+        let html = `
+            <table style="width:100%;border-collapse:collapse;font-size:0.85rem;background:#fff;border:1px solid var(--border-dark);">
+                <thead>
+                    <tr style="background:var(--secondary);color:#fff;text-align:left;">
+                        <th style="padding:12px;border:1px solid #1a4055;">Feature / Spec</th>
+                        ${selected.map(p => `<th style="padding:12px;border:1px solid #1a4055;min-width:170px;">${esc(p.title || 'Product')}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Image</td>
+                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);text-align:center;"><img src="${p.image_url || 'logo.jpg'}" style="height:65px;object-fit:contain;margin:0 auto;" /></td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Wholesale Unit Price</td>
+                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);font-weight:800;color:var(--primary);font-size:1.1rem;">$${Number(p.price || 0).toFixed(2)}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Min. Order Qty (MOQ)</td>
+                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);font-weight:700;color:#d35400;">${p.moq || 1} units</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Est. Lead Time</td>
+                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);">${p.lead_time || '7–10 days'}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Brand / Supplier</td>
+                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);"><strong>${esc(p.brand || 'Pilot Distribution')}</strong><br><small style="color:var(--text-light);">${p.supplier_verified ? '✓ Verified Supplier' : ''}</small></td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">VIP Supplier Tier</td>
+                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);">${p.supplier_tier === 'platinum' ? '<span style="color:#8e44ad;font-weight:700;">👑 Platinum (0% Fee)</span>' : p.supplier_tier === 'gold' ? '<span style="color:#f39c12;font-weight:700;">👑 Gold (5% Fee)</span>' : 'Basic (10% Fee)'}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Incoterms Basis</td>
+                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);font-weight:600;color:var(--secondary);">DDP / FOB / EXW</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Actions</td>
+                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);text-align:center;">
+                            <button type="button" class="btn-add-product" style="background:var(--primary);padding:6px 12px;font-size:0.8rem;width:100%;margin-bottom:6px;" onclick="addToCart('${p.id}')"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
+                            <a href="/product/${p.slug || generateSlug(p.title)}" class="btn-cancel" style="font-size:0.75rem;padding:4px 10px;display:inline-block;text-decoration:none;">View Specs</a>
+                        </td>`).join('')}
+                    </tr>
+                </tbody>
+            </table>
+        `;
+        container.innerHTML = html;
+        const modal = document.getElementById('compareModal');
+        if (modal) modal.classList.add('show');
+    }
+
+    function closeCompareModal() {
+        const modal = document.getElementById('compareModal');
+        if (modal) modal.classList.remove('show');
+    }
+
+    window.toggleCompareProduct = toggleCompareProduct;
+    window.openCompareModal = openCompareModal;
+    window.closeCompareModal = closeCompareModal;
+    window.clearCompare = clearCompare;
 
     // ─── EXPOSE ───
     window.addToCart = addToCart;

@@ -35,19 +35,7 @@
         dbPollMs: 250
     };
 
-    // ─── FALLBACK CATALOG (synced with products.html & product-detail.html) ───
-    // Used when Firestore is unavailable, blocked, or simply not ready — so the
-    // pro search still returns meaningful suggestions on every page.
-    var FALLBACK_PRODUCTS = [
-        { id: '1', title: 'Premium Wireless Headphones', brand: 'Sony', price: 89.99, old_price: 129.99, image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=200&h=200&q=80', moq: 10, supplier_verified: true, category: 'electronics', rating: 4.8, stock: 150, sku: 'WH-1000XM4', slug: 'premium-wireless-headphones' },
-        { id: '2', title: 'Smartphone 5G 128GB', brand: 'Samsung', price: 499.99, old_price: 599.99, image_url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=200&h=200&q=80', moq: 5, supplier_verified: true, category: 'electronics', rating: 4.9, stock: 85, sku: 'S23-128', slug: 'smartphone-5g-128gb' },
-        { id: '3', title: 'Organic Cotton T-Shirt', brand: 'Nike', price: 24.99, old_price: 34.99, image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=200&h=200&q=80', moq: 20, supplier_verified: false, category: 'fashion', rating: 4.2, stock: 200, sku: 'CT-ORG-01', slug: 'organic-cotton-t-shirt' },
-        { id: '4', title: 'Professional Kitchen Knife Set', brand: 'Zwilling', price: 149.99, old_price: 199.99, image_url: 'https://images.unsplash.com/photo-1593618998160-e3408e6769a1?auto=format&fit=crop&w=200&h=200&q=80', moq: 6, supplier_verified: true, category: 'home', rating: 4.7, stock: 45, sku: 'KK-PRO-04', slug: 'professional-kitchen-knife-set' },
-        { id: '5', title: 'LED Desk Lamp', brand: 'Philips', price: 39.99, old_price: 59.99, image_url: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=200&h=200&q=80', moq: 15, supplier_verified: true, category: 'home', rating: 4.5, stock: 120, sku: 'LED-DL-05', slug: 'led-desk-lamp' },
-        { id: '6', title: 'Fitness Tracker Watch', brand: 'Garmin', price: 129.99, old_price: 169.99, image_url: 'https://images.unsplash.com/photo-1576243345690-4e4b79b63288?auto=format&fit=crop&w=200&h=200&q=80', moq: 10, supplier_verified: true, category: 'sports', rating: 4.6, stock: 60, sku: 'FT-GAR-06', slug: 'fitness-tracker-watch' },
-        { id: '7', title: 'Leather Wallet', brand: 'Coach', price: 49.99, old_price: 69.99, image_url: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=200&h=200&q=80', moq: 12, supplier_verified: false, category: 'fashion', rating: 4.0, stock: 80, sku: 'LW-COA-07', slug: 'leather-wallet' },
-        { id: '8', title: 'Wireless Charging Pad', brand: 'Anker', price: 29.99, old_price: 39.99, image_url: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?auto=format&fit=crop&w=200&h=200&q=80', moq: 25, supplier_verified: true, category: 'electronics', rating: 4.3, stock: 300, sku: 'WC-ANK-08', slug: 'wireless-charging-pad' }
-    ];
+
 
     // ─── STATE ────────────────────────────────────────────────────────────────
     var input = null, panel = null, bar = null, btn = null;
@@ -95,6 +83,8 @@
             stock: num(p.stock),
             moq: num(p.moq),
             supplier_verified: !!p.supplier_verified,
+            supplier_tier: String(p.supplier_tier || p.membership_tier || 'basic'),
+            sponsored: !!p.sponsored,
             sku: p.sku ? String(p.sku) : ''
         };
     }
@@ -161,24 +151,6 @@
         });
     }
 
-    function mergeCatalogs(fireProducts, fallback) {
-        var seen = {};
-        var merged = [];
-        fireProducts.forEach(function (p) {
-            var n = normalizeProduct(p);
-            if (!n) return;
-            seen[n.title.toLowerCase()] = true;
-            merged.push(n);
-        });
-        fallback.forEach(function (p) {
-            var n = normalizeProduct(p);
-            if (!n || seen[n.title.toLowerCase()]) return;
-            seen[n.title.toLowerCase()] = true;
-            merged.push(n);
-        });
-        return merged;
-    }
-
     function loadCatalog() {
         if (catalogPromise) return catalogPromise;
         var cached = readCache();
@@ -188,18 +160,22 @@
             return catalogPromise;
         }
         catalogPromise = loadFromFirestore()
-            .catch(function () { return null; })
+            .catch(function () { return []; })
             .then(function (fireProducts) {
-                var merged = mergeCatalogs(fireProducts || [], FALLBACK_PRODUCTS);
-                catalog = merged;
-                writeCache(merged);
-                return merged;
+                var normalized = [];
+                (fireProducts || []).forEach(function (p) {
+                    var n = normalizeProduct(p);
+                    if (n) normalized.push(n);
+                });
+                catalog = normalized;
+                writeCache(normalized);
+                return normalized;
             });
         return catalogPromise;
     }
 
     function getCatalogSync() {
-        return catalog || FALLBACK_PRODUCTS.map(normalizeProduct);
+        return catalog || [];
     }
 
     // ─── SEARCH RANKING ───────────────────────────────────────────────────────
@@ -235,6 +211,9 @@
 
         // slight tie-breaker — only boosts products that already matched
         if (score > 0 && p.supplier_verified) score += 3;
+        if (score > 0 && p.sponsored) score += 20;
+        if (score > 0 && p.supplier_tier === 'platinum') score += 10;
+        else if (score > 0 && p.supplier_tier === 'gold') score += 5;
         return score;
     }
 
@@ -305,7 +284,7 @@
         var topCats = Object.keys(cats).sort(function (a, b) { return cats[b] - cats[a]; }).slice(0, 3);
         var topBrands = Object.keys(brands).sort(function (a, b) { return brands[b] - brands[a]; }).slice(0, 2);
         var list = topCats.concat(topBrands);
-        if (!list.length) list = ['wireless headphones', '5g smartphone', 'led lamp', 'fitness tracker', 'nike'];
+        if (!list.length) return [];
         return list.slice(0, CFG.maxChips);
     }
 
@@ -329,8 +308,10 @@
             stock = '<span class="pse-suggest__stock ' + cls + '">' +
                 (p.stock <= 20 ? 'Low stock · ' : 'In stock · ') + p.stock + '</span>';
         }
-        var badge = p.supplier_verified
-            ? '<span class="pse-suggest__badge" title="Verified seller">✓ Verified</span>' : '';
+        var badge = (p.sponsored ? '<span class="pse-suggest__badge" style="background:#d35400;color:#fff;border-color:#d35400;" title="Sponsored Listing">🚀 Sponsored</span> ' : '') +
+            (p.supplier_tier === 'platinum' ? '<span class="pse-suggest__badge" style="background:#8e44ad;color:#fff;border-color:#8e44ad;" title="Platinum Supplier">👑 Platinum</span> ' :
+             p.supplier_tier === 'gold' ? '<span class="pse-suggest__badge" style="background:#f39c12;color:#fff;border-color:#f39c12;" title="Gold Supplier">👑 Gold</span> ' :
+             p.supplier_verified ? '<span class="pse-suggest__badge" title="Verified seller">✓ Verified</span>' : '');
         return '<div class="pse-suggest__item" role="option" data-action="product" data-slug="' + esc(p.slug) + '" data-title="' + esc(p.title) + '">' +
             '<img src="' + esc(p.image_url || '') + '" alt="' + esc(p.title) + '" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
             '<div class="pse-suggest__info">' +
@@ -390,13 +371,14 @@
 
         if (!results.length) {
             var popular = buildPopular();
-            panel.innerHTML =
-                '<div class="pse-suggest__status">No products match “' + esc(q) + '”. Try:</div>' +
-                '<div class="pse-suggest__chips pse-suggest__chips--centered">' +
-                popular.map(function (r) {
-                    return '<button type="button" class="pse-suggest__chip" data-action="search" data-query="' + esc(r) + '">' + esc(r) + '</button>';
-                }).join('') +
-                '</div>';
+            panel.innerHTML = popular.length
+                ? '<div class="pse-suggest__status">No products match “' + esc(q) + '”. Try:</div>' +
+                  '<div class="pse-suggest__chips pse-suggest__chips--centered">' +
+                  popular.map(function (r) {
+                      return '<button type="button" class="pse-suggest__chip" data-action="search" data-query="' + esc(r) + '">' + esc(r) + '</button>';
+                  }).join('') +
+                  '</div>'
+                : '<div class="pse-suggest__status">No products match “' + esc(q) + '”.</div>';
             panel.classList.add('show');
             return;
         }

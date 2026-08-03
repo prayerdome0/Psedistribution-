@@ -976,12 +976,25 @@
 
             <!-- PRODUCTS -->
             <div class="tab-content" id="tab-products">
-                <div class="page-header">
-                    <h2><i class="fa-regular fa-box"></i> Products</h2>
-                    <span class="time" id="productCount">0 products</span>
-                    <button class="btn-add-product" onclick="openAddProduct()">
-                        <i class="fa-regular fa-plus"></i> Add Product
-                    </button>
+                <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8rem;">
+                    <div>
+                        <h2><i class="fa-regular fa-box"></i> Products</h2>
+                        <span class="time" id="productCount">0 products</span>
+                    </div>
+                    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+                        <button type="button" class="btn-add-product" onclick="downloadCSVTemplate()" style="background:var(--secondary);font-size:0.82rem;padding:0.5rem 1rem;">
+                            <i class="fa-solid fa-file-csv"></i> Template
+                        </button>
+                        <button type="button" class="btn-add-product" onclick="openCSVImportModal()" style="background:#27ae60;font-size:0.82rem;padding:0.5rem 1rem;">
+                            <i class="fa-solid fa-upload"></i> Bulk Import
+                        </button>
+                        <button type="button" class="btn-add-product" onclick="exportProductsCSV()" style="background:#2980b9;font-size:0.82rem;padding:0.5rem 1rem;">
+                            <i class="fa-solid fa-download"></i> Export CSV
+                        </button>
+                        <button class="btn-add-product" onclick="openAddProduct()">
+                            <i class="fa-regular fa-plus"></i> Add Product
+                        </button>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table>
@@ -1475,6 +1488,29 @@
     </div>
 </div>
 
+<!-- CSV IMPORT MODAL -->
+<div class="modal-overlay" id="csvImportModal">
+    <div class="modal-box" style="max-width:550px;">
+        <h3><i class="fa-solid fa-upload" style="color:#27ae60;"></i> Bulk Import Products (CSV)</h3>
+        <p style="color:var(--text-light);font-size:0.88rem;margin-bottom:1.2rem;">Upload a CSV file to add multiple wholesale products at once. Need the format? <a href="javascript:void(0)" onclick="downloadCSVTemplate()" style="color:var(--primary);font-weight:700;">Download CSV Template</a>.</p>
+        
+        <div style="border:2px dashed var(--border-dark);border-radius:12px;padding:2rem 1rem;text-align:center;background:var(--light);margin-bottom:1.5rem;">
+            <i class="fa-solid fa-file-csv" style="font-size:2.8rem;color:var(--primary);margin-bottom:0.8rem;"></i>
+            <div style="font-weight:700;color:var(--secondary);margin-bottom:0.4rem;">Select CSV File</div>
+            <input type="file" id="csvFileInput" accept=".csv,.txt" style="margin-top:0.6rem;font-size:0.85rem;" />
+        </div>
+
+        <div id="csvImportStatus" style="font-size:0.85rem;color:var(--text-light);margin-bottom:1.2rem;display:none;"></div>
+
+        <div style="display:flex;justify-content:flex-end;gap:0.8rem;">
+            <button type="button" class="btn-cancel" onclick="closeCSVImportModal()">Cancel</button>
+            <button type="button" class="btn-add-product" id="confirmCSVImportBtn" onclick="confirmCSVImport()" style="background:#27ae60;">
+                <i class="fa-solid fa-upload"></i> Upload &amp; Import
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- FOOTER -->
 <footer class="footer">
     <div class="container">
@@ -1634,9 +1670,14 @@
                 return;
             }
 
-            tbody.innerHTML = allUsers.slice(0, 20).map(u => `
+            tbody.innerHTML = allUsers.slice(0, 20).map(u => {
+                const net30Chip = u.trade_credit_status === 'approved' ?
+                    `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#e8f8f0;color:#27ae60;font-size:0.7rem;font-weight:700;margin-left:6px;">💳 Net-30 ($${(u.trade_credit_limit || 15000).toLocaleString()})</span>` :
+                    u.trade_credit_status === 'pending' ?
+                    `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#f39c12;color:#fff;font-size:0.7rem;font-weight:700;margin-left:6px;">💳 Net-30 Pending</span>` : '';
+                return `
                 <tr>
-                    <td><strong>${u.full_name || u.email || 'N/A'}</strong></td>
+                    <td><strong>${u.full_name || u.email || 'N/A'}</strong> ${net30Chip}</td>
                     <td>${u.email || ''}</td>
                     <td><span class="status-badge ${u.role === 'admin' ? 'active' : ''}">${u.role || 'buyer'}</span></td>
                     <td><span class="status-badge ${u.status === 'active' ? 'active' : u.status === 'suspended' ? 'suspended' : 'inactive'}">${u.status || 'active'}</span></td>
@@ -1644,6 +1685,8 @@
                     <td>
                         <button class="btn-action view" onclick="viewUser('${u.id}')" title="View"><i class="fa-regular fa-eye"></i></button>
                         <button class="btn-action reply" onclick="AdminExt.emailOne('${u.email || ''}')" title="Email this user"><i class="fa-regular fa-paper-plane"></i></button>
+                        ${u.trade_credit_status === 'pending' ? `<button class="btn-action" style="background:#27ae60;color:#fff;font-size:0.72rem;padding:2px 6px;border-radius:12px;margin-right:3px;" onclick="approveNet30Credit('${u.id}', 15000)" title="Approve $15,000 Net-30 Credit">✓ Net-30</button>` : ''}
+                        ${u.trade_credit_status === 'approved' ? `<button class="btn-action" style="background:#c0392b;color:#fff;font-size:0.72rem;padding:2px 6px;border-radius:12px;margin-right:3px;" onclick="revokeNet30Credit('${u.id}')" title="Revoke Net-30 Credit">× Net-30</button>` : ''}
                         ${u.role === 'seller'
                             ? `<button class="btn-action approve" onclick="AdminExt.setUserRole('${u.id}','buyer')" title="Change to buyer"><i class="fa-regular fa-user"></i></button>`
                             : `<button class="btn-action approve" onclick="AdminExt.setUserRole('${u.id}','seller')" title="Make seller"><i class="fa-regular fa-store"></i></button>`}
@@ -1651,7 +1694,8 @@
                         <button class="btn-action delete" onclick="AdminExt.deleteUser('${u.id}')" title="Delete user record"><i class="fa-regular fa-trash-can"></i></button>
                     </td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
 
         } catch (error) {
             tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading customers</p></div></td></tr>`;
@@ -2158,9 +2202,15 @@
                 }
             });
 
-            tbody.innerHTML = sellers.slice(0, 20).map(s => `
+            tbody.innerHTML = sellers.slice(0, 20).map(s => {
+                const tierChip = s.membership_tier === 'platinum' || s.supplier_tier === 'platinum' ?
+                    `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#8e44ad;color:#fff;font-size:0.7rem;font-weight:700;margin-left:6px;"><i class="fa-solid fa-crown"></i> Platinum (0%)</span>` :
+                    s.membership_tier === 'gold' || s.supplier_tier === 'gold' ?
+                    `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#f39c12;color:#fff;font-size:0.7rem;font-weight:700;margin-left:6px;"><i class="fa-solid fa-crown"></i> Gold (5%)</span>` :
+                    `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:var(--bg-main);color:var(--text-light);font-size:0.7rem;font-weight:600;margin-left:6px;">Basic (10%)</span>`;
+                return `
                 <tr>
-                    <td><strong>${s.verified ? '✓ ' : ''}${s.company || s.full_name || 'N/A'}</strong></td>
+                    <td><strong>${s.verified ? '✓ ' : ''}${s.company || s.full_name || 'N/A'}</strong> ${tierChip}</td>
                     <td>${s.full_name || ''}</td>
                     <td>${productCounts[s.id] || 0}</td>
                     <td><span class="status-badge ${s.status === 'approved' ? 'active' : s.status === 'suspended' ? 'suspended' : 'pending'}">${s.status || 'pending'}</span></td>
@@ -2178,7 +2228,8 @@
                         ${s.status === 'approved' ? `<button class="btn-action ban" onclick="suspendUser('${s.id}')" title="Suspend"><i class="fa-regular fa-ban"></i></button>` : ''}
                     </td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
 
         } catch (error) {
             tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading sellers</p></div></td></tr>`;
@@ -2736,6 +2787,164 @@
     window.deleteMessage = deleteMessage;
     window.viewMessage = viewMessage;
     window.closeViewMessage = closeViewMessage;
+    // ─── BULK CSV IMPORT / EXPORT / TEMPLATE ───
+    function downloadCSVTemplate() {
+        const headers = ['title', 'brand', 'category', 'price', 'old_price', 'moq', 'stock', 'sku', 'description', 'image_url'];
+        const sampleRow = ['"Industrial LED Floodlight 100W"', '"Philips"', '"industrial"', '45.00', '65.00', '10', '200', '"PH-FLD-100"', '"Heavy duty waterproof outdoor floodlight"', '"https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400"'];
+        const csvContent = 'data:text/csv;charset=utf-8,' + headers.join(',') + '\r\n' + sampleRow.join(',');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', 'pse_wholesale_products_template.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('📄 Downloaded CSV Template!', 'success');
+    }
+
+    function openCSVImportModal() {
+        const modal = document.getElementById('csvImportModal');
+        if (modal) modal.classList.add('show');
+    }
+    function closeCSVImportModal() {
+        const modal = document.getElementById('csvImportModal');
+        if (modal) {
+            modal.classList.remove('show');
+            const statusEl = document.getElementById('csvImportStatus');
+            if (statusEl) statusEl.style.display = 'none';
+        }
+    }
+
+    async function confirmCSVImport() {
+        const fileInput = document.getElementById('csvFileInput');
+        const file = fileInput?.files[0];
+        if (!file) { showToast('Please select a CSV file first', 'error'); return; }
+        const btn = document.getElementById('confirmCSVImportBtn');
+        const statusEl = document.getElementById('csvImportStatus');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Importing...'; }
+        if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = 'Parsing CSV file...'; }
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const text = e.target.result;
+            const lines = text.split(/\r\n|\n/).filter(l => l.trim().length > 0);
+            if (lines.length <= 1) {
+                showToast('CSV file is empty or only has headers', 'error');
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-upload"></i> Upload &amp; Import'; }
+                return;
+            }
+
+            const headers = lines[0].split(',').map(h => h.trim().replace(/^["']|["']$/g, '').toLowerCase());
+            const user = auth.currentUser;
+            if (!user) return;
+
+            let successCount = 0;
+            const batch = db.batch();
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim().replace(/^["']|["']$/g, ''));
+                if (!values[0]) continue;
+
+                const productData = {
+                    title: values[headers.indexOf('title')] || values[0] || 'Wholesale Product',
+                    brand: values[headers.indexOf('brand')] || 'Pilot Distribution',
+                    category: values[headers.indexOf('category')] || 'other',
+                    price: parseFloat(values[headers.indexOf('price')]) || 0,
+                    old_price: parseFloat(values[headers.indexOf('old_price')]) || 0,
+                    moq: parseInt(values[headers.indexOf('moq')]) || 1,
+                    stock: parseInt(values[headers.indexOf('stock')]) || 100,
+                    sku: values[headers.indexOf('sku')] || '',
+                    description: values[headers.indexOf('description')] || 'Wholesale product listed by admin team.',
+                    image_url: values[headers.indexOf('image_url')] || 'logo.jpg',
+                    slug: generateSlug(values[headers.indexOf('title')] || values[0]),
+                    supplier_id: user.uid,
+                    seller_id: user.uid,
+                    supplier_verified: true,
+                    status: 'active',
+                    created_at: new Date().toISOString()
+                };
+                const docRef = db.collection('products').doc();
+                batch.set(docRef, productData);
+                successCount++;
+            }
+
+            try {
+                await batch.commit();
+                showToast(`🎉 Successfully imported ${successCount} products!`, 'success');
+                closeCSVImportModal();
+                loadProducts();
+                updateStats();
+            } catch (err) {
+                console.error('CSV Import Error:', err);
+                showToast('Failed to import CSV items', 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-upload"></i> Upload &amp; Import'; }
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function exportProductsCSV() {
+        if (!allProducts || allProducts.length === 0) {
+            showToast('No products to export', 'error');
+            return;
+        }
+        const headers = ['id', 'title', 'brand', 'category', 'price', 'old_price', 'moq', 'stock', 'sku', 'status'];
+        const rows = allProducts.map(p => [
+            `"${p.id || ''}"`,
+            `"${(p.title || '').replace(/"/g, '""')}"`,
+            `"${(p.brand || '').replace(/"/g, '""')}"`,
+            `"${p.category || 'other'}"`,
+            p.price || 0,
+            p.old_price || 0,
+            p.moq || 1,
+            p.stock || 0,
+            `"${p.sku || ''}"`,
+            `"${p.status || 'active'}"`
+        ]);
+        const csvContent = 'data:text/csv;charset=utf-8,' + headers.join(',') + '\r\n' + rows.map(r => r.join(',')).join('\r\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', `pse_products_export_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('📤 Catalog exported to CSV!', 'success');
+    }
+
+    window.downloadCSVTemplate = downloadCSVTemplate;
+    window.openCSVImportModal = openCSVImportModal;
+    window.closeCSVImportModal = closeCSVImportModal;
+    window.confirmCSVImport = confirmCSVImport;
+    window.exportProductsCSV = exportProductsCSV;
+
+    // ─── NET-30 CREDIT ADMIN ACTIONS ───
+    async function approveNet30Credit(userId, limit) {
+        if (!confirm(`Approve Net-30 Trade Credit ($${limit.toLocaleString()} limit) for this buyer?`)) return;
+        try {
+            await db.collection('users').doc(userId).update({
+                trade_credit_status: 'approved',
+                trade_credit_limit: limit,
+                updated_at: new Date().toISOString()
+            });
+            showToast(`🎉 Approved Net-30 Trade Credit ($${limit.toLocaleString()})!`, 'success');
+            loadCustomers();
+        } catch (e) { showToast('Failed to approve credit', 'error'); }
+    }
+    async function revokeNet30Credit(userId) {
+        if (!confirm('Revoke Net-30 Trade Credit for this buyer?')) return;
+        try {
+            await db.collection('users').doc(userId).update({
+                trade_credit_status: 'revoked',
+                updated_at: new Date().toISOString()
+            });
+            showToast('Credit revoked', 'info');
+            loadCustomers();
+        } catch (e) { showToast('Failed to revoke credit', 'error'); }
+    }
+    window.approveNet30Credit = approveNet30Credit;
+    window.revokeNet30Credit = revokeNet30Credit;
+
     window.viewOrder = viewOrder;
     window.closeViewOrder = closeViewOrder;
     window.viewUser = viewUser;

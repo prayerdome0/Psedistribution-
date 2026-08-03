@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Supplier Storefront - Pilot Sales Distribution</title>
+    <meta name="description" content="Official B2B Verified Supplier Storefront on Pilot Sales Distribution." />
+    
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="main.js"></script>
+    
+    <style>
+        .store-hero {
+            background: linear-gradient(135deg, var(--secondary), #0d384c);
+            color: #fff;
+            border-radius: var(--radius);
+            padding: 2.5rem 2rem;
+            margin: 2rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        .store-hero-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            max-width: 750px;
+        }
+        .store-logo-box {
+            width: 85px;
+            height: 85px;
+            border-radius: 16px;
+            background: #fff;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            overflow: hidden;
+            border: 3px solid var(--primary);
+        }
+        .store-logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .store-title h1 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            margin: 0 0 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .store-title .badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 0.6rem;
+        }
+        .badge-chip {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .badge-verified { background: #e8f8f0; color: #27ae60; border: 1px solid #27ae60; }
+        .badge-gold { background: linear-gradient(135deg,#f39c12,#d35400); color: #fff; }
+        .badge-platinum { background: linear-gradient(135deg,#8e44ad,#9b59b6); color: #fff; }
+        .badge-escrow { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+
+        .store-meta {
+            font-size: 0.88rem;
+            color: #b4d0e0;
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+        .store-meta i { color: var(--accent); margin-right: 5px; }
+
+        .store-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            min-width: 200px;
+        }
+        .store-actions .btn-action-custom {
+            padding: 0.75rem 1.4rem;
+            border-radius: 50px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            text-decoration: none;
+        }
+        .btn-wa-store { background: #25D366; color: #fff; }
+        .btn-wa-store:hover { background: #1da851; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37,211,102,0.35); }
+        .btn-email-store { background: var(--primary); color: #fff; }
+        .btn-email-store:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .btn-rfq-store { background: transparent; color: #fff; border: 2px solid var(--accent); }
+        .btn-rfq-store:hover { background: var(--accent); color: var(--secondary); }
+
+        .store-trust-band {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow);
+        }
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1rem;
+        }
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1rem;
+            background: var(--light);
+            border-radius: 10px;
+            border: 1px solid var(--border-light);
+        }
+        .trust-item i {
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+        .trust-item strong {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+        .trust-item span {
+            font-size: 0.78rem;
+            color: var(--text-light);
+        }
+
+        .catalog-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .catalog-header h2 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            font-weight: 800;
+        }
+        .catalog-header span { color: var(--primary); }
+
+        @media (max-width: 768px) {
+            .store-hero { padding: 1.8rem 1.2rem; flex-direction: column; text-align: center; }
+            .store-hero-info { flex-direction: column; text-align: center; justify-content: center; }
+            .store-title .badges { justify-content: center; }
+            .store-meta { justify-content: center; }
+            .store-actions { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="container">
+        <a href="/home" class="logo">
+            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <div class="brand-name">
+                <span class="main">PSE <span>Distribution</span></span>
+                <span class="sub">wholesale</span>
+            </div>
+        </a>
+        <div class="search-bar" id="searchBar">
+            <input type="text" id="searchInput" placeholder="Search wholesale products..." autocomplete="off" />
+            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+        <div class="header-actions">
+            <a href="#" class="icon-btn" onclick="toggleWishlist()">
+                <i class="fa-regular fa-heart"></i>
+                <span>Wishlist</span>
+                <span class="badge-count wishlist-count">0</span>
+            </a>
+            <a href="/cart" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Cart</span>
+                <span class="badge-count cart-count">0</span>
+            </a>
+            <a href="/account" class="icon-btn" id="accountBtn">
+                <i class="fa-regular fa-user"></i>
+                <span id="accountLabel">Account</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="nav-categories">
+    <div class="container">
+        <a href="/home"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/products" class="active"><i class="fa-solid fa-box"></i> Products</a>
+        <a href="/about"><i class="fa-solid fa-info-circle"></i> About</a>
+        <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
+        <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
+        <a href="/become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+    <!-- STORE HERO -->
+    <div class="store-hero animate-on-scroll" id="storeHero">
+        <div class="store-hero-info">
+            <div class="store-logo-box" id="storeLogoBox">
+                <img src="logo.jpg" alt="Supplier Logo" id="storeLogoImg" />
+            </div>
+            <div class="store-title">
+                <div class="badges" id="storeBadges">
+                    <span class="badge-chip badge-verified"><i class="fa-solid fa-circle-check"></i> Verified Supplier</span>
+                    <span class="badge-chip badge-escrow"><i class="fa-solid fa-shield-halved"></i> 100% Escrow Assurance</span>
+                </div>
+                <h1 id="storeName">Loading Supplier Storefront...</h1>
+                <div class="store-meta" id="storeMeta">
+                    <span><i class="fa-solid fa-location-dot"></i> <span id="storeLocation">Global Wholesale</span></span>
+                    <span><i class="fa-solid fa-calendar-check"></i> <span id="storeYears">Verified Partner</span></span>
+                    <span><i class="fa-solid fa-boxes-stacked"></i> <span id="storeCatalogCount">0</span> Products Listed</span>
+                </div>
+                <p style="margin-top:0.6rem;font-size:0.9rem;color:#d4e8f5;max-width:550px;" id="storeBio">
+                    Official B2B wholesale manufacturer and distributor on Pilot Sales Distribution.
+                </p>
+            </div>
+        </div>
+        <div class="store-actions">
+            <button class="btn-action-custom btn-wa-store" onclick="contactStoreWhatsApp()">
+                <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
+            </button>
+            <button class="btn-action-custom btn-email-store" onclick="contactStoreEmail()">
+                <i class="fa-regular fa-envelope"></i> Email Supplier
+            </button>
+            <a href="/rfq" class="btn-action-custom btn-rfq-store">
+                <i class="fa-solid fa-file-lines"></i> Submit Custom RFQ
+            </a>
+        </div>
+    </div>
+
+    <!-- SUPPLIER TRUST KYC SHOWCASE -->
+    <div class="store-trust-band animate-on-scroll">
+        <div style="font-weight:800;font-size:0.95rem;color:var(--secondary);margin-bottom:0.8rem;text-transform:uppercase;letter-spacing:0.5px;">
+            <i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> Verified Supplier Credentials &amp; Trade Assurance
+        </div>
+        <div class="trust-grid">
+            <div class="trust-item">
+                <i class="fa-solid fa-certificate" style="color:#27ae60;"></i>
+                <div>
+                    <strong>ISO 9001 Certified</strong>
+                    <span>Quality management &amp; factory standard audit passed.</span>
+                </div>
+            </div>
+            <div class="trust-item">
+                <i class="fa-solid fa-industry" style="color:#2980b9;"></i>
+                <div>
+                    <strong>Verified Manufacturer</strong>
+                    <span>Direct factory wholesale pricing without intermediaries.</span>
+                </div>
+            </div>
+            <div class="trust-item">
+                <i class="fa-solid fa-building-circle-check" style="color:#8e44ad;"></i>
+                <div>
+                    <strong>On-Site Facility Inspected</strong>
+                    <span>Physical production check and capacity audit verified.</span>
+                </div>
+            </div>
+            <div class="trust-item">
+                <i class="fa-solid fa-shield-check" style="color:var(--primary);"></i>
+                <div>
+                    <strong>100% Escrow Trade Assurance</strong>
+                    <span>Buyer payments held securely in escrow until delivery.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CATALOG HEADER -->
+    <div class="catalog-header animate-on-scroll">
+        <h2>Supplier <span>Catalog</span> (<span id="productCountHeader">0</span>)</h2>
+        <div style="display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap;">
+            <input type="text" id="storeSearchInput" placeholder="Search this store..." oninput="filterStoreProducts()" style="padding:0.55rem 1rem;border:1px solid var(--border-dark);border-radius:30px;font-size:0.88rem;outline:none;min-width:220px;" />
+        </div>
+    </div>
+
+    <!-- PRODUCTS GRID -->
+    <div class="product-grid" id="productGrid" style="min-height:300px;margin-bottom:4rem;">
+        <div style="grid-column:1/-1;text-align:center;padding:4rem 1rem;color:var(--text-light);">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size:2.5rem;color:var(--primary);margin-bottom:1rem;"></i>
+            <p>Loading supplier catalog...</p>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/help-center">Help</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms &amp; Conditions</a>
+                <a href="/become-seller">Become a Seller</a>
+                <a href="/supplier-verification">Supplier Verification</a>
+            </div>
+            <div class="footer-social">
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- JAVASCRIPT -->
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
+        authDomain: "pilot-sales-distribution.firebaseapp.com",
+        projectId: "pilot-sales-distribution",
+        storageBucket: "pilot-sales-distribution.firebasestorage.app",
+        messagingSenderId: "729127273727",
+        appId: "1:729127273727:web:402d67be8346257755f8ca"
+    };
+
+    let db, auth;
+    let currentStoreId = '';
+    let currentStoreBrand = '';
+    let storeProducts = [];
+    let currentSupplierInfo = { whatsapp: '', phone: '', email: '' };
+
+    function initFirebase() {
+        if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        db = firebase.firestore(); window.db = db;
+        auth = firebase.auth();
+        setupAuthListener();
+        loadStorefront();
+        loadCartCount();
+        loadWishlistCount();
+    }
+
+    function setupAuthListener() {
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const doc = await db.collection('users').doc(user.uid).get();
+                    const data = doc.exists ? doc.data() : {};
+                    localStorage.setItem('pilot_user', JSON.stringify({
+                        id: user.uid, email: user.email,
+                        full_name: data.full_name || user.displayName || '',
+                        role: data.role || 'buyer'
+                    }));
+                } catch (e) {}
+            } else { localStorage.removeItem('pilot_user'); }
+            updateAuthUI();
+        });
+    }
+
+    function getCurrentUser() {
+        try { return JSON.parse(localStorage.getItem('pilot_user')); } catch (e) { return null; }
+    }
+
+    function updateAuthUI() {
+        const user = getCurrentUser();
+        const account = document.getElementById('accountLabel');
+        if (account) account.textContent = user ? (user.full_name || 'Account') : 'Account';
+    }
+
+    function showToast(message, type = 'info') {
+        let toast = document.getElementById('toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.className = 'toast';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.className = 'toast ' + type + ' show';
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
+    }
+
+    function generateSlug(title) {
+        if (!title) return '';
+        return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
+    }
+
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    async function loadStorefront() {
+        const params = new URLSearchParams(window.location.search);
+        currentStoreId = params.get('id') || params.get('seller') || '';
+        currentStoreBrand = params.get('brand') || '';
+
+        let storeName = currentStoreBrand || 'Verified Supplier Store';
+        let storeBio = 'Official B2B wholesale manufacturer and distributor on Pilot Sales Distribution.';
+        let tier = 'gold';
+        let location = 'Global Wholesale';
+        let years = 'Verified Partner';
+        let profileImage = 'logo.jpg';
+
+        if (currentStoreId && db) {
+            try {
+                const doc = await db.collection('users').doc(currentStoreId).get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    storeName = data.company || data.full_name || data.display_name || storeName;
+                    storeBio = data.bio || data.description || storeBio;
+                    tier = data.membership_tier || data.supplier_tier || 'gold';
+                    location = data.location || data.address || location;
+                    years = data.years_in_business ? data.years_in_business + ' yrs in business' : 'Verified Partner';
+                    profileImage = data.profileImage || data.avatar || 'logo.jpg';
+                    currentSupplierInfo.whatsapp = data.whatsapp || data.phone || '';
+                    currentSupplierInfo.phone = data.phone || '';
+                    currentSupplierInfo.email = data.contactEmail || data.email || '';
+                }
+            } catch (e) {
+                console.error('Error fetching seller info:', e);
+            }
+        }
+
+        document.getElementById('storeName').textContent = storeName;
+        document.getElementById('storeBio').textContent = storeBio;
+        document.getElementById('storeLocation').textContent = location;
+        document.getElementById('storeYears').textContent = years;
+        document.getElementById('storeLogoImg').src = profileImage;
+
+        // Render Badges
+        const badgesEl = document.getElementById('storeBadges');
+        let badgesHtml = `<span class="badge-chip badge-verified"><i class="fa-solid fa-circle-check"></i> Verified Supplier</span>
+                          <span class="badge-chip badge-escrow"><i class="fa-solid fa-shield-halved"></i> 100% Escrow Assurance</span>`;
+        if (tier === 'platinum') {
+            badgesHtml += ` <span class="badge-chip badge-platinum"><i class="fa-solid fa-crown"></i> Platinum Supplier (0% Commission)</span>`;
+        } else if (tier === 'gold') {
+            badgesHtml += ` <span class="badge-chip badge-gold"><i class="fa-solid fa-crown"></i> Gold Supplier (5% Commission)</span>`;
+        }
+        badgesEl.innerHTML = badgesHtml;
+
+        loadStoreCatalog();
+    }
+
+    async function loadStoreCatalog() {
+        const grid = document.getElementById('productGrid');
+        try {
+            let products = [];
+            const snapshot = await db.collection('products').get();
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.status === 'inactive' || data.status === 'deleted') return;
+                
+                // Match by supplier ID or brand
+                const matchId = currentStoreId && (data.supplier_id === currentStoreId || data.seller_id === currentStoreId);
+                const matchBrand = currentStoreBrand && data.brand && data.brand.toLowerCase() === currentStoreBrand.toLowerCase();
+                
+                if (matchId || matchBrand || (!currentStoreId && !currentStoreBrand)) {
+                    products.push({
+                        id: doc.id,
+                        ...data,
+                        image_url: data.image_url || data.images?.[0] || 'logo.jpg',
+                        slug: data.slug || generateSlug(data.title || 'product'),
+                        title: data.title || 'Product',
+                        price: data.price || 0,
+                        brand: data.brand || 'Pilot Distribution',
+                        moq: data.moq || 1,
+                        category: data.category || 'other',
+                        supplier_verified: true,
+                        supplier_tier: data.supplier_tier || 'gold',
+                        sponsored: !!data.sponsored,
+                        rating: data.rating || 5.0,
+                        stock: data.stock || 0
+                    });
+                }
+            });
+
+            // Sort sponsored to top
+            products.sort((a, b) => (b.sponsored ? 1 : 0) - (a.sponsored ? 1 : 0));
+            storeProducts = products;
+
+            document.getElementById('storeCatalogCount').textContent = products.length;
+            document.getElementById('productCountHeader').textContent = products.length;
+            renderStoreGrid(products);
+        } catch (error) {
+            console.error('Error loading catalog:', error);
+            grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:var(--text-light);">
+                <i class="fa-solid fa-box-open" style="font-size:3rem;color:var(--primary);margin-bottom:1rem;"></i>
+                <h3>No products listed</h3>
+                <p>This verified supplier is currently updating their wholesale catalog.</p>
+            </div>`;
+        }
+    }
+
+    function renderStoreGrid(products) {
+        const grid = document.getElementById('productGrid');
+        if (!products || products.length === 0) {
+            grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3.5rem 1rem;background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border-light);">
+                <i class="fa-solid fa-box-open" style="font-size:3rem;color:var(--text-light);margin-bottom:1rem;display:block;"></i>
+                <h3 style="margin-bottom:0.5rem;color:var(--text-dark);">No Products Found</h3>
+                <p style="color:var(--text-light);font-size:0.95rem;max-width:420px;margin:0 auto;">This supplier has no active listings matching your current search.</p>
+            </div>`;
+            return;
+        }
+
+        grid.innerHTML = products.map(p => {
+            const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
+            const slug = p.slug || generateSlug(p.title || 'product');
+            const imageUrl = p.image_url || 'logo.jpg';
+            const sponsoredBadge = p.sponsored ? `<span class="product-badge" style="background:#d35400;color:#fff;top:10px;right:10px;z-index:10;font-weight:700;"><i class="fa-solid fa-rocket"></i> SPONSORED</span>` : '';
+            const vipTierBadge = p.supplier_tier === 'platinum' ?
+                `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#8e44ad;margin-top:2px;"><i class="fa-solid fa-crown"></i> Platinum Supplier</div>` :
+                `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#d35400;margin-top:2px;"><i class="fa-solid fa-crown"></i> Gold Supplier</div>`;
+            
+            return `<div class="product-card animate-on-scroll visible">
+                ${sponsoredBadge}
+                ${p.moq ? `<span class="product-badge wholesale" style="${p.sponsored ? 'top:38px;' : ''}">MOQ ${p.moq}</span>` : ''}
+                ${discount > 0 ? `<span class="product-badge flash" style="${p.sponsored ? 'top:66px;' : ''}">-${discount}%</span>` : ''}
+                <span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>
+                <div class="product-image" onclick="window.location.href='/product/${slug}'">
+                    <img src="${imageUrl}" alt="${esc(p.title)}" loading="lazy" />
+                </div>
+                <div class="product-title">${esc(p.title)}</div>
+                <div class="product-brand">${esc(p.brand)}</div>
+                ${vipTierBadge}
+                <div class="product-price">$${(p.price || 0).toFixed(2)}${p.old_price ? ` <span class="old">$${p.old_price.toFixed(2)}</span>` : ''}</div>
+                <div class="product-actions">
+                    <button class="btn-add" onclick="addToCart('${p.id}')"><i class="fa-solid fa-cart-plus"></i> Add</button>
+                    <button class="btn-wish" onclick="toggleWishlist('${p.id}')"><i class="fa-regular fa-heart"></i></button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function filterStoreProducts() {
+        const query = (document.getElementById('storeSearchInput').value || '').toLowerCase().trim();
+        if (!query) {
+            renderStoreGrid(storeProducts);
+            return;
+        }
+        const filtered = storeProducts.filter(p =>
+            p.title.toLowerCase().includes(query) ||
+            (p.brand && p.brand.toLowerCase().includes(query)) ||
+            (p.category && p.category.toLowerCase().includes(query))
+        );
+        renderStoreGrid(filtered);
+    }
+
+    function contactStoreWhatsApp() {
+        const wa = (currentSupplierInfo.whatsapp || currentSupplierInfo.phone || '19099384682').replace(/[^0-9]/g, '');
+        const name = document.getElementById('storeName').textContent;
+        const msg = `Hi ${name}, I am visiting your official storefront on Pilot Sales Distribution and would like to inquire about bulk wholesale orders.`;
+        window.open('https://wa.me/' + wa + '?text=' + encodeURIComponent(msg), '_blank');
+    }
+
+    function contactStoreEmail() {
+        const email = currentSupplierInfo.email || 'support@pilotsalesdistribution.com';
+        const name = document.getElementById('storeName').textContent;
+        const subject = encodeURIComponent(`B2B Wholesale Inquiry: ${name} Storefront`);
+        const body = encodeURIComponent(`Hi ${name},\n\nI am viewing your verified storefront on Pilot Sales Distribution and would like to discuss bulk order terms and catalogs.\n\nThank you.`);
+        window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+    }
+
+    async function addToCart(productId) {
+        const user = getCurrentUser();
+        const product = storeProducts.find(p => p.id === productId);
+        if (!product) return;
+        const qty = product.moq || 1;
+        
+        if (!user) {
+            const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+            const idx = cart.findIndex(i => i.product_id === productId && !i.is_sample);
+            if (idx > -1) {
+                cart[idx].quantity = (cart[idx].quantity || 1) + qty;
+            } else {
+                cart.push({
+                    product_id: productId,
+                    title: product.title,
+                    price: product.price,
+                    old_price: product.old_price || 0,
+                    image_url: product.image_url || '',
+                    brand: product.brand || 'Pilot Distribution',
+                    moq: product.moq || 1,
+                    quantity: qty
+                });
+            }
+            localStorage.setItem('pilot_cart', JSON.stringify(cart));
+            showToast('✅ Added to cart!', 'success');
+            loadCartCount();
+        } else {
+            try {
+                const snapshot = await db.collection('cart')
+                    .where('user_id', '==', user.id)
+                    .where('product_id', '==', productId)
+                    .get();
+                if (!snapshot.empty) {
+                    const docRef = snapshot.docs[0].ref;
+                    const currQty = snapshot.docs[0].data().quantity || 1;
+                    await docRef.update({ quantity: currQty + qty });
+                } else {
+                    await db.collection('cart').add({
+                        user_id: user.id,
+                        product_id: productId,
+                        title: product.title,
+                        price: product.price,
+                        old_price: product.old_price || 0,
+                        image_url: product.image_url || '',
+                        brand: product.brand || 'Pilot Distribution',
+                        moq: product.moq || 1,
+                        quantity: qty,
+                        created_at: new Date().toISOString()
+                    });
+                }
+                showToast('✅ Added to cart!', 'success');
+                loadCartCount();
+            } catch (e) {
+                showToast('Failed to add to cart', 'error');
+            }
+        }
+    }
+
+    function toggleWishlist(productId) {
+        const user = getCurrentUser();
+        if (!user) {
+            showToast('Please login to save wishlist items', 'info');
+            return;
+        }
+        window.location.href = '/wishlist';
+    }
+
+    async function loadCartCount() {
+        const user = getCurrentUser();
+        if (!user) {
+            try {
+                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+                const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                document.querySelectorAll('.cart-count').forEach(el => {
+                    el.textContent = count;
+                    el.style.display = count > 0 ? 'inline' : 'none';
+                });
+            } catch (e) {}
+            return;
+        }
+        try {
+            const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
+            let count = 0;
+            snapshot.forEach(doc => { count += doc.data().quantity || 1; });
+            document.querySelectorAll('.cart-count').forEach(el => {
+                el.textContent = count;
+                el.style.display = count > 0 ? 'inline' : 'none';
+            });
+        } catch (e) {}
+    }
+
+    async function loadWishlistCount() {
+        const user = getCurrentUser();
+        if (!user) return;
+        try {
+            const snapshot = await db.collection('wishlist').where('user_id', '==', user.id).get();
+            document.querySelectorAll('.wishlist-count').forEach(el => {
+                el.textContent = snapshot.size;
+                el.style.display = snapshot.size > 0 ? 'inline' : 'none';
+            });
+        } catch (e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initFirebase();
+        document.getElementById('year').textContent = new Date().getFullYear();
+    });
+
+    window.contactStoreWhatsApp = contactStoreWhatsApp;
+    window.contactStoreEmail = contactStoreEmail;
+    window.addToCart = addToCart;
+    window.toggleWishlist = toggleWishlist;
+    window.filterStoreProducts = filterStoreProducts;
+</script>
+    <script src="email.js"></script>
+    <script src="ai-assistant.js"></script>
+    <script src="notifications.js"></script>
+    <script src="/search-pro.js"></script>
+</body>
+</html>
