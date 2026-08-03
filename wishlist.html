@@ -530,7 +530,7 @@
         grid.innerHTML = products.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
             const slug = p.slug || generateSlug(p.title || 'product');
-            const imageUrl = p.image_url || 'https://via.placeholder.com/300x300?text=No+Image';
+            const imageUrl = p.image_url || 'logo.jpg';
             return `
                 <div class="product-card animate-on-scroll">
                     ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}

@@ -39,7 +39,8 @@ Key routes (clean URLs on Vercel):
 
 - Landing image carousel — full-width promo images that auto-scroll horizontally (arrows, dots, swipe, pause-on-hover); no text banner
 - Featured products, category browsing
-- **🔎 Pro Search suggestions** — the header search bar on every page is a professional suggestion engine: instant debounced results as you type (no Enter needed), ranked by prefix/word/substring relevance, rich product previews (thumbnail, brand, ★ rating, price, stock, ✓ Verified badge), category & brand chips, recent searches (clearable) and popular searches, full keyboard navigation (↑/↓/Enter/Esc, ARIA listbox), match highlighting, and a "See all N results" footer. Catalog is cached for 10 minutes (sessionStorage), loaded once from Firestore, and works offline via an embedded fallback catalog. Powered by the shared `search-pro.js` — no API keys, no server
+- **🔎 Pro Search suggestions** — the header search bar on every page is a professional suggestion engine: instant debounced results as you type (no Enter needed), ranked by prefix/word/substring relevance, rich product previews (thumbnail, brand, ★ rating, price, stock, ✓ Verified badge), category & brand chips, recent searches (clearable) and popular searches, full keyboard navigation (↑/↓/Enter/Esc, ARIA listbox), match highlighting, and a "See all N results" footer. Catalog is cached for 10 minutes (sessionStorage), loaded once from Firestore — 100% real products only, no fake or sample demo catalogs. Powered by the shared `search-pro.js` — no API keys, no server
+- **🚫 100% Real Only — No Fake or Demo Content** — all sample, demo, placeholder, and fallback products (`FALLBACK_PRODUCTS`), fake statistics (`12,000+`, `580+`, `1,234+`), and demo toast alerts have been completely removed across the catalog, search bar, AI assistant, product detail pages, and home page. The site displays honest, real-time data from Firestore with clean empty states when inventory or statistics are zero.
 - Email/password + Google sign-up and login (no SMS/phone verification)
 - Guest cart (localStorage) that merges on login
 - Wishlist, RFQ, order tracking, WhatsApp quote checkout
@@ -62,7 +63,7 @@ Key routes (clean URLs on Vercel):
 - All header/footer/nav links are **absolute** (`/products`, `/cart`, …) so they never 404 on deep URLs like `/product/slug`
 - `/product/:path*` rewrites in `vercel.json` cover every product URL
 - `404.html` now includes a **deep-link rescue**: if it is ever served for a valid clean route (e.g. hosts where the Vercel rewrites are not applied), it instantly forwards `/product/<slug>` → `product-detail.html?slug=…` and other known routes to their pages, instead of stranding visitors
-- `product-detail.html` parses `?slug=`, `?id=`, `/product/<slug>` and `/product-detail/<slug>` (URL-decoded, trailing-slash tolerant), has a fallback catalog synced with the store catalog (all 8 products), redirects unknown products to `/products` with a message, and still renders from local data if the Firebase CDN can't load
+- `product-detail.html` parses `?slug=`, `?id=`, `/product/<slug>` and `/product-detail/<slug>` (URL-decoded, trailing-slash tolerant), redirects unknown products to `/products` with an explanation message, and shows clean empty states when no products match — 100% real products only without fake or demo sample data
 - Missing `main.js` (referenced by `chat.html`) recreated — no more broken-script 404
 
 ## Configuration

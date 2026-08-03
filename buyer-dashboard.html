@@ -699,7 +699,7 @@
                 <div class="wishlist-item">
                     <button class="wishlist-remove" onclick="removeFromWishlist('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
                     <div class="wishlist-image" onclick="window.location.href='/product/${p.slug}'">
-                        <img src="${p.image_url || 'https://via.placeholder.com/200x200?text=No+Image'}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />
+                        <img src="${p.image_url || 'logo.jpg'}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />
                     </div>
                     <div class="wishlist-title">${p.title || 'Product'}</div>
                     <div class="wishlist-price">$${(p.price || 0).toFixed(2)}</div>

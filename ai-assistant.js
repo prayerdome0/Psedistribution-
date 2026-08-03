@@ -58,7 +58,7 @@
         },
         {
             id: 'product_search',
-            keywords: ['headphone', 'earbud', 'speaker', 'smartphone', 'phone', 'tablet', 'laptop', 'shirt', 'tshirt', 't-shirt', 'knife', 'lamp', 'watch', 'wallet', 'charger', 'pad', 'nike', 'sony', 'samsung', 'anker', 'garmin', 'philips', 'zwilling', 'coach'],
+            keywords: ['search', 'find', 'looking for', 'do you have', 'buy', 'product', 'catalog', 'item', 'inventory', 'stock', 'carry', 'sell', 'deal', 'order'],
             reply: function (q) {
                 var found = findProduct(q);
                 if (found) {
@@ -69,7 +69,7 @@
                         '.<br><a href="/product/' + slugify(found.title) + '" class="pse-link">View product details</a> · ' +
                         '<a href="/product/' + slugify(found.title) + '" class="pse-link">Add to cart</a>';
                 }
-                return 'I don\'t have that exact item in my offline catalog, but we carry thousands of wholesale products. Try <a href="/products?search=' + encodeURIComponent(q.replace(/^(show|find|get|me|the|a|an|for)\s+/gi, '')) + '" class="pse-link">searching the catalog</a> for "' + esc(q) + '".';
+                return 'We carry thousands of verified wholesale products. Try <a href="/products?search=' + encodeURIComponent(q.replace(/^(show|find|get|me|the|a|an|for|looking|buy|do you have)\s+/gi, '').trim()) + '" class="pse-link">searching the catalog</a> for "' + esc(q) + '" or submit an <a href="/rfq" class="pse-link">RFQ</a> for custom bulk orders.';
             }
         },
         {
@@ -201,19 +201,7 @@
         }
     ];
 
-    // ────────────────────────────────────────────
-    // FALLBACK CATALOG (mirrors products.html)
-    // ────────────────────────────────────────────
-    var FALLBACK_PRODUCTS = [
-        { title: 'Premium Wireless Headphones', brand: 'Sony', price: 89.99, moq: 10, rating: 4.8, category: 'electronics' },
-        { title: 'Smartphone 5G 128GB', brand: 'Samsung', price: 499.99, moq: 5, rating: 4.9, category: 'electronics' },
-        { title: 'Organic Cotton T-Shirt', brand: 'Nike', price: 24.99, moq: 20, rating: 4.2, category: 'fashion' },
-        { title: 'Professional Kitchen Knife Set', brand: 'Zwilling', price: 149.99, moq: 6, rating: 4.7, category: 'home' },
-        { title: 'LED Desk Lamp', brand: 'Philips', price: 39.99, moq: 15, rating: 4.5, category: 'home' },
-        { title: 'Fitness Tracker Watch', brand: 'Garmin', price: 129.99, moq: 10, rating: 4.6, category: 'sports' },
-        { title: 'Leather Wallet', brand: 'Coach', price: 49.99, moq: 12, rating: 4.0, category: 'fashion' },
-        { title: 'Wireless Charging Pad', brand: 'Anker', price: 29.99, moq: 25, rating: 4.3, category: 'electronics' }
-    ];
+
 
     // ────────────────────────────────────────────
     // UTILITIES
@@ -241,30 +229,14 @@
         return null;
     }
     function findProduct(q) {
-        var ql = q.toLowerCase();
-        var cat = {
-            headphones: ['headphone', 'earbud', 'earphone'],
-            smartphone: ['smartphone', 'phone', 'galaxy', '5g'],
-            tshirt: ['t-shirt', 'tshirt', 'shirt', 'tee'],
-            knife: ['knife', 'kitchen knife', 'cutlery'],
-            lamp: ['lamp', 'desk lamp', 'light'],
-            watch: ['watch', 'fitness tracker', 'garmin'],
-            wallet: ['wallet', 'leather wallet'],
-            charger: ['charger', 'charging pad', 'wireless charger', 'anker']
-        };
-        var best = null;
-        Object.keys(cat).forEach(function (key) {
-            cat[key].forEach(function (kw) {
-                if (ql.indexOf(kw) > -1) best = key;
-            });
-        });
-        if (!best) return null;
-        var titles = {
-            headphones: 'Premium Wireless Headphones', smartphone: 'Smartphone 5G 128GB', tshirt: 'Organic Cotton T-Shirt',
-            knife: 'Professional Kitchen Knife Set', lamp: 'LED Desk Lamp', watch: 'Fitness Tracker Watch',
-            wallet: 'Leather Wallet', charger: 'Wireless Charging Pad'
-        };
-        return FALLBACK_PRODUCTS.find(function (p) { return p.title === titles[best]; }) || null;
+        var ql = String(q || '').toLowerCase();
+        if (W.PSE && W.PSE.search && typeof W.PSE.search.query === 'function') {
+            var results = W.PSE.search.query(ql);
+            if (results && results.length > 0) {
+                return results[0];
+            }
+        }
+        return null;
     }
 
     // ────────────────────────────────────────────
@@ -758,7 +730,8 @@
         send: sendUserText,
         setBadge: setBadge,
         clearBadge: clearBadge,
-        openLiveSupport: openLiveSupport
+        openLiveSupport: openLiveSupport,
+        getAnswer: getAnswer
     };
 
     if (document.readyState === 'loading') {

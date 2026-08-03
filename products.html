@@ -745,17 +745,7 @@
     const productsPerPage = 12;
     let db, auth;
 
-    // ─── FALLBACK PRODUCTS ───
-    const FALLBACK_PRODUCTS = [
-        { id: '1', title: 'Premium Wireless Headphones', brand: 'Sony', price: 89.99, old_price: 129.99, image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&h=300&q=80', moq: 10, supplier_verified: true, category: 'electronics', rating: 4.8, stock: 150 },
-        { id: '2', title: 'Smartphone 5G 128GB', brand: 'Samsung', price: 499.99, old_price: 599.99, image_url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&h=300&q=80', moq: 5, supplier_verified: true, category: 'electronics', rating: 4.9, stock: 85 },
-        { id: '3', title: 'Organic Cotton T-Shirt', brand: 'Nike', price: 24.99, old_price: 34.99, image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=300&h=300&q=80', moq: 20, supplier_verified: false, category: 'fashion', rating: 4.2, stock: 200 },
-        { id: '4', title: 'Professional Kitchen Knife Set', brand: 'Zwilling', price: 149.99, old_price: 199.99, image_url: 'https://images.unsplash.com/photo-1593618998160-e3408e6769a1?auto=format&fit=crop&w=300&h=300&q=80', moq: 6, supplier_verified: true, category: 'home', rating: 4.7, stock: 45 },
-        { id: '5', title: 'LED Desk Lamp', brand: 'Philips', price: 39.99, old_price: 59.99, image_url: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=300&h=300&q=80', moq: 15, supplier_verified: true, category: 'home', rating: 4.5, stock: 120 },
-        { id: '6', title: 'Fitness Tracker Watch', brand: 'Garmin', price: 129.99, old_price: 169.99, image_url: 'https://images.unsplash.com/photo-1576243345690-4e4b79b63288?auto=format&fit=crop&w=300&h=300&q=80', moq: 10, supplier_verified: true, category: 'sports', rating: 4.6, stock: 60 },
-        { id: '7', title: 'Leather Wallet', brand: 'Coach', price: 49.99, old_price: 69.99, image_url: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=300&h=300&q=80', moq: 12, supplier_verified: false, category: 'fashion', rating: 4.0, stock: 80 },
-        { id: '8', title: 'Wireless Charging Pad', brand: 'Anker', price: 29.99, old_price: 39.99, image_url: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?auto=format&fit=crop&w=300&h=300&q=80', moq: 25, supplier_verified: true, category: 'electronics', rating: 4.3, stock: 300 }
-    ];
+
 
     // ─── INIT ───
     function initFirebase() {
@@ -867,8 +857,7 @@
                     // Second try: query without status filter
                     snapshot = await db.collection('products').get();
                 } catch (error) {
-                    // Third try: use fallback
-                    products = FALLBACK_PRODUCTS;
+                    products = [];
                 }
             }
 
@@ -892,12 +881,6 @@
                         stock: data.stock || 0
                     });
                 });
-            }
-
-            // If no products found, use fallback
-            if (products.length === 0) {
-                products = FALLBACK_PRODUCTS;
-                showToast('Showing sample products', 'info');
             }
 
             allProducts = products;
@@ -924,10 +907,9 @@
 
         } catch (error) {
             console.error('Error loading products:', error);
-            allProducts = FALLBACK_PRODUCTS;
-            filteredProducts = [...allProducts];
+            allProducts = [];
+            filteredProducts = [];
             applyFilters();
-            showToast('Using sample products', 'info');
         }
     }
 
@@ -1041,7 +1023,7 @@
         grid.innerHTML = pageProducts.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
             const slug = p.slug || generateSlug(p.title || 'product');
-            const imageUrl = p.image_url || 'https://via.placeholder.com/300x300?text=No+Image';
+            const imageUrl = p.image_url || 'logo.jpg';
             const stars = p.rating ? '★'.repeat(Math.floor(p.rating)) + (p.rating % 1 >= 0.5 ? '½' : '') : '';
             const stockStatus = p.stock > 0 ? 'In Stock' : 'Out of Stock';
             
