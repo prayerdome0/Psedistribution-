@@ -1,0 +1,11 @@
+title,brand,price,old_price,moq,stock,category,description,image_url,supplier_verified,supplier_tier,sponsored,rating,sku,lead_time,status
+"Wireless Noise Cancelling Headphones","Sony",89.00,119.00,24,450,"electronics","Premium over-ear ANC headphones with 30-hour battery","https://picsum.photos/id/1015/600/600",true,"gold",false,4.7,"SONY-WH1000XM5","7-10 days","active"
+"Premium Cotton T-Shirt Pack (10 pcs)","Adidas",45.00,59.00,50,1200,"fashion","Breathable organic cotton crewneck tees","https://picsum.photos/id/1005/600/600",true,"platinum",true,4.5,"ADIDAS-TS10","3-5 days","active"
+"Stainless Steel Water Bottle 1L","Hydro Flask",12.50,16.00,100,800,"home","Insulated vacuum flask keeps drinks cold 24h","https://picsum.photos/id/106/600/600",false,"basic",false,4.2,"HF-1L-SS","5-7 days","active"
+"Bluetooth Portable Speaker","JBL",35.00,49.00,30,650,"electronics","Waterproof IPX7 speaker with 12-hour playtime","https://picsum.photos/id/1018/600/600",true,"gold",false,4.6,"JBL-FLIP6","4-6 days","active"
+"Running Shoes - Men's","Nike",65.00,89.00,12,950,"sports","Lightweight breathable running sneakers","https://picsum.photos/id/1033/600/600",true,"platinum",true,4.8,"NIKE-RUNV2","2-4 days","active"
+"Organic Coffee Beans 5kg","Starbucks",78.00,95.00,20,300,"grocery","Fairtrade Arabica whole bean coffee","https://picsum.photos/id/1060/600/600",true,"gold",false,4.4,"SB-COFFEE5","10-14 days","active"
+"Wireless Mouse Ergonomic","Logitech",22.00,29.00,48,1100,"office","Silent click vertical ergonomic mouse","https://picsum.photos/id/201/600/600",false,"basic",false,4.1,"LOGI-MX3","3-5 days","active"
+"Denim Jeans Slim Fit","Levi's",38.00,52.00,24,700,"fashion","Premium stretch denim jeans","https://picsum.photos/id/1009/600/600",true,"platinum",false,4.3,"LEVIS-511","6-8 days","active"
+"Smart LED Bulb 4-Pack","Philips",29.00,39.00,36,550,"home","WiFi color changing smart bulbs","https://picsum.photos/id/160/600/600",true,"gold",true,4.5,"PHILIPS-HUE4","5-7 days","active"
+"Protein Powder 2kg Whey","Optimum Nutrition",42.00,55.00,18,480,"health","Gold Standard 100% Whey Isolate","https://picsum.photos/id/292/600/600",true,"platinum",false,4.7,"ON-WHEY2KG","4-6 days","active"
