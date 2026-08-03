@@ -349,6 +349,27 @@
             .profile-preview { flex-direction: column; align-items: center; }
             .top-bar .moving-words .words-track span { font-size: 0.65rem; }
         }
+        /* ─── REWARDS & WALLET TAB ─── */
+        .rewards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+        .reward-card { background:linear-gradient(135deg,#fff,#f8f9fb); border:1px solid var(--border); border-radius:var(--radius); padding:1.3rem 1.2rem; text-align:center; position:relative; overflow:hidden; }
+        .reward-card .ico { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 0.6rem; font-size:1.3rem; color:#fff; }
+        .reward-card .val { font-size:1.7rem; font-weight:800; color:var(--secondary); line-height:1.1; }
+        .reward-card .lbl { font-size:0.72rem; color:var(--text-light); text-transform:uppercase; letter-spacing:.06em; margin-top:0.2rem; }
+        .tier-ladder { display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:1.4rem; }
+        .tier-chip { flex:1; min-width:120px; border:1px solid var(--border); border-radius:var(--radius-sm); padding:0.8rem; text-align:center; background:var(--white); position:relative; }
+        .tier-chip.current { border-width:2px; box-shadow:0 4px 14px rgba(0,0,0,0.08); }
+        .tier-chip .dot { width:14px; height:14px; border-radius:50%; margin:0 auto 0.4rem; }
+        .tier-chip .nm { font-weight:700; font-size:0.85rem; color:var(--secondary); }
+        .tier-chip .mn { font-size:0.68rem; color:var(--text-light); }
+        .tier-chip .mult { font-size:0.72rem; font-weight:700; margin-top:0.25rem; }
+        .progress-wrap { background:#eef2f6; border-radius:30px; height:10px; overflow:hidden; margin:0.4rem 0 1rem; }
+        .progress-bar { height:100%; background:linear-gradient(90deg,#9b59b6,#8e44ad); border-radius:30px; transition:width .6s ease; }
+        .referral-box { background:linear-gradient(135deg,#8e44ad,#9b59b6); color:#fff; border-radius:var(--radius); padding:1.4rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+        .referral-box .ref-code { font-family:monospace; font-size:1.1rem; font-weight:700; background:rgba(255,255,255,0.2); padding:0.5rem 1rem; border-radius:8px; }
+        .referral-box button { background:#fff; color:#8e44ad; border:none; padding:0.6rem 1.2rem; border-radius:8px; font-weight:700; cursor:pointer; transition:var(--transition); }
+        .referral-box button:hover { transform:translateY(-2px); }
+        .rewards-disabled { text-align:center; padding:2.5rem 1rem; color:var(--text-light); }
+        .rewards-disabled i { font-size:2.5rem; color:#bdc3c7; margin-bottom:0.6rem; }
     </style>
 </head>
 <body>
@@ -445,6 +466,7 @@
                     <div class="name" id="userName">User</div>
                     <div class="email" id="userEmail">user@example.com</div>
                     <span class="role-badge buyer" id="userRoleBadge">Buyer</span>
+                    <span id="adminCrown" style="display:none;margin-top:0.4rem;background:linear-gradient(135deg,#f1c40f,#f39c12);color:#fff;font-size:0.62rem;font-weight:700;padding:0.18rem 0.7rem;border-radius:30px;letter-spacing:.03em;">👑 Administrator</span>
                 </div>
                 <button class="nav-item active" onclick="showTab('profile')">
                     <i class="fa-regular fa-user"></i> Profile
@@ -465,6 +487,10 @@
                 </button>
                 <button class="nav-item" onclick="showTab('credit')">
                     <i class="fa-solid fa-credit-card" style="color:#27ae60;"></i> Net-30 Credit
+                </button>
+                <button class="nav-item" onclick="showTab('rewards')">
+                    <i class="fa-solid fa-gem" style="color:#9b59b6;"></i> Rewards &amp; Wallet
+                    <span class="badge" id="rewardsBadge" style="background:#9b59b6;display:none;">NEW</span>
                 </button>
                 
                 <!-- ─── ADMIN DASHBOARD LINK (VISIBLE ONLY TO ADMINS) ─── -->
@@ -693,6 +719,17 @@
                         </button>
                     </form>
                 </div>
+
+                <!-- ─── REWARDS & WALLET TAB ─── -->
+                <div class="tab-content" id="tab-rewards">
+                    <div class="section-title"><i class="fa-solid fa-gem" style="color:#9b59b6;"></i> Rewards, VIP Tier &amp; Wallet</div>
+                    <div id="rewardsContainer">
+                        <div class="rewards-disabled">
+                            <i class="fa-solid fa-gem"></i>
+                            <p>Loading your rewards…</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -764,12 +801,32 @@
         storage = firebase.storage();
         setupAuthListener();
         if (!protectAccount()) return;
+        // ─── INSTANT ADMIN DETECTION (from cached session) ───
+        // Shows the admin controls immediately, before Firestore resolves,
+        // so admins never see a flash of missing admin tools.
+        try {
+            const cached = getCurrentUser();
+            if (cached) applyAdminRole(cached.role);
+        } catch (e) {}
         loadUserProfile();
         loadOrders();
         loadWishlist();
         loadAddresses();
         loadCartCount();
         loadWishlistCount();
+    }
+
+    // ─── APPLY ADMIN ROLE (single source of truth for admin UI) ───
+    // Robust: handles 'admin' exactly, plus accidental 'Admin'/'administrator'.
+    function applyAdminRole(role) {
+        const isAdmin = String(role || '').toLowerCase() === 'admin';
+        const adminNav = document.getElementById('adminNavLink');
+        const crown = document.getElementById('adminCrown');
+        if (adminNav) adminNav.style.display = isAdmin ? 'flex' : 'none';
+        if (crown) crown.style.display = isAdmin ? 'inline-block' : 'none';
+        const badge = document.getElementById('userRoleBadge');
+        if (badge && isAdmin) { badge.textContent = 'Administrator'; badge.className = 'role-badge admin'; }
+        return isAdmin;
     }
 
     // ─── AUTH LISTENER ───
@@ -791,12 +848,7 @@
                     
                     // ─── CHECK IF USER IS ADMIN AND SHOW ADMIN NAV ───
                     const role = data.role || 'buyer';
-                    const adminNav = document.getElementById('adminNavLink');
-                    if (role === 'admin') {
-                        adminNav.style.display = 'flex';
-                    } else {
-                        adminNav.style.display = 'none';
-                    }
+                    applyAdminRole(role);
 
                     if (data.trade_credit_status === 'approved') {
                         const creditText = document.getElementById('tradeCreditStatusText');
@@ -1007,15 +1059,10 @@
 
                 const roleBadge = document.getElementById('userRoleBadge');
                 const role = data.role || 'buyer';
-                roleBadge.textContent = role.charAt(0).toUpperCase() + role.slice(1);
-                roleBadge.className = 'role-badge ' + role;
-
-                // ─── SHOW/HIDE ADMIN NAV BASED ON ROLE ───
-                const adminNav = document.getElementById('adminNavLink');
-                if (role === 'admin') {
-                    adminNav.style.display = 'flex';
-                } else {
-                    adminNav.style.display = 'none';
+                // ─── SHOW/HIDE ADMIN NAV + CROWN BASED ON ROLE ───
+                if (!applyAdminRole(role)) {
+                    roleBadge.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+                    roleBadge.className = 'role-badge ' + role;
                 }
 
                 const avatar = data.avatar || data.profile_image || '';
@@ -1437,6 +1484,87 @@
         if (tab === 'orders') loadOrders();
         if (tab === 'wishlist') loadWishlist();
         if (tab === 'addresses') loadAddresses();
+        if (tab === 'rewards') loadRewards();
+    }
+
+    // ─── LOAD REWARDS / WALLET / REFERRAL ───
+    async function loadRewards() {
+        const container = document.getElementById('rewardsContainer');
+        if (!container) return;
+        const user = getCurrentUser();
+        if (!user) {
+            container.innerHTML = '<div class="rewards-disabled"><i class="fa-solid fa-lock"></i><p>Please log in again to view your rewards.</p></div>';
+            return;
+        }
+        if (!window.PSE_PREMIUM) {
+            container.innerHTML = '<div class="rewards-disabled"><i class="fa-solid fa-gem"></i><p>Rewards are loading…</p></div>';
+            return;
+        }
+        const cfg = window.PSE_PREMIUM.getConfig();
+        // Make sure config + referral code are loaded
+        try { await window.PSE_PREMIUM.loadConfig(); } catch (e) {}
+        const c = window.PSE_PREMIUM.getConfig();
+        if (!c.loyalty_enabled && !c.wallet_enabled) {
+            container.innerHTML = '<div class="rewards-disabled"><i class="fa-solid fa-gem"></i><p>The rewards program is currently turned off. Check back soon!</p></div>';
+            return;
+        }
+        let loyalty = null, refCode = '';
+        try { loyalty = await window.PSE_PREMIUM.getUserLoyalty(user.id); } catch (e) {}
+        try { refCode = await window.PSE_PREMIUM.ensureReferralCode(user.id, user.email) || ''; } catch (e) {}
+
+        const points = loyalty ? loyalty.points : 0;
+        const wallet = loyalty ? loyalty.wallet : 0;
+        const tierInfo = window.PSE_PREMIUM.computeTier(points);
+        const tier = tierInfo.current;
+        const next = tierInfo.next;
+        const ppd = Number(c.points_per_dollar) || 1;
+        const mult = Number(tier.multiplier) || 1;
+        const pct = next ? Math.min(100, Math.round((points - tier.min_points) / Math.max(1, (next.min_points - tier.min_points)) * 100)) : 100;
+
+        // Tier ladder
+        const ladder = window.PSE_PREMIUM.getTiers().map(function (t) {
+            const cur = t.name === tier.name;
+            return '<div class="tier-chip' + (cur ? ' current' : '') + '" style="' + (cur ? 'border-color:' + t.color + ';' : '') + '">' +
+                '<div class="dot" style="background:' + t.color + ';"></div>' +
+                '<div class="nm">' + t.name + (cur ? ' ✓' : '') + '</div>' +
+                '<div class="mn">' + t.min_points.toLocaleString() + ' pts</div>' +
+                '<div class="mult" style="color:' + t.color + ';">' + t.multiplier + '× earn</div>' +
+                '</div>';
+        }).join('');
+
+        const progressHtml = next
+            ? '<div style="margin-bottom:0.3rem;font-size:0.82rem;color:var(--text-light);">You are <strong style="color:var(--secondary);">' + (next.min_points - points).toLocaleString() + ' pts</strong> away from <strong style="color:' + next.color + ';">' + next.name + '</strong> tier.</div>' +
+              '<div class="progress-wrap"><div class="progress-bar" style="width:' + pct + '%;background:linear-gradient(90deg,' + tier.color + ',' + (next.color) + ');"></div></div>'
+            : '<div style="margin-bottom:0.3rem;font-size:0.82rem;color:var(--text-light);">🏆 You\'ve reached the highest <strong style="color:' + tier.color + ';">' + tier.name + '</strong> tier!</div>';
+
+        container.innerHTML =
+            '<div class="rewards-grid">' +
+                '<div class="reward-card"><div class="ico" style="background:' + tier.color + ';"><i class="fa-solid fa-crown"></i></div><div class="val" style="color:' + tier.color + ';">' + tier.name + '</div><div class="lbl">Your VIP Tier</div></div>' +
+                '<div class="reward-card"><div class="ico" style="background:#9b59b6;"><i class="fa-solid fa-star"></i></div><div class="val">' + points.toLocaleString() + '</div><div class="lbl">Reward Points</div></div>' +
+                '<div class="reward-card"><div class="ico" style="background:#27ae60;"><i class="fa-solid fa-wallet"></i></div><div class="val">' + (window.PSE_PREMIUM.fmtMoney(wallet)) + '</div><div class="lbl">Store Credit</div></div>' +
+                '<div class="reward-card"><div class="ico" style="background:#e67e22;"><i class="fa-solid fa-bolt"></i></div><div class="val">' + mult + '×</div><div class="lbl">Earn Rate (' + ppd + ' pt/$)</div></div>' +
+            '</div>' +
+            progressHtml +
+            '<div class="section-title" style="margin-top:1rem;font-size:0.95rem;"><i class="fa-solid fa-ranking-star"></i> Tier Ladder</div>' +
+            '<div class="tier-ladder">' + ladder + '</div>' +
+            '<p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1.4rem;">💡 Earn <strong>' + ppd + ' point per $1</strong> on every order, multiplied by your tier. Admins can credit your wallet for refunds &amp; bonuses.</p>' +
+            '<div class="referral-box">' +
+                '<div><div style="font-size:0.78rem;text-transform:uppercase;opacity:.85;letter-spacing:.08em;">🎁 Refer &amp; Earn ' + (c.referral_bonus_points || 500) + ' pts</div>' +
+                '<div style="font-size:1.05rem;margin-top:0.3rem;">Share your code — friends get ' + (c.referral_invitee_points || 200) + ' pts!</div></div>' +
+                '<div style="display:flex;align-items:center;gap:0.7rem;flex-wrap:wrap;">' +
+                    '<span class="ref-code" id="userReferralCode">' + (refCode || '—') + '</span>' +
+                    '<button onclick="copyReferralCode()"><i class="fa-regular fa-copy"></i> Copy</button>' +
+                '</div>' +
+            '</div>';
+    }
+
+    function copyReferralCode() {
+        const elc = document.getElementById('userReferralCode');
+        if (!elc) return;
+        const code = elc.textContent.trim();
+        try {
+            navigator.clipboard.writeText(code).then(function () { showToast('📋 Referral code copied: ' + code, 'success'); }, function () { showToast('Code: ' + code, 'info'); });
+        } catch (e) { showToast('Referral code: ' + code, 'info'); }
     }
 
     // ─── TOGGLE WISHLIST ───
@@ -1540,10 +1668,14 @@
     window.showToast = showToast;
     window.getCurrentUser = getCurrentUser;
     window.goToAdminDashboard = goToAdminDashboard;
+    window.loadRewards = loadRewards;
+    window.copyReferralCode = copyReferralCode;
+    window.applyAdminRole = applyAdminRole;
 </script>
     <script src="email.js"></script>
     <script src="ai-assistant.js"></script>
     <script src="notifications.js"></script>
+    <script src="premium.js"></script>
     <script src="/search-pro.js"></script>
 </body>
 </html>

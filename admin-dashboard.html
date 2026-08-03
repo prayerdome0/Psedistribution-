@@ -807,6 +807,25 @@
                 <i class="fa-regular fa-gear"></i> Settings
             </button>
 
+            <!-- ─── PREMIUM SUITE (admin-managed) ─── -->
+            <div class="sidebar-section-label" style="margin:0.9rem 0.4rem 0.3rem;font-size:0.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-light);font-weight:700;">💎 Premium Suite</div>
+            <button class="nav-item" onclick="showTab('coupons')">
+                <i class="fa-solid fa-ticket"></i> Coupons
+                <span class="badge gold">PRO</span>
+            </button>
+            <button class="nav-item" onclick="showTab('banners')">
+                <i class="fa-solid fa-bullhorn"></i> Promo Banners
+            </button>
+            <button class="nav-item" onclick="showTab('flash')">
+                <i class="fa-solid fa-bolt"></i> Flash Sales
+            </button>
+            <button class="nav-item" onclick="showTab('loyalty')">
+                <i class="fa-solid fa-gem"></i> Loyalty &amp; Wallet
+            </button>
+            <button class="nav-item" onclick="showTab('audit')">
+                <i class="fa-solid fa-shield-halved"></i> Audit Log
+            </button>
+
             <button class="logout-btn" onclick="logoutAdmin()">
                 <i class="fa-regular fa-right-from-bracket"></i> Logout
             </button>
@@ -1330,6 +1349,129 @@
                 </form>
             </div>
 
+            <!-- ════════════ PREMIUM: COUPONS ════════════ -->
+            <div class="tab-content" id="tab-coupons">
+                <div class="page-header">
+                    <h2><i class="fa-solid fa-ticket"></i> Coupons &amp; Promo Codes</h2>
+                    <span class="time">Discount codes customers redeem at checkout</span>
+                </div>
+                <div style="background:var(--light);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;margin-bottom:1.2rem;">
+                    <h4 style="margin-bottom:0.8rem;color:var(--secondary);"><i class="fa-solid fa-plus"></i> Create Coupon</h4>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.7rem;">
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Code</label><input type="text" id="cCode" placeholder="SAVE10" style="text-transform:uppercase;width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Type</label><select id="cType" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;"><option value="percent">Percent %</option><option value="fixed">Fixed $</option></select></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Value</label><input type="number" id="cValue" placeholder="10" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Min Spend $</label><input type="number" id="cMin" placeholder="0" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Max Uses</label><input type="number" id="cMaxUses" placeholder="0 = unlimited" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Expires</label><input type="date" id="cExpires" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                    </div>
+                    <button class="btn-add-product" style="margin-top:0.9rem;" onclick="PremiumAdmin.addCouponFromForm()"><i class="fa-solid fa-ticket"></i> Add Coupon</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Code</th><th>Discount</th><th>Min Spend</th><th>Uses</th><th>Expires</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="couponTableBody"><tr><td colspan="7" style="text-align:center;color:#888;padding:1.5rem;">Loading coupons…</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ════════════ PREMIUM: PROMO BANNERS ════════════ -->
+            <div class="tab-content" id="tab-banners">
+                <div class="page-header">
+                    <h2><i class="fa-solid fa-bullhorn"></i> Promo Banners</h2>
+                    <span class="time">Site-wide announcement bar shown on every page</span>
+                </div>
+                <div style="background:var(--light);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;margin-bottom:1.2rem;">
+                    <h4 style="margin-bottom:0.8rem;color:var(--secondary);"><i class="fa-solid fa-plus"></i> Publish Banner</h4>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.7rem;">
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Message</label><input type="text" id="bText" placeholder="🎉 Free shipping over $250" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Emoji (optional)</label><input type="text" id="bEmoji" placeholder="🎉" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Link (optional)</label><input type="text" id="bLink" placeholder="/products" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Background</label><input type="color" id="bBg" value="#1565c0" style="width:100%;height:38px;padding:2px;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Text color</label><input type="color" id="bColor" value="#ffffff" style="width:100%;height:38px;padding:2px;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Start (optional)</label><input type="datetime-local" id="bStart" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">End (optional)</label><input type="datetime-local" id="bEnd" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                    </div>
+                    <button class="btn-add-product" style="margin-top:0.9rem;" onclick="PremiumAdmin.addBannerFromForm()"><i class="fa-solid fa-bullhorn"></i> Publish Banner</button>
+                </div>
+                <div id="bannerList"><p style="color:#888;">Loading banners…</p></div>
+            </div>
+
+            <!-- ════════════ PREMIUM: FLASH SALES ════════════ -->
+            <div class="tab-content" id="tab-flash">
+                <div class="page-header">
+                    <h2><i class="fa-solid fa-bolt"></i> Flash Sales</h2>
+                    <span class="time">Scheduled, site-wide percentage discounts</span>
+                </div>
+                <div style="background:var(--light);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;margin-bottom:1.2rem;">
+                    <h4 style="margin-bottom:0.8rem;color:var(--secondary);"><i class="fa-solid fa-plus"></i> Schedule Flash Sale</h4>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.7rem;">
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Name</label><input type="text" id="fName" placeholder="Summer Mega Sale" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Discount %</label><input type="number" id="fPct" placeholder="15" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Start (optional)</label><input type="datetime-local" id="fStart" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">End (optional)</label><input type="datetime-local" id="fEnd" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                    </div>
+                    <button class="btn-add-product" style="margin-top:0.9rem;" onclick="PremiumAdmin.addFlashFromForm()"><i class="fa-solid fa-bolt"></i> Schedule Sale</button>
+                </div>
+                <div id="flashList"><p style="color:#888;">Loading flash sales…</p></div>
+            </div>
+
+            <!-- ════════════ PREMIUM: LOYALTY & WALLET ════════════ -->
+            <div class="tab-content" id="tab-loyalty">
+                <div class="page-header">
+                    <h2><i class="fa-solid fa-gem"></i> Loyalty &amp; Wallet</h2>
+                    <span class="time">VIP tiers, points, store credit &amp; referrals</span>
+                </div>
+                <div id="pmSettingsForm" style="background:var(--light);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;margin-bottom:1.2rem;">
+                    <h4 style="margin-bottom:0.8rem;color:var(--secondary);"><i class="fa-solid fa-sliders"></i> Program Settings</h4>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.7rem;">
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Loyalty program</label><select id="pmLoyaltyOn" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;"><option value="on">Enabled</option><option value="off">Disabled</option></select></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Wallet / store credit</label><select id="pmWalletOn" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;"><option value="on">Enabled</option><option value="off">Disabled</option></select></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Coupons</label><select id="pmCouponsOn" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;"><option value="on">Enabled</option><option value="off">Disabled</option></select></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Promo banners</label><select id="pmBannersOn" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;"><option value="on">Enabled</option><option value="off">Disabled</option></select></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Flash sales</label><select id="pmFlashOn" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;"><option value="on">Enabled</option><option value="off">Disabled</option></select></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Points per $1</label><input type="number" id="pmPpd" value="1" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Signup bonus</label><input type="number" id="pmSignupBonus" value="100" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Referrer bonus</label><input type="number" id="pmRefBonus" value="500" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                        <div><label style="display:block;font-size:0.72rem;font-weight:600;color:var(--secondary);margin-bottom:3px;">Invited buyer bonus</label><input type="number" id="pmInviteeBonus" value="200" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;" /></div>
+                    </div>
+                    <div style="margin-top:0.9rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+                        <button class="btn-add-product" onclick="PremiumAdmin.savePmSettings()"><i class="fa-regular fa-floppy-disk"></i> Save Settings</button>
+                        <button class="btn-action reply" style="padding:0.55rem 1rem;border-radius:6px;" onclick="PremiumAdmin.resetTiers()"><i class="fa-solid fa-rotate-left"></i> Reset VIP Tiers to Defaults</button>
+                    </div>
+                </div>
+
+                <h4 style="margin:0.4rem 0 0.6rem;color:var(--secondary);"><i class="fa-solid fa-ranking-star"></i> VIP Tier Ladder</h4>
+                <div class="table-container" style="margin-bottom:1.4rem;">
+                    <table>
+                        <thead><tr><th>Tier</th><th>Min Points</th><th>Earn Multiplier</th><th>Perks</th></tr></thead>
+                        <tbody id="tierTableBody"></tbody>
+                    </table>
+                </div>
+
+                <h4 style="margin:0.4rem 0 0.6rem;color:var(--secondary);"><i class="fa-solid fa-wallet"></i> Member Wallets &amp; Points</h4>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Member</th><th>Email</th><th>Tier &amp; Points</th><th>Wallet</th><th>Actions</th></tr></thead>
+                        <tbody id="walletTableBody"><tr><td colspan="5" style="text-align:center;color:#888;padding:1.5rem;">Loading wallets…</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ════════════ PREMIUM: AUDIT LOG ════════════ -->
+            <div class="tab-content" id="tab-audit">
+                <div class="page-header">
+                    <h2><i class="fa-solid fa-shield-halved"></i> Audit Log</h2>
+                    <span class="time">Every admin action is recorded for accountability</span>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>When</th><th>Admin</th><th>Action</th><th>Detail</th></tr></thead>
+                        <tbody id="auditTableBody"><tr><td colspan="4" style="text-align:center;color:#888;padding:1.5rem;">Loading audit log…</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
 
     </div>
@@ -1584,6 +1726,8 @@
                         document.getElementById('adminAvatar').textContent = (data.full_name || 'A').charAt(0).toUpperCase();
                         loadAllData();
                         startRealTimeListeners();
+                        // ─── Record admin session in the audit log ───
+                        try { if (window.PSE_PREMIUM && PSE_PREMIUM.logAudit) PSE_PREMIUM.logAudit('admin.login', 'Admin session started'); } catch (e) {}
                     } else {
                         showToast('Admin access required', 'error');
                         setTimeout(() => window.location.href = '/home', 1500);
@@ -2956,6 +3100,7 @@
     <script src="email.js"></script>
     <script src="holiday-engine.js"></script>
     <script src="admin-extensions.js"></script>
+    <script src="premium.js"></script>
     <script src="ai-assistant.js"></script>
     <script src="notifications.js"></script>
 </body>
