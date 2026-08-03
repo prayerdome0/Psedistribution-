@@ -783,12 +783,45 @@
                     </div>
                 </div>
 
+                <!-- BULK FREIGHT & LEAD TIME ESTIMATOR -->
+                <div style="background:var(--light);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1.1rem;margin-bottom:1.4rem;font-size:0.85rem;">
+                    <div style="font-weight:700;color:var(--secondary);margin-bottom:0.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+                        <span><i class="fa-solid fa-ship" style="color:var(--primary);"></i> Bulk Freight &amp; Lead Time Estimator</span>
+                        <span style="font-size:0.75rem;color:var(--primary);font-weight:700;">Live Container Quotes</span>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;">
+                        <div>
+                            <label style="font-size:0.75rem;font-weight:600;color:var(--text-light);display:block;margin-bottom:2px;">Destination Region</label>
+                            <select id="pdpFreightRegion" onchange="calculatePdpFreight()" style="width:100%;padding:0.4rem;border:1px solid var(--border-dark);border-radius:6px;font-size:0.82rem;background:#fff;">
+                                <option value="North America">North America</option>
+                                <option value="Western Europe">Western Europe</option>
+                                <option value="Eastern Europe">Eastern Europe</option>
+                                <option value="Middle East">Middle East</option>
+                                <option value="Africa">Africa</option>
+                                <option value="Latin America">Latin America</option>
+                                <option value="East Asia">East &amp; Southeast Asia</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size:0.75rem;font-weight:600;color:var(--text-light);display:block;margin-bottom:2px;">Freight Method</label>
+                            <select id="pdpFreightMethod" onchange="calculatePdpFreight()" style="width:100%;padding:0.4rem;border:1px solid var(--border-dark);border-radius:6px;font-size:0.82rem;background:#fff;">
+                                <option value="Ocean">🚢 Ocean Freight / LCL (25–35 Days)</option>
+                                <option value="StandardAir">✈️ Standard Air Cargo (10–14 Days)</option>
+                                <option value="ExpressAir">✈️ Express Air Freight (5–7 Days)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="pdpFreightResult" style="background:#fff;border:1px solid var(--border-dark);border-radius:6px;padding:0.6rem 0.8rem;font-size:0.82rem;color:var(--secondary);font-weight:600;">
+                        🚢 Est. Ocean Freight to North America: <span style="color:var(--primary);">$0.45/unit</span> · Lead time: 25–35 days
+                    </div>
+                </div>
+
                 <!-- Quantity -->
                 <div class="quantity-section">
                     <label for="qtyInput">Quantity:</label>
                     <div class="qty-control">
                         <button onclick="updateQty(-1)">−</button>
-                        <input type="number" id="qtyInput" value="1" min="1" oninput="updateTierSummary()" />
+                        <input type="number" id="qtyInput" value="1" min="1" oninput="updateTierSummary(); calculatePdpFreight();" />
                         <button onclick="updateQty(1)">+</button>
                     </div>
                 </div>
@@ -1501,6 +1534,37 @@
         }
     }
 
+    function calculatePdpFreight() {
+        const region = document.getElementById('pdpFreightRegion')?.value || 'North America';
+        const method = document.getElementById('pdpFreightMethod')?.value || 'Ocean';
+        const qtyEl = document.getElementById('qtyInput');
+        const qty = parseInt(qtyEl ? qtyEl.value : '100') || 100;
+        const resultEl = document.getElementById('pdpFreightResult');
+        if (!resultEl) return;
+
+        let ratePerUnit = 0.45;
+        let days = '25–35 days';
+        let methodLabel = '🚢 Ocean Container Freight';
+
+        if (method === 'ExpressAir') {
+            ratePerUnit = 3.50;
+            days = '5–7 days';
+            methodLabel = '✈️ Express Air Freight';
+        } else if (method === 'StandardAir') {
+            ratePerUnit = 1.80;
+            days = '10–14 days';
+            methodLabel = '✈️ Standard Air Cargo';
+        }
+
+        if (region === 'Africa' || region === 'Latin America') ratePerUnit *= 1.15;
+        else if (region === 'East Asia') ratePerUnit *= 0.75;
+
+        const totalFreight = ratePerUnit * qty;
+        resultEl.innerHTML = `${methodLabel} to <strong>${region}</strong> (${qty} units): <span style="color:var(--primary);font-weight:700;">$${totalFreight.toFixed(2)} ($${ratePerUnit.toFixed(2)}/unit)</span> · Est. Lead Time: <strong>${days}</strong>`;
+    }
+
+    window.calculatePdpFreight = calculatePdpFreight;
+
     function orderEvaluationSample() {
         if (!currentProduct) return;
         const samplePrice = currentProduct.price || 0;
@@ -1547,6 +1611,7 @@
         val = Math.max(min, val + change);
         input.value = val;
         updateTierSummary();
+        calculatePdpFreight();
     }
 
     // ─── ADD TO CART ───

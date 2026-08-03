@@ -182,6 +182,62 @@
     window.saveUser = saveUser;
     window.__PSE_MAIN_LOADED__ = true;
 
+    // ─── GLOBAL CURRENCY CONVERTER ENGINE ───
+    var CURRENCY_RATES = {
+        USD: { rate: 1.0, symbol: '$', code: 'USD' },
+        EUR: { rate: 0.92, symbol: '€', code: 'EUR' },
+        GBP: { rate: 0.79, symbol: '£', code: 'GBP' },
+        CAD: { rate: 1.36, symbol: 'CA$', code: 'CAD' }
+    };
+
+    function getCurrency() {
+        try {
+            return localStorage.getItem('pse_currency') || 'USD';
+        } catch (e) { return 'USD'; }
+    }
+
+    function setCurrency(code) {
+        if (!CURRENCY_RATES[code]) code = 'USD';
+        try {
+            localStorage.setItem('pse_currency', code);
+        } catch (e) {}
+        window.dispatchEvent(new CustomEvent('pse_currency_change', { detail: code }));
+    }
+
+    function formatCurrency(usdAmount) {
+        var c = getCurrency();
+        var rateObj = CURRENCY_RATES[c] || CURRENCY_RATES.USD;
+        var num = parseFloat(usdAmount) || 0;
+        var converted = num * rateObj.rate;
+        return rateObj.symbol + converted.toFixed(2);
+    }
+
+    window.PSE_CURRENCY = {
+        get: getCurrency,
+        set: setCurrency,
+        format: formatCurrency,
+        rates: CURRENCY_RATES
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var topBarLinks = document.querySelector('.top-bar .top-links') || document.querySelector('.top-bar .container');
+        if (topBarLinks && !document.getElementById('pseGlobalCurrencySelector')) {
+            var curr = getCurrency();
+            var select = document.createElement('select');
+            select.id = 'pseGlobalCurrencySelector';
+            select.style.cssText = 'background:rgba(255,255,255,0.14);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;outline:none;margin-left:8px;';
+            select.innerHTML = '<option value="USD" style="color:#222;">USD $</option>' +
+                               '<option value="EUR" style="color:#222;">EUR €</option>' +
+                               '<option value="GBP" style="color:#222;">GBP £</option>' +
+                               '<option value="CAD" style="color:#222;">CAD $</option>';
+            select.value = curr;
+            select.addEventListener('change', function (e) {
+                setCurrency(e.target.value);
+            });
+            topBarLinks.appendChild(select);
+        }
+    });
+
     // ─── AUTO-INIT (only when the page relies on main.js, e.g. chat.html) ───
     // Ensures firebase/db/auth exist for pages that don't call their own init.
     // Pages with their own initFirebase override window.initFirebase and handle

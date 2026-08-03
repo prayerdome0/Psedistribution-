@@ -415,6 +415,11 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Corporate Purchase Order # (Optional PO Number)</label>
+                    <input type="text" id="rfqPoNumber" placeholder="e.g. PO-2026-99482 (From SAP / Oracle / NetSuite ERP)" />
+                </div>
+
+                <div class="form-group">
                     <label>Additional Notes</label>
                     <textarea id="rfqNotes" placeholder="Any other requirements or preferences..." rows="3"></textarea>
                 </div>
@@ -576,6 +581,7 @@
         try {
             const docRef = await db.collection('rfqs').add({
                 title, description, quantity, budget, category, urgency, notes,
+                purchase_order_number: document.getElementById('rfqPoNumber')?.value.trim() || '',
                 user_id: user.id,
                 user_email: user.email,
                 status: 'pending',
@@ -716,6 +722,7 @@
                     <div class="meta">
                         <strong style="font-size:16px;color:#0b2a3b;">RFQ #: ${rfqNum}</strong><br />
                         Date Issued: ${dateStr}<br />
+                        ${rfq.purchase_order_number ? `<strong style="color:#1a7b6b;">CORPORATE PO #: ${esc(rfq.purchase_order_number)}</strong><br />` : ''}
                         Status: ${rfq.status ? rfq.status.toUpperCase() : 'PENDING'}
                     </div>
                 </div>
