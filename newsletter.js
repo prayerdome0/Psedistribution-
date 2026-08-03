@@ -55,6 +55,16 @@
             return { success: false, existing: false };
         }
 
+        // Rate limit: one subscribe attempt per 30 seconds per browser (anti-spam)
+        try {
+            var lastSub = parseInt(localStorage.getItem('pse_last_subscribe') || '0', 10);
+            if (Date.now() - lastSub < 30000) {
+                toast('Please wait a few seconds before subscribing again', 'error');
+                return { success: false, existing: false };
+            }
+            localStorage.setItem('pse_last_subscribe', String(Date.now()));
+        } catch (e) {}
+
         var existed = false;
 
         // 1) Firestore: dedupe + save (every subscriber is stored so admin sees it)

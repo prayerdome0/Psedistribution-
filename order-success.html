@@ -287,7 +287,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -366,6 +366,16 @@
             <a href="https://wa.me/19099384682" target="_blank" class="whatsapp-btn">
                 <i class="fa-brands fa-whatsapp"></i> Contact us on WhatsApp
             </a>
+
+            <!-- Guest → account conversion (hidden for signed-in buyers) -->
+            <div id="guestAccountCta" style="display:none;margin-top:1.4rem;background:linear-gradient(135deg,#8e44ad,#9b59b6);color:#fff;border-radius:var(--radius-sm);padding:1.1rem 1.3rem;text-align:left;">
+                <div style="font-weight:800;font-size:0.95rem;margin-bottom:0.3rem;">🔐 Save this quote to your account</div>
+                <div style="font-size:0.8rem;opacity:0.92;line-height:1.5;">Create a free account in 30 seconds to track this order anywhere, earn loyalty points on it, and reorder in one click.</div>
+                <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:0.7rem;">
+                    <a id="guestSignupLink" href="/register" style="background:#fff;color:#8e44ad;padding:0.5rem 1.2rem;border-radius:30px;font-weight:700;font-size:0.82rem;"><i class="fa-regular fa-user-plus"></i> Create Free Account</a>
+                    <a id="guestLoginLink" href="/login" style="background:rgba(255,255,255,0.18);color:#fff;padding:0.5rem 1.2rem;border-radius:30px;font-weight:600;font-size:0.82rem;border:1px solid rgba(255,255,255,0.4);">I already have an account</a>
+                </div>
+            </div>
 
             <div class="btn-group" style="display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1.2rem;">
                 <button type="button" class="btn-primary-custom" onclick="downloadFormalInvoicePDF()" style="background:#0b2a3b;color:#fff;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-weight:600;">
@@ -528,6 +538,17 @@
             if (typeof window.pushNotification === 'function') {
                 window.pushNotification('Order placed 🎉', `Order #${order.quoteNumber || order.orderNumber || 'N/A'} confirmed — total $${(totals.total || 0).toFixed(2)}. We'll email you the details.`, { icon: 'fa-circle-check', url: '/track-order?order=' + (order.quoteNumber || order.orderNumber || ''), tag: 'order' });
             }
+
+            // Guest → account conversion prompt (quote already persisted server-side)
+            try {
+                if (!getCurrentUser()) {
+                    const cta = document.getElementById('guestAccountCta');
+                    const link = document.getElementById('guestSignupLink');
+                    const orderEmail = (order.customer && order.customer.email) || '';
+                    if (cta) cta.style.display = 'block';
+                    if (link) link.href = '/register' + (orderEmail ? '?email=' + encodeURIComponent(orderEmail) : '');
+                }
+            } catch (ctaErr) {}
 
             // Email upgrade: send order confirmation (Resend → free FormSubmit → mailto)
             try {

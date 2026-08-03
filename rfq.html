@@ -14,6 +14,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="quote-pdf.js"></script>
     <script src="main.js"></script>
     
@@ -300,7 +301,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -604,6 +605,21 @@
                 created_at: new Date().toISOString()
             });
 
+            // Register in the public authenticity registry (/verify + lookups)
+            try {
+                const rfqNum = 'RFQ-PSE-' + docRef.id.slice(0, 8).toUpperCase();
+                await db.collection('verifications').doc(rfqNum).set({
+                    ref: rfqNum,
+                    type: 'rfq',
+                    status: 'submitted',
+                    email: (user.email || '').toLowerCase(),
+                    items_count: 1,
+                    title: title.substring(0, 80),
+                    issued_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                });
+            } catch (verifyErr) { console.warn('verification registry skipped', verifyErr); }
+
             showToast('✅ RFQ submitted successfully!', 'success');
             if (typeof window.pushNotification === 'function') {
                 window.pushNotification('RFQ submitted 📋', 'Suppliers will respond to "' + title + '" within 24–48 hours.', { icon: 'fa-file-lines', url: '/rfq', tag: 'rfq' });
@@ -665,6 +681,9 @@
                     </div>
                     ${rfq.quote ? rfqQuoteCard(rfq) : ''}
                     <div style="margin-top:0.8rem;display:flex;justify-content:flex-end;gap:0.5rem;flex-wrap:wrap;">
+                        <button type="button" class="btn-submit" style="background:#7f8c8d;color:#fff;padding:0.4rem 1rem;font-size:0.8rem;border-radius:6px;width:auto;" onclick="duplicateRFQ('${rfq.id}')" title="Clone this RFQ into the form to re-order similar items">
+                            <i class="fa-regular fa-clone"></i> Duplicate
+                        </button>
                         <button type="button" class="btn-submit" style="background:var(--secondary);color:#fff;padding:0.4rem 1rem;font-size:0.8rem;border-radius:6px;width:auto;" onclick="downloadRFQPdf('${rfq.id}')">
                             <i class="fa-solid fa-file-pdf" style="color:#f1c40f;"></i> Download PDF
                         </button>
@@ -739,16 +758,22 @@
         const unit = Number(q.unit_price || 0);
         const total = unit * qty;
         let validUntil = '';
+        let daysLeft = null;
         try {
             const vd = new Date(q.quoted_at || Date.now());
             vd.setDate(vd.getDate() + (Number(q.valid_days) || 14));
+            daysLeft = Math.ceil((vd.getTime() - Date.now()) / 86400000);
             validUntil = vd.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
         } catch (e) { validUntil = ''; }
+        const expired = daysLeft !== null && daysLeft < 0;
+        const validityBadge = expired
+            ? `<span style="font-size:0.72rem;color:#c0392b;font-weight:700;">⌛ Expired ${Math.abs(daysLeft)} day${Math.abs(daysLeft) === 1 ? '' : 's'} ago</span>`
+            : (validUntil ? `<span style="font-size:0.72rem;color:#0f4f43;">⏳ Valid until ${validUntil}${daysLeft !== null && daysLeft <= 3 ? ` — only ${daysLeft} day${daysLeft === 1 ? '' : 's'} left!` : ''}</span>` : '');
         return `
         <div style="margin-top:0.7rem;background:#e8f5f0;border:1px solid #1a7b6b;border-radius:10px;padding:0.9rem 1.1rem;">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.4rem;">
                 <span style="font-weight:700;color:#0f4f43;font-size:0.85rem;"><i class="fa-solid fa-file-invoice-dollar" style="color:#1a7b6b;"></i> SUPPLIER QUOTE RECEIVED${q.quote_ref ? ' • ' + esc(q.quote_ref) : ''}</span>
-                ${validUntil ? `<span style="font-size:0.72rem;color:#0f4f43;">Valid until ${validUntil}</span>` : ''}
+                ${validityBadge}
             </div>
             <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:0.4rem;font-size:0.85rem;color:#0b2a3b;">
                 <span>💲 <strong>$${unit.toFixed(2)}</strong>/unit</span>
@@ -761,10 +786,11 @@
                 <button type="button" class="btn-submit" style="background:var(--secondary);color:#fff;padding:0.4rem 1rem;font-size:0.78rem;border-radius:6px;width:auto;" onclick="downloadSupplierQuotePdf('${rfq.id}')">
                     <i class="fa-solid fa-file-pdf" style="color:#f1c40f;"></i> Download Quote PDF
                 </button>
-                ${rfq.status === 'quoted' ? `
+                ${rfq.status === 'quoted' && !expired ? `
                 <button type="button" class="btn-submit" style="background:#1a7b6b;color:#fff;padding:0.4rem 1rem;font-size:0.78rem;border-radius:6px;width:auto;" onclick="acceptRFQQuote('${rfq.id}')">
                     <i class="fa-solid fa-circle-check"></i> Accept Quote
                 </button>` : ''}
+                ${rfq.status === 'quoted' && expired ? `<span style="font-size:0.78rem;color:#c0392b;font-weight:700;align-self:center;">⌛ Quote expired — <a href="https://wa.me/19099384682?text=${encodeURIComponent('Hi! Please re-quote my RFQ ' + (q.quote_ref || '') + ' (expired).')}" target="_blank" style="color:#1a7b6b;text-decoration:underline;">request a re-quote</a></span>` : ''}
                 ${rfq.status === 'accepted' ? `<span style="font-size:0.78rem;color:#0f4f43;font-weight:700;align-self:center;">✅ Quote accepted — our team will finalize your order shortly</span>` : ''}
             </div>
         </div>`;
@@ -790,6 +816,11 @@
                 accepted_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             });
+            // Sync the public verification registry (best-effort)
+            try {
+                const rfqNum = 'RFQ-PSE-' + String(rfqId).slice(0, 8).toUpperCase();
+                await db.collection('verifications').doc(rfqNum).set({ status: 'quoted', substatus: 'accepted', updated_at: new Date().toISOString() }, { merge: true });
+            } catch (e) {}
             showToast('✅ Quote accepted! Our team will contact you to finalize the order.', 'success');
             if (typeof window.pushNotification === 'function') {
                 window.pushNotification('Quote accepted ✅', 'Your supplier quote was accepted. We will contact you shortly to finalize the order.', { icon: 'fa-circle-check', url: '/rfq', tag: 'rfq' });
@@ -802,6 +833,23 @@
 
     window.downloadSupplierQuotePdf = downloadSupplierQuotePdf;
     window.acceptRFQQuote = acceptRFQQuote;
+
+    // ─── DUPLICATE RFQ (clone into the form for fast re-ordering) ───
+    function duplicateRFQ(rfqId) {
+        const rfq = userRFQsCache.find(r => r.id === rfqId);
+        if (!rfq) { showToast('RFQ not loaded yet', 'error'); return; }
+        document.getElementById('rfqTitle').value = rfq.title || '';
+        document.getElementById('rfqDescription').value = rfq.description || '';
+        document.getElementById('rfqQuantity').value = rfq.quantity || '';
+        document.getElementById('rfqBudget').value = rfq.budget || '';
+        document.getElementById('rfqCategory').value = rfq.category || '';
+        document.getElementById('rfqUrgency').value = rfq.urgency || 'normal';
+        document.getElementById('rfqPoNumber').value = '';
+        document.getElementById('rfqNotes').value = rfq.notes || '';
+        document.getElementById('rfqForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        showToast('⧉ RFQ cloned into the form — review & submit', 'success');
+    }
+    window.duplicateRFQ = duplicateRFQ;
 
     async function loadCartCount() {
         const user = getCurrentUser();

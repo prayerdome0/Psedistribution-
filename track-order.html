@@ -332,7 +332,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -384,13 +384,16 @@
 
         <div class="track-search animate-on-scroll">
             <div class="search-box">
-                <input type="text" id="trackInput" placeholder="Enter order number (e.g., ORD-12345678)" />
+                <input type="text" id="trackInput" placeholder="Enter quote / order number (e.g., QTE-12345678-ABC)" />
                 <button onclick="trackOrder()" id="trackBtn">
                     <i class="fa-solid fa-magnifying-glass"></i> Track Order
                 </button>
             </div>
+            <div class="search-box" style="margin-top:0.6rem;">
+                <input type="email" id="trackEmail" placeholder="Email on the quote (required for guest orders)" />
+            </div>
             <div class="help-text">
-                <i class="fa-regular fa-circle-info"></i> Enter your order number from your confirmation email
+                <i class="fa-regular fa-circle-info"></i> Enter your quote # from your confirmation or PDF — guest orders also need the email used at checkout
             </div>
         </div>
 
@@ -550,19 +553,39 @@
             order = orders.find(o => o.orderNumber === orderNumber || o.quoteNumber === orderNumber);
 
             // Search in Firestore
-            if (!order) {
-                const user = getCurrentUser();
-                if (user) {
-                    const snapshot = await db.collection('orders')
-                        .where('user_id', '==', user.id)
-                        .get();
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        if (data.orderNumber === orderNumber || data.quoteNumber === orderNumber) {
-                            order = { id: doc.id, ...data };
-                        }
-                    });
+            const user = getCurrentUser();
+            if (!order && user) {
+                const snapshot = await db.collection('orders')
+                    .where('user_id', '==', user.id)
+                    .get();
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.orderNumber === orderNumber || data.quoteNumber === orderNumber) {
+                        order = { id: doc.id, ...data };
+                    }
+                });
+            }
+
+            // Guest lookup via the public verification registry (email-gated)
+            if (!order && !user) {
+                const trackEmail = (document.getElementById('trackEmail')?.value || '').trim().toLowerCase();
+                if (!trackEmail) {
+                    loading.style.display = 'none';
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Track Order';
+                    showToast('Guest orders need the email used at checkout — enter it below the quote #', 'error');
+                    document.getElementById('trackEmail')?.focus();
+                    return;
                 }
+                try {
+                    const vdoc = await db.collection('verifications').doc(orderNumber).get();
+                    if (vdoc.exists && (vdoc.data().email || '') === trackEmail) {
+                        renderGuestOrder(vdoc.data());
+                        resultDiv.classList.add('show');
+                        showToast('✅ Order found!', 'success');
+                        return;
+                    }
+                } catch (guestLookupErr) { console.warn('guest lookup failed', guestLookupErr); }
             }
 
             if (order) {
@@ -579,6 +602,45 @@
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Track Order';
         }
+    }
+
+    // ─── GUEST ORDER RENDERER (privacy-safe, from verifications registry) ───
+    function renderGuestOrder(v) {
+        const content = document.getElementById('orderContent');
+        const statusMap = { pending: 0, issued: 0, submitted: 0, reviewing: 1, processing: 1, preparing: 1, quoted: 1, accepted: 1, inspected: 2, shipped: 3, delivered: 4, completed: 4, cancelled: 0 };
+        const currentStatus = (v.status || 'pending').toLowerCase();
+        const currentIndex = statusMap[currentStatus] !== undefined ? statusMap[currentStatus] : 0;
+        const orderDate = new Date(v.issued_at || Date.now());
+        const steps = [
+            { label: '🔒 Step 1: Escrow Secured', desc: 'Quote received & payment secured' },
+            { label: '🏭 Step 2: In Production', desc: 'Supplier preparing bulk shipment' },
+            { label: '📋 Step 3: Inspected & Passed', desc: 'Quality certificate verified' },
+            { label: '🚢 Step 4: In Transit / Shipped', desc: 'Shipment dispatched & en route' },
+            { label: '✅ Step 5: Escrow Released', desc: 'Delivered & funds released' }
+        ];
+        content.innerHTML = `
+            <div class="order-header">
+                <span class="order-number"><i class="fa-solid fa-receipt"></i> ${(v.ref || 'QUOTE').replace(/</g, '&lt;')}</span>
+                <span class="order-status ${currentStatus.replace(/[^a-z]/g, '') || 'pending'}">${currentStatus}</span>
+            </div>
+            <div class="order-details-grid">
+                <div class="detail-item"><div class="label">Placed</div><div class="value">${orderDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div></div>
+                <div class="detail-item"><div class="label">Line items</div><div class="value">${v.items_count || '—'}</div></div>
+                ${typeof v.total === 'number' ? `<div class="detail-item"><div class="label">Quote total</div><div class="value">$${Number(v.total).toFixed(2)}</div></div>` : ''}
+                <div class="detail-item"><div class="label">Verified</div><div class="value" style="color:var(--primary);"><i class="fa-solid fa-shield-halved"></i> Genuine — PSE Registry</div></div>
+            </div>
+            <div class="order-items">
+                <div class="items-title"><i class="fa-regular fa-truck"></i> Trade Assurance Progress</div>
+                ${steps.map((s, i) => `
+                    <div class="item-row" style="${i <= currentIndex ? 'color:#1a7b6b;font-weight:600;' : 'color:#9db2c0;'}">
+                        <span>${i <= currentIndex ? '✅' : '⏳'} ${s.label}</span>
+                        <span style="font-size:0.75rem;font-weight:400;">${s.desc}</span>
+                    </div>`).join('')}
+            </div>
+            <div style="margin-top:1rem;background:var(--primary-light);border-radius:var(--radius-sm);padding:0.8rem 1rem;font-size:0.82rem;color:var(--primary-dark);">
+                <i class="fa-regular fa-circle-info"></i> Full item-level detail is visible in your account.
+                <a href="/register?email=${encodeURIComponent(v.email || '')}" style="font-weight:700;color:var(--primary);">Create a free account</a> to unlock the complete dashboard.
+            </div>`;
     }
 
     function renderOrder(order) {

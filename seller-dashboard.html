@@ -481,7 +481,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">Pilot <span>Distribution</span></span>
                 <span class="sub">Seller Panel</span>
@@ -1405,6 +1405,15 @@
                 return;
             }
 
+            // Low-stock badge: flag when stock hits the MOQ threshold (or zero)
+            const stockCell = p => {
+                const stock = p.stock || 0;
+                const threshold = p.moq || 10;
+                if (stock <= 0) return `<td><span style="display:inline-flex;align-items:center;gap:0.3rem;background:#fdecea;color:#c0392b;border-radius:12px;padding:0.15rem 0.55rem;font-size:0.75rem;font-weight:700;"><i class="fa-solid fa-circle-xmark"></i> Out of stock</span></td>`;
+                if (stock <= threshold) return `<td><span style="display:inline-flex;align-items:center;gap:0.3rem;background:#fff4e5;color:#d35400;border-radius:12px;padding:0.15rem 0.55rem;font-size:0.75rem;font-weight:700;" title="Stock is at or below your MOQ (${threshold})"><i class="fa-solid fa-triangle-exclamation"></i> ${stock} — Low</span></td>`;
+                return `<td>${stock}</td>`;
+            };
+
             tbody.innerHTML = allProducts.slice(0, 10).map(p => {
                 const imagePreview = p.image_url ? 
                     `<img src="${p.image_url}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;" />` : 
@@ -1419,7 +1428,7 @@
                         </td>
                         <td>$${(p.price || 0).toFixed(2)}</td>
                         <td>${p.moq || 1}</td>
-                        <td>${p.stock || 0}</td>
+                        ${stockCell(p)}
                         <td><span class="status-badge ${p.status === 'active' || p.status === 'approved' ? 'active' : p.status === 'pending' ? 'pending' : 'inactive'}">${p.status || 'pending'}</span></td>
                         <td>
                             <button class="btn-action edit" onclick="openAddProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
@@ -1447,7 +1456,7 @@
                             <tr>
                                 <td><strong>${esc(p.title || 'Untitled')}</strong></td>
                                 <td>$${(p.price || 0).toFixed(2)}</td>
-                                <td>${p.stock || 0}</td>
+                                <td>${(p.stock || 0) <= 0 ? '<span style="color:#c0392b;font-weight:700;">0 — Out</span>' : (p.stock || 0) <= (p.moq || 10) ? `<span style="color:#d35400;font-weight:700;">${p.stock} — Low</span>` : (p.stock || 0)}</td>
                                 <td><span class="status-badge active">${p.status || 'active'}</span></td>
                                 <td>${statusText}</td>
                                 <td>${actionBtn}</td>

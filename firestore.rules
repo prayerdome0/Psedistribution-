@@ -76,11 +76,41 @@ service cloud.firestore {
 
     // ─── ORDERS / QUOTATIONS ───
     match /orders/{orderId} {
-      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      // Signed-in buyers own their orders; guests create guest-flagged quotes
+      // (lookup happens via the privacy-safe `verifications` registry below).
+      allow create: if (isSignedIn() && request.resource.data.user_id == request.auth.uid)
+        || (!isSignedIn() && request.resource.data.get('user_id', '') == ''
+            && request.resource.data.get('guest', false) == true);
       allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
       // Fulfillment status moves are admin-only.
       allow update: if isAdmin();
       allow delete: if isAdmin();
+    }
+
+    // ─── DOCUMENT VERIFICATION REGISTRY (public, privacy-safe) ───
+    // Minimal authenticity records for /verify?ref=… lookups + guest order
+    // tracking — no item-level detail is stored here.
+    match /verifications/{docId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ─── PRICE / STOCK ALERTS ───
+    match /price_alerts/{docId} {
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow update: if isAdmin()
+        || (isSignedIn() && resource.data.user_id == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['active', 'notified_at', 'updated_at']));
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+    }
+
+    // ─── CLIENT ERROR LOG ───
+    match /error_log/{docId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
     }
 
     // ─── RFQs (buyer requests; admin quotes back) ───

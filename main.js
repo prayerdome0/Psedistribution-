@@ -236,7 +236,8 @@
         USD: { rate: 1.0, symbol: '$', code: 'USD' },
         EUR: { rate: 0.92, symbol: '€', code: 'EUR' },
         GBP: { rate: 0.79, symbol: '£', code: 'GBP' },
-        CAD: { rate: 1.36, symbol: 'CA$', code: 'CAD' }
+        CAD: { rate: 1.36, symbol: 'CA$', code: 'CAD' },
+        ZMW: { rate: 26.5, symbol: 'K', code: 'ZMW' }
     };
 
     function getCurrency() {
@@ -314,4 +315,99 @@
     });
 
     console.log('✅ main.js loaded (shared core utilities)');
+
+    // ════════════════════════════════════════════
+    // GLOBAL ENGAGEMENT & RELIABILITY LAYER
+    // (auto-injected on every page that loads main.js)
+    // ════════════════════════════════════════════
+
+    // ─── 1. PWA SERVICE WORKER ───
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/sw.js').catch(function () { /* optional */ });
+        });
+    }
+
+    // ─── 2. CLIENT ERROR MONITORING → Firestore error_log ───
+    // Throttled (max 3/session, deduped per message) so a broken page can't
+    // spam the log, and flushed lazily once window.db becomes available.
+    var _errQueue = [], _errSeen = {}, _errFlushed = 0;
+    function pseLogError(kind, message, source, line) {
+        try {
+            if (_errFlushed >= 3) return;
+            var key = String(message || '').slice(0, 120);
+            if (!key || _errSeen[key]) return;
+            _errSeen[key] = true;
+            _errQueue.push({ kind: kind, message: key, source: String(source || '').slice(0, 200), line: line || 0, page: location.pathname, ts: new Date().toISOString() });
+            _errFlushErrors(0);
+        } catch (e) {}
+    }
+    function _errFlushErrors(tries) {
+        if (!_errQueue.length) return;
+        if (!(window.db && typeof window.db.collection === 'function')) {
+            if ((tries || 0) < 10) setTimeout(function () { _errFlushErrors((tries || 0) + 1); }, 1500);
+            return;
+        }
+        while (_errQueue.length && _errFlushed < 3) {
+            var entry = _errQueue.shift();
+            _errFlushed++;
+            try { window.db.collection('error_log').add(Object.assign({ ua: (navigator.userAgent || '').slice(0, 150) }, entry)).catch(function () {}); } catch (e) {}
+        }
+    }
+    window.addEventListener('error', function (ev) { pseLogError('error', ev.message, ev.filename, ev.lineno); });
+    window.addEventListener('unhandledrejection', function (ev) { pseLogError('unhandledrejection', (ev.reason && (ev.reason.message || ev.reason)) || 'unknown', '', 0); });
+
+    // ─── 3. FLOATING WHATSAPP BUTTON ───
+    var PSE_WA_NUMBER = '19099384682';
+    function pseWaMessage() {
+        var path = location.pathname || '';
+        if (path.indexOf('product-detail') !== -1 || path.indexOf('/product') !== -1) {
+            var title = (document.getElementById('productTitle') || {}).textContent || document.title;
+            return 'Hi Pilot Sales Distribution! I have a question about: ' + title.trim();
+        }
+        if (path.indexOf('rfq') !== -1) return 'Hi! I need help submitting a Request for Quotation (RFQ).';
+        if (path.indexOf('cart') !== -1 || path.indexOf('checkout') !== -1) return 'Hi! I need help completing my wholesale order.';
+        if (path.indexOf('track') !== -1) return 'Hi! I need help tracking my order.';
+        return 'Hi Pilot Sales Distribution! I have a question about wholesale ordering.';
+    }
+    function pseInjectWhatsAppFloat() {
+        if (document.getElementById('pseWaFloat')) return;
+        if (/admin-dashboard|seller-dashboard|login|register/.test(location.pathname)) return; // keep ops/auth pages clean
+        var a = document.createElement('a');
+        a.id = 'pseWaFloat';
+        a.href = 'https://wa.me/' + PSE_WA_NUMBER + '?text=' + encodeURIComponent(pseWaMessage());
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.setAttribute('aria-label', 'Chat on WhatsApp');
+        a.innerHTML = '<svg viewBox="0 0 32 32" width="28" height="28" fill="#fff"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.6.8 5 2.3 7L4 29l7.2-2.3c1.9 1 4 .6 4.8.6 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.8c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3 1.1 1.1-3.2-.2-.3C7.7 19.9 7 17.5 7 15 7 10 11 6 16 6s9 4 9 9-4 9.8-9 9.8zm5-7.3c-.3-.1-1.6-.8-1.9-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6.1-.1.3-.3.4-.4.1-.1.2-.3.3-.4.1-.2.1-.3 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.2-.3-.2-.6-.4z"/></svg>';
+        a.style.cssText = 'position:fixed;right:18px;bottom:88px;width:54px;height:54px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(37,211,102,.45);z-index:9990;transition:transform .2s ease,box-shadow .2s ease;';
+        a.addEventListener('mouseenter', function () { a.style.transform = 'scale(1.08)'; });
+        a.addEventListener('mouseleave', function () { a.style.transform = 'scale(1)'; });
+        var tip = document.createElement('span');
+        tip.textContent = 'Chat with us';
+        tip.style.cssText = 'position:absolute;right:60px;background:#0b2a3b;color:#fff;font:600 11px Inter,sans-serif;padding:5px 10px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none;';
+        a.appendChild(tip);
+        a.addEventListener('mouseenter', function () { tip.style.opacity = '1'; });
+        a.addEventListener('mouseleave', function () { tip.style.opacity = '0'; });
+        document.body.appendChild(a);
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pseInjectWhatsAppFloat);
+    else pseInjectWhatsAppFloat();
+
+    // ─── 4. COOKIE CONSENT ───
+    function pseCookieConsent() {
+        try { if (localStorage.getItem('pse_cookie_consent')) return; } catch (e) { return; }
+        var bar = document.createElement('div');
+        bar.style.cssText = 'position:fixed;left:0;right:0;bottom:0;background:#0b2a3b;color:#d4e2ed;padding:0.7rem 1rem;display:flex;align-items:center;justify-content:center;gap:0.8rem;flex-wrap:wrap;z-index:9995;font:400 12.5px Inter,sans-serif;box-shadow:0 -4px 20px rgba(0,0,0,.25);';
+        bar.innerHTML = '<span>🍪 We use cookies to keep you signed in, save your cart and improve your shopping experience.</span>' +
+            '<a href="/privacy" style="color:#f1c40f;font-weight:600;">Privacy Policy</a>' +
+            '<button id="pseCookieOk" style="background:#1a7b6b;color:#fff;border:none;padding:0.45rem 1.3rem;border-radius:30px;font-weight:700;cursor:pointer;font-size:12.5px;">Accept</button>' +
+            '<button id="pseCookieNo" style="background:transparent;color:#b4d0e0;border:1px solid #4a6b80;padding:0.45rem 1rem;border-radius:30px;cursor:pointer;font-size:12.5px;">Decline</button>';
+        document.body.appendChild(bar);
+        function done(v) { try { localStorage.setItem('pse_cookie_consent', v); } catch (e) {} bar.remove(); }
+        bar.querySelector('#pseCookieOk').addEventListener('click', function () { done('accepted'); });
+        bar.querySelector('#pseCookieNo').addEventListener('click', function () { done('declined'); });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pseCookieConsent);
+    else pseCookieConsent();
 })();

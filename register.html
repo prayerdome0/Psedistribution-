@@ -90,7 +90,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -275,7 +275,12 @@
             const params = new URLSearchParams(location.search);
             const ref = (params.get('ref') || '').trim();
             const promo = (params.get('promo') || '').trim();
+            const emailPrefill = (params.get('email') || '').trim();
             document.addEventListener('DOMContentLoaded', function () {
+                if (emailPrefill) {
+                    const emailInput = document.getElementById('regEmail');
+                    if (emailInput && !emailInput.value) emailInput.value = emailPrefill;
+                }
                 if (ref) {
                     referredByCode = ref.toUpperCase();
                     const banner = document.getElementById('referralBanner');

@@ -14,6 +14,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="quote-pdf.js"></script>
     <script src="main.js"></script>
     
@@ -319,7 +320,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -391,6 +392,22 @@
                     <div class="form-group">
                         <label>Phone Number <span class="required">*</span></label>
                         <input type="tel" id="phone" placeholder="(555) 123-4567" required />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Company <span style="color:var(--text-light);font-weight:400;font-size:0.72rem;">(optional — printed on quote)</span></label>
+                            <input type="text" id="company" placeholder="Your business name" />
+                        </div>
+                        <div class="form-group">
+                            <label>VAT / Tax ID <span style="color:var(--text-light);font-weight:400;font-size:0.72rem;">(optional)</span></label>
+                            <input type="text" id="vatId" placeholder="e.g. US-88-1234567" />
+                        </div>
+                    </div>
+                    <div class="form-group" id="savedAddressGroup" style="display:none;">
+                        <label><i class="fa-regular fa-bookmark" style="color:var(--primary);"></i> Use a saved address</label>
+                        <select id="savedAddressSelect" style="width:100%;padding:0.7rem 0.8rem;border:1px solid var(--border-dark);border-radius:var(--radius-sm);font-size:0.9rem;background:var(--white);">
+                            <option value="">— Select a saved address —</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Street Address <span class="required">*</span></label>
@@ -815,11 +832,14 @@
                     if (data.last_name) document.getElementById('lastName').value = data.last_name || '';
                     if (user.email) document.getElementById('email').value = user.email || '';
                     if (data.phone) document.getElementById('phone').value = data.phone || '';
+                    if (data.company) document.getElementById('company').value = data.company || '';
+                    if (data.vat_id) document.getElementById('vatId').value = data.vat_id || '';
                     if (data.address) document.getElementById('address').value = data.address || '';
                     if (data.city) document.getElementById('city').value = data.city || '';
                     if (data.state) document.getElementById('state').value = data.state || '';
                     if (data.zip) document.getElementById('zip').value = data.zip || '';
                     if (data.country) document.getElementById('country').value = data.country || 'US';
+                    loadSavedAddresses(user.uid);
                 } catch (e) {}
             } else { 
                 localStorage.removeItem('pilot_user'); 
@@ -1135,6 +1155,51 @@
         document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
     }
 
+    // ─── SAVED ADDRESSES (account.html → checkout prefill) ───
+    async function loadSavedAddresses(uid) {
+        try {
+            const snap = await db.collection('addresses').where('user_id', '==', uid).get();
+            if (snap.empty) return;
+            const group = document.getElementById('savedAddressGroup');
+            const select = document.getElementById('savedAddressSelect');
+            const addresses = [];
+            snap.forEach(doc => addresses.push({ id: doc.id, ...doc.data() }));
+            select.innerHTML = '<option value="">— Select a saved address —</option>' + addresses.map((a, i) =>
+                `<option value="${i}">${(a.label || a.line1 || 'Address')} — ${a.line1 || ''}, ${a.city || ''}</option>`).join('');
+            group.style.display = 'block';
+            select.onchange = function () {
+                const a = addresses[parseInt(this.value, 10)];
+                if (!a) return;
+                document.getElementById('address').value = a.line1 || '';
+                document.getElementById('city').value = a.city || '';
+                document.getElementById('state').value = a.state || '';
+                document.getElementById('zip').value = a.zip || '';
+                if (a.country) {
+                    const countrySelect = document.getElementById('country');
+                    const opt = Array.from(countrySelect.options).find(o =>
+                        o.value === a.country || o.textContent.trim().toLowerCase() === String(a.country).toLowerCase());
+                    if (opt) countrySelect.value = opt.value;
+                }
+                showToast('📍 Saved address applied', 'success');
+            };
+        } catch (e) { /* saved addresses optional */ }
+    }
+
+    // ─── DOCUMENT VERIFICATION REGISTRY (public /verify + guest tracking) ───
+    async function registerVerification(ref, type, email, status, extra) {
+        if (!ref || !db) return;
+        try {
+            await db.collection('verifications').doc(String(ref)).set(Object.assign({
+                ref: String(ref),
+                type: type || 'order',
+                status: status || 'issued',
+                email: (email || '').toLowerCase(),
+                issued_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }, extra || {}));
+        } catch (e) { console.warn('verification registry skipped', e); }
+    }
+
     // ─── AUTO-APPLY SIGNUP PROMO (captured on register.html) ───
     async function autoApplySignupPromo() {
         if (appliedCoupon) return;
@@ -1406,6 +1471,8 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
         const state = document.getElementById('state').value.trim();
         const zip = document.getElementById('zip').value.trim();
         const country = document.getElementById('country').value;
+        const company = (document.getElementById('company')?.value || '').trim();
+        const vatId = (document.getElementById('vatId')?.value || '').trim();
         const notes = document.getElementById('notes').value.trim();
 
         if (!firstName || !lastName || !email || !phone || !address || !city || !state || !zip || !country) {
@@ -1457,6 +1524,8 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
                 lastName: lastName,
                 email: email,
                 phone: phone,
+                company: company,
+                vat_id: vatId,
                 address: address,
                 city: city,
                 state: state,
@@ -1511,10 +1580,30 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
                     updated_at: new Date().toISOString()
                 });
             } else {
+                // Guests persist server-side too — makes guest quotes trackable
+                // (via quote # + email) and visible to the admin team.
+                try {
+                    await db.collection('orders').add({
+                        ...orderData,
+                        user_id: '',
+                        guest: true,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    });
+                } catch (guestErr) { console.warn('Guest order mirrored locally only', guestErr); }
                 const orders = JSON.parse(localStorage.getItem('pilot_orders') || '[]');
                 orders.push(orderData);
                 localStorage.setItem('pilot_orders', JSON.stringify(orders));
             }
+
+            // Public authenticity + guest-lookup registry (best-effort)
+            try {
+                await registerVerification(quoteNumber, 'order', email, 'pending', {
+                    total,
+                    items_count: orderData.items.length,
+                    guest: !user
+                });
+            } catch (e) {}
 
             // Clear cart
             if (user) {
@@ -1525,6 +1614,7 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
             } else {
                 localStorage.setItem('pilot_cart', '[]');
             }
+            try { localStorage.removeItem('pilot_cart_ts'); localStorage.removeItem('pse_cart_banner_dismissed'); } catch (e) {}
             loadCartCount();
 
             // ─── Premium: redeem coupon + award loyalty points (never block the order) ───

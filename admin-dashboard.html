@@ -13,7 +13,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="quote-pdf.js"></script>
+    <script src="email.js"></script>
     <script src="main.js"></script>
     <script src="search-pro.js"></script>
     <script src="bulk-import.js"></script>
@@ -718,7 +721,7 @@
 <header class="header">
     <div class="container">
         <a href="/home" class="logo">
-            <img src="/logo.jpg" alt="Pilot Sales Distribution" />
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
             <div class="brand-name">
                 <span class="main">Pilot <span>Distribution</span></span>
                 <span class="sub">Admin Panel</span>
@@ -919,6 +922,14 @@
                     </div>
                 </div>
 
+                <div style="background:#fff;border:1px solid #e5ebef;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;box-shadow:0 1px 3px rgba(11,42,59,0.06);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+                        <h3 style="font-size:0.95rem;color:var(--secondary);margin:0;"><i class="fa-regular fa-chart-line" style="color:var(--primary);"></i> Revenue — Last 30 Days</h3>
+                        <span id="revenueChartTotal" style="font-size:0.8rem;color:var(--text-light);"></span>
+                    </div>
+                    <div style="position:relative;height:220px;"><canvas id="revenueChart"></canvas></div>
+                </div>
+
                 <h3 style="font-size:0.85rem; color:var(--secondary); margin-bottom:0.5rem;">Quick Actions</h3>
                 <div class="quick-actions">
                     <div class="action-btn" onclick="openAddProduct()">
@@ -989,9 +1000,12 @@
 
             <!-- ORDERS -->
             <div class="tab-content" id="tab-orders">
-                <div class="page-header">
+                <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.6rem;">
                     <h2><i class="fa-regular fa-receipt"></i> Orders</h2>
-                    <span class="time" id="orderCount">0 orders</span>
+                    <div style="display:flex;align-items:center;gap:0.6rem;">
+                        <span class="time" id="orderCount">0 orders</span>
+                        <button type="button" class="btn-action process" onclick="exportOrdersCSV()" title="Download all orders as CSV"><i class="fa-regular fa-file-excel"></i> Export CSV</button>
+                    </div>
                 </div>
                 <div id="orderList">
                     <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading orders...</p></div>
@@ -2098,6 +2112,8 @@
             document.getElementById('orderBadge').textContent = pending.length;
             document.getElementById('orderCount').textContent = `${allOrders.length} orders`;
 
+            try { renderRevenueChart(); } catch (e) { /* chart is optional */ }
+
             if (allOrders.length === 0) {
                 container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-receipt"></i><p>No orders placed yet</p></div>`;
                 return;
@@ -2250,6 +2266,35 @@
                 status_updated_at: new Date().toISOString()
             });
             showToast(`✅ Order status updated to ${status}`, 'success');
+
+            // Sync public verification registry (guest track-order / verify page)
+            const order = allOrders.find(o => o.id === orderId);
+            if (order && order.quoteNumber) {
+                db.collection('verifications').doc(order.quoteNumber)
+                    .set({ status, updated_at: new Date().toISOString() }, { merge: true })
+                    .catch(() => {});
+            }
+
+            // Email the buyer about the new status (non-blocking)
+            if (order && order.customer && order.customer.email) {
+                const name = `${order.customer.firstName || ''} ${order.customer.lastName || ''}`.trim() || 'Valued Customer';
+                const ref = order.quoteNumber || orderId;
+                try {
+                    if (status === 'shipped' && typeof sendShippingUpdate === 'function') {
+                        sendShippingUpdate(order.customer.email, name, ref, order.tracking_number || 'Assigned on dispatch', 'PSE Logistics Partner', '3-7 business days').catch(() => {});
+                    } else if (typeof sendNotificationEmail === 'function') {
+                        const msgs = {
+                            processing: 'Your order is confirmed and being prepared by our fulfilment team.',
+                            delivered: 'Your order has been delivered. Thank you for choosing Pilot Sales Distribution!',
+                            cancelled: 'Your order has been cancelled. If this is unexpected, please contact our support team.'
+                        };
+                        if (msgs[status]) {
+                            sendNotificationEmail(order.customer.email, name, `Order ${ref} — ${status.charAt(0).toUpperCase() + status.slice(1)}`, msgs[status], 'Track Order', 'https://pilotsalesdistribution.com/track-order').catch(() => {});
+                        }
+                    }
+                } catch (e) { /* email is best-effort */ }
+            }
+
             loadOrders();
             updateStats();
         } catch (error) { showToast('Failed', 'error'); }
@@ -2437,6 +2482,23 @@
                 status_updated_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             });
+
+            // Register quote in the public verification registry + bump the RFQ ref
+            const nowIso = new Date().toISOString();
+            db.collection('verifications').doc(quote.quote_ref).set({
+                ref: quote.quote_ref,
+                type: 'supplier_quote',
+                status: 'quoted',
+                email: (rfq.user_email || '').toLowerCase(),
+                title: rfq.product_name || rfq.title || 'Bulk RFQ',
+                items_count: 1,
+                total: quote.total,
+                issued_at: nowIso,
+                updated_at: nowIso
+            }, { merge: true }).catch(() => {});
+            db.collection('verifications').doc('RFQ-PSE-' + String(rfqId).slice(0, 8).toUpperCase())
+                .set({ status: 'quoted', updated_at: nowIso }, { merge: true }).catch(() => {});
+
             showToast(`✅ Quote sent to ${rfq.user_email || 'buyer'} — they can now view, download & accept it`, 'success');
             closeQuoteModal();
             loadRFQs();
@@ -3084,7 +3146,69 @@
     window.handleImagePreview = handleImagePreview;
     window.removePreviewImage = removePreviewImage;
     window.deleteProduct = deleteProduct;
+    // ─── REVENUE CHART (Chart.js, last 30 days) ───
+    let revenueChartInstance = null;
+    function renderRevenueChart() {
+        const canvas = document.getElementById('revenueChart');
+        if (!canvas || typeof Chart === 'undefined') return;
+        const days = [];
+        const totals = [];
+        const dayMap = {};
+        for (let i = 29; i >= 0; i--) {
+            const d = new Date(); d.setDate(d.getDate() - i);
+            const key = d.toISOString().slice(0, 10);
+            dayMap[key] = 0;
+            days.push(key);
+        }
+        (allOrders || []).forEach(o => {
+            if (o.status === 'cancelled') return;
+            const raw = o.date || o.created_at || '';
+            const key = String(raw).slice(0, 10);
+            if (key in dayMap) dayMap[key] += (o.totals && o.totals.total) || o.total || 0;
+        });
+        days.forEach(k => totals.push(+dayMap[k].toFixed(2)));
+        const labels = days.map(k => new Date(k + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        const sum = totals.reduce((a, b) => a + b, 0);
+        const totalEl = document.getElementById('revenueChartTotal');
+        if (totalEl) totalEl.textContent = `$${sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} total`;
+        if (revenueChartInstance) { revenueChartInstance.destroy(); revenueChartInstance = null; }
+        revenueChartInstance = new Chart(canvas.getContext('2d'), {
+            type: 'line',
+            data: { labels, datasets: [{ label: 'Revenue', data: totals, borderColor: '#1a7b6b', backgroundColor: 'rgba(26,123,107,0.12)', fill: true, tension: 0.35, pointRadius: 2, borderWidth: 2 }] },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' $' + (+c.parsed.y).toFixed(2) } } },
+                scales: { y: { beginAtZero: true, ticks: { callback: v => '$' + v } }, x: { ticks: { autoSkip: true, maxTicksLimit: 10 } } }
+            }
+        });
+    }
+
+    // ─── EXPORT ORDERS AS CSV ───
+    function exportOrdersCSV() {
+        if (!allOrders || allOrders.length === 0) { showToast('No orders to export', 'info'); return; }
+        const esc = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+        const rows = [['Order Ref', 'Date', 'Customer', 'Email', 'Phone', 'Country', 'Items', 'Subtotal', 'Shipping', 'Discount', 'Total', 'Status', 'Payment Method'].join(',')];
+        allOrders.forEach(o => {
+            const c = o.customer || {};
+            const t = o.totals || {};
+            rows.push([
+                esc(o.quoteNumber || o.id), esc(String(o.date || o.created_at || '').slice(0, 19).replace('T', ' ')),
+                esc(((c.firstName || '') + ' ' + (c.lastName || '')).trim()), esc(c.email), esc(c.phone), esc(c.country),
+                (o.items || []).length, t.subtotal || 0, t.shipping || 0, t.discount || 0, t.total || o.total || 0,
+                esc(o.status || 'pending'), esc(o.paymentMethod || o.payment_method || '')
+            ].join(','));
+        });
+        const blob = new Blob(['﻿' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'PSE-Orders-' + new Date().toISOString().slice(0, 10) + '.csv';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+        showToast('📊 Orders exported as CSV', 'success');
+    }
+
     window.updateOrderStatus = updateOrderStatus;
+    window.exportOrdersCSV = exportOrdersCSV;
     window.updateRFQStatus = updateRFQStatus;
     window.openQuoteModal = openQuoteModal;
     window.closeQuoteModal = closeQuoteModal;
@@ -3173,7 +3297,7 @@
                     stock: parseInt(values[headers.indexOf('stock')]) || 100,
                     sku: values[headers.indexOf('sku')] || '',
                     description: values[headers.indexOf('description')] || 'Wholesale product listed by admin team.',
-                    image_url: values[headers.indexOf('image_url')] || 'logo.jpg',
+                    image_url: values[headers.indexOf('image_url')] || 'logo.webp',
                     slug: generateSlug(values[headers.indexOf('title')] || values[0]),
                     supplier_id: user.uid,
                     seller_id: user.uid,

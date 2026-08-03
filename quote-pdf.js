@@ -107,7 +107,7 @@
 
     function drawPartyBoxes(doc, y, leftTitle, leftLines, rightTitle, rightLines) {
         var boxW = (CONTENT_W - 20) / 2;
-        var boxH = 82;
+        var boxH = 92;
 
         [[MARGIN, leftTitle, leftLines], [MARGIN + boxW + 20, rightTitle, rightLines]].forEach(function (b) {
             var x = b[0], heading = b[1], lines = b[2];
@@ -161,12 +161,16 @@
 
         // ─── Parties ───
         var c = orderData.customer || {};
+        var billTo = [(c.firstName || '') + ' ' + (c.lastName || '')];
+        if (c.company) billTo.push(truncate(c.company, 44));
+        billTo.push('Email: ' + (c.email || 'N/A'));
+        billTo.push('Phone: ' + (c.phone || 'N/A') + (c.vat_id ? '  |  VAT/Tax ID: ' + truncate(c.vat_id, 18) : ''));
+        billTo.push(truncate((c.address || '') + ', ' + (c.city || '') + ', ' + (c.state || '') + ' ' + (c.zip || '') + '  ' + (c.country || ''), 52));
         y = drawPartyBoxes(doc, y,
             'ISSUED BY',
             ['Pilot Sales Distribution', 'Verified Wholesale Suppliers Network', 'Email: support@pilotsalesdistribution.com', 'WhatsApp: +1 (909) 938-4682'],
             'BILL TO (COMMERCIAL BUYER)',
-            [(c.firstName || '') + ' ' + (c.lastName || ''), 'Email: ' + (c.email || 'N/A'), 'Phone: ' + (c.phone || 'N/A'),
-                truncate((c.address || '') + ', ' + (c.city || '') + ', ' + (c.state || '') + ' ' + (c.zip || '') + '  ' + (c.country || ''), 52)]);
+            billTo.slice(0, 5));
 
         // ─── Meta strip ───
         y += 12;
@@ -333,6 +337,7 @@
         doc.text('This quotation is valid for 14 days from the issue date. Prices are quoted on the trade basis stated above and include PSE Distribution', MARGIN, y);
         doc.text('Trade Assurance buyer protection. E&OE. (C) ' + new Date().getFullYear() + ' Pilot Sales Distribution.', MARGIN, y + 10);
 
+        addVerification(doc, qn);
         drawFooter(doc);
         return doc;
     }
@@ -471,6 +476,7 @@
         doc.text(truncate('Quoted prices must include estimated lead times, Minimum Order Quantity (MOQ) breakdown, and trade assurance delivery terms.', 100), MARGIN + 12, y + 27);
         doc.text('Sealed bids are protected by 100% escrow buyer protection under PSE Distribution Trade Assurance.', MARGIN + 12, y + 38);
 
+        addVerification(doc, rfqNum);
         drawFooter(doc);
         return doc;
     }
@@ -605,6 +611,182 @@
         doc.setTextColor.apply(doc, MUTED);
         doc.setFontSize(7);
         doc.text('This supplier quotation is firm until the validity date stated above. E&OE. (C) ' + new Date().getFullYear() + ' Pilot Sales Distribution.', MARGIN, y);
+        y += 12;
+
+        addVerification(doc, ref);
+        drawFooter(doc);
+        return doc;
+    }
+
+    // ════════════════════════════════════════════
+    // DOCUMENT AUTHENTICITY VERIFICATION (QR + link on every PDF)
+    // ════════════════════════════════════════════
+    // Renders a QR (qrcodejs CDN — optional, synchronous) pointing at
+    // /verify?ref=… plus a printed URL, above the footer of page 1 area.
+    function addVerification(doc, ref) {
+        if (!doc || !ref) return;
+        var origin = 'https://pilotsalesdistribution.com';
+        try { if (typeof window !== 'undefined' && window.location && window.location.origin) origin = window.location.origin; } catch (e) {}
+        var url = origin + '/verify?ref=' + encodeURIComponent(ref);
+        var yQr = PAGE_H - 106;
+        doc.setTextColor.apply(doc, MUTED);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6.8);
+        doc.text('VERIFY AUTHENTICITY OF THIS DOCUMENT', MARGIN + 52, yQr + 8);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6.5);
+        doc.text('Scan the code or visit: ' + url, MARGIN + 52, yQr + 18);
+        doc.text('Reference: ' + truncate(ref, 40), MARGIN + 52, yQr + 28);
+        try {
+            if (typeof document !== 'undefined' && window.QRCode) {
+                var holder = document.createElement('div');
+                holder.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+                document.body.appendChild(holder);
+                new window.QRCode(holder, {
+                    text: url, width: 56, height: 56,
+                    correctLevel: window.QRCode.CorrectLevel ? window.QRCode.CorrectLevel.M : 1
+                });
+                var canvas = holder.querySelector('canvas');
+                var img = !canvas ? holder.querySelector('img') : null;
+                var dataUrl = canvas ? canvas.toDataURL('image/png') : (img && img.src ? img.src : null);
+                if (dataUrl) doc.addImage(dataUrl, 'PNG', MARGIN, yQr, 44, 44);
+                holder.remove();
+            } else {
+                // No QR library — draw a simple outlined box placeholder
+                doc.setDrawColor.apply(doc, TEAL);
+                doc.rect(MARGIN, yQr, 44, 44);
+            }
+        } catch (e) { /* QR is decorative */ }
+        doc.setTextColor.apply(doc, DARK_TXT);
+    }
+
+    // ════════════════════════════════════════════
+    // BUYER STATEMENT OF ACCOUNT (multi-order ledger PDF)
+    // ════════════════════════════════════════════
+    // orders: array of order docs { quoteNumber, created_at|date, status, totals.total, items[] }
+    function buildStatementPdf(orders, user) {
+        var doc = newDoc();
+        if (!doc) return null;
+        orders = (orders || []).slice().sort(function (a, b) {
+            return new Date(b.created_at || b.date || 0) - new Date(a.created_at || a.date || 0);
+        });
+
+        var ref = 'STMT-' + Date.now().toString(36).toUpperCase();
+        var y = drawTopBand(doc, 'PILOT SALES DISTRIBUTION', 'STATEMENT OF ACCOUNT', 'Statement: ', ref, fmtDate(new Date().toISOString()));
+
+        y = drawPartyBoxes(doc, y,
+            'PREPARED BY',
+            ['Pilot Sales Distribution', 'B2B Wholesale Marketplace', 'Email: support@pilotsalesdistribution.com', 'WhatsApp: +1 (909) 938-4682'],
+            'PREPARED FOR',
+            [(user && user.full_name) || 'Commercial Buyer', 'Email: ' + ((user && user.email) || 'N/A'), 'Account ID: ' + truncate((user && user.id) || 'N/A', 30), '']);
+
+        // ─── Meta strip ───
+        y += 12;
+        var totalCount = orders.length;
+        var grandTotal = orders.reduce(function (s, o) { return s + (((o.totals || {}).total) || o.total || 0); }, 0);
+        var statuses = {};
+        orders.forEach(function (o) { var st = (o.status || 'pending'); statuses[st] = (statuses[st] || 0) + 1; });
+        doc.setFillColor(232, 245, 240);
+        doc.roundedRect(MARGIN, y, CONTENT_W, 34, 5, 5, 'F');
+        var meta = [
+            ['QUOTES / ORDERS', String(totalCount)],
+            ['COMBINED VALUE', money(grandTotal)],
+            ['IN PROGRESS', String((statuses.pending || 0) + (statuses.processing || 0) + (statuses.shipped || 0))],
+            ['COMPLETED', String((statuses.delivered || 0) + (statuses.completed || 0))]
+        ];
+        var colW = CONTENT_W / 4;
+        meta.forEach(function (m, i) {
+            var x = MARGIN + i * colW + 10;
+            doc.setTextColor.apply(doc, TEAL_DARK);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(6.5);
+            doc.text(m[0], x, y + 13);
+            doc.setTextColor.apply(doc, DARK_TXT);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.8);
+            doc.text(truncate(m[1], 28), x, y + 26);
+        });
+
+        // ─── Ledger table ───
+        y += 52;
+        var cols = [
+            { label: 'DATE', x: MARGIN, w: 78, align: 'left' },
+            { label: 'REFERENCE', x: MARGIN + 78, w: 128, align: 'left' },
+            { label: 'TYPE', x: MARGIN + 206, w: 52, align: 'left' },
+            { label: 'ITEMS', x: MARGIN + 258, w: 44, align: 'center' },
+            { label: 'STATUS', x: MARGIN + 302, w: 90, align: 'left' },
+            { label: 'TOTAL', x: MARGIN + 392, w: 123, align: 'right' }
+        ];
+
+        function drawHeader() {
+            doc.setFillColor.apply(doc, NAVY);
+            doc.rect(MARGIN, y, CONTENT_W, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(7);
+            cols.forEach(function (col) {
+                var tx = col.align === 'right' ? col.x + col.w - 4 : col.align === 'center' ? col.x + col.w / 2 : col.x + 4;
+                doc.text(col.label, tx, y + 13, { align: col.align });
+            });
+            doc.setTextColor.apply(doc, DARK_TXT);
+            y += 20;
+        }
+
+        drawHeader();
+        orders.forEach(function (o, i) {
+            if (y + 18 > PAGE_H - 140) { doc.addPage(); y = 60; drawHeader(); }
+            if (i % 2 === 0) {
+                doc.setFillColor.apply(doc, ROW_ALT);
+                doc.rect(MARGIN, y, CONTENT_W, 18, 'F');
+            }
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.5);
+            var d = new Date(o.created_at || o.date || Date.now());
+            doc.text(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), cols[0].x + 4, y + 13);
+            doc.setFont('helvetica', 'bold');
+            doc.text(truncate(o.quoteNumber || o.orderNumber || 'N/A', 22), cols[1].x + 4, y + 13);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor.apply(doc, MUTED);
+            doc.text('QUOTE', cols[2].x + 4, y + 13);
+            doc.setTextColor.apply(doc, DARK_TXT);
+            doc.text(String((o.items || []).length || o.items_count || '—'), cols[3].x + cols[3].w / 2, y + 13, { align: 'center' });
+            var st = (o.status || 'pending').toUpperCase();
+            doc.setTextColor.apply(doc, st === 'DELIVERED' || st === 'COMPLETED' ? TEAL : (st === 'CANCELLED' ? [192, 57, 43] : MUTED));
+            doc.text(st, cols[4].x + 4, y + 13);
+            doc.setTextColor.apply(doc, DARK_TXT);
+            doc.setFont('helvetica', 'bold');
+            doc.text(money(((o.totals || {}).total) || o.total || 0), cols[5].x + cols[5].w - 4, y + 13, { align: 'right' });
+            doc.setFont('helvetica', 'normal');
+            doc.setDrawColor(224, 230, 235);
+            doc.line(MARGIN, y + 18, PAGE_W - MARGIN, y + 18);
+            y += 18;
+        });
+
+        if (!orders.length) {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor.apply(doc, MUTED);
+            doc.text('No activity on this account yet.', MARGIN + 4, y + 14);
+            y += 24;
+        }
+
+        // ─── Grand total box ───
+        y += 12;
+        if (y > PAGE_H - 200) { doc.addPage(); y = 60; }
+        doc.setFillColor.apply(doc, TEAL);
+        doc.roundedRect(MARGIN + 260, y, CONTENT_W - 260, 24, 4, 4, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text('COMBINED VALUE', MARGIN + 270, y + 16);
+        doc.text(money(grandTotal), PAGE_W - MARGIN - 10, y + 16, { align: 'right' });
+        doc.setTextColor.apply(doc, DARK_TXT);
+        y += 40;
+
+        doc.setTextColor.apply(doc, MUTED);
+        doc.setFontSize(7);
+        doc.text('This statement reflects quotations and orders placed through Pilot Sales Distribution. For dispute or reconciliation,', MARGIN, y);
+        doc.text('contact support@pilotsalesdistribution.com quoting the reference numbers above. (C) ' + new Date().getFullYear() + ' Pilot Sales Distribution.', MARGIN, y + 10);
 
         drawFooter(doc);
         return doc;
@@ -658,6 +840,7 @@
         buildQuotePdf: buildQuotePdf,
         buildRfqPdf: buildRfqPdf,
         buildSupplierQuotePdf: buildSupplierQuotePdf,
+        buildStatementPdf: buildStatementPdf,
         shareViaWhatsApp: shareViaWhatsApp
     };
 })();
