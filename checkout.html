@@ -697,6 +697,15 @@
                 </div>
                 <div class="summary-totals">
                     <div class="row"><span>Subtotal</span><span class="amount" id="checkoutSubtotal">$0.00</span></div>
+                    <!-- ─── COUPON REDEMPTION (admin-managed via Premium suite) ─── -->
+                    <div class="row" style="flex-direction:column;align-items:stretch;gap:0.4rem;padding:0.4rem 0;border-bottom:none;">
+                        <div style="display:flex;gap:0.4rem;">
+                            <input type="text" id="couponInput" placeholder="Promo / coupon code" style="flex:1;padding:0.45rem 0.7rem;border:1px solid var(--border-dark);border-radius:6px;font-size:0.8rem;text-transform:uppercase;" />
+                            <button type="button" id="applyCouponBtn" onclick="applyCheckoutCoupon()" style="background:var(--primary);color:#fff;border:none;border-radius:6px;padding:0.45rem 0.9rem;font-size:0.78rem;font-weight:700;cursor:pointer;">Apply</button>
+                        </div>
+                        <div id="couponMsg" style="font-size:0.72rem;min-height:0.9rem;"></div>
+                    </div>
+                    <div class="row" id="discountRow" style="display:none;color:#27ae60;"><span>Discount</span><span class="amount" id="checkoutDiscount">-$0.00</span></div>
                     <div class="row"><span>Shipping</span><span class="amount" id="checkoutShipping">$0.00</span></div>
                     <div class="row"><span>Tax (8%)</span><span class="amount" id="checkoutTax">$0.00</span></div>
                     <div class="row total"><span>Total</span><span class="amount" id="checkoutTotal">$0.00</span></div>
@@ -762,6 +771,9 @@
 
     let auth, db;
     let cartItems = [];
+    // ─── Premium coupon state (admin-managed coupons via premium.js) ───
+    let appliedCoupon = null;   // { coupon, discount, code }
+    let lastSubtotal = 0;
     let zipTimeout = null;
 
     // ─── INIT ───
@@ -1058,15 +1070,70 @@
             const price = item.price || 0;
             subtotal += price * qty;
         });
+        lastSubtotal = subtotal;
+
+        // Re-validate the applied coupon against the new subtotal (min-spend / expiry etc.)
+        let discount = 0;
+        if (appliedCoupon) {
+            const c = appliedCoupon.coupon || {};
+            const validNow = c.active &&
+                (!c.expires_at || new Date(c.expires_at).getTime() >= Date.now()) &&
+                (!c.max_uses || Number(c.used || 0) < Number(c.max_uses)) &&
+                (!c.min_spend || subtotal >= Number(c.min_spend));
+            if (validNow) {
+                discount = appliedCoupon.coupon.type === 'percent'
+                    ? subtotal * (Number(appliedCoupon.coupon.value) || 0) / 100
+                    : (Number(appliedCoupon.coupon.value) || 0);
+                if (discount > subtotal) discount = subtotal;
+            } else {
+                // Subtotal no longer qualifies — clear it
+                appliedCoupon = null;
+                const msg = document.getElementById('couponMsg');
+                if (msg) { msg.textContent = 'Coupon no longer applies to this cart.'; msg.style.color = '#e74c3c'; }
+                const dr = document.getElementById('discountRow'); if (dr) dr.style.display = 'none';
+            }
+        }
 
         const shipping = subtotal < 250 && subtotal > 0 ? 15 : 0;
         const tax = subtotal * 0.08;
-        const total = subtotal + shipping + tax;
+        const total = subtotal - discount + shipping + tax;
 
         document.getElementById('checkoutSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+        if (discount > 0) {
+            const dr = document.getElementById('discountRow');
+            if (dr) dr.style.display = 'flex';
+            document.getElementById('checkoutDiscount').textContent = `-$${discount.toFixed(2)}`;
+        } else {
+            const dr = document.getElementById('discountRow');
+            if (dr) dr.style.display = 'none';
+        }
         document.getElementById('checkoutShipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
         document.getElementById('checkoutTax').textContent = `$${tax.toFixed(2)}`;
         document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
+    }
+
+    // ─── APPLY COUPON (Premium suite) ───
+    async function applyCheckoutCoupon() {
+        const input = document.getElementById('couponInput');
+        const msg = document.getElementById('couponMsg');
+        const code = (input && input.value || '').trim();
+        if (!code) { msg.textContent = 'Enter a coupon code.'; msg.style.color = '#e74c3c'; return; }
+        msg.textContent = 'Checking…'; msg.style.color = '#7f8c8d';
+        if (!window.PSE_PREMIUM) { msg.textContent = 'Coupons unavailable right now.'; msg.style.color = '#e74c3c'; return; }
+        try {
+            const res = await window.PSE_PREMIUM.validateCoupon(code, lastSubtotal || 0);
+            if (res.valid) {
+                appliedCoupon = { coupon: res.coupon, discount: res.discount, code: code.toUpperCase() };
+                msg.innerHTML = '✅ ' + res.message; msg.style.color = '#27ae60';
+                updateCheckoutSummary(cartItems);
+            } else {
+                appliedCoupon = null;
+                msg.textContent = '❌ ' + res.message; msg.style.color = '#e74c3c';
+                updateCheckoutSummary(cartItems);
+            }
+        } catch (e) {
+            msg.textContent = 'Could not validate coupon. Try again.'; msg.style.color = '#e74c3c';
+        }
     }
 
     // ─── SEND WHATSAPP QUOTE ───
@@ -1147,8 +1214,10 @@
             });
 
             const shipping = subtotal < 250 && subtotal > 0 ? 15 : 0;
-            const tax = subtotal * 0.08;
-            const total = subtotal + shipping + tax;
+            const emailDiscount = (appliedCoupon && appliedCoupon.discount) ? Math.min(appliedCoupon.discount, subtotal) : 0;
+            const tax = (subtotal - emailDiscount) * 0.08;
+            const total = subtotal - emailDiscount + shipping + tax;
+            const emailCouponCode = appliedCoupon ? appliedCoupon.code : '';
             const quoteNumber = 'QTE-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 5).toUpperCase();
 
             orderData = {
@@ -1176,11 +1245,12 @@
                 },
                 totals: {
                     subtotal: subtotal,
-                    discount: 0,
+                    discount: emailDiscount,
                     shipping: shipping,
                     tax: tax,
                     total: total
                 },
+                coupon_code: emailCouponCode,
                 paymentMethod: document.querySelector('input[name="paymentOption"]:checked')?.value || 'Escrow Trade Assurance (WhatsApp / Wire / Card)',
                 purchase_order_number: document.getElementById('corporatePoNumber')?.value.trim() || '',
                 incoterm: document.querySelector('input[name="orderIncoterm"]:checked')?.value || 'DDP (Delivered Duty Paid)',
@@ -1263,8 +1333,11 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
         });
 
         const shipping = subtotal < 250 && subtotal > 0 ? 15 : 0;
-        const tax = subtotal * 0.08;
-        const total = subtotal + shipping + tax;
+        // ─── Premium coupon discount (admin-managed) ───
+        const discount = (appliedCoupon && appliedCoupon.discount) ? Math.min(appliedCoupon.discount, subtotal) : 0;
+        const tax = (subtotal - discount) * 0.08;
+        const total = subtotal - discount + shipping + tax;
+        const couponCode = appliedCoupon ? appliedCoupon.code : '';
 
         const quoteNumber = 'QTE-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 5).toUpperCase();
 
@@ -1293,11 +1366,12 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
             },
             totals: {
                 subtotal: subtotal,
-                discount: 0,
+                discount: discount,
                 shipping: shipping,
                 tax: tax,
                 total: total
             },
+            coupon_code: couponCode,
             paymentMethod: document.querySelector('input[name="paymentOption"]:checked')?.value || 'Escrow Trade Assurance (WhatsApp / Wire / Card)',
             purchase_order_number: document.getElementById('corporatePoNumber')?.value.trim() || '',
             incoterm: document.querySelector('input[name="orderIncoterm"]:checked')?.value || 'DDP (Delivered Duty Paid)',
@@ -1349,6 +1423,21 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
                 localStorage.setItem('pilot_cart', '[]');
             }
             loadCartCount();
+
+            // ─── Premium: redeem coupon + award loyalty points (never block the order) ───
+            try {
+                if (window.PSE_PREMIUM) {
+                    if (appliedCoupon && appliedCoupon.coupon && appliedCoupon.coupon.id) {
+                        window.PSE_PREMIUM.redeemCoupon(appliedCoupon.coupon.id).catch(() => {});
+                        window.PSE_PREMIUM.logAudit('coupon.redeemed', appliedCoupon.code + ' on ' + quoteNumber).catch(() => {});
+                    }
+                    if (user) {
+                        window.PSE_PREMIUM.awardPointsForOrder(user.id, total).then(function (pts) {
+                            if (pts > 0) console.log('[PSE Premium] Awarded ' + pts + ' loyalty points for order ' + quoteNumber);
+                        }).catch(() => {});
+                    }
+                }
+            } catch (premiumErr) { console.log('Premium post-order step skipped', premiumErr); }
 
             // Best-effort order confirmation email
             try {
@@ -1465,10 +1554,12 @@ ${orderData.notes ? '📝 Notes: ' + orderData.notes + '\n\n' : ''}
     window.toggleWishlist = toggleWishlist;
     window.showToast = showToast;
     window.sendEmailQuote = sendEmailQuote;
+    window.applyCheckoutCoupon = applyCheckoutCoupon;
 </script>
     <script src="email.js"></script>
     <script src="ai-assistant.js"></script>
     <script src="notifications.js"></script>
+    <script src="premium.js"></script>
     <script src="/search-pro.js"></script>
 </body>
 </html>

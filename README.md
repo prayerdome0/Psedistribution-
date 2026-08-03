@@ -60,6 +60,14 @@ Key routes (clean URLs on Vercel):
   - **⚖️ Side-by-Side B2B Product Specs & MOQ Comparison Matrix:** Commercial buyers can select up to 4 competing products on `products.html` and compare their *Wholesale Price, Volume Tier Brackets, MOQ, Available Stock, Lead Time, Supplier VIP Tier, Incoterms Basis, and KYC Certifications* side-by-side in a responsive comparison matrix.
   - **📎 Corporate Purchase Order (PO) Reference Tracking:** Commercial buyers can attach their official corporate PO number (e.g. from SAP / Oracle / NetSuite ERP) during checkout and RFQ submission (`checkout.html`, `rfq.html`), which carries over directly onto Official Commercial Invoices (`order-success.html`, `buyer-dashboard.html`).
 - **🔎 Pro Search suggestions** — the header search bar on every page is a professional suggestion engine: instant debounced results as you type (no Enter needed), ranked by prefix/word/substring relevance, rich product previews (thumbnail, brand, ★ rating, price, stock, ✓ Verified badge), category & brand chips, recent searches (clearable) and popular searches, full keyboard navigation (↑/↓/Enter/Esc, ARIA listbox), match highlighting, and a "See all N results" footer. Catalog is cached for 10 minutes (sessionStorage), loaded once from Firestore — 100% real products only, no fake or sample demo catalogs. Powered by the shared `search-pro.js` — no API keys, no server
+- **💎 Premium Suite (100% admin-managed)** — a full marketing, loyalty & accountability layer powered by the shared `premium.js` engine, all controlled from the admin dashboard:
+  - **🎟️ Coupons & Promo Codes** — admins create percent- or fixed-amount discount codes with minimum spend, usage caps and expiry dates (admin **Coupons** tab). Buyers redeem them live at `checkout.html`; the discount flows into the order totals and is recorded on the saved order.
+  - **📣 Site-wide Promo Banners** — admins publish a scheduled announcement bar (message, emoji, link, custom colors, start/end window) that renders at the very top of **every** customer-facing page via `premium.js` (admin **Promo Banners** tab). Auto-hidden on the admin dashboard.
+  - **⚡ Flash Sales** — admins schedule site-wide percentage-off sales with a live/off status and time window (admin **Flash Sales** tab).
+  - **🏆 Loyalty Points + Tiered VIP Program** — members earn points on every order (configurable points-per-$ × their tier multiplier). Four tiers — *Bronze → Silver → Gold → Platinum* — with escalating earn multipliers. Members see their points, tier, progress to the next tier and a referral code in a new **Rewards & Wallet** tab on `account.html`.
+  - **💰 Store-Credit Wallet + Referrals** — admins credit/debit member wallets (refunds, bonuses); members share a referral code that awards points to both referrer and invitee (admin **Loyalty & Wallet** tab).
+  - **🛡️ Admin Audit Log** — every premium action (coupon/banner/flash create·toggle·delete, settings save, wallet adjust, coupon redemption, admin login) is recorded with actor, action, detail and timestamp in the admin **Audit Log** tab for full accountability.
+  - **⭐ Robust admin-role detection** — the account page now detects the admin role from the live Firestore doc *and* the cached session, so admins instantly see an **👑 Administrator** crown and the **Admin Dashboard** shortcut with no flash of missing controls.
 - **🚫 100% Real Only — No Fake or Demo Content** — all sample, demo, placeholder, and fallback products (`FALLBACK_PRODUCTS`), fake statistics (`12,000+`, `580+`, `1,234+`), and demo toast alerts have been completely removed across the catalog, search bar, AI assistant, product detail pages, and home page. The site displays honest, real-time data from Firestore with clean empty states when inventory or statistics are zero.
 - Email/password + Google sign-up and login (no SMS/phone verification)
 - Guest cart (localStorage) that merges on login
@@ -110,6 +118,7 @@ Email sending uses Resend — set a valid key in `email.js` for production; othe
 ├── newsletter.js           # Real newsletter subscriptions (Firestore subscribers)
 ├── holiday-engine.js       # Festival calendar + branded card generator + auto emails
 ├── admin-extensions.js     # Admin: subscribers, support, email center, reviews, trust, festivals
+├── premium.js              # Premium suite engine + admin (coupons, banners, flash sales, loyalty, wallet, audit)
 ├── Email Template/         # Transactional HTML emails
 ├── manifest.json           # PWA
 ├── sitemap.xml / robots.txt
@@ -130,6 +139,14 @@ Email sending uses Resend — set a valid key in `email.js` for production; othe
 | `festival_runs` | once-per-year claim that festival emails already went out |
 | `email_log` | history of every sent campaign/reply (Email Center) |
 | `config/holidays` | festival auto-email toggle |
+| `config/premium` | premium suite settings (loyalty/wallet/coupons/banners/flash toggles, earn rate, referral bonuses) |
+| `config/loyalty_tiers` | VIP tier ladder (Bronze/Silver/Gold/Platinum thresholds, multipliers, perks) |
+| `coupons` | admin-created discount codes (percent/fixed, min spend, usage cap, expiry) |
+| `promo_banners` | admin-published site-wide banner bars (scheduled) |
+| `flash_sales` | admin-scheduled site-wide % -off sales |
+| `point_ledger` | per-user loyalty point & wallet transaction history |
+| `referrals` | referral attributions (referrer ↔ invitee + bonuses granted) |
+| `audit_log` | every admin/premium action (actor, action, detail, timestamp) |
 
 ## License
 
