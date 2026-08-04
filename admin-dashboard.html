@@ -147,52 +147,96 @@
         }
 
         /* ─── ADMIN LAYOUT ─── */
-        .admin-wrapper {
-            display: grid;
-            grid-template-columns: 220px 1fr;
-            gap: 1.5rem;
-            margin: 1rem 0;
-            min-height: 500px;
-        }
 
-        .admin-sidebar {
-            background: var(--secondary);
-            border-radius: var(--radius);
-            padding: 1rem;
-            height: fit-content;
-            position: sticky;
-            top: 80px;
+        /* ─── HAMBURGER MENU ─── */
+        .menu-toggle-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--light);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--secondary);
+            font-size: 1.1rem;
+            flex-shrink: 0;
         }
-        .admin-sidebar .sidebar-header {
+        .menu-toggle-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+
+        .admin-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(2px);
+            z-index: 900;
+        }
+        .admin-menu-overlay.show { display: block; }
+
+        .admin-menu-panel {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 290px;
+            height: 100%;
+            background: var(--secondary);
+            z-index: 950;
+            overflow-y: auto;
+            transition: left 0.3s ease;
+            padding: 1rem;
+            border-radius: 0;
+        }
+        .admin-menu-panel.open { left: 0; box-shadow: 4px 0 30px rgba(0,0,0,0.2); }
+
+        .admin-menu-panel .sidebar-header {
             color: var(--white);
             padding-bottom: 0.8rem;
             border-bottom: 1px solid #1a4055;
             margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
         }
-        .admin-sidebar .sidebar-header h3 { font-size: 0.95rem; font-weight: 700; }
-        .admin-sidebar .sidebar-header h3 i { color: var(--accent); margin-right: 0.4rem; }
-        .admin-sidebar .sidebar-header .admin-name { font-size: 0.65rem; opacity: 0.7; margin-top: 0.1rem; }
+        .admin-menu-panel .sidebar-header h3 { font-size: 0.95rem; font-weight: 700; }
+        .admin-menu-panel .sidebar-header h3 i { color: var(--accent); margin-right: 0.4rem; }
+        .admin-menu-panel .sidebar-header .admin-name { font-size: 0.65rem; opacity: 0.7; margin-top: 0.1rem; }
+        .admin-menu-panel .close-menu-btn {
+            background: none;
+            border: none;
+            color: #b4d0e0;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.2rem;
+            transition: var(--transition);
+        }
+        .admin-menu-panel .close-menu-btn:hover { color: var(--white); }
 
-        .admin-sidebar .nav-item {
+        .admin-menu-panel .nav-item {
             display: flex;
             align-items: center;
             gap: 0.6rem;
-            padding: 0.5rem 0.7rem;
+            padding: 0.55rem 0.7rem;
             border-radius: 6px;
             color: #b4d0e0;
             cursor: pointer;
             transition: var(--transition);
             margin-bottom: 0.1rem;
-            font-size: 0.75rem;
+            font-size: 0.78rem;
             border: none;
             background: none;
             width: 100%;
             text-align: left;
         }
-        .admin-sidebar .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--white); }
-        .admin-sidebar .nav-item.active { background: rgba(255,255,255,0.1); color: var(--white); font-weight: 600; }
-        .admin-sidebar .nav-item i { width: 18px; text-align: center; font-size: 0.9rem; }
-        .admin-sidebar .nav-item .badge {
+        .admin-menu-panel .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+        .admin-menu-panel .nav-item.active { background: rgba(255,255,255,0.1); color: var(--white); font-weight: 600; }
+        .admin-menu-panel .nav-item i { width: 18px; text-align: center; font-size: 0.9rem; }
+        .admin-menu-panel .nav-item .badge {
             margin-left: auto;
             background: #c0392b;
             color: var(--white);
@@ -202,13 +246,13 @@
             min-width: 18px;
             text-align: center;
         }
-        .admin-sidebar .nav-item .badge.orange { background: #e67e22; }
-        .admin-sidebar .nav-item .badge.green { background: var(--primary); }
-        .admin-sidebar .nav-item .badge.purple { background: #8e44ad; }
-        .admin-sidebar .nav-item .badge.blue { background: #2980b9; }
-        .admin-sidebar .nav-item .badge.gold { background: #f39c12; }
+        .admin-menu-panel .nav-item .badge.orange { background: #e67e22; }
+        .admin-menu-panel .nav-item .badge.green { background: var(--primary); }
+        .admin-menu-panel .nav-item .badge.purple { background: #8e44ad; }
+        .admin-menu-panel .nav-item .badge.blue { background: #2980b9; }
+        .admin-menu-panel .nav-item .badge.gold { background: #f39c12; }
 
-        .admin-sidebar .logout-btn {
+        .admin-menu-panel .logout-btn {
             margin-top: 0.8rem;
             padding-top: 0.8rem;
             border-top: 1px solid #1a4055;
@@ -220,15 +264,14 @@
             gap: 0.6rem;
             padding: 0.5rem 0.7rem;
             border-radius: 6px;
-            font-size: 0.75rem;
+            font-size: 0.78rem;
             background: none;
             border: none;
             width: 100%;
             text-align: left;
         }
-        .admin-sidebar .logout-btn:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+        .admin-menu-panel .logout-btn:hover { background: rgba(255,255,255,0.05); color: var(--white); }
 
-        /* ─── ADMIN CONTENT ─── */
         .admin-content {
             background: var(--white);
             border-radius: var(--radius);
@@ -236,6 +279,7 @@
             border: 1px solid var(--border);
             overflow: hidden;
             min-height: 600px;
+            width: 100%;
         }
         .admin-content .page-header {
             display: flex;
@@ -605,21 +649,7 @@
         .timeline-step .step-label.completed { color: var(--primary); }
         .timeline-step .step-label.active { color: var(--accent); }
 
-        .footer {
-            background: var(--secondary);
-            color: #b4d0e0;
-            padding: 1.5rem 0 0.8rem;
-            margin-top: 2rem;
-        }
-        .footer .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .footer .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
-        .footer .footer-links a { color: #b4d0e0; font-size: 0.7rem; transition: var(--transition); }
-        .footer .footer-links a:hover { color: var(--white); }
-        .footer .footer-bottom { border-top: 1px solid #1a4055; padding-top: 0.8rem; margin-top: 0.8rem; text-align: center; font-size: 0.65rem; opacity: 0.6; }
-        .footer .footer-bottom strong { color: var(--white); }
-        .footer .footer-social { display: flex; gap: 0.8rem; }
-        .footer .footer-social a { color: #b4d0e0; transition: var(--transition); font-size: 0.9rem; }
-        .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
+
 
         .toast {
             position: fixed;
@@ -659,23 +689,14 @@
         .empty-state p { font-size: 0.9rem; }
 
         @media (max-width: 992px) {
-            .admin-wrapper { grid-template-columns: 1fr; }
-            .admin-sidebar {
-                position: static;
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-                gap: 0.2rem;
-                padding: 0.8rem;
-            }
-            .admin-sidebar .sidebar-header { grid-column: 1 / -1; }
-            .admin-sidebar .logout-btn { grid-column: 1 / -1; margin-top: 0.3rem; padding-top: 0.3rem; }
+            .admin-menu-panel { width: 260px; }
             .stats-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
             .order-timeline { flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
             .order-timeline::before { display: none; }
         }
         @media (max-width: 768px) {
             .admin-content { padding: 1rem; }
-            .admin-sidebar { grid-template-columns: 1fr 1fr; }
+            .admin-menu-panel { width: 85vw; max-width: 280px; }
             .stats-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
             .stat-card { padding: 0.6rem 0.8rem; }
             .stat-card .stat-number { font-size: 1.1rem; }
@@ -686,11 +707,9 @@
             .top-links { justify-content: center; }
             .header .container { gap: 0.5rem; }
             .header-actions .icon-btn span { display: none; }
-            .footer .footer-content { flex-direction: column; text-align: center; }
-            .footer .footer-links { justify-content: center; gap: 0.8rem; }
+
         }
         @media (max-width: 480px) {
-            .admin-sidebar { grid-template-columns: 1fr; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
             .modal-overlay .modal-box { padding: 1rem; }
             .quick-actions .action-btn { width: 100%; justify-content: center; }
@@ -730,6 +749,9 @@
             </div>
         </a>
         <div class="header-actions">
+            <button class="menu-toggle-btn" onclick="toggleAdminMenu()" title="Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
             <span class="notification-bell" onclick="showTab('messages')">
                 <i class="fa-regular fa-bell"></i>
                 <span class="badge" id="notificationBadge">0</span>
@@ -743,104 +765,108 @@
     </div>
 </header>
 
+<!-- SLIDE-OUT NAV MENU -->
+<div class="admin-menu-overlay" id="adminMenuOverlay" onclick="closeAdminMenu()"></div>
+<div class="admin-menu-panel" id="adminMenuPanel">
+    <div class="sidebar-header">
+        <div>
+            <h3><i class="fa-solid fa-gauge-high"></i> Dashboard</h3>
+            <div class="admin-name" id="adminEmail">admin@pilotsalesdistribution.com</div>
+        </div>
+        <button class="close-menu-btn" onclick="closeAdminMenu()" title="Close menu">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <button class="nav-item active" onclick="showTab('dashboard'); closeAdminMenu()">
+        <i class="fa-solid fa-chart-simple"></i> Overview
+    </button>
+    <button class="nav-item" onclick="showTab('customers'); closeAdminMenu()">
+        <i class="fa-solid fa-users"></i> Customers
+        <span class="badge blue" id="customerBadge">0</span>
+    </button>
+    <button class="nav-item" onclick="showTab('messages'); closeAdminMenu()">
+        <i class="fa-regular fa-envelope"></i> Messages
+        <span class="badge" id="messageBadge">0</span>
+    </button>
+    <button class="nav-item" onclick="showTab('orders'); closeAdminMenu()">
+        <i class="fa-solid fa-receipt"></i> Orders
+        <span class="badge orange" id="orderBadge">0</span>
+    </button>
+    <button class="nav-item" onclick="showTab('products'); closeAdminMenu()">
+        <i class="fa-solid fa-box"></i> Products
+        <span class="badge green" id="productBadge">0</span>
+    </button>
+    <button class="nav-item" onclick="showTab('rfqs'); closeAdminMenu()">
+        <i class="fa-regular fa-file-lines"></i> RFQs
+        <span class="badge purple" id="rfqBadge">0</span>
+    </button>
+    <button class="nav-item" onclick="showTab('sellers'); closeAdminMenu()">
+        <i class="fa-solid fa-store"></i> Sellers
+        <span class="badge orange" id="sellerBadge">0</span>
+    </button>
+    <button class="nav-item" onclick="showTab('applications'); closeAdminMenu()">
+        <i class="fa-solid fa-file-signature"></i> Applications
+        <span class="badge orange" id="applicationBadge" style="display:none;">0</span>
+    </button>
+    <button class="nav-item" onclick="showTab('support'); closeAdminMenu()">
+        <i class="fa-solid fa-headset"></i> Live Support
+        <span class="badge red" id="supportBadge">0</span>
+    </button>
+    <button class="nav-item" onclick="showTab('subscribers'); closeAdminMenu()">
+        <i class="fa-regular fa-envelope-open"></i> Subscribers
+        <span class="badge blue" id="subscriberBadge">0</span>
+    </button>
+    <button class="nav-item" onclick="showTab('emailcenter'); closeAdminMenu()">
+        <i class="fa-regular fa-paper-plane"></i> Email Center
+        <span class="badge gold">NEW</span>
+    </button>
+    <button class="nav-item" onclick="showTab('reviews'); closeAdminMenu()">
+        <i class="fa-regular fa-star"></i> Reviews
+        <span class="badge green" id="reviewBadge">0</span>
+    </button>
+    <button class="nav-item" onclick="showTab('trust'); closeAdminMenu()">
+        <i class="fa-solid fa-shield-halved"></i> Trust & Safety
+        <span class="badge red" id="reportBadge">0</span>
+    </button>
+    <button class="nav-item" onclick="showTab('holidays'); closeAdminMenu()">
+        <i class="fa-regular fa-calendar-days"></i> Festivals
+        <span class="badge purple">🎉</span>
+    </button>
+    <button class="nav-item" onclick="showTab('analytics'); closeAdminMenu()">
+        <i class="fa-solid fa-chart-line"></i> Analytics
+        <span class="badge gold">NEW</span>
+    </button>
+    <button class="nav-item" onclick="showTab('settings'); closeAdminMenu()">
+        <i class="fa-solid fa-gear"></i> Settings
+    </button>
+
+    <!-- ─── PREMIUM SUITE (admin-managed) ─── -->
+    <div style="margin:0.9rem 0.4rem 0.3rem;font-size:0.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-light);font-weight:700;">💎 Premium Suite</div>
+    <button class="nav-item" onclick="showTab('coupons'); closeAdminMenu()">
+        <i class="fa-solid fa-ticket"></i> Coupons
+        <span class="badge gold">PRO</span>
+    </button>
+    <button class="nav-item" onclick="showTab('banners'); closeAdminMenu()">
+        <i class="fa-solid fa-bullhorn"></i> Promo Banners
+    </button>
+    <button class="nav-item" onclick="showTab('flash'); closeAdminMenu()">
+        <i class="fa-solid fa-bolt"></i> Flash Sales
+    </button>
+    <button class="nav-item" onclick="showTab('loyalty'); closeAdminMenu()">
+        <i class="fa-solid fa-gem"></i> Loyalty &amp; Wallet
+    </button>
+    <button class="nav-item" onclick="showTab('audit'); closeAdminMenu()">
+        <i class="fa-solid fa-shield-halved"></i> Audit Log
+    </button>
+
+    <button class="logout-btn" onclick="logoutAdmin()">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </button>
+</div>
+
 <!-- MAIN CONTENT -->
 <div class="container">
-    <div class="admin-wrapper">
-
-        <!-- SIDEBAR -->
-        <aside class="admin-sidebar">
-            <div class="sidebar-header">
-                <h3><i class="fa-solid fa-gauge-high"></i> Dashboard</h3>
-                <div class="admin-name" id="adminEmail">admin@pilotsalesdistribution.com</div>
-            </div>
-
-            <button class="nav-item active" onclick="showTab('dashboard')">
-                <i class="fa-solid fa-chart-simple"></i> Overview
-            </button>
-            <button class="nav-item" onclick="showTab('customers')">
-                <i class="fa-solid fa-users"></i> Customers
-                <span class="badge blue" id="customerBadge">0</span>
-            </button>
-            <button class="nav-item" onclick="showTab('messages')">
-                <i class="fa-regular fa-envelope"></i> Messages
-                <span class="badge" id="messageBadge">0</span>
-            </button>
-            <button class="nav-item" onclick="showTab('orders')">
-                <i class="fa-solid fa-receipt"></i> Orders
-                <span class="badge orange" id="orderBadge">0</span>
-            </button>
-            <button class="nav-item" onclick="showTab('products')">
-                <i class="fa-solid fa-box"></i> Products
-                <span class="badge green" id="productBadge">0</span>
-            </button>
-            <button class="nav-item" onclick="showTab('rfqs')">
-                <i class="fa-regular fa-file-lines"></i> RFQs
-                <span class="badge purple" id="rfqBadge">0</span>
-            </button>
-            <button class="nav-item" onclick="showTab('sellers')">
-                <i class="fa-solid fa-store"></i> Sellers
-                <span class="badge orange" id="sellerBadge">0</span>
-            </button>
-            <button class="nav-item" onclick="showTab('applications')">
-                <i class="fa-solid fa-file-signature"></i> Applications
-                <span class="badge orange" id="applicationBadge" style="display:none;">0</span>
-            </button>
-            <button class="nav-item" onclick="showTab('support')">
-                <i class="fa-solid fa-headset"></i> Live Support
-                <span class="badge red" id="supportBadge">0</span>
-            </button>
-            <button class="nav-item" onclick="showTab('subscribers')">
-                <i class="fa-regular fa-envelope-open"></i> Subscribers
-                <span class="badge blue" id="subscriberBadge">0</span>
-            </button>
-            <button class="nav-item" onclick="showTab('emailcenter')">
-                <i class="fa-regular fa-paper-plane"></i> Email Center
-                <span class="badge gold">NEW</span>
-            </button>
-            <button class="nav-item" onclick="showTab('reviews')">
-                <i class="fa-regular fa-star"></i> Reviews
-                <span class="badge green" id="reviewBadge">0</span>
-            </button>
-            <button class="nav-item" onclick="showTab('trust')">
-                <i class="fa-solid fa-shield-halved"></i> Trust & Safety
-                <span class="badge red" id="reportBadge">0</span>
-            </button>
-            <button class="nav-item" onclick="showTab('holidays')">
-                <i class="fa-regular fa-calendar-days"></i> Festivals
-                <span class="badge purple">🎉</span>
-            </button>
-            <button class="nav-item" onclick="showTab('analytics')">
-                <i class="fa-solid fa-chart-line"></i> Analytics
-                <span class="badge gold">NEW</span>
-            </button>
-            <button class="nav-item" onclick="showTab('settings')">
-                <i class="fa-solid fa-gear"></i> Settings
-            </button>
-
-            <!-- ─── PREMIUM SUITE (admin-managed) ─── -->
-            <div class="sidebar-section-label" style="margin:0.9rem 0.4rem 0.3rem;font-size:0.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-light);font-weight:700;">💎 Premium Suite</div>
-            <button class="nav-item" onclick="showTab('coupons')">
-                <i class="fa-solid fa-ticket"></i> Coupons
-                <span class="badge gold">PRO</span>
-            </button>
-            <button class="nav-item" onclick="showTab('banners')">
-                <i class="fa-solid fa-bullhorn"></i> Promo Banners
-            </button>
-            <button class="nav-item" onclick="showTab('flash')">
-                <i class="fa-solid fa-bolt"></i> Flash Sales
-            </button>
-            <button class="nav-item" onclick="showTab('loyalty')">
-                <i class="fa-solid fa-gem"></i> Loyalty &amp; Wallet
-            </button>
-            <button class="nav-item" onclick="showTab('audit')">
-                <i class="fa-solid fa-shield-halved"></i> Audit Log
-            </button>
-
-            <button class="logout-btn" onclick="logoutAdmin()">
-                <i class="fa-solid fa-right-from-bracket"></i> Logout
-            </button>
-        </aside>
-
         <!-- CONTENT -->
         <div class="admin-content">
 
@@ -1047,6 +1073,9 @@
                         <button type="button" class="btn-add-product" onclick="exportProductsCSV()" style="background:#2980b9;font-size:0.82rem;padding:0.5rem 1rem;">
                             <i class="fa-solid fa-download"></i> Export CSV
                         </button>
+                        <button type="button" class="btn-add-product" onclick="exportInventoryCSV()" style="background:#8e44ad;font-size:0.82rem;padding:0.5rem 1rem;">
+                            <i class="fa-solid fa-warehouse"></i> Inventory
+                        </button>
                         <button class="btn-add-product" onclick="openAddProduct()">
                             <i class="fa-solid fa-plus"></i> Add Product
                         </button>
@@ -1064,6 +1093,8 @@
                         <thead>
                             <tr>
                                 <th>Product</th>
+                                <th>Brand</th>
+                                <th>Category</th>
                                 <th>Price</th>
                                 <th>Stock</th>
                                 <th>Status</th>
@@ -1071,7 +1102,7 @@
                             </tr>
                         </thead>
                         <tbody id="productTableBody">
-                            <tr><td colspan="5"><div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading products...</p></div></td></tr>
+                            <tr><td colspan="7"><div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading products...</p></div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1518,7 +1549,6 @@
 
         </div>
 
-    </div>
 </div>
 
 <!-- ADD PRODUCT MODAL -->
@@ -1735,29 +1765,55 @@
     </div>
 </div>
 
-<!-- FOOTER -->
-<footer class="footer">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-links">
-                <a href="/about">About</a>
-                <a href="/contact">Contact</a>
-                <a href="/help-center">Help</a>
-                <a href="/privacy">Privacy</a>
-                <a href="/terms">Terms</a>
+<!-- INVENTORY ADJUST MODAL -->
+<div class="modal-overlay" id="inventoryAdjustModal">
+    <div class="modal-box" style="max-width:500px;">
+        <h3><i class="fa-solid fa-warehouse" style="color:var(--primary);"></i> Adjust Inventory</h3>
+        <div id="inventoryAdjustSummary" style="background:var(--light);border-radius:8px;padding:0.7rem 0.9rem;font-size:0.8rem;color:var(--text);margin-bottom:1rem;"></div>
+        <input type="hidden" id="invAdjustProductId" />
+        <div class="form-group">
+            <label>Current Stock</label>
+            <input type="text" id="invCurrentStock" disabled style="background:var(--light);font-weight:700;" />
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Adjustment Type</label>
+                <select id="invAdjustType" onchange="onInvAdjustTypeChange()">
+                    <option value="set">Set to exact quantity</option>
+                    <option value="add">Add to stock</option>
+                    <option value="remove">Remove from stock</option>
+                </select>
             </div>
-            <div class="footer-social">
-                <a href="#"><i class="fa-brands fa-facebook"></i></a>
-                <a href="#"><i class="fa-brands fa-twitter"></i></a>
-                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" id="invAdjustQty" min="0" step="1" placeholder="0" oninput="updateInvPreview()" />
             </div>
         </div>
-        <div class="footer-bottom">
-            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
+        <div id="invAdjustPreview" style="font-size:0.85rem;color:var(--primary);font-weight:700;margin-bottom:0.5rem;"></div>
+        <div class="form-group">
+            <label>Reason (optional)</label>
+            <select id="invAdjustReason">
+                <option value="">— Select reason —</option>
+                <option value="restock">Restock / New shipment</option>
+                <option value="correction">Inventory correction</option>
+                <option value="damage">Damaged / Defective</option>
+                <option value="return">Customer return</option>
+                <option value="sample">Sample sent</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Notes (optional)</label>
+            <textarea id="invAdjustNotes" rows="2" placeholder="Any additional notes..." style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border-dark);border-radius:var(--radius-sm);font-size:0.85rem;resize:vertical;"></textarea>
+        </div>
+        <div class="btn-group">
+            <button class="btn-submit" id="invSubmitBtn" onclick="submitInventoryAdjust()">
+                <i class="fa-solid fa-check"></i> Apply Adjustment
+            </button>
+            <button class="btn-close" onclick="closeInventoryAdjust()">Cancel</button>
         </div>
     </div>
-</footer>
+</div>
 
 <!-- TOAST -->
 <div id="toast" class="toast"></div>
@@ -1847,16 +1903,36 @@
         toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
     }
 
+    // ─── SLIDE-OUT MENU ───
+    function toggleAdminMenu() {
+        const panel = document.getElementById('adminMenuPanel');
+        const overlay = document.getElementById('adminMenuOverlay');
+        const isOpen = panel.classList.contains('open');
+        if (isOpen) {
+            closeAdminMenu();
+        } else {
+            panel.classList.add('open');
+            overlay.classList.add('show');
+        }
+    }
+
+    function closeAdminMenu() {
+        const panel = document.getElementById('adminMenuPanel');
+        const overlay = document.getElementById('adminMenuOverlay');
+        panel.classList.remove('open');
+        overlay.classList.remove('show');
+    }
+
     function showTab(tab) {
-        document.querySelectorAll('.admin-sidebar .nav-item').forEach(n => n.classList.remove('active'));
-        document.querySelector(`.admin-sidebar .nav-item[onclick="showTab('${tab}')"]`)?.classList.add('active');
+        document.querySelectorAll('.admin-menu-panel .nav-item').forEach(n => n.classList.remove('active'));
+        document.querySelector(`.admin-menu-panel .nav-item[onclick*="showTab('${tab}')"]`)?.classList.add('active');
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         const target = document.getElementById('tab-' + tab);
         if (target) target.classList.add('active');
         if (tab === 'customers') loadCustomers();
         if (tab === 'messages') loadMessages();
         if (tab === 'orders') loadOrders();
-        if (tab === 'products') loadProducts();
+        if (tab === 'products') { loadProducts(); updateInventorySummary(); }
         if (tab === 'rfqs') loadRFQs();
         if (tab === 'sellers') loadSellers();
         if (tab === 'applications') loadSellerApplications();
@@ -2418,13 +2494,13 @@
             if (invEl) invEl.textContent = '📦 $' + inv.toLocaleString('en-US', { maximumFractionDigits: 0 }) + ' on hand';
 
             if (products.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-box"></i><p>No products added yet</p></div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-box"></i><p>No products added yet</p></div></td></tr>`;
                 return;
             }
 
             renderAdminProducts();
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading products</p></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading products</p></div></td></tr>`;
         }
     }
 
@@ -2446,26 +2522,51 @@
             else if (productFilter === 'low') list = list.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= (p.moq || 10));
             else if (productFilter === 'out') list = list.filter(p => (p.stock || 0) <= 0);
             if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-magnifying-glass"></i><p>No products match this filter</p></div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-magnifying-glass"></i><p>No products match this filter</p></div></td></tr>`;
                 return;
             }
-            tbody.innerHTML = list.slice(0, 20).map(p => `
+
+            const categoryLabels = {
+                electronics: 'Electronics', fashion: 'Fashion', grocery: 'Grocery',
+                home: 'Home', beauty: 'Beauty', health: 'Health', sports: 'Sports',
+                automotive: 'Automotive', baby: 'Baby', office: 'Office',
+                industrial: 'Industrial', books: 'Books', pets: 'Pets', other: 'Other'
+            };
+            const categoryColors = {
+                electronics: '#2980b9', fashion: '#8e44ad', grocery: '#27ae60',
+                home: '#e67e22', beauty: '#e91e63', health: '#00bcd4', sports: '#ff5722',
+                automotive: '#607d8b', baby: '#f48fb1', office: '#795548',
+                industrial: '#455a64', books: '#3f51b5', pets: '#4caf50', other: '#9e9e9e'
+            };
+
+            tbody.innerHTML = list.slice(0, 20).map(p => {
+                const cat = (p.category || 'other').toLowerCase();
+                const catLabel = categoryLabels[cat] || (p.category || 'Other');
+                const catColor = categoryColors[cat] || '#9e9e9e';
+                const brand = p.brand || '—';
+                return `
                 <tr>
                     <td>
                         <div style="display:flex; align-items:center; gap:0.5rem;">
                             ${p.image_url ? `<img src="${p.image_url}" style="width:32px; height:32px; object-fit:cover; border-radius:4px;" />` : `<i class="fa-solid fa-box" style="color:var(--text-light);"></i>`}
-                            <strong>${p.title || 'Untitled'}</strong>
+                            <div>
+                                <strong style="display:block;line-height:1.2;">${p.title || 'Untitled'}</strong>
+                                ${p.sku ? `<span style="font-size:0.62rem;color:var(--text-light);">SKU: ${p.sku}</span>` : ''}
+                            </div>
                         </div>
                     </td>
+                    <td><span style="font-size:0.75rem;color:var(--secondary);font-weight:500;">${brand}</span></td>
+                    <td><span style="display:inline-block;padding:0.1rem 0.55rem;border-radius:12px;font-size:0.65rem;font-weight:600;background:${catColor}15;color:${catColor};border:1px solid ${catColor}30;">${catLabel}</span></td>
                     <td>$${(p.price || 0).toFixed(2)}</td>
                     <td>${(p.stock || 0) <= 0 ? '<span style="background:#fdecea;color:#c0392b;border-radius:12px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;">0 — Out</span>' : (p.stock || 0) <= (p.moq || 10) ? `<span style="background:#fff4e5;color:#d35400;border-radius:12px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;" title="At or below MOQ (${p.moq || 10})">${p.stock} — Low</span>` : (p.stock || 0)}</td>
                     <td><span class="status-badge ${p.status === 'active' || p.status === 'approved' ? 'active' : 'inactive'}">${p.status || 'pending'}</span></td>
                     <td>
-                        <button class="btn-action edit" onclick="openAddProduct('${p.id}')"><i class="fa-solid fa-pen"></i></button>
-                        <button class="btn-action delete" onclick="deleteProduct('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
+                        <button class="btn-action edit" onclick="openAddProduct('${p.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-action" style="background:#e8f5e9;color:#2e7d32;" onclick="openInventoryAdjust('${p.id}')" title="Adjust Stock"><i class="fa-solid fa-warehouse"></i></button>
+                        <button class="btn-action delete" onclick="deleteProduct('${p.id}')" title="Delete"><i class="fa-regular fa-trash-can"></i></button>
                     </td>
                 </tr>
-            `).join('');
+            `;}).join('');
     }
 
     async function deleteProduct(productId) {
@@ -2476,6 +2577,174 @@
             loadProducts();
             updateStats();
         } catch (error) { showToast('Failed', 'error'); }
+    }
+
+    // ─── INVENTORY MANAGEMENT ───
+    let inventoryAdjustHistory = [];
+
+    function openInventoryAdjust(productId) {
+        const product = (allAdminProducts || []).find(p => p.id === productId);
+        if (!product) { showToast('Product not found', 'error'); return; }
+        document.getElementById('invAdjustProductId').value = productId;
+        document.getElementById('invCurrentStock').value = (product.stock || 0) + ' units';
+        document.getElementById('invAdjustQty').value = '';
+        document.getElementById('invAdjustNotes').value = '';
+        document.getElementById('invAdjustReason').value = '';
+        document.getElementById('invAdjustType').value = 'set';
+        document.getElementById('invAdjustPreview').textContent = '';
+        document.getElementById('inventoryAdjustSummary').innerHTML =
+            `<strong>${product.title || 'Untitled'}</strong><br>` +
+            `📂 ${product.category || 'Other'} &bull; 💲$${(product.price || 0).toFixed(2)} &bull; 📦 MOQ: ${product.moq || 1}`;
+        document.getElementById('inventoryAdjustModal').classList.add('show');
+    }
+
+    function onInvAdjustTypeChange() {
+        document.getElementById('invAdjustQty').value = '';
+        updateInvPreview();
+    }
+
+    function updateInvPreview() {
+        const productId = document.getElementById('invAdjustProductId').value;
+        const product = (allAdminProducts || []).find(p => p.id === productId);
+        if (!product) return;
+        const current = product.stock || 0;
+        const type = document.getElementById('invAdjustType').value;
+        const qty = parseInt(document.getElementById('invAdjustQty').value) || 0;
+        const el = document.getElementById('invAdjustPreview');
+        let newStock;
+        if (type === 'set') newStock = qty;
+        else if (type === 'add') newStock = current + qty;
+        else newStock = Math.max(0, current - qty);
+        const diff = newStock - current;
+        const diffLabel = diff > 0 ? `+${diff}` : String(diff);
+        const color = newStock <= 0 ? '#c0392b' : newStock <= (product.moq || 10) ? '#d35400' : '#27ae60';
+        el.innerHTML = `New stock: <span style="color:${color};">${newStock}</span> (${diffLabel}) &mdash; Value: $${(newStock * (product.price || 0)).toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
+    }
+
+    async function submitInventoryAdjust() {
+        const productId = document.getElementById('invAdjustProductId').value;
+        const product = (allAdminProducts || []).find(p => p.id === productId);
+        if (!product) { showToast('Product not found', 'error'); return; }
+        const current = product.stock || 0;
+        const type = document.getElementById('invAdjustType').value;
+        const qty = parseInt(document.getElementById('invAdjustQty').value) || 0;
+        const reason = document.getElementById('invAdjustReason').value;
+        const notes = document.getElementById('invAdjustNotes').value.trim();
+
+        if (qty < 0) { showToast('Quantity cannot be negative', 'error'); return; }
+        if (type !== 'set' && qty === 0) { showToast('Enter a quantity', 'error'); return; }
+
+        let newStock;
+        if (type === 'set') newStock = qty;
+        else if (type === 'add') newStock = current + qty;
+        else newStock = Math.max(0, current - qty);
+
+        if (newStock < 0) { showToast('Stock cannot go below zero', 'error'); return; }
+
+        const btn = document.getElementById('invSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+        try {
+            await db.collection('products').doc(productId).update({
+                stock: newStock,
+                updated_at: new Date().toISOString()
+            });
+
+            // Log the inventory change
+            const logEntry = {
+                product_id: productId,
+                product_title: product.title || 'Untitled',
+                previous_stock: current,
+                new_stock: newStock,
+                change: newStock - current,
+                adjustment_type: type,
+                quantity: qty,
+                reason: reason,
+                notes: notes,
+                adjusted_at: new Date().toISOString(),
+                adjusted_by: auth.currentUser ? auth.currentUser.email : 'admin'
+            };
+
+            try {
+                await db.collection('inventory_log').add(logEntry);
+            } catch (e) { console.warn('Inventory log save failed:', e); }
+
+            // Keep local history for the session
+            inventoryAdjustHistory.unshift(logEntry);
+            if (inventoryAdjustHistory.length > 50) inventoryAdjustHistory.pop();
+
+            // Log to audit trail
+            try {
+                if (window.PSE_PREMIUM && PSE_PREMIUM.logAudit) {
+                    PSE_PREMIUM.logAudit('inventory.adjust', `${product.title}: ${current} → ${newStock} (${reason || 'no reason'})`);
+                }
+            } catch (e) {}
+
+            const diff = newStock - current;
+            showToast(`✅ Stock updated: ${current} → ${newStock} (${diff > 0 ? '+' : ''}${diff})`, 'success');
+            closeInventoryAdjust();
+            loadProducts();
+            updateStats();
+        } catch (error) {
+            console.error('Inventory adjust error:', error);
+            showToast('❌ Failed to update stock', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Apply Adjustment';
+        }
+    }
+
+    function closeInventoryAdjust() {
+        document.getElementById('inventoryAdjustModal').classList.remove('show');
+    }
+
+    function getInventorySummary() {
+        const products = allAdminProducts || [];
+        const totalItems = products.length;
+        const totalStock = products.reduce((s, p) => s + (p.stock || 0), 0);
+        const totalValue = products.reduce((s, p) => s + (p.stock || 0) * (p.price || 0), 0);
+        const outOfStock = products.filter(p => (p.stock || 0) <= 0).length;
+        const lowStock = products.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= (p.moq || 10)).length;
+        return { totalItems, totalStock, totalValue, outOfStock, lowStock };
+    }
+
+    function updateInventorySummary() {
+        // Called when the products tab is shown; updates the inventory value badge
+        const summary = getInventorySummary();
+        const invEl = document.getElementById('inventoryValue');
+        if (invEl) {
+            invEl.textContent = '📦 $' + summary.totalValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) + ' on hand';
+            invEl.title = `${summary.totalItems} products · ${summary.totalStock.toLocaleString()} units in stock · ${summary.outOfStock} out of stock · ${summary.lowStock} low stock`;
+        }
+    }
+
+    function exportInventoryCSV() {
+        const products = allAdminProducts || [];
+        if (products.length === 0) { showToast('No products to export', 'info'); return; }
+        const esc = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+        const headers = ['Title', 'Brand', 'Category', 'SKU', 'Price', 'Stock', 'MOQ', 'Status', 'Stock Value', 'Stock Level'];
+        const rows = products.map(p => {
+            const stock = p.stock || 0;
+            const moq = p.moq || 10;
+            let level = 'OK';
+            if (stock <= 0) level = 'Out of Stock';
+            else if (stock <= moq) level = 'Low';
+            return [
+                esc(p.title), esc(p.brand || ''), esc(p.category || 'other'),
+                esc(p.sku || ''), p.price || 0, stock, moq,
+                esc(p.status || 'pending'), (stock * (p.price || 0)).toFixed(2), level
+            ].join(',');
+        });
+        const csvContent = 'data:text/csv;charset=utf-8,' + headers.join(',') + '\r\n' + rows.join('\r\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', 'pse_inventory_' + new Date().toISOString().slice(0, 10) + '.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('📊 Inventory exported as CSV', 'success');
     }
 
     // ─── LOAD RFQS ───
@@ -3269,12 +3538,22 @@
 
     // ─── EXPOSE ───
     window.showTab = showTab;
+    window.toggleAdminMenu = toggleAdminMenu;
+    window.closeAdminMenu = closeAdminMenu;
     window.logoutAdmin = logoutAdmin;
     window.openAddProduct = openAddProduct;
     window.closeAddProduct = closeAddProduct;
     window.handleImagePreview = handleImagePreview;
     window.removePreviewImage = removePreviewImage;
     window.deleteProduct = deleteProduct;
+    window.openInventoryAdjust = openInventoryAdjust;
+    window.closeInventoryAdjust = closeInventoryAdjust;
+    window.submitInventoryAdjust = submitInventoryAdjust;
+    window.onInvAdjustTypeChange = onInvAdjustTypeChange;
+    window.updateInvPreview = updateInvPreview;
+    window.getInventorySummary = getInventorySummary;
+    window.updateInventorySummary = updateInventorySummary;
+    window.exportInventoryCSV = exportInventoryCSV;
     // ─── REVENUE CHART (Chart.js, last 30 days) ───
     let revenueChartInstance = null;
     function renderRevenueChart() {
