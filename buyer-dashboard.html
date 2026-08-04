@@ -8,7 +8,7 @@
     
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -329,10 +329,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="/seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="/track-order"><i class="fa-solid fa-truck"></i> Track</a>
+            <a href="/seller-dashboard"><i class="fa-solid fa-store"></i> Sell</a>
             <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/register" id="registerLink"><i class="fa-solid fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -379,7 +379,7 @@
         <a href="/about"><i class="fa-solid fa-info-circle"></i> About</a>
         <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
         <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="/become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/become-seller" class="wholesale-nav"><i class="fa-solid fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -393,7 +393,7 @@
 
         <div class="dashboard-stats animate-on-scroll">
             <div class="dashboard-stat">
-                <div class="stat-icon"><i class="fa-regular fa-receipt"></i></div>
+                <div class="stat-icon"><i class="fa-solid fa-receipt"></i></div>
                 <div class="stat-number" id="statOrders">0</div>
                 <div class="stat-label">Total Orders</div>
             </div>
@@ -415,7 +415,7 @@
         </div>
 
         <div class="dashboard-tabs animate-on-scroll">
-            <button class="active" onclick="switchTab('orders')"><i class="fa-regular fa-receipt"></i> Orders</button>
+            <button class="active" onclick="switchTab('orders')"><i class="fa-solid fa-receipt"></i> Orders</button>
             <button onclick="switchTab('rfqs')"><i class="fa-regular fa-file-lines"></i> RFQs</button>
             <button onclick="switchTab('wishlist')"><i class="fa-regular fa-heart"></i> Wishlist</button>
         </div>
@@ -463,7 +463,7 @@
 
         <div class="quick-actions animate-on-scroll">
             <div class="quick-action" onclick="window.location.href='/products'">
-                <i class="fa-regular fa-box"></i>
+                <i class="fa-solid fa-box"></i>
                 <h4>Browse Products</h4>
                 <p>Explore our wholesale catalog</p>
             </div>
@@ -478,7 +478,7 @@
                 <p>Check your shopping cart</p>
             </div>
             <div class="quick-action" onclick="window.location.href='/track-order'">
-                <i class="fa-regular fa-truck"></i>
+                <i class="fa-solid fa-truck"></i>
                 <h4>Track Order</h4>
                 <p>Check your order status</p>
             </div>
@@ -628,7 +628,7 @@
         const container = document.getElementById('orderList');
         const user = getCurrentUser();
         if (!user) {
-            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation"></i><h3>Not Logged In</h3><p>Please login to view your orders.</p></div>`;
+            container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>Not Logged In</h3><p>Please login to view your orders.</p></div>`;
             return;
         }
         try {
@@ -639,7 +639,7 @@
             const orders = [];
             snapshot.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
             if (orders.length === 0) {
-                container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-receipt"></i><h3>No Orders Yet</h3><p>You haven't placed any orders yet.</p><a href="/products" style="color:var(--primary);font-weight:600;">Start Shopping →</a></div>`;
+                container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-receipt"></i><h3>No Orders Yet</h3><p>You haven't placed any orders yet.</p><a href="/products" style="color:var(--primary);font-weight:600;">Start Shopping →</a></div>`;
                 return;
             }
             const pending = orders.filter(o => o.status === 'pending' || o.status === 'processing');
@@ -676,7 +676,7 @@
                 </div>
             `).join('');
         } catch (error) {
-            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><h3>Error Loading Orders</h3><p>Failed to load your orders.</p><button onclick="loadOrders()" style="margin-top:0.5rem;background:var(--primary);color:#fff;border:none;padding:0.3rem 1.2rem;border-radius:30px;cursor:pointer;">Retry</button></div>`;
+            container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><h3>Error Loading Orders</h3><p>Failed to load your orders.</p><button onclick="loadOrders()" style="margin-top:0.5rem;background:var(--primary);color:#fff;border:none;padding:0.3rem 1.2rem;border-radius:30px;cursor:pointer;">Retry</button></div>`;
         }
     }
 
@@ -684,7 +684,7 @@
         const container = document.getElementById('rfqList');
         const user = getCurrentUser();
         if (!user) {
-            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation"></i><h3>Not Logged In</h3><p>Please login to view your RFQ requests.</p></div>`;
+            container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>Not Logged In</h3><p>Please login to view your RFQ requests.</p></div>`;
             return;
         }
         try {
@@ -730,7 +730,7 @@
                 </div>
             `).join('');
         } catch (error) {
-            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><h3>Error Loading RFQs</h3><p>Failed to load your RFQ requests.</p><button onclick="loadRFQs()" style="margin-top:0.5rem;background:var(--primary);color:#fff;border:none;padding:0.3rem 1.2rem;border-radius:30px;cursor:pointer;">Retry</button></div>`;
+            container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><h3>Error Loading RFQs</h3><p>Failed to load your RFQ requests.</p><button onclick="loadRFQs()" style="margin-top:0.5rem;background:var(--primary);color:#fff;border:none;padding:0.3rem 1.2rem;border-radius:30px;cursor:pointer;">Retry</button></div>`;
         }
     }
 
@@ -738,7 +738,7 @@
         const grid = document.getElementById('wishlistGrid');
         const user = getCurrentUser();
         if (!user) {
-            grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fa-regular fa-circle-exclamation"></i><h3>Not Logged In</h3><p>Please login to view your wishlist.</p></div>`;
+            grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fa-solid fa-circle-exclamation"></i><h3>Not Logged In</h3><p>Please login to view your wishlist.</p></div>`;
             return;
         }
         try {
@@ -764,7 +764,7 @@
                 }
             }
             if (products.length === 0) {
-                grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fa-regular fa-box"></i><h3>No Products Found</h3><p>Your wishlist items are no longer available.</p></div>`;
+                grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fa-solid fa-box"></i><h3>No Products Found</h3><p>Your wishlist items are no longer available.</p></div>`;
                 return;
             }
             grid.innerHTML = products.map(p => `
@@ -778,7 +778,7 @@
                 </div>
             `).join('');
         } catch (error) {
-            grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><h3>Error Loading Wishlist</h3><p>Failed to load your wishlist.</p><button onclick="loadWishlist()" style="margin-top:0.5rem;background:var(--primary);color:#fff;border:none;padding:0.3rem 1.2rem;border-radius:30px;cursor:pointer;">Retry</button></div>`;
+            grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><h3>Error Loading Wishlist</h3><p>Failed to load your wishlist.</p><button onclick="loadWishlist()" style="margin-top:0.5rem;background:var(--primary);color:#fff;border:none;padding:0.3rem 1.2rem;border-radius:30px;cursor:pointer;">Retry</button></div>`;
         }
     }
 

@@ -81,7 +81,7 @@
             }).join('');
         } catch (e) {
             console.error('loadSubscribers error:', e);
-            tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading subscribers</p></div></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading subscribers</p></div></td></tr>';
         }
     }
 
@@ -133,7 +133,7 @@
             if (el('supportCount')) el('supportCount').textContent = open.length + ' open of ' + cachedTickets.length;
 
             if (cachedTickets.length === 0) {
-                container.innerHTML = '<div class="empty-state"><i class="fa-regular fa-headset"></i><p>No live-support tickets yet</p></div>';
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-headset"></i><p>No live-support tickets yet</p></div>';
                 return;
             }
             container.innerHTML = cachedTickets.map(function (t) {
@@ -156,7 +156,7 @@
                         '<div class="msg-preview-text">' + esc(t.message || '') + '</div>' +
                     '</div>' +
                     '<div style="display:flex;gap:0.3rem;margin-top:0.5rem;flex-wrap:wrap;">' +
-                        '<button class="btn-action reply" onclick="AdminExt.replyToSupport(\'' + t.id + '\')"><i class="fa-regular fa-reply"></i> Reply</button>' +
+                        '<button class="btn-action reply" onclick="AdminExt.replyToSupport(\'' + t.id + '\')"><i class="fa-solid fa-reply"></i> Reply</button>' +
                         (resolved
                             ? '<button class="btn-action view" onclick="AdminExt.reopenSupport(\'' + t.id + '\')"><i class="fa-regular fa-folder-open"></i> Re-open</button>'
                             : '<button class="btn-action approve" onclick="AdminExt.resolveSupport(\'' + t.id + '\')"><i class="fa-regular fa-circle-check"></i> Resolve</button>') +
@@ -166,7 +166,7 @@
             }).join('');
         } catch (e) {
             console.error('loadSupport error:', e);
-            container.innerHTML = '<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading tickets</p></div>';
+            container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading tickets</p></div>';
         }
     }
 
@@ -328,7 +328,7 @@
             logs.sort(function (a, b) { return (b.created_at || '').localeCompare(a.created_at || ''); });
             if (el('emailLogCount')) el('emailLogCount').textContent = logs.length + ' emails logged';
             if (logs.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-inbox"></i><p>No emails sent yet</p></div></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-inbox"></i><p>No emails sent yet</p></div></td></tr>';
                 return;
             }
             tbody.innerHTML = logs.slice(0, 50).map(function (l) {
@@ -341,7 +341,7 @@
                 '</tr>';
             }).join('');
         } catch (e) {
-            tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading log</p></div></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading log</p></div></td></tr>';
         }
     }
 
@@ -378,7 +378,7 @@
             }).join('');
         } catch (e) {
             console.error('loadReviewsAdmin error:', e);
-            tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading reviews</p></div></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading reviews</p></div></td></tr>';
         }
     }
     async function deleteReview(id) {
@@ -408,7 +408,7 @@
             if (el('statReports')) el('statReports').textContent = open.length;
 
             if (reports.length === 0) {
-                container.innerHTML = '<div class="empty-state"><i class="fa-regular fa-shield-halved"></i><p>No scam reports — marketplace is healthy 🎉</p></div>';
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-shield-halved"></i><p>No scam reports — marketplace is healthy 🎉</p></div>';
                 return;
             }
             container.innerHTML = reports.map(function (r) {
@@ -429,14 +429,14 @@
                     '</div>' +
                     '<div style="display:flex;gap:0.3rem;margin-top:0.5rem;flex-wrap:wrap;">' +
                         (!resolved ? '<button class="btn-action approve" onclick="AdminExt.resolveReport(\'' + r.id + '\')"><i class="fa-regular fa-circle-check"></i> Resolve</button>' : '') +
-                        (r.seller_id ? '<button class="btn-action ban" onclick="AdminExt.suspendSeller(\'' + r.seller_id + '\')"><i class="fa-regular fa-ban"></i> Suspend Seller</button>' : '') +
+                        (r.seller_id ? '<button class="btn-action ban" onclick="AdminExt.suspendSeller(\'' + r.seller_id + '\')"><i class="fa-solid fa-ban"></i> Suspend Seller</button>' : '') +
                         '<button class="btn-action delete" onclick="AdminExt.deleteReport(\'' + r.id + '\')"><i class="fa-regular fa-trash-can"></i></button>' +
                     '</div>' +
                 '</div>';
             }).join('');
         } catch (e) {
             console.error('loadReports error:', e);
-            container.innerHTML = '<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading reports</p></div>';
+            container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading reports</p></div>';
         }
     }
     async function resolveReport(id) {

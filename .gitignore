@@ -1,5 +1,7 @@
 .vercel
 .env*
+# Placeholder-only templates are safe to commit (no real values, enforced by test)
+!**/.env.example
 .DS_Store
 node_modules/
 .idea/

@@ -8,7 +8,7 @@
     
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -296,10 +296,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="/seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="/track-order"><i class="fa-solid fa-truck"></i> Track</a>
+            <a href="/seller-dashboard"><i class="fa-solid fa-store"></i> Sell</a>
             <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/register" id="registerLink"><i class="fa-solid fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -346,7 +346,7 @@
         <a href="/about"><i class="fa-solid fa-info-circle"></i> About</a>
         <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
         <a href="/help-center" class="nav-tab active"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="/become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/become-seller" class="wholesale-nav"><i class="fa-solid fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -364,17 +364,17 @@
 
         <div class="help-categories animate-on-scroll">
             <div class="help-category" onclick="filterFaq('orders')">
-                <i class="fa-regular fa-receipt"></i>
+                <i class="fa-solid fa-receipt"></i>
                 <h3>Orders</h3>
                 <p>Order status, tracking &amp; issues</p>
             </div>
             <div class="help-category" onclick="filterFaq('shipping')">
-                <i class="fa-regular fa-truck"></i>
+                <i class="fa-solid fa-truck"></i>
                 <h3>Shipping</h3>
                 <p>Delivery times, costs &amp; policies</p>
             </div>
             <div class="help-category" onclick="filterFaq('returns')">
-                <i class="fa-regular fa-rotate-left"></i>
+                <i class="fa-solid fa-rotate-left"></i>
                 <h3>Returns</h3>
                 <p>Return policy &amp; procedures</p>
             </div>
@@ -384,7 +384,7 @@
                 <p>Profile, security &amp; settings</p>
             </div>
             <div class="help-category" onclick="filterFaq('selling')">
-                <i class="fa-regular fa-store"></i>
+                <i class="fa-solid fa-store"></i>
                 <h3>Selling</h3>
                 <p>Become a seller &amp; manage products</p>
             </div>
@@ -482,12 +482,12 @@
         </div>
 
         <div class="contact-support animate-on-scroll">
-            <h3><i class="fa-regular fa-headset"></i> Still Need Help?</h3>
+            <h3><i class="fa-solid fa-headset"></i> Still Need Help?</h3>
             <p>Our support team is here to assist you with any questions or concerns.</p>
             <div class="support-options">
                 <!-- ─── UPDATED: Correct email and phone ─── -->
                 <div class="option"><i class="fa-regular fa-envelope"></i> <a href="mailto:support@pilotsalesdistribution.com">support@pilotsalesdistribution.com</a></div>
-                <div class="option"><i class="fa-regular fa-phone"></i> <a href="tel:+19099384682">+1 (909) 938-4682</a></div>
+                <div class="option"><i class="fa-solid fa-phone"></i> <a href="tel:+19099384682">+1 (909) 938-4682</a></div>
                 <div class="option"><i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> <a href="https://wa.me/19099384682" target="_blank">Chat on WhatsApp</a></div>
                 <div class="option"><i class="fa-regular fa-clock"></i> <span>Mon-Fri: 8AM - 8PM EST</span></div>
             </div>
@@ -644,7 +644,7 @@
                 noResults = document.createElement('div');
                 noResults.className = 'no-results';
                 noResults.style.cssText = 'text-align:center; padding:2rem; color:var(--text-light);';
-                noResults.innerHTML = `<i class="fa-regular fa-circle-info" style="font-size:2rem; color:var(--primary);"></i><p style="margin-top:0.5rem;">No results found for "${query}"</p><p style="font-size:0.85rem;">Try different keywords or contact our support team.</p>`;
+                noResults.innerHTML = `<i class="fa-solid fa-circle-info" style="font-size:2rem; color:var(--primary);"></i><p style="margin-top:0.5rem;">No results found for "${query}"</p><p style="font-size:0.85rem;">Try different keywords or contact our support team.</p>`;
                 faqSection.appendChild(noResults);
             }
         } else if (noResults) { noResults.remove(); }
@@ -669,7 +669,7 @@
                 noResults = document.createElement('div');
                 noResults.className = 'category-no-results';
                 noResults.style.cssText = 'text-align:center; padding:2rem; color:var(--text-light);';
-                noResults.innerHTML = `<i class="fa-regular fa-circle-info" style="font-size:2rem; color:var(--primary);"></i><p style="margin-top:0.5rem;">No FAQs available in this category yet.</p><p style="font-size:0.85rem;">Check back soon or contact our support team.</p>`;
+                noResults.innerHTML = `<i class="fa-solid fa-circle-info" style="font-size:2rem; color:var(--primary);"></i><p style="margin-top:0.5rem;">No FAQs available in this category yet.</p><p style="font-size:0.85rem;">Check back soon or contact our support team.</p>`;
                 faqSection.appendChild(noResults);
             }
         } else if (noResults) { noResults.remove(); }

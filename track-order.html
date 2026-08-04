@@ -8,7 +8,7 @@
     
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -320,10 +320,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="/seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="/track-order"><i class="fa-solid fa-truck"></i> Track</a>
+            <a href="/seller-dashboard"><i class="fa-solid fa-store"></i> Sell</a>
             <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/register" id="registerLink"><i class="fa-solid fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -370,7 +370,7 @@
         <a href="/about"><i class="fa-solid fa-info-circle"></i> About</a>
         <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
         <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="/become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/become-seller" class="wholesale-nav"><i class="fa-solid fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -393,7 +393,7 @@
                 <input type="email" id="trackEmail" placeholder="Email on the quote (required for guest orders)" />
             </div>
             <div class="help-text">
-                <i class="fa-regular fa-circle-info"></i> Enter your quote # from your confirmation or PDF — guest orders also need the email used at checkout
+                <i class="fa-solid fa-circle-info"></i> Enter your quote # from your confirmation or PDF — guest orders also need the email used at checkout
             </div>
         </div>
 
@@ -406,7 +406,7 @@
             <i class="fa-regular fa-circle-xmark"></i>
             <h3>Order Not Found</h3>
             <p>We couldn't find an order with that number. Please check and try again.</p>
-            <button class="btn-try-again" onclick="resetSearch()"><i class="fa-regular fa-arrow-left"></i> Try Again</button>
+            <button class="btn-try-again" onclick="resetSearch()"><i class="fa-solid fa-arrow-left"></i> Try Again</button>
         </div>
 
         <div class="order-result" id="orderResult">
@@ -630,7 +630,7 @@
                 <div class="detail-item"><div class="label">Verified</div><div class="value" style="color:var(--primary);"><i class="fa-solid fa-shield-halved"></i> Genuine — PSE Registry</div></div>
             </div>
             <div class="order-items">
-                <div class="items-title"><i class="fa-regular fa-truck"></i> Trade Assurance Progress</div>
+                <div class="items-title"><i class="fa-solid fa-truck"></i> Trade Assurance Progress</div>
                 ${steps.map((s, i) => `
                     <div class="item-row" style="${i <= currentIndex ? 'color:#1a7b6b;font-weight:600;' : 'color:#9db2c0;'}">
                         <span>${i <= currentIndex ? '✅' : '⏳'} ${s.label}</span>
@@ -638,7 +638,7 @@
                     </div>`).join('')}
             </div>
             <div style="margin-top:1rem;background:var(--primary-light);border-radius:var(--radius-sm);padding:0.8rem 1rem;font-size:0.82rem;color:var(--primary-dark);">
-                <i class="fa-regular fa-circle-info"></i> Full item-level detail is visible in your account.
+                <i class="fa-solid fa-circle-info"></i> Full item-level detail is visible in your account.
                 <a href="/register?email=${encodeURIComponent(v.email || '')}" style="font-weight:700;color:var(--primary);">Create a free account</a> to unlock the complete dashboard.
             </div>`;
     }
@@ -698,7 +698,7 @@
         content.innerHTML = `
             <div class="order-card">
                 <div class="order-header">
-                    <div class="order-number"><i class="fa-regular fa-receipt"></i> Order #${order.orderNumber || order.quoteNumber || 'N/A'}</div>
+                    <div class="order-number"><i class="fa-solid fa-receipt"></i> Order #${order.orderNumber || order.quoteNumber || 'N/A'}</div>
                     <span class="order-status ${currentStatus}">${currentStatus}</span>
                 </div>
 
@@ -730,7 +730,7 @@
                 </div>
 
                 <div class="order-items">
-                    <div class="items-title"><i class="fa-regular fa-box"></i> Items (${items.length})</div>
+                    <div class="items-title"><i class="fa-solid fa-box"></i> Items (${items.length})</div>
                     ${itemsHtml}
                 </div>
 
