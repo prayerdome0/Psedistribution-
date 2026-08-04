@@ -22,9 +22,17 @@ def test_products_page_reads_public_api_not_private_master():
     html = (ROOT / "products.html").read_text(encoding="utf-8")
     assert "/api/inventory" in html
     assert "fetchInventoryFeed" in html
-    # the inventory grid must not query Firestore for products anymore
+    # The storefront shows BOTH the live inventory API feed AND the current
+    # products uploaded to Firestore (never only the inventory feed). The
+    # merge must be unconditional — not a length-0 fallback — and dedupe
+    # against dealId/slug/title so items never render twice.
     load_block = html.split("async function loadProducts()")[1].split("allProducts = products;")[0]
-    assert "db.collection('products')" not in load_block
+    assert "db.collection('products')" in load_block
+    assert "ALWAYS merge" in load_block
+    assert "if (products.length === 0) {" not in load_block.split("// 3)")[0]
+    inventory_pos = load_block.index("fetchInventoryFeed")
+    firestore_pos = load_block.index("db.collection('products')")
+    assert inventory_pos < firestore_pos, "inventory feed stays the primary source; Firestore merges after"
 
 
 def test_product_detail_page_prefers_public_api():

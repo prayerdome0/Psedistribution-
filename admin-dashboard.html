@@ -797,6 +797,10 @@
         <i class="fa-solid fa-box"></i> Products
         <span class="badge green" id="productBadge">0</span>
     </button>
+    <button class="nav-item" onclick="window.location.href='/inventory-upload'">
+        <i class="fa-solid fa-cloud-upload"></i> Upload Inventory
+        <span class="badge gold">NEW</span>
+    </button>
     <button class="nav-item" onclick="showTab('rfqs'); closeAdminMenu()">
         <i class="fa-regular fa-file-lines"></i> RFQs
         <span class="badge purple" id="rfqBadge">0</span>
@@ -1075,6 +1079,9 @@
                         </button>
                         <button type="button" class="btn-add-product" onclick="exportInventoryCSV()" style="background:#8e44ad;font-size:0.82rem;padding:0.5rem 1rem;">
                             <i class="fa-solid fa-warehouse"></i> Inventory
+                        </button>
+                        <button type="button" class="btn-add-product" onclick="window.location.href='/inventory-upload'" style="background:#d35400;font-size:0.82rem;padding:0.5rem 1rem;">
+                            <i class="fa-solid fa-cloud-upload"></i> Upload Inventory
                         </button>
                         <button class="btn-add-product" onclick="openAddProduct()">
                             <i class="fa-solid fa-plus"></i> Add Product

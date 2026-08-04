@@ -952,59 +952,73 @@
             let products = [];
             window.PSE_INVENTORY_META = null;
             
-            // 1) Try the public inventory API first
+            // 1) Try the public live-inventory API first
             try {
                 const feed = await fetchInventoryFeed();
                 window.PSE_INVENTORY_META = feed.meta;
                 products = feed.items.map(mapInventoryItem);
-                const hasPublicPrice = products.some(p => p.price !== null);
-                const priceFilter = document.getElementById('priceFilterGroup');
-                if (priceFilter) priceFilter.style.display = hasPublicPrice ? '' : 'none';
             } catch (feedError) {
-                console.log('Inventory API unavailable, loading from Firestore...');
+                console.log('Inventory API unavailable, loading current products...');
             }
 
-            // 2) FALLBACK: Load from Firestore `products` collection
-            if (products.length === 0) {
-                try {
-                    const snapshot = await db.collection('products')
-                        .where('status', 'in', ['active', 'approved'])
-                        .orderBy('created_at', 'desc')
-                        .limit(100)
-                        .get();
-                    
-                    if (!snapshot.empty) {
-                        snapshot.forEach(doc => {
-                            const data = doc.data();
-                            const imageUrl = window.getProductImage ? window.getProductImage(data, '') : (data.image_url || '');
-                            products.push({
-                                id: doc.id,
-                                dealId: doc.id,
-                                slug: data.slug || generateSlug(data.title || 'product'),
-                                title: data.title || 'Product',
-                                brand: data.brand || 'Pilot Distribution',
-                                moq: data.moq || 1,
-                                category: data.category || 'other',
-                                pricingMode: 'public',
-                                price: data.price || 0,
-                                old_price: data.old_price || 0,
-                                image_url: imageUrl,
-                                availability: (data.stock || 0) > 0 ? 'in-stock' : 'unavailable',
-                                stock: data.stock || 0,
-                                rfqEnabled: true,
-                                condition: data.condition || '',
-                                fob: data.fob || '',
-                                freightTerms: data.freightTerms || 'Freight quoted separately',
-                                sku: data.sku || ''
-                            });
+            // 2) ALWAYS merge the current products from the Firestore `products`
+            //    collection — the storefront shows both, never only the inventory feed
+            try {
+                const snapshot = await db.collection('products')
+                    .where('status', 'in', ['active', 'approved'])
+                    .orderBy('created_at', 'desc')
+                    .limit(100)
+                    .get();
+
+                if (!snapshot.empty) {
+                    const seen = new Set();
+                    products.forEach(p => {
+                        if (p.slug) seen.add('slug:' + p.slug);
+                        if (p.id) seen.add('id:' + p.id);
+                        seen.add('title:' + (p.title || '').toLowerCase());
+                    });
+                    let merged = 0;
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const slug = data.slug || generateSlug(data.title || 'product');
+                        if (seen.has('id:' + doc.id) || seen.has('slug:' + slug) || seen.has('title:' + (data.title || '').toLowerCase())) return;
+                        seen.add('id:' + doc.id);
+                        seen.add('slug:' + slug);
+                        seen.add('title:' + (data.title || '').toLowerCase());
+                        const imageUrl = window.getProductImage ? window.getProductImage(data, '') : (data.image_url || '');
+                        products.push({
+                            id: doc.id,
+                            dealId: doc.id,
+                            slug: slug,
+                            title: data.title || 'Product',
+                            brand: data.brand || 'Pilot Distribution',
+                            moq: data.moq || 1,
+                            category: data.category || 'other',
+                            pricingMode: 'public',
+                            price: data.price || 0,
+                            old_price: data.old_price || 0,
+                            image_url: imageUrl,
+                            availability: (data.stock || 0) > 0 ? 'in-stock' : 'unavailable',
+                            stock: data.stock || 0,
+                            rfqEnabled: true,
+                            condition: data.condition || '',
+                            fob: data.fob || '',
+                            freightTerms: data.freightTerms || 'Freight quoted separately',
+                            sku: data.sku || ''
                         });
-                        console.log(`✅ Loaded ${products.length} products from Firestore`);
-                        const priceFilter = document.getElementById('priceFilterGroup');
-                        if (priceFilter) priceFilter.style.display = '';
-                    }
-                } catch (dbError) {
-                    console.error('Firestore product load error:', dbError);
+                        merged++;
+                    });
+                    console.log(`✅ Merged ${merged} current products with ${products.length - merged} live inventory items (${products.length} total)`);
                 }
+            } catch (dbError) {
+                console.error('Firestore product load error:', dbError);
+            }
+
+            // Price filter visibility after both sources are merged
+            {
+                const hasPublicPrice = products.some(p => p.price !== null && p.price !== undefined);
+                const priceFilter = document.getElementById('priceFilterGroup');
+                if (priceFilter) priceFilter.style.display = hasPublicPrice ? '' : 'none';
             }
 
             // 3) Last resort: catalog-data.js static products

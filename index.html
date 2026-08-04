@@ -1497,45 +1497,57 @@
                     });
                 }
             } catch (feedError) {
-                console.log('Inventory API unavailable, loading from Firestore...');
+                console.log('Inventory API unavailable, loading current products...');
             }
 
-            // 2) FALLBACK: Load from Firestore `products` collection (always works)
-            if (products.length === 0) {
-                try {
-                    const snapshot = await db.collection('products')
-                        .where('status', 'in', ['active', 'approved'])
-                        .orderBy('created_at', 'desc')
-                        .limit(20)
-                        .get();
-                    
-                    if (!snapshot.empty) {
-                        snapshot.forEach(doc => {
-                            const data = doc.data();
-                            const imageUrl = window.getProductImage ? window.getProductImage(data, '') : (data.image_url || data.image_urls?.[0] || '');
-                            products.push({
-                                id: doc.id,
-                                dealId: doc.id,
-                                slug: data.slug || generateSlug(data.title || 'product'),
-                                title: data.title || 'Product',
-                                brand: data.brand || 'Pilot Distribution',
-                                moq: data.moq || 1,
-                                category: data.category || 'other',
-                                pricingMode: 'public',
-                                price: data.price || 0,
-                                old_price: data.old_price || 0,
-                                image_url: imageUrl,
-                                rfqEnabled: true,
-                                status: data.status || 'active',
-                                stock: data.stock || 0,
-                                supplier_verified: data.supplier_verified || false
-                            });
+            // 2) ALWAYS merge the current Firestore `products` — the home page shows
+            //    both the live inventory feed and the uploaded products, not only inventory
+            try {
+                const snapshot = await db.collection('products')
+                    .where('status', 'in', ['active', 'approved'])
+                    .orderBy('created_at', 'desc')
+                    .limit(20)
+                    .get();
+
+                if (!snapshot.empty) {
+                    const seen = new Set();
+                    products.forEach(p => {
+                        if (p.slug) seen.add('slug:' + p.slug);
+                        if (p.id) seen.add('id:' + p.id);
+                        seen.add('title:' + (p.title || '').toLowerCase());
+                    });
+                    let merged = 0;
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const slug = data.slug || generateSlug(data.title || 'product');
+                        if (seen.has('id:' + doc.id) || seen.has('slug:' + slug) || seen.has('title:' + (data.title || '').toLowerCase())) return;
+                        seen.add('id:' + doc.id);
+                        seen.add('slug:' + slug);
+                        seen.add('title:' + (data.title || '').toLowerCase());
+                        const imageUrl = window.getProductImage ? window.getProductImage(data, '') : (data.image_url || data.image_urls?.[0] || '');
+                        products.push({
+                            id: doc.id,
+                            dealId: doc.id,
+                            slug: slug,
+                            title: data.title || 'Product',
+                            brand: data.brand || 'Pilot Distribution',
+                            moq: data.moq || 1,
+                            category: data.category || 'other',
+                            pricingMode: 'public',
+                            price: data.price || 0,
+                            old_price: data.old_price || 0,
+                            image_url: imageUrl,
+                            rfqEnabled: true,
+                            status: data.status || 'active',
+                            stock: data.stock || 0,
+                            supplier_verified: data.supplier_verified || false
                         });
-                        console.log(`✅ Loaded ${products.length} products from Firestore`);
-                    }
-                } catch (dbError) {
-                    console.error('Firestore product load error:', dbError);
+                        merged++;
+                    });
+                    console.log(`✅ Merged ${merged} current products with ${products.length - merged} live inventory items (${products.length} total)`);
                 }
+            } catch (dbError) {
+                console.error('Firestore product load error:', dbError);
             }
 
             // 3) Also try catalog-data.js static products as last resort
