@@ -388,6 +388,14 @@
         .product-card .product-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
         .product-card:hover .product-image img { transform: scale(1.08); }
         .product-card .product-image .placeholder { font-size: 3rem; color: var(--text-light); }
+
+        /* Editorial deal cards keep the home page visual without depending on inventory. */
+        .deal-photo-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+        .deal-photo-card { position: relative; min-height: 220px; overflow: hidden; border-radius: var(--radius-sm); background: var(--secondary); box-shadow: var(--shadow); color: #fff; text-decoration: none; }
+        .deal-photo-card img { width: 100%; height: 100%; min-height: 220px; object-fit: cover; display: block; transition: transform .45s ease; }
+        .deal-photo-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(11,42,59,.9) 100%); }
+        .deal-photo-card:hover img { transform: scale(1.06); }
+        .deal-photo-card span { position: absolute; z-index: 1; left: 1rem; right: 1rem; bottom: .9rem; font-weight: 700; font-size: 1rem; }
         .product-card .product-title { font-weight: 600; font-size: 0.95rem; color: var(--dark); margin-bottom: 0.2rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .product-card .product-brand { font-size: 0.7rem; color: var(--text-light); margin-bottom: 0.3rem; }
         .product-card .product-price { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
@@ -566,6 +574,7 @@
             .banner-slider { height: 240px; margin: 1rem 0; }
             .banner-slider .banner-nav { width: 34px; height: 34px; font-size: 0.8rem; }
             .product-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+            .deal-photo-grid { grid-template-columns: repeat(2, 1fr); }
             .header-actions .icon-btn span { display: none; }
             .stats-section { grid-template-columns: 1fr 1fr; padding: 1.5rem; }
             .stat-item .number { font-size: 1.8rem; }
@@ -584,6 +593,8 @@
         @media (max-width: 480px) {
             .banner-slider { height: 180px; }
             .product-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .deal-photo-grid { gap: 0.6rem; }
+            .deal-photo-card, .deal-photo-card img { min-height: 160px; }
             .product-card { padding: 0.6rem; }
             .product-card .product-title { font-size: 0.8rem; }
             .product-card .product-price { font-size: 1rem; }
@@ -650,15 +661,15 @@
         </div>
 
         <div class="header-actions">
-            <a href="#" class="icon-btn" onclick="toggleWishlist()">
-                <i class="fa-regular fa-heart"></i>
-                <span>Wishlist</span>
-                <span class="badge-count wishlist-count">0</span>
-            </a>
-            <a href="/cart" class="icon-btn">
+            <a href="/cart" class="icon-btn" id="cartBtn" aria-label="Cart">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span>Cart</span>
                 <span class="badge-count cart-count">0</span>
+            </a>
+            <a href="#" class="icon-btn" id="wishlistBtn" onclick="toggleWishlist()" aria-label="Wishlist">
+                <i class="fa-regular fa-heart"></i>
+                <span>Wishlist</span>
+                <span class="badge-count wishlist-count">0</span>
             </a>
             <a href="/account" class="icon-btn" id="accountBtn">
                 <i class="fa-regular fa-user"></i>
@@ -699,52 +710,7 @@
         <div class="dots" id="bannerDots"></div>
     </div>
 
-    <!-- 2. STATISTICS WITH COUNTING ANIMATION -->
-    <div class="stats-section animate-on-scroll">
-        <div class="stat-item">
-            <div class="icon"><i class="fa-solid fa-box"></i></div>
-            <div class="number" id="statProducts"><span class="count" data-target="0">0</span><span class="suffix"></span></div>
-            <div class="label">Published Offers</div>
-        </div>
-        <div class="stat-item">
-            <div class="icon"><i class="fa-regular fa-handshake"></i></div>
-            <div class="number" id="statSuppliers"><span class="count" data-target="0">0</span><span class="suffix"></span></div>
-            <div class="label">Available Now</div>
-        </div>
-        <div class="stat-item">
-            <div class="icon"><i class="fa-regular fa-file-lines"></i></div>
-            <div class="number" id="statSatisfaction"><span class="count" data-target="0">0</span><span class="suffix"></span></div>
-            <div class="label">RFQ-Enabled Offers</div>
-        </div>
-        <div class="stat-item">
-            <div class="icon"><i class="fa-regular fa-clock"></i></div>
-            <div class="number" id="statOrders"><span class="count" data-target="0">0</span><span class="suffix"></span></div>
-            <div class="label">Categories Represented</div>
-        </div>
-    </div>
-
-    <!-- 3. FEATURED PRODUCTS -->
-    <div class="section-title animate-on-scroll">
-        <h2>Featured <span>Products</span></h2>
-        <p>Current published offers from the verified inventory feed</p>
-    </div>
-    <div class="product-grid" id="productGrid">
-        <!-- Products loaded by JavaScript -->
-    </div>
-
-    <!-- 3b. RECENTLY VIEWED -->
-    <div id="recentViewsSection" style="display:none;">
-        <div class="section-title animate-on-scroll" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:0.5rem;">
-            <div>
-                <h2>Recently <span>Viewed</span></h2>
-                <p>Pick up where you left off</p>
-            </div>
-            <button type="button" onclick="clearRecentViews()" style="background:none;border:1.5px solid var(--border-dark);color:var(--text-light);padding:0.3rem 0.9rem;border-radius:30px;font-size:0.72rem;font-weight:700;cursor:pointer;">
-                <i class="fa-regular fa-trash-can"></i> Clear
-            </button>
-        </div>
-        <div class="product-grid" id="recentViewsGrid"></div>
-    </div>
+    <!-- The home page stays focused on discovery and visual deals. -->
 
     <!-- 4. SHOP BY CATEGORY -->
     <div class="section-title animate-on-scroll" style="margin-top: 3rem;">
@@ -869,12 +835,29 @@
         </div>
     </div>
 
-    <!-- EXTRA FEATURED PRODUCTS -->
+    <!-- MORE DEALS: visual discovery links, not an inventory feed -->
     <div class="section-title animate-on-scroll" style="margin-top:3rem;">
         <h2>More <span>Deals</span></h2>
-        <p>Hand-picked products with the best wholesale margins</p>
+        <p>Explore wholesale opportunities by category</p>
     </div>
-    <div class="product-grid" id="extraProductGrid"></div>
+    <div class="deal-photo-grid animate-on-scroll" aria-label="Browse more deals">
+        <a class="deal-photo-card" href="/products?category=electronics">
+            <img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=800&q=85" alt="Electronics wholesale deals" loading="lazy" />
+            <span>Electronics</span>
+        </a>
+        <a class="deal-photo-card" href="/products?category=fashion">
+            <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=800&q=85" alt="Fashion wholesale deals" loading="lazy" />
+            <span>Fashion</span>
+        </a>
+        <a class="deal-photo-card" href="/products?category=home">
+            <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=800&q=85" alt="Home and lifestyle wholesale deals" loading="lazy" />
+            <span>Home &amp; Lifestyle</span>
+        </a>
+        <a class="deal-photo-card" href="/products?category=automotive">
+            <img src="https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=800&q=85" alt="Automotive wholesale deals" loading="lazy" />
+            <span>Automotive</span>
+        </a>
+    </div>
 
     <!-- RECENTLY VIEWED PRODUCTS -->
     <div id="recentlyViewedSection" style="display:none;"></div>
@@ -953,8 +936,6 @@
         window.db = firebase.firestore();
         window.auth = firebase.auth();
         setupAuthListener();
-        loadProducts();
-        loadStats();
         loadCartCount();
         loadWishlistCount();
         renderLogos();
@@ -1065,69 +1046,6 @@
         requestAnimationFrame(updateCounter);
     }
 
-    async function loadStats() {
-        try {
-            // Stats are SOURCE-BACKED: computed from the live public inventory
-            // feed (GET /api/inventory), never hardcoded or promotional.
-            let productCount = 0;
-            let supplierCount = 0;
-            let orderCount = 0;
-            let satisfactionRate = 0;
-
-            try {
-                const items = [];
-                let cursor = null;
-                for (let page = 0; page < 10; page++) {
-                    const url = new URL('/api/inventory', window.location.origin);
-                    url.searchParams.set('limit', '100');
-                    if (cursor) url.searchParams.set('cursor', cursor);
-                    const res = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
-                    if (!res.ok) break;
-                    const payload = await res.json();
-                    items.push(...(payload.data || []));
-                    cursor = payload.meta && payload.meta.nextCursor;
-                    if (!cursor) break;
-                }
-                productCount = items.length;
-                supplierCount = items.filter(i => i.status === 'available' || i.status === 'limited').length;
-                orderCount = items.filter(i => i.rfqEnabled !== false).length;
-                satisfactionRate = new Set(items.map(i => i.category).filter(Boolean)).size;
-            } catch (e) {
-                console.log('Error loading stats from inventory feed:', e);
-            }
-
-            const productCounter = document.querySelector('#statProducts .count');
-            const supplierCounter = document.querySelector('#statSuppliers .count');
-            const satisfactionCounter = document.querySelector('#statSatisfaction .count');
-            const orderCounter = document.querySelector('#statOrders .count');
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const el = entry.target;
-                        const target = parseFloat(el.dataset.target);
-                        if (!isNaN(target)) {
-                            animateCounter(el, target, 2500);
-                        }
-                        observer.unobserve(el);
-                    }
-                });
-            }, { threshold: 0.3 });
-
-            if (productCounter) { productCounter.dataset.target = productCount; observer.observe(productCounter); }
-            if (supplierCounter) { supplierCounter.dataset.target = supplierCount; observer.observe(supplierCounter); }
-            if (satisfactionCounter) { satisfactionCounter.dataset.target = satisfactionRate; observer.observe(satisfactionCounter); }
-            if (orderCounter) { orderCounter.dataset.target = orderCount; observer.observe(orderCounter); }
-
-        } catch (error) {
-            console.error('Error loading stats:', error);
-            document.querySelectorAll('.count').forEach(el => {
-                const target = el.dataset.target;
-                if (target) el.textContent = target;
-            });
-        }
-    }
-
     function renderLogos() {
         const track = document.getElementById('logoTrack');
         if (!track) return;
@@ -1140,67 +1058,11 @@
         `).join('');
     }
 
-    // Keep a local cache of rendered products for guest cart details
-    let featuredProductsCache = [];
-
-    async function addToCart(productId) {
-        const user = getCurrentUser();
-        const btn = document.querySelector(`.btn-add[data-product-id="${productId}"]`);
-        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; }
-
-        try {
-            if (!user) {
-                // Guest cart via localStorage
-                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
-                const product = featuredProductsCache.find(p => p.id === productId);
-                const existingIndex = cart.findIndex(item => item.product_id === productId);
-                if (existingIndex > -1) {
-                    cart[existingIndex].quantity = (cart[existingIndex].quantity || 1) + 1;
-                } else {
-                    cart.push({
-                        product_id: productId,
-                        title: product?.title || 'Product',
-                        price: product?.price || 0,
-                        old_price: product?.old_price || 0,
-                        image_url: window.getProductImage ? window.getProductImage(product, '') : (product?.image_url || ''),
-                        brand: product?.brand || 'Pilot Distribution',
-                        moq: product?.moq || 1,
-                        quantity: 1
-                    });
-                }
-                localStorage.setItem('pilot_cart', JSON.stringify(cart));
-                showToast('✅ Added to cart!', 'success');
-                loadCartCount();
-            } else {
-                const snapshot = await db.collection('cart')
-                    .where('user_id', '==', user.id)
-                    .where('product_id', '==', productId)
-                    .get();
-
-                if (!snapshot.empty) {
-                    const docRef = snapshot.docs[0].ref;
-                    const currentQty = snapshot.docs[0].data().quantity || 1;
-                    await docRef.update({ quantity: currentQty + 1, updated_at: new Date().toISOString() });
-                } else {
-                    await db.collection('cart').add({
-                        user_id: user.id,
-                        product_id: productId,
-                        quantity: 1,
-                        created_at: new Date().toISOString()
-                    });
-                }
-                showToast('✅ Added to cart!', 'success');
-                loadCartCount();
-            }
-        } catch (error) {
-            console.error(error);
-            showToast('❌ Failed to add to cart', 'error');
-        }
-
-        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add'; }
-    }
-
     async function toggleWishlist(productId) {
+        if (!productId) {
+            window.location.href = '/wishlist';
+            return;
+        }
         const user = getCurrentUser();
         if (!user) {
             showToast('Please login first', 'error');
@@ -1339,236 +1201,6 @@
     function nextSlide() { goToSlide(currentSlide + 1); }
     function prevSlide() { goToSlide(currentSlide - 1); }
 
-    // ─── PRODUCT VIEW STATE ───
-    let currentProductView = 'all';
-
-    function setProductView(view) {
-        currentProductView = view;
-        // Keep the hamburger menu (admin-style) view tabs in sync
-        document.querySelectorAll('#pseMobileMenu .nav-item[data-view]').forEach(b => {
-            b.classList.toggle('active', b.dataset.view === view);
-        });
-        renderProducts(featuredProductsCache);
-    }
-
-    async function loadProducts() {
-        const grid = document.getElementById('productGrid');
-
-        try {
-            if (typeof db === 'undefined' || !db) {
-                // Wait for Firebase to initialize
-                setTimeout(loadProducts, 800);
-                return;
-            }
-
-            let products = [];
-
-            // 1) Try the public inventory API first
-            try {
-                const response = await fetch('/api/inventory?limit=8', { headers: { 'Accept': 'application/json' } });
-                if (response.ok) {
-                    const payload = await response.json();
-                    products = (payload.data || []).map(item => {
-                        const isPublicPrice = item.pricingMode === 'public' && Number.isFinite(Number(item.publicUnitPrice));
-                        return {
-                            id: item.dealId,
-                            dealId: item.dealId,
-                            slug: item.slug,
-                            title: item.title || 'Product',
-                            brand: item.brand || 'Pilot Distribution',
-                            moq: item.moqUnits || 0,
-                            category: item.category || 'other',
-                            pricingMode: item.pricingMode || 'rfq',
-                            price: isPublicPrice ? Number(item.publicUnitPrice) : null,
-                            image_url: (item.imageUrls && item.imageUrls[0]) || '',
-                            sourceVersion: item.sourceVersion || '',
-                            snapshotVersion: item.snapshotVersion || '',
-                            rfqEnabled: item.rfqEnabled !== false,
-                            status: item.status || 'active'
-                        };
-                    });
-                }
-            } catch (feedError) {
-                console.log('Inventory API unavailable, loading current products...');
-            }
-
-            // 2) ALWAYS merge the current Firestore `products` — the home page shows
-            //    both the live inventory feed and the uploaded products, not only inventory
-            try {
-                const snapshot = await db.collection('products')
-                    .where('status', 'in', ['active', 'approved'])
-                    .orderBy('created_at', 'desc')
-                    .limit(20)
-                    .get();
-
-                if (!snapshot.empty) {
-                    const seen = new Set();
-                    products.forEach(p => {
-                        if (p.slug) seen.add('slug:' + p.slug);
-                        if (p.id) seen.add('id:' + p.id);
-                        seen.add('title:' + (p.title || '').toLowerCase());
-                    });
-                    let merged = 0;
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        const slug = data.slug || generateSlug(data.title || 'product');
-                        if (seen.has('id:' + doc.id) || seen.has('slug:' + slug) || seen.has('title:' + (data.title || '').toLowerCase())) return;
-                        seen.add('id:' + doc.id);
-                        seen.add('slug:' + slug);
-                        seen.add('title:' + (data.title || '').toLowerCase());
-                        const imageUrl = window.getProductImage ? window.getProductImage(data, '') : (data.image_url || data.image_urls?.[0] || '');
-                        products.push({
-                            id: doc.id,
-                            dealId: doc.id,
-                            slug: slug,
-                            title: data.title || 'Product',
-                            brand: data.brand || 'Pilot Distribution',
-                            moq: data.moq || 1,
-                            category: data.category || 'other',
-                            pricingMode: 'public',
-                            price: data.price || 0,
-                            old_price: data.old_price || 0,
-                            image_url: imageUrl,
-                            rfqEnabled: true,
-                            status: data.status || 'active',
-                            stock: data.stock || 0,
-                            supplier_verified: data.supplier_verified || false
-                        });
-                        merged++;
-                    });
-                    console.log(`✅ Merged ${merged} current products with ${products.length - merged} live inventory items (${products.length} total)`);
-                }
-            } catch (dbError) {
-                console.error('Firestore product load error:', dbError);
-            }
-
-            // 3) Also try catalog-data.js static products as last resort
-            if (products.length === 0 && window.PSE_CATALOG_DATA && window.PSE_CATALOG_DATA.products) {
-                products = window.PSE_CATALOG_DATA.products.map((p, i) => ({
-                    id: 'catalog-' + i,
-                    dealId: 'catalog-' + i,
-                    slug: generateSlug(p.title),
-                    title: p.title,
-                    brand: p.brand || 'Pilot Distribution',
-                    moq: p.moq || 1,
-                    category: p.category || 'other',
-                    pricingMode: 'public',
-                    price: p.price || 0,
-                    old_price: p.old_price || 0,
-                    image_url: p.image_url || '',
-                    rfqEnabled: true,
-                    status: 'active',
-                    stock: 100,
-                    supplier_verified: true
-                }));
-            }
-
-            renderProducts(products);
-
-        } catch (error) {
-            console.error('Error loading products:', error);
-            renderProducts([]);
-        }
-    }
-
-    function renderProducts(products) {
-        const grid = document.getElementById('productGrid');
-        featuredProductsCache = products || [];
-        
-        // Apply product view filter
-        let displayProducts = [...featuredProductsCache];
-        if (currentProductView === 'available') {
-            displayProducts = displayProducts.filter(p => (p.stock || 0) > 0 || p.status === 'active');
-        } else if (currentProductView === 'rfq') {
-            displayProducts = displayProducts.filter(p => p.rfqEnabled !== false);
-        }
-        
-        if (!displayProducts || displayProducts.length === 0) {
-            const msg = currentProductView === 'available' ? 'No in-stock products right now.' 
-                : currentProductView === 'rfq' ? 'No RFQ deals available.' 
-                : 'No products available yet.';
-            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-light);">
-                <i class="fa-solid fa-box" style="font-size:3rem; color:var(--primary);"></i>
-                <p style="margin-top:1rem; font-size:1.1rem;">${msg}</p>
-                <p style="font-size:0.9rem;">Add inventory or check back soon for new wholesale deals!</p>
-                <a href="/inventory-upload" style="display:inline-block;margin-top:0.8rem;background:var(--primary);color:#fff;padding:0.5rem 1.5rem;border-radius:30px;text-decoration:none;font-weight:600;font-size:0.85rem;">
-                    <i class="fa-solid fa-cloud-upload"></i> Upload Inventory
-                </a>
-            </div>`;
-            return;
-        }
-
-        // Sort sponsored listings to the top of home page featured products
-        displayProducts.sort((a, b) => (b.sponsored ? 1 : 0) - (a.sponsored ? 1 : 0));
-
-        grid.innerHTML = displayProducts.map(p => {
-            const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
-            const slug = p.slug || generateSlug(p.title || 'product');
-            const imageUrl = window.getProductImage ? window.getProductImage(p) : (p.image_url || 'logo.webp');
-            const sponsoredBadge = p.sponsored ? `<span class="product-badge" style="background:#d35400;color:#fff;top:10px;right:10px;z-index:10;font-weight:700;"><i class="fa-solid fa-rocket"></i> SPONSORED</span>` : '';
-            const vipTierBadge = p.supplier_tier === 'platinum' || p.membership_tier === 'platinum' ?
-                `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#8e44ad;margin-top:2px;"><i class="fa-solid fa-crown"></i> Platinum Supplier</div>` :
-                p.supplier_tier === 'gold' || p.membership_tier === 'gold' ?
-                `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#d35400;margin-top:2px;"><i class="fa-solid fa-crown"></i> Gold Supplier</div>` : '';
-            
-            const priceBlock = p.price !== null && p.price !== undefined
-                ? `$${Number(p.price).toFixed(2)}${p.old_price ? ` <span class="old">$${p.old_price.toFixed(2)}</span>` : ''}`
-                : `<span style="font-size:0.95rem;color:var(--primary);font-weight:700;">Quote required</span>`;
-            const rfqHref = buildFeaturedRfqUrl(p);
-            return `<div class="product-card animate-on-scroll">
-                ${sponsoredBadge}
-                ${p.moq ? `<span class="product-badge wholesale" style="${p.sponsored ? 'top:38px;' : ''}">MOQ ${p.moq}</span>` : ''}
-                ${discount > 0 ? `<span class="product-badge flash" style="${p.sponsored ? 'top:66px;' : ''}">-${discount}%</span>` : ''}
-                <div class="product-image" onclick="window.location.href='/product/${encodeURIComponent(slug)}'">
-                    <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'" />
-                </div>
-                <div class="product-title">${p.title || 'Product'}</div>
-                <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
-                <div class="product-price">${priceBlock}</div>
-                <div class="product-actions">
-                    <a class="btn-add" href="/product/${encodeURIComponent(slug)}" style="text-align:center;text-decoration:none;"><i class="fa-regular fa-eye"></i> Details</a>
-                    ${p.rfqEnabled ? `<a class="btn-add" href="${rfqHref}" style="background:var(--primary);text-align:center;text-decoration:none;"><i class="fa-regular fa-file-lines"></i> RFQ</a>` : ''}
-                </div>
-            </div>`;
-        }).join('');
-
-        document.querySelectorAll('.animate-on-scroll').forEach(el => {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-            }, { threshold: 0.1 });
-            observer.observe(el);
-        });
-    }
-
-    function toggleWishlist() {
-        const user = getCurrentUser();
-        if (!user) {
-            showToast('Please login to view wishlist', 'error');
-            setTimeout(() => window.location.href = '/login', 1500);
-            return;
-        }
-        window.location.href = '/wishlist';
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        initFirebase();
-        initBanner();
-        initFlashTimer();
-        renderExtraProducts();
-        renderRecentViews();
-        document.getElementById('year').textContent = new Date().getFullYear();
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
-    });
-
-    // ─── RECENTLY VIEWED RAIL (localStorage, written by product-detail pages) ───
     function renderRecentViews() {
         const section = document.getElementById('recentViewsSection');
         const grid = document.getElementById('recentViewsGrid');
@@ -1613,86 +1245,12 @@
         }, 1000);
     }
 
-    // Render extra products grid
-    async function renderExtraProducts() {
-        const grid = document.getElementById('extraProductGrid');
-        if (!grid) return;
-        try {
-            const snapshot = await db.collection('products').where('status', 'in', ['active', 'approved']).limit(4).get();
-            let products = [];
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const image_url = window.getProductImage ? window.getProductImage(data, '') : (data.image_url || data.images?.[0] || '');
-                products.push({
-                    id: doc.id,
-                    ...data,
-                    title: data.title || 'Product',
-                    brand: data.brand || 'Pilot',
-                    price: data.price || 0,
-                    old_price: data.old_price || 0,
-                    image_url: image_url,
-                    moq: data.moq || 1,
-                    supplier_verified: data.supplier_verified || false,
-                    slug: data.slug || generateSlug(data.title || 'product')
-                });
-            });
-            if (products.length === 0) {
-                const sectionTitle = grid.previousElementSibling;
-                if (sectionTitle && sectionTitle.classList.contains('section-title')) {
-                    sectionTitle.style.display = 'none';
-                }
-                grid.style.display = 'none';
-                return;
-            }
-
-            // Add these products to the featuredProductsCache so guest cart add functions correctly
-            if (typeof featuredProductsCache !== 'undefined' && Array.isArray(featuredProductsCache)) {
-                products.forEach(p => {
-                    if (!featuredProductsCache.some(item => item.id === p.id)) {
-                        featuredProductsCache.push(p);
-                    }
-                });
-            }
-
-            grid.innerHTML = products.map(p => {
-                const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
-                const slug = p.slug || generateSlug(p.title || 'product');
-                const imageUrl = window.getProductImage ? window.getProductImage(p, '') : (p.image_url || 'logo.webp');
-                return `<div class="product-card animate-on-scroll">
-                    ${p.moq ? `<span class="product-badge wholesale">MOQ ${p.moq}</span>` : ''}
-                    ${discount > 0 ? `<span class="product-badge flash">-${discount}%</span>` : ''}
-                    ${p.supplier_verified ? `<span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>` : ''}
-                    <div class="product-image" onclick="window.location.href='/product/${slug}'">
-                        <img src="${imageUrl}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'" />
-                    </div>
-                    <div class="product-title">${p.title || 'Product'}</div>
-                    <div class="product-brand">${p.brand || 'Pilot'}</div>
-                    <div class="product-price">$${(p.price || 0).toFixed(2)}${p.old_price ? ` <span class="old">$${p.old_price.toFixed(2)}</span>` : ''}</div>
-                    <div class="product-actions">
-                        <button class="btn-add" data-product-id="${p.id}" onclick="addToCart('${p.id}')"><i class="fa-solid fa-cart-plus"></i> Add</button>
-                        <button class="btn-wish" data-wishlist-id="${p.id}" onclick="toggleWishlist('${p.id}')"><i class="fa-regular fa-heart"></i></button>
-                    </div>
-                </div>`;
-            }).join('');
-        } catch (e) {
-            console.error('Extra products error:', e);
-            const sectionTitle = grid.previousElementSibling;
-            if (sectionTitle && sectionTitle.classList.contains('section-title')) {
-                sectionTitle.style.display = 'none';
-            }
-            grid.style.display = 'none';
-        }
-    }
-
-    window.addToCart = addToCart;
     window.toggleWishlist = toggleWishlist;
-    window.loadProducts = loadProducts;
     window.goToSlide = goToSlide;
     window.nextSlide = nextSlide;
     window.prevSlide = prevSlide;
     window.showToast = showToast;
     window.getCurrentUser = getCurrentUser;
-    window.setProductView = setProductView;
 </script>
 
 <!-- ═══════════ CENTER POPUP (promo + festival greeting) ═══════════ -->

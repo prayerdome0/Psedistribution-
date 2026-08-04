@@ -172,26 +172,21 @@
                 </div>
                 <button class="menu-close" aria-label="Close menu">&times;</button>
             </div>
-            <a class="nav-item" href="/"><i class="fa-solid fa-home"></i> Home</a>
-            <div class="menu-section">Browse</div>
-            <a class="nav-item active" data-view="all" href="/products"><i class="fa-solid fa-grid-2"></i> All Products</a>
-            <a class="nav-item" data-view="available" href="/products"><i class="fa-solid fa-circle-check"></i> In Stock</a>
-            <a class="nav-item" data-view="rfq" href="/rfq"><i class="fa-regular fa-file-lines"></i> RFQ Deals</a>
-            <a class="nav-item" href="/products"><i class="fa-solid fa-box"></i> All</a>
-            <a class="nav-item" href="/catalogs"><i class="fa-solid fa-file-pdf"></i> Catalogs</a>
+            <div class="menu-section">Main menu</div>
+            <a class="nav-item" href="/"><i class="fa-solid fa-house"></i> Home</a>
+            <a class="nav-item" href="/products"><i class="fa-solid fa-grid-2"></i> Products</a>
+            <a class="nav-item" href="/seller-dashboard"><i class="fa-solid fa-store"></i> Sell</a>
             <a class="nav-item" href="/rfq"><i class="fa-regular fa-file-lines"></i> RFQ</a>
-            <a class="nav-item" href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
-            <a class="nav-item" href="/inventory-upload"><i class="fa-solid fa-cloud-upload"></i> Upload Inventory <span class="badge gold">NEW</span></a>
+            <a class="nav-item" href="${accountLink.href}"><i class="${accountLink.icon}"></i> Account</a>
+            <a class="nav-item" href="/about"><i class="fa-solid fa-circle-info"></i> About us</a>
             <div class="menu-section">Shopping</div>
             <a class="nav-item" href="/cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
             <a class="nav-item" href="/wishlist"><i class="fa-regular fa-heart"></i> Wishlist</a>
             <a class="nav-item" href="/track-order"><i class="fa-solid fa-truck"></i> Track Order</a>
             <div class="menu-section">Account</div>
-            <a class="nav-item" href="${accountLink.href}"><i class="${accountLink.icon}"></i> ${accountLink.label}</a>
             <a class="nav-item" href="/seller-dashboard"><i class="fa-solid fa-store"></i> Seller Dashboard</a>
             <a class="nav-item" href="/become-seller"><i class="fa-solid fa-handshake"></i> Become a Seller</a>
             <div class="menu-section">Support</div>
-            <a class="nav-item" href="/about"><i class="fa-solid fa-circle-info"></i> About</a>
             <a class="nav-item" href="/help-center"><i class="fa-regular fa-circle-question"></i> Help Center</a>
         `;
         return menu;
