@@ -52,6 +52,43 @@ python3 -m venv .venv
 Then open `/products`, `/product/demo-closeout-beverage-lot`, and
 `/rfq?dealId=PSE-DEMO-0001`.
 
+### Publish live inventory (production path)
+
+Live inventory is never uploaded directly: it flows through the same gated
+pipeline the demo uses — review-only import, owner approval bound to the exact
+source version, packet publish gate, privacy scan, atomic promotion.
+
+```bash
+# 1. Import the authority export into PRIVATE review-only drafts (publishes nothing)
+./.venv/bin/python services/pse-inventory/migrations/100_import_verified_inventory.py \
+    --source live-export.json --authority <authority-id> \
+    --output-dir services/pse-inventory/data/import-$(date -u +%Y%m%d)
+
+# 2. Review canonical_drafts.json + review_queue.json: clear every blocker
+#    (availability confirmation, proof evidence, quantity, pricing mode) and
+#    record an owner approval per record bound to its exact source.sourceVersion.
+
+# 3. Publish the approved canonical records through the production CLI
+./.venv/bin/python services/pse-inventory/publish_snapshot.py \
+    --records approved-canonical-records.json \
+    --approvals owner-approvals.json \
+    --operator "<owner or documented delegate>" \
+    --run-id <run-id> --release-id <release-id>
+```
+
+The publish CLI fails the whole run closed on any approval mismatch, gate
+failure, or integrity problem, writes an audit report to
+`data/publish_reports/` on every run, supports `--dry-run`, and atomically
+promotes to `data/current.json` (prior snapshot archived to `data/history/`).
+See `services/pse-inventory/contracts/canonical_inventory_record.example.json`
+for the record shape and `services/pse-inventory/deploy/.env.example` for the
+deployment environment template (placeholders only; real secrets live in the
+secret store).
+
+After promotion: `scripts/pse-inventory-backup.sh` to take a validated backup,
+restart the API so it serves the new snapshot at `/api/inventory`, and use
+`scripts/pse-inventory-rollback.sh <snapshotVersion>` if anything looks wrong.
+
 ### Run the tests
 
 ```bash
