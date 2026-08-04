@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Inventory — Pilot Sales Distribution</title>
+    <meta name="description" content="Manually upload wholesale inventory to Pilot Sales Distribution. Add single products or bulk import via CSV." />
+    
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="main.js"></script>
+
+    <style>
+        :root {
+            --primary: #1a7b6b;
+            --primary-dark: #0f4f43;
+            --primary-light: #e8f5f0;
+            --secondary: #0b2a3b;
+            --accent: #f1c40f;
+            --text: #2c5a6b;
+            --text-light: #6a889a;
+            --border: #e9edf2;
+            --border-dark: #dce3e9;
+            --light: #f0f4f8;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.06);
+            --radius: 1rem;
+            --radius-sm: 0.6rem;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        body { background: var(--light); color: var(--secondary); line-height: 1.6; min-height: 100vh; }
+        a { text-decoration: none; color: inherit; }
+        
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            padding: 0.7rem 0;
+            box-shadow: var(--shadow);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .container { display: flex; align-items: center; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 800; color: var(--secondary); }
+        .logo span { color: var(--primary); }
+        .logo img { height: 36px; border-radius: 6px; }
+        .back-link { margin-left: auto; color: var(--text-light); font-size: 0.85rem; }
+        .back-link:hover { color: var(--primary); }
+
+        /* Page layout */
+        .page { padding: 2rem 0 4rem; }
+        .page h1 { font-size: 1.8rem; font-weight: 800; color: var(--secondary); margin-bottom: 0.3rem; }
+        .page h1 i { color: var(--primary); }
+        .page .subtitle { color: var(--text-light); margin-bottom: 1.5rem; font-size: 0.95rem; }
+
+        /* Tab switcher */
+        .tab-bar {
+            display: flex;
+            gap: 0.4rem;
+            margin-bottom: 1.8rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0;
+        }
+        .tab-btn {
+            padding: 0.6rem 1.4rem;
+            border: none;
+            background: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: 0.2s;
+        }
+        .tab-btn:hover { color: var(--primary); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Form card */
+        .form-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        .form-card h2 { font-size: 1.2rem; color: var(--secondary); margin-bottom: 1.2rem; }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin-bottom: 0.25rem;
+        }
+        .form-group label .req { color: #c0392b; }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1.5px solid var(--border-dark);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: 0.2s;
+            background: var(--white);
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26,123,107,0.08);
+        }
+        .form-group textarea { resize: vertical; min-height: 70px; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.6rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-outline { background: var(--white); color: var(--primary); border: 2px solid var(--primary); }
+        .btn-outline:hover { background: var(--primary-light); }
+        .btn-secondary { background: var(--secondary); color: #fff; }
+        .btn-secondary:hover { filter: brightness(1.3); }
+
+        .btn-group { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 1rem; }
+
+        /* CSV upload area */
+        .csv-dropzone {
+            border: 2px dashed var(--border-dark);
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            background: var(--light);
+            margin-bottom: 1rem;
+        }
+        .csv-dropzone:hover { border-color: var(--primary); background: var(--primary-light); }
+        .csv-dropzone i { font-size: 2.5rem; color: var(--primary); margin-bottom: 0.8rem; }
+        .csv-dropzone p { color: var(--text-light); font-size: 0.9rem; }
+        .csv-dropzone .cta { font-weight: 700; color: var(--secondary); }
+
+        /* Preview table */
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            margin-top: 1rem;
+        }
+        .preview-table th {
+            background: var(--light);
+            padding: 0.5rem 0.7rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+        .preview-table td {
+            padding: 0.4rem 0.7rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Status message */
+        .status-msg {
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            display: none;
+        }
+        .status-msg.show { display: block; }
+        .status-msg.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-msg.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status-msg.info { background: #cce5ff; color: #004085; border: 1px solid #b8daff; }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--secondary);
+            color: #fff;
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+            opacity: 0;
+            transition: 0.25s;
+            z-index: 9999;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            vertical-align: -2px;
+            margin-right: 0.3rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .template-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            background: var(--light);
+            color: var(--primary);
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            border: 1px solid var(--border-dark);
+            cursor: pointer;
+            margin-bottom: 0.8rem;
+        }
+        .template-download:hover { background: var(--primary-light); }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="container">
+        <a href="/" class="logo">
+            <img src="/logo.webp" alt="PSE" />
+            PSE <span>Distribution</span>
+        </a>
+        <a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+    </div>
+</div>
+
+<div class="container page">
+    <h1><i class="fa-solid fa-cloud-upload"></i> Upload Live Inventory</h1>
+    <p class="subtitle">Manually add your wholesale products — one at a time or bulk import via CSV</p>
+
+    <div class="tab-bar">
+        <button class="tab-btn active" data-tab="single" onclick="switchTab('single')">
+            <i class="fa-solid fa-plus"></i> Add Single Product
+        </button>
+        <button class="tab-btn" data-tab="bulk" onclick="switchTab('bulk')">
+            <i class="fa-solid fa-file-csv"></i> Bulk CSV Import
+        </button>
+        <button class="tab-btn" data-tab="paste" onclick="switchTab('paste')">
+            <i class="fa-solid fa-clipboard-list"></i> Quick Paste
+        </button>
+    </div>
+
+    <!-- SINGLE PRODUCT FORM -->
+    <div class="tab-content active" id="tab-single">
+        <div class="form-card">
+            <h2><i class="fa-solid fa-box"></i> Add One Product</h2>
+            <div id="singleStatus" class="status-msg"></div>
+            <form id="singleProductForm" onsubmit="submitSingleProduct(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Product Title <span class="req">*</span></label>
+                        <input type="text" id="sTitle" placeholder="e.g. Industrial LED Floodlight 100W" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Brand</label>
+                        <input type="text" id="sBrand" placeholder="e.g. Philips" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Wholesale Price (USD) <span class="req">*</span></label>
+                        <input type="number" id="sPrice" placeholder="0.00" step="0.01" min="0" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Compare-at Price (optional)</label>
+                        <input type="number" id="sOldPrice" placeholder="0.00" step="0.01" min="0" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>MOQ (Minimum Order Qty)</label>
+                        <input type="number" id="sMoq" placeholder="1" min="1" value="1" />
+                    </div>
+                    <div class="form-group">
+                        <label>Current Stock</label>
+                        <input type="number" id="sStock" placeholder="100" min="0" value="100" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="sCategory">
+                            <option value="electronics">Electronics</option>
+                            <option value="fashion">Fashion</option>
+                            <option value="grocery">Grocery</option>
+                            <option value="home">Home &amp; Kitchen</option>
+                            <option value="beauty">Beauty</option>
+                            <option value="health">Health</option>
+                            <option value="sports">Sports</option>
+                            <option value="automotive">Automotive</option>
+                            <option value="baby">Baby</option>
+                            <option value="office">Office</option>
+                            <option value="industrial">Industrial</option>
+                            <option value="books">Books</option>
+                            <option value="pets">Pets</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>SKU (optional)</label>
+                        <input type="text" id="sSku" placeholder="e.g. PH-FLD-100" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Image URL (optional)</label>
+                    <input type="url" id="sImageUrl" placeholder="https://images.unsplash.com/photo-..." />
+                </div>
+                <div class="form-group">
+                    <label>Short Description</label>
+                    <textarea id="sDescription" placeholder="Describe the product in a sentence or two..."></textarea>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-cloud-upload"></i> Add to Inventory
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="clearSingleForm()">
+                        <i class="fa-solid fa-rotate-left"></i> Clear
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- BULK CSV IMPORT -->
+    <div class="tab-content" id="tab-bulk">
+        <div class="form-card">
+            <h2><i class="fa-solid fa-file-csv"></i> Bulk CSV Import</h2>
+            <p style="color:var(--text-light);font-size:0.9rem;margin-bottom:1rem;">
+                Upload a CSV file with columns: <strong>title, brand, price, moq, stock, category, sku, image_url, description</strong>
+            </p>
+            <a href="javascript:void(0)" class="template-download" onclick="downloadCSVTemplate()">
+                <i class="fa-solid fa-download"></i> Download CSV Template
+            </a>
+            <div id="bulkStatus" class="status-msg"></div>
+            
+            <div class="csv-dropzone" id="csvDropZone">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <p class="cta">Drop CSV file here or click to browse</p>
+                <p>Max 500 products per import</p>
+                <input type="file" id="csvFileInput" accept=".csv,.txt" style="display:none;" onchange="handleCSVFile(event)" />
+            </div>
+            
+            <div id="csvPreview" style="display:none;">
+                <h4 style="margin:1rem 0 0.5rem;">Preview — <span id="csvCount">0</span> products found</h4>
+                <div style="max-height:300px;overflow:auto;border:1px solid var(--border);border-radius:8px;" id="csvPreviewTable"></div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="importCSVToFirestore()">
+                        <i class="fa-solid fa-upload"></i> Import to Live Inventory
+                    </button>
+                    <button class="btn btn-outline" onclick="clearCSV()">
+                        <i class="fa-solid fa-xmark"></i> Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK PASTE -->
+    <div class="tab-content" id="tab-paste">
+        <div class="form-card">
+            <h2><i class="fa-solid fa-clipboard-list"></i> Quick Paste Products</h2>
+            <p style="color:var(--text-light);font-size:0.9rem;margin-bottom:1rem;">
+                Paste one product per line: <strong>Title | Brand | Price | MOQ | Stock | Category | Image URL</strong><br />
+                <small>Example: <code>LED Floodlight | Philips | 45.00 | 10 | 200 | industrial | https://...</code></small>
+            </p>
+            <div id="pasteStatus" class="status-msg"></div>
+            <div class="form-group">
+                <textarea id="pasteText" rows="8" placeholder="LED Floodlight 100W | Philips | 45.00 | 10 | 200 | industrial&#10;Wireless Mouse | Logitech | 22.00 | 48 | 500 | electronics&#10;Protein Powder 2kg | Optimum Nutrition | 42.00 | 18 | 300 | health"></textarea>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="parsePastedProducts()">
+                    <i class="fa-solid fa-list-check"></i> Parse &amp; Preview
+                </button>
+                <button class="btn btn-secondary" onclick="importPastedToFirestore()" id="importPastedBtn" disabled>
+                    <i class="fa-solid fa-upload"></i> Import All
+                </button>
+            </div>
+            <div id="pastePreview" style="margin-top:1rem;"></div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    // ─── FIREBASE ───
+    const firebaseConfig = {
+        apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
+        authDomain: "pilot-sales-distribution.firebaseapp.com",
+        projectId: "pilot-sales-distribution",
+        storageBucket: "pilot-sales-distribution.firebasestorage.app",
+        messagingSenderId: "729127273727",
+        appId: "1:729127273727:web:402d67be8346257755f8ca"
+    };
+
+    let db;
+
+    function initFirebase() {
+        if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        console.log('✅ Firebase ready for inventory upload');
+    }
+
+    function toast(msg, type) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast ' + (type || 'info') + ' show';
+        clearTimeout(t._timeout);
+        t._timeout = setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    function generateSlug(title) {
+        return (title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
+    }
+
+    function showStatus(id, msg, type) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = msg;
+        el.className = 'status-msg show ' + (type || 'info');
+    }
+
+    // ─── TAB SWITCHING ───
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab));
+    }
+
+    // ═══════════ SINGLE PRODUCT ═══════════
+    async function submitSingleProduct(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Adding...';
+        showStatus('singleStatus', '', 'info');
+
+        try {
+            const product = {
+                title: document.getElementById('sTitle').value.trim(),
+                brand: document.getElementById('sBrand').value.trim() || 'Pilot Distribution',
+                price: parseFloat(document.getElementById('sPrice').value) || 0,
+                old_price: parseFloat(document.getElementById('sOldPrice').value) || 0,
+                moq: parseInt(document.getElementById('sMoq').value) || 1,
+                stock: parseInt(document.getElementById('sStock').value) || 0,
+                category: document.getElementById('sCategory').value,
+                sku: document.getElementById('sSku').value.trim() || '',
+                image_url: document.getElementById('sImageUrl').value.trim() || '',
+                description: document.getElementById('sDescription').value.trim() || '',
+                slug: generateSlug(document.getElementById('sTitle').value),
+                status: 'active',
+                type: 'Wholesale',
+                supplier_verified: true,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            if (!product.title || !product.price) {
+                showStatus('singleStatus', '❌ Title and Price are required.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-cloud-upload"></i> Add to Inventory';
+                return;
+            }
+
+            await db.collection('products').add(product);
+            showStatus('singleStatus', '✅ Product "' + product.title + '" added to live inventory!', 'success');
+            toast('✅ Product added to live inventory!', 'success');
+            clearSingleForm();
+        } catch (err) {
+            console.error(err);
+            showStatus('singleStatus', '❌ Failed: ' + err.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-cloud-upload"></i> Add to Inventory';
+        }
+    }
+
+    function clearSingleForm() {
+        document.getElementById('singleProductForm').reset();
+        document.getElementById('sMoq').value = '1';
+        document.getElementById('sStock').value = '100';
+        document.getElementById('singleStatus').className = 'status-msg';
+    }
+
+    // ═══════════ BULK CSV ═══════════
+    let csvProducts = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropZone = document.getElementById('csvDropZone');
+        const fileInput = document.getElementById('csvFileInput');
+        if (dropZone) {
+            dropZone.addEventListener('click', () => fileInput.click());
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#1a7b6b'; });
+            dropZone.addEventListener('dragleave', () => dropZone.style.borderColor = '#cbd5e1');
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#cbd5e1';
+                if (e.dataTransfer.files[0]) parseCSVFile(e.dataTransfer.files[0]);
+            });
+        }
+    });
+
+    function handleCSVFile(event) {
+        if (event.target.files[0]) parseCSVFile(event.target.files[0]);
+    }
+
+    function parseCSVFile(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            csvProducts = parseCSVText(e.target.result);
+            renderCSVPreview();
+        };
+        reader.readAsText(file);
+    }
+
+    function parseCSVText(text) {
+        const lines = text.trim().split(/\r?\n/);
+        if (lines.length < 2) return [];
+        const headers = lines[0].split(',').map(h => h.trim().replace(/^["']|["']$/g, '').toLowerCase());
+        const products = [];
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            const values = lines[i].split(',').map(v => v.trim().replace(/^["']|["']$/g, ''));
+            const p = {};
+            headers.forEach((h, idx) => {
+                let val = values[idx] || '';
+                if (['price', 'old_price', 'moq', 'stock'].includes(h)) val = parseFloat(val) || 0;
+                p[h] = val;
+            });
+            if (p.title) products.push(p);
+        }
+        return products;
+    }
+
+    function renderCSVPreview() {
+        const container = document.getElementById('csvPreview');
+        const table = document.getElementById('csvPreviewTable');
+        const count = document.getElementById('csvCount');
+        
+        if (!csvProducts.length) {
+            showStatus('bulkStatus', 'No valid products found in CSV.', 'error');
+            container.style.display = 'none';
+            return;
+        }
+
+        count.textContent = csvProducts.length;
+        let html = '<table class="preview-table"><thead><tr><th>Title</th><th>Brand</th><th>Price</th><th>MOQ</th><th>Stock</th><th>Category</th></tr></thead><tbody>';
+        csvProducts.slice(0, 30).forEach(p => {
+            html += `<tr><td>${p.title || ''}</td><td>${p.brand || ''}</td><td>$${(p.price || 0).toFixed(2)}</td><td>${p.moq || 1}</td><td>${p.stock || 0}</td><td>${p.category || ''}</td></tr>`;
+        });
+        if (csvProducts.length > 30) html += `<tr><td colspan="6" style="text-align:center;color:#888;">... and ${csvProducts.length - 30} more</td></tr>`;
+        html += '</tbody></table>';
+        table.innerHTML = html;
+        container.style.display = 'block';
+        showStatus('bulkStatus', '', 'info');
+    }
+
+    async function importCSVToFirestore() {
+        if (!csvProducts.length) return;
+        const btn = document.querySelector('#csvPreview .btn-primary');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Importing...';
+        
+        try {
+            let imported = 0;
+            for (const p of csvProducts) {
+                await db.collection('products').add({
+                    title: p.title || 'Product',
+                    brand: p.brand || 'Pilot Distribution',
+                    price: parseFloat(p.price) || 0,
+                    old_price: parseFloat(p.old_price) || 0,
+                    moq: parseInt(p.moq) || 1,
+                    stock: parseInt(p.stock) || 100,
+                    category: p.category || 'other',
+                    sku: p.sku || '',
+                    image_url: p.image_url || '',
+                    description: p.description || '',
+                    slug: p.slug || generateSlug(p.title),
+                    status: 'active',
+                    type: 'Wholesale',
+                    supplier_verified: true,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                });
+                imported++;
+            }
+            showStatus('bulkStatus', `✅ Successfully imported ${imported} products into live inventory!`, 'success');
+            toast(`✅ ${imported} products imported!`, 'success');
+            clearCSV();
+        } catch (err) {
+            console.error(err);
+            showStatus('bulkStatus', '❌ Import failed: ' + err.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-upload"></i> Import to Live Inventory';
+        }
+    }
+
+    function clearCSV() {
+        csvProducts = [];
+        document.getElementById('csvPreview').style.display = 'none';
+        document.getElementById('csvFileInput').value = '';
+        document.getElementById('bulkStatus').className = 'status-msg';
+    }
+
+    function downloadCSVTemplate() {
+        const headers = ['title', 'brand', 'price', 'old_price', 'moq', 'stock', 'category', 'sku', 'image_url', 'description'];
+        const sample = ['"Industrial LED Floodlight 100W"', '"Philips"', '45.00', '65.00', '10', '200', '"industrial"', '"PH-FLD-100"', '"https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400"', '"Heavy duty waterproof outdoor floodlight"'];
+        const csv = [headers.join(','), sample.join(',')].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'pse_inventory_template.csv';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        toast('📄 CSV template downloaded', 'info');
+    }
+
+    // ═══════════ QUICK PASTE ═══════════
+    let pastedProducts = [];
+
+    function parsePastedProducts() {
+        const text = document.getElementById('pasteText').value;
+        if (!text.trim()) { showStatus('pasteStatus', 'Paste product data first.', 'error'); return; }
+        
+        pastedProducts = [];
+        const lines = text.trim().split(/\n/);
+        lines.forEach(line => {
+            const parts = line.split('|').map(s => s.trim());
+            if (parts.length >= 3 && parts[0]) {
+                pastedProducts.push({
+                    title: parts[0],
+                    brand: parts[1] || 'Pilot Distribution',
+                    price: parseFloat(parts[2]) || 0,
+                    moq: parseInt(parts[3]) || 1,
+                    stock: parseInt(parts[4]) || 100,
+                    category: parts[5] || 'other',
+                    image_url: parts[6] || '',
+                    description: parts[7] || ''
+                });
+            }
+        });
+
+        const container = document.getElementById('pastePreview');
+        const btn = document.getElementById('importPastedBtn');
+
+        if (!pastedProducts.length) {
+            container.innerHTML = '<p style="color:#c0392b;">No valid products parsed. Use format: Title | Brand | Price | MOQ | Stock | Category</p>';
+            btn.disabled = true;
+            return;
+        }
+
+        let html = '<table class="preview-table"><thead><tr><th>#</th><th>Title</th><th>Brand</th><th>Price</th><th>MOQ</th><th>Stock</th><th>Category</th></tr></thead><tbody>';
+        pastedProducts.forEach((p, i) => {
+            html += `<tr><td>${i + 1}</td><td>${p.title}</td><td>${p.brand}</td><td>$${p.price.toFixed(2)}</td><td>${p.moq}</td><td>${p.stock}</td><td>${p.category}</td></tr>`;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+        btn.disabled = false;
+        showStatus('pasteStatus', `✅ ${pastedProducts.length} products parsed. Review & import.`, 'success');
+    }
+
+    async function importPastedToFirestore() {
+        if (!pastedProducts.length) return;
+        const btn = document.getElementById('importPastedBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Importing...';
+
+        try {
+            let imported = 0;
+            for (const p of pastedProducts) {
+                await db.collection('products').add({
+                    ...p,
+                    slug: generateSlug(p.title),
+                    status: 'active',
+                    type: 'Wholesale',
+                    supplier_verified: true,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                });
+                imported++;
+            }
+            showStatus('pasteStatus', `✅ Imported ${imported} products into live inventory!`, 'success');
+            toast(`✅ ${imported} products imported!`, 'success');
+            document.getElementById('pasteText').value = '';
+            document.getElementById('pastePreview').innerHTML = '';
+            document.getElementById('importPastedBtn').disabled = true;
+            pastedProducts = [];
+        } catch (err) {
+            console.error(err);
+            showStatus('pasteStatus', '❌ Import failed: ' + err.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-upload"></i> Import All';
+        }
+    }
+
+    // ─── INIT ───
+    document.addEventListener('DOMContentLoaded', initFirebase);
+</script>
+
+</body>
+</html>

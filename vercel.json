@@ -201,6 +201,14 @@
     {
       "source": "/notifications/:path*",
       "destination": "/index.html"
+    },
+    {
+      "source": "/inventory-upload",
+      "destination": "/inventory-upload.html"
+    },
+    {
+      "source": "/inventory-upload/:path*",
+      "destination": "/inventory-upload.html"
     }
   ],
   "redirects": [

@@ -177,38 +177,103 @@
         }
         @keyframes badgePop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
-        .nav-categories {
+        .product-toggle-bar {
             background: var(--white);
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
-            padding: 0.4rem 0;
-            overflow-x: auto;
-            white-space: nowrap;
-            scrollbar-width: thin;
+            padding: 0.5rem 0;
             position: sticky;
             top: 75px;
             z-index: 99;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-        .nav-categories::-webkit-scrollbar { height: 3px; }
-        .nav-categories::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #1a3340; }
-        .nav-tab { padding: 0.3rem 0; border-bottom: 3px solid transparent; transition: var(--transition); cursor: pointer; position: relative; flex-shrink: 0; }
-        .nav-tab::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 3px; background: var(--primary); transition: width 0.4s ease; }
-        .nav-tab:hover::after, .nav-tab.active::after { width: 100%; }
-        .nav-tab:hover { color: var(--secondary); }
-        .nav-tab.active { color: var(--primary); font-weight: 700; }
-        .wholesale-nav { color: var(--primary); font-weight: 700; }
+        .product-toggle-bar .container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .toggle-label {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--secondary);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .toggle-label i { color: var(--primary); }
+        .toggle-switches {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+        .toggle-btn {
+            padding: 0.4rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1.5px solid var(--border-dark);
+            background: var(--white);
+            color: var(--text);
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .toggle-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .toggle-btn.active {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+        .toggle-btn.upload-btn {
+            background: var(--secondary);
+            color: var(--white);
+            border-color: var(--secondary);
+        }
+        .toggle-btn.upload-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .toggle-links {
+            display: flex;
+            gap: 0.8rem;
+            margin-left: auto;
+            font-size: 0.72rem;
+            font-weight: 500;
+        }
+        .toggle-links a {
+            color: var(--text-light);
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .toggle-links a:hover {
+            color: var(--primary);
+        }
+        .toggle-links a i {
+            margin-right: 0.2rem;
+            color: var(--primary);
+            opacity: 0.6;
+        }
 
         /* ─── IMAGE CAROUSEL (images only — auto-scrolls horizontally, swipeable) ─── */
         .banner-slider {
             position: relative;
-            border-radius: var(--radius);
+            border-radius: 5px;
             overflow: hidden;
             margin: 1.5rem 0;
             height: 420px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.08);
             background: var(--secondary);
             touch-action: pan-y;
+            animation: bannerIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes bannerIn {
+            0% { opacity: 0; transform: translateY(20px) scale(0.985); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         .banner-track {
             display: flex;
@@ -217,7 +282,18 @@
         }
         .banner-slider .slide { min-width: 100%; height: 100%; }
         .banner-slider .slide a { display: block; width: 100%; height: 100%; }
-        .banner-slider .slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .banner-slider .slide img { 
+            width: 100%; height: 100%; object-fit: cover; display: block; 
+            animation: slideFadeIn 1s ease forwards;
+            transition: transform 4s ease;
+        }
+        .banner-slider:hover .slide img {
+            transform: scale(1.03);
+        }
+        @keyframes slideFadeIn {
+            0% { opacity: 0; filter: brightness(1.3); }
+            100% { opacity: 1; filter: brightness(1); }
+        }
         .banner-slider .banner-nav {
             position: absolute;
             top: 50%;
@@ -236,14 +312,36 @@
             justify-content: center;
             transition: var(--transition);
             backdrop-filter: blur(4px);
+            animation: btnFloatIn 0.6s ease 0.4s both;
         }
-        .banner-slider .banner-nav:hover { background: var(--primary); }
+        @keyframes btnFloatIn {
+            0% { opacity: 0; transform: translateY(-50%) scale(0.7); }
+            100% { opacity: 1; transform: translateY(-50%) scale(1); }
+        }
+        .banner-slider .banner-nav:hover { background: var(--primary); transform: translateY(-50%) scale(1.1); }
         .banner-slider .banner-nav.prev { left: 15px; }
         .banner-slider .banner-nav.next { right: 15px; }
-        .banner-slider .dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 0.6rem; z-index: 10; }
-        .banner-slider .dots .dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.45); cursor: pointer; transition: 0.4s; border: none; padding: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
-        .banner-slider .dots .dot:hover { background: rgba(255,255,255,0.85); }
-        .banner-slider .dots .dot.active { background: var(--accent); transform: scale(1.25); }
+        .banner-slider .dots { 
+            position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); 
+            display: flex; gap: 0.6rem; z-index: 10; 
+            animation: dotsFadeIn 0.6s ease 0.6s both;
+        }
+        @keyframes dotsFadeIn {
+            0% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+            100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        .banner-slider .dots .dot { 
+            width: 12px; height: 12px; border-radius: 50%; 
+            background: rgba(255,255,255,0.45); cursor: pointer; 
+            transition: 0.4s; border: none; padding: 0; 
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3); 
+        }
+        .banner-slider .dots .dot:hover { background: rgba(255,255,255,0.85); transform: scale(1.2); }
+        .banner-slider .dots .dot.active { background: var(--accent); transform: scale(1.25); animation: dotPulse 0.5s ease; }
+        @keyframes dotPulse {
+            0%, 100% { transform: scale(1.25); }
+            50% { transform: scale(1.45); }
+        }
 
         .stats-section {
             display: grid;
@@ -538,6 +636,9 @@
         .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
 
         @media (max-width: 992px) {
+            .product-toggle-bar .container { flex-direction: column; gap: 0.5rem; align-items: stretch; }
+            .toggle-switches { justify-content: center; }
+            .toggle-links { margin-left: 0; justify-content: center; }
             .banner-slider { height: 330px; }
             .stats-section { grid-template-columns: repeat(2, 1fr); }
             .stat-item .number { font-size: 2.2rem; }
@@ -653,18 +754,32 @@
 </header>
 
 <!-- NAVIGATION TABS -->
-<nav class="nav-categories">
+<!-- PRODUCT TOGGLE BAR (replaces old nav tabs) -->
+<div class="product-toggle-bar" id="productToggleBar">
     <div class="container">
-        <a href="/home" class="nav-tab active"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="/products" class="nav-tab"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="/catalogs" class="nav-tab"><i class="fa-solid fa-file-pdf"></i> Catalogs</a>
-        <a href="/rfq" class="nav-tab"><i class="fa-regular fa-file-lines"></i> RFQ</a>
-        <a href="/about" class="nav-tab"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="/contact" class="nav-tab"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="/help-center" class="nav-tab"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="/become-seller" class="nav-tab wholesale-nav"><i class="fa-solid fa-store"></i> Sell</a>
+        <div class="toggle-label"><i class="fa-solid fa-boxes-stacked"></i> Live Inventory</div>
+        <div class="toggle-switches">
+            <button class="toggle-btn active" data-view="all" onclick="setProductView('all')">
+                <i class="fa-solid fa-grid-2"></i> All Products
+            </button>
+            <button class="toggle-btn" data-view="available" onclick="setProductView('available')">
+                <i class="fa-solid fa-circle-check"></i> In Stock
+            </button>
+            <button class="toggle-btn" data-view="rfq" onclick="setProductView('rfq')">
+                <i class="fa-regular fa-file-lines"></i> RFQ Deals
+            </button>
+            <a href="/inventory-upload" class="toggle-btn upload-btn">
+                <i class="fa-solid fa-cloud-upload"></i> Upload Inventory
+            </a>
+        </div>
+        <div class="toggle-links">
+            <a href="/products"><i class="fa-solid fa-box"></i> All</a>
+            <a href="/catalogs"><i class="fa-solid fa-file-pdf"></i> Catalogs</a>
+            <a href="/rfq"><i class="fa-regular fa-file-lines"></i> RFQ</a>
+            <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
+        </div>
     </div>
-</nav>
+</div>
 
 <!-- MAIN CONTENT -->
 <div class="container">
@@ -1333,19 +1448,30 @@
     function nextSlide() { goToSlide(currentSlide + 1); }
     function prevSlide() { goToSlide(currentSlide - 1); }
 
+    // ─── PRODUCT VIEW STATE ───
+    let currentProductView = 'all';
+
+    function setProductView(view) {
+        currentProductView = view;
+        document.querySelectorAll('.toggle-btn[data-view]').forEach(b => {
+            b.classList.toggle('active', b.dataset.view === view);
+        });
+        renderProducts(featuredProductsCache);
+    }
+
     async function loadProducts() {
         const grid = document.getElementById('productGrid');
 
         try {
             if (typeof db === 'undefined' || !db) {
-                renderProducts([]);
+                // Wait for Firebase to initialize
+                setTimeout(loadProducts, 800);
                 return;
             }
 
             let products = [];
 
-            // Featured offers come from the public inventory API (buyer-safe
-            // allowlisted snapshot), never from the private master.
+            // 1) Try the public inventory API first
             try {
                 const response = await fetch('/api/inventory?limit=8', { headers: { 'Accept': 'application/json' } });
                 if (response.ok) {
@@ -1365,12 +1491,72 @@
                             image_url: (item.imageUrls && item.imageUrls[0]) || '',
                             sourceVersion: item.sourceVersion || '',
                             snapshotVersion: item.snapshotVersion || '',
-                            rfqEnabled: item.rfqEnabled !== false
+                            rfqEnabled: item.rfqEnabled !== false,
+                            status: item.status || 'active'
                         };
                     });
                 }
             } catch (feedError) {
-                console.error('Featured inventory feed unavailable:', feedError);
+                console.log('Inventory API unavailable, loading from Firestore...');
+            }
+
+            // 2) FALLBACK: Load from Firestore `products` collection (always works)
+            if (products.length === 0) {
+                try {
+                    const snapshot = await db.collection('products')
+                        .where('status', 'in', ['active', 'approved'])
+                        .orderBy('created_at', 'desc')
+                        .limit(20)
+                        .get();
+                    
+                    if (!snapshot.empty) {
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            const imageUrl = window.getProductImage ? window.getProductImage(data, '') : (data.image_url || data.image_urls?.[0] || '');
+                            products.push({
+                                id: doc.id,
+                                dealId: doc.id,
+                                slug: data.slug || generateSlug(data.title || 'product'),
+                                title: data.title || 'Product',
+                                brand: data.brand || 'Pilot Distribution',
+                                moq: data.moq || 1,
+                                category: data.category || 'other',
+                                pricingMode: 'public',
+                                price: data.price || 0,
+                                old_price: data.old_price || 0,
+                                image_url: imageUrl,
+                                rfqEnabled: true,
+                                status: data.status || 'active',
+                                stock: data.stock || 0,
+                                supplier_verified: data.supplier_verified || false
+                            });
+                        });
+                        console.log(`✅ Loaded ${products.length} products from Firestore`);
+                    }
+                } catch (dbError) {
+                    console.error('Firestore product load error:', dbError);
+                }
+            }
+
+            // 3) Also try catalog-data.js static products as last resort
+            if (products.length === 0 && window.PSE_CATALOG_DATA && window.PSE_CATALOG_DATA.products) {
+                products = window.PSE_CATALOG_DATA.products.map((p, i) => ({
+                    id: 'catalog-' + i,
+                    dealId: 'catalog-' + i,
+                    slug: generateSlug(p.title),
+                    title: p.title,
+                    brand: p.brand || 'Pilot Distribution',
+                    moq: p.moq || 1,
+                    category: p.category || 'other',
+                    pricingMode: 'public',
+                    price: p.price || 0,
+                    old_price: p.old_price || 0,
+                    image_url: p.image_url || '',
+                    rfqEnabled: true,
+                    status: 'active',
+                    stock: 100,
+                    supplier_verified: true
+                }));
             }
 
             renderProducts(products);
@@ -1385,19 +1571,33 @@
         const grid = document.getElementById('productGrid');
         featuredProductsCache = products || [];
         
-        if (!products || products.length === 0) {
+        // Apply product view filter
+        let displayProducts = [...featuredProductsCache];
+        if (currentProductView === 'available') {
+            displayProducts = displayProducts.filter(p => (p.stock || 0) > 0 || p.status === 'active');
+        } else if (currentProductView === 'rfq') {
+            displayProducts = displayProducts.filter(p => p.rfqEnabled !== false);
+        }
+        
+        if (!displayProducts || displayProducts.length === 0) {
+            const msg = currentProductView === 'available' ? 'No in-stock products right now.' 
+                : currentProductView === 'rfq' ? 'No RFQ deals available.' 
+                : 'No products available yet.';
             grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-light);">
                 <i class="fa-solid fa-box" style="font-size:3rem; color:var(--primary);"></i>
-                <p style="margin-top:1rem; font-size:1.1rem;">No products available yet.</p>
-                <p style="font-size:0.9rem;">Check back soon for new wholesale deals!</p>
+                <p style="margin-top:1rem; font-size:1.1rem;">${msg}</p>
+                <p style="font-size:0.9rem;">Add inventory or check back soon for new wholesale deals!</p>
+                <a href="/inventory-upload" style="display:inline-block;margin-top:0.8rem;background:var(--primary);color:#fff;padding:0.5rem 1.5rem;border-radius:30px;text-decoration:none;font-weight:600;font-size:0.85rem;">
+                    <i class="fa-solid fa-cloud-upload"></i> Upload Inventory
+                </a>
             </div>`;
             return;
         }
 
         // Sort sponsored listings to the top of home page featured products
-        products.sort((a, b) => (b.sponsored ? 1 : 0) - (a.sponsored ? 1 : 0));
+        displayProducts.sort((a, b) => (b.sponsored ? 1 : 0) - (a.sponsored ? 1 : 0));
 
-        grid.innerHTML = products.map(p => {
+        grid.innerHTML = displayProducts.map(p => {
             const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
             const slug = p.slug || generateSlug(p.title || 'product');
             const imageUrl = window.getProductImage ? window.getProductImage(p) : (p.image_url || 'logo.webp');
@@ -1588,6 +1788,7 @@
     window.prevSlide = prevSlide;
     window.showToast = showToast;
     window.getCurrentUser = getCurrentUser;
+    window.setProductView = setProductView;
 </script>
 
 <!-- ═══════════ CENTER POPUP (promo + festival greeting) ═══════════ -->
