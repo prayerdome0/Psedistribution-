@@ -1,0 +1,65 @@
+groups:
+  - name: pse-inventory.availability
+    rules:
+      - alert: PSEInventoryApiUnavailable
+        expr: up{job="pse-inventory-api"} == 0
+        for: 2m
+        labels: {severity: critical}
+        annotations:
+          summary: "PSE inventory API is unreachable"
+      - alert: PseInventoryHighServerErrorRate
+        expr: |
+          sum(rate(pse_inventory_http_requests_total{status=~"5.."}[5m]))
+            / sum(rate(pse_inventory_http_requests_total[5m])) > 0.05
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: "PSE inventory API 5xx rate above 5%"
+  - name: pse-inventory.freshness
+    rules:
+      - alert: PSEInventorySnapshotStale
+        expr: time() - max(pse_inventory_snapshot_generated_timestamp_seconds) > 900
+        for: 1m
+        labels: {severity: warning}
+        annotations:
+          summary: "Public inventory snapshot older than approved last-known-good age"
+      - alert: PseInventorySnapshotEmpty
+        expr: pse_inventory_snapshot_records == 0
+        for: 1m
+        labels: {severity: warning}
+        annotations:
+          summary: "Active public snapshot is empty; verify publish intent before override"
+  - name: pse-inventory.integrity
+    rules:
+      - alert: PSEInventoryParityMismatch
+        expr: pse_inventory_parity_mismatch_total > 0
+        for: 0m
+        labels: {severity: critical}
+        annotations:
+          summary: "Feed/API/site parity drift detected"
+      - alert: PSEInventoryPrivacyViolation
+        expr: pse_inventory_privacy_violations_total > 0
+        for: 0m
+        labels: {severity: critical}
+        annotations:
+          summary: "Privacy scan detected a prohibited field or value path"
+      - alert: PSEInventoryPublishRollback
+        expr: increase(pse_inventory_publish_rollbacks_total[10m]) > 0
+        for: 0m
+        labels: {severity: critical}
+        annotations:
+          summary: "A snapshot or deployment rollback occurred"
+  - name: pse-inventory.shared-state
+    rules:
+      - alert: PSEInventoryReplaySpike
+        expr: increase(pse_inventory_revalidations_total{result="replay"}[5m]) > 5
+        for: 0m
+        labels: {severity: warning}
+        annotations:
+          summary: "Signed revalidation replay attempts spiking"
+      - alert: PSEInventorySharedStateUnavailable
+        expr: pse_inventory_shared_state_up == 0
+        for: 1m
+        labels: {severity: critical}
+        annotations:
+          summary: "Shared nonce/rate-limit state unavailable; protected routes fail closed"
