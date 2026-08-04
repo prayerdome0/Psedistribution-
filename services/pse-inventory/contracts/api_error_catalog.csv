@@ -1,0 +1,7 @@
+Code,HTTP,Public Message,Operator Action
+INVENTORY_INVALID_QUERY,400,Invalid inventory query.,Correct validated query parameters.
+INVENTORY_NOT_FOUND,404,Item is not currently published.,Verify slug and current publication state.
+INVENTORY_RATE_LIMITED,429,Too many requests.,Retry with backoff.
+INVENTORY_STALE_BLOCKED,503,Inventory is temporarily unavailable.,Restore a valid current or last-known-good snapshot.
+REVALIDATION_SIGNATURE_INVALID,401,Unauthorized.,"Verify secret, exact body, timestamp and content hash."
+REVALIDATION_REPLAY,409,Request conflict.,Use a new nonce and investigate replay.

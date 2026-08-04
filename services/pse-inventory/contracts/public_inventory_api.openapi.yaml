@@ -1,0 +1,214 @@
+openapi: 3.1.0
+info:
+  title: PSE Public Inventory API
+  version: 4.0.0
+  description: >-
+    Read-only buyer-safe inventory API and signed internal cache-revalidation
+    operation for pilotsalesdistribution.com. Private supplier, acquisition-cost,
+    margin, proof, owner, and internal-note fields are outside this contract.
+servers:
+  - url: https://pilotsalesdistribution.com/api
+paths:
+  /inventory:
+    get:
+      operationId: listInventory
+      summary: List the current published inventory snapshot
+      parameters:
+        - in: query
+          name: q
+          schema: {type: string, minLength: 1, maxLength: 100}
+        - in: query
+          name: category
+          schema: {type: string, maxLength: 80}
+        - in: query
+          name: status
+          schema: {type: string, enum: [available, limited, confirm-availability]}
+        - in: query
+          name: limit
+          schema: {type: integer, minimum: 1, maximum: 100, default: 24}
+        - in: query
+          name: cursor
+          description: Opaque HMAC-signed cursor bound to the snapshot and exact filter set.
+          schema: {type: string, minLength: 20, maxLength: 2048}
+      responses:
+        '200':
+          description: Paginated public inventory
+          headers:
+            ETag: {$ref: '#/components/headers/ETag'}
+            X-PSE-Snapshot-Version: {$ref: '#/components/headers/SnapshotVersion'}
+            X-Request-Id: {$ref: '#/components/headers/RequestId'}
+            Cache-Control: {$ref: '#/components/headers/CacheControl'}
+          content:
+            application/json:
+              schema: {$ref: './public_inventory_list_response.schema.json'}
+        '304':
+          description: The caller already has the current snapshot representation.
+          headers:
+            ETag: {$ref: '#/components/headers/ETag'}
+            X-PSE-Snapshot-Version: {$ref: '#/components/headers/SnapshotVersion'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /inventory/{slug}:
+    get:
+      operationId: getInventoryItem
+      summary: Return one published inventory item by public slug
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: {type: string, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$', maxLength: 120}
+      responses:
+        '200':
+          description: One buyer-safe published item
+          headers:
+            ETag: {$ref: '#/components/headers/ETag'}
+            X-PSE-Snapshot-Version: {$ref: '#/components/headers/SnapshotVersion'}
+            X-Request-Id: {$ref: '#/components/headers/RequestId'}
+            Cache-Control: {$ref: '#/components/headers/CacheControl'}
+          content:
+            application/json:
+              schema: {$ref: './public_inventory_item.schema.json'}
+        '304': {description: The caller already has this current representation.}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /internal/inventory/revalidate:
+    post:
+      operationId: revalidateInventory
+      summary: Reload the validated snapshot and invalidate storefront caches
+      description: >-
+        Internal-only operation. The signature covers the exact request bytes,
+        timestamp, nonce, key ID, and content hash. Replayed nonces are rejected.
+      security:
+        - PseHmac: []
+      parameters:
+        - in: header
+          name: X-PSE-Key-Id
+          required: true
+          schema: {type: string, minLength: 1, maxLength: 80}
+        - in: header
+          name: X-PSE-Timestamp
+          required: true
+          schema: {type: string, format: date-time}
+        - in: header
+          name: X-PSE-Nonce
+          required: true
+          schema: {type: string, minLength: 16, maxLength: 128}
+        - in: header
+          name: X-PSE-Content-SHA256
+          required: true
+          schema: {type: string, pattern: '^[a-f0-9]{64}$'}
+        - in: header
+          name: X-PSE-Signature
+          required: true
+          schema: {type: string, pattern: '^[a-f0-9]{64}$'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [runId, releaseId, sourceVersion, snapshotVersion, publishedAt]
+              properties:
+                runId: {type: string, minLength: 1, maxLength: 120}
+                releaseId: {type: string, minLength: 1, maxLength: 120}
+                sourceVersion: {type: string, pattern: '^sha256:[a-f0-9]{64}$'}
+                snapshotVersion: {type: string, pattern: '^sha256:[a-f0-9]{64}$'}
+                publishedAt: {type: string, format: date-time}
+      responses:
+        '202':
+          description: Revalidation accepted and the snapshot is active.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [status, snapshotVersion]
+                properties:
+                  status: {type: string, const: accepted}
+                  snapshotVersion: {type: string, pattern: '^sha256:[a-f0-9]{64}$'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '409':
+          description: Nonce replay or request snapshot mismatch.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ErrorResponse'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+components:
+  securitySchemes:
+    PseHmac:
+      type: apiKey
+      in: header
+      name: X-PSE-Signature
+      description: HMAC-SHA256 signature; all five X-PSE headers are mandatory.
+  headers:
+    ETag:
+      schema: {type: string}
+      description: Strong entity tag derived from the validated snapshot or item representation.
+    SnapshotVersion:
+      schema: {type: string, pattern: '^sha256:[a-f0-9]{64}$'}
+    RequestId:
+      schema: {type: string, minLength: 8, maxLength: 80}
+    CacheControl:
+      schema: {type: string}
+  parameters:
+    KeyId:
+      in: header
+      name: X-PSE-Key-Id
+      required: true
+      schema: {type: string, minLength: 1, maxLength: 80}
+    Timestamp:
+      in: header
+      name: X-PSE-Timestamp
+      required: true
+      schema: {type: string, format: date-time}
+    Nonce:
+      in: header
+      name: X-PSE-Nonce
+      required: true
+      schema: {type: string, minLength: 16, maxLength: 128}
+    ContentSha256:
+      in: header
+      name: X-PSE-Content-SHA256
+      required: true
+      schema: {type: string, pattern: '^[a-f0-9]{64}$'}
+    Signature:
+      in: header
+      name: X-PSE-Signature
+      required: true
+      schema: {type: string, pattern: '^[a-f0-9]{64}$'}
+  schemas:
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [error, requestId]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message]
+          properties:
+            code: {type: string, pattern: '^[A-Z0-9_]+$'}
+            message: {type: string, maxLength: 240}
+        requestId: {type: string, minLength: 8, maxLength: 80}
+  responses:
+    BadRequest:
+      description: Invalid bounded input or cursor.
+      content: {application/json: {schema: {$ref: '#/components/schemas/ErrorResponse'}}}
+    Unauthorized:
+      description: Signature, key, timestamp, or content hash is invalid.
+      content: {application/json: {schema: {$ref: '#/components/schemas/ErrorResponse'}}}
+    NotFound:
+      description: The item is not published.
+      content: {application/json: {schema: {$ref: '#/components/schemas/ErrorResponse'}}}
+    RateLimited:
+      description: Per-client request limit exceeded.
+      headers:
+        Retry-After: {schema: {type: integer, minimum: 1}}
+      content: {application/json: {schema: {$ref: '#/components/schemas/ErrorResponse'}}}
+    Unavailable:
+      description: No acceptable current or last-known-good snapshot exists.
+      content: {application/json: {schema: {$ref: '#/components/schemas/ErrorResponse'}}}

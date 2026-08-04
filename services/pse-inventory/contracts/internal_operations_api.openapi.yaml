@@ -1,0 +1,37 @@
+openapi: 3.1.0
+info:
+  title: PSE Inventory Internal Operations API
+  version: 4.0.0
+  description: Loopback/private-network health, readiness, and Prometheus metrics contract.
+servers:
+  - url: http://127.0.0.1:8080
+paths:
+  /internal/healthz:
+    get:
+      responses:
+        '200':
+          description: Process is alive.
+          content:
+            application/json:
+              schema: {$ref: './internal_operations_response.schema.json'}
+  /internal/readyz:
+    get:
+      responses:
+        '200':
+          description: A validated current or acceptable last-known-good snapshot is available.
+          content:
+            application/json:
+              schema: {$ref: './internal_operations_response.schema.json'}
+        '503':
+          description: No acceptable snapshot is available.
+          content:
+            application/json:
+              schema: {$ref: './internal_operations_response.schema.json'}
+  /internal/metrics:
+    get:
+      responses:
+        '200':
+          description: Prometheus text exposition format.
+          content:
+            text/plain:
+              schema: {type: string}

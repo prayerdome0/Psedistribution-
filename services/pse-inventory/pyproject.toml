@@ -1,0 +1,20 @@
+[project]
+name = "pse-inventory"
+version = "4.0.0"
+description = "Deterministic, self-hostable inventory publication service for pilotsalesdistribution.com (packet contract v4.0.0). No proprietary AI in the inventory path."
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+# Production container images must pin the exact locks in
+# requirements.runtime.lock / requirements.test.lock. The packet's verified
+# production Python pin is 3.13 (see vendor/pse-inventory-packet
+# /10_OPEN_SOURCE/07_VERIFIED_REFERENCE_VERSIONS.md); this repository's CI and
+# local verification additionally support 3.11+ because the implementation is
+# written to the same deterministic contracts on both.
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["pse_inventory*"]

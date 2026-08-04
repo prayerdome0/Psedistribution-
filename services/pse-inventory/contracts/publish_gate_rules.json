@@ -1,0 +1,172 @@
+{
+  "version": "4.0.0",
+  "evaluation": "all approved records; all-or-nothing snapshot",
+  "operatorSemantics": {
+    "eq": "strict equality",
+    "in": "value appears in allowed list",
+    "empty": "array length is zero",
+    "notEmpty": "value/array is present and non-empty",
+    "positive": "integer/number greater than zero",
+    "validDateTime": "RFC 3339 timestamp with timezone",
+    "httpsUri": "valid absolute HTTPS URI",
+    "gtin": "valid 8/12/13/14-digit GTIN including check digit",
+    "atsEquation": "availableToSell = onHandUnits - reservedUnits",
+    "notFuture": "timestamp no more than configured clock skew in future",
+    "withinFreshness": "age <= unpublish threshold",
+    "noMarkup": "text contains no angle-bracket markup or control characters",
+    "noSensitivePattern": "text does not match denylist patterns",
+    "uniqueAcrossSnapshot": "no other approved record has same value",
+    "dualControl": "two distinct approvers with current timestamps"
+  },
+  "rules": [
+    {
+      "id": "status_publishable",
+      "path": "status",
+      "operator": "in",
+      "value": [
+        "available",
+        "limited"
+      ],
+      "severity": "BLOCK"
+    },
+    {
+      "id": "review_ready",
+      "path": "reviewStatus",
+      "operator": "eq",
+      "value": "ready",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "publish_approved",
+      "path": "publishApproved",
+      "operator": "eq",
+      "value": true,
+      "severity": "BLOCK"
+    },
+    {
+      "id": "approval_evidence",
+      "path": "publishApproval",
+      "operator": "notEmpty",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "no_blockers",
+      "path": "publishBlockers",
+      "operator": "empty",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "source_records",
+      "path": "source.sourceRecordIds",
+      "operator": "notEmpty",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "source_hashes",
+      "path": "source.sourceHashes",
+      "operator": "notEmpty",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "proof_evidence",
+      "path": "source.proofEvidenceIds",
+      "operator": "notEmpty",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "source_verified",
+      "path": "source.lastSourceVerifiedAt",
+      "operator": "validDateTime",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "availability_confirmed",
+      "path": "source.lastAvailabilityConfirmedAt",
+      "operator": "validDateTime",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "freshness_window",
+      "path": "source.lastAvailabilityConfirmedAt",
+      "operator": "withinFreshness",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "availability_expiry",
+      "path": "source.availabilityExpiresAt",
+      "operator": "validDateTime",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "ats_equation",
+      "path": "inventory.availableToSell",
+      "operator": "atsEquation",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "ats_positive",
+      "path": "inventory.availableToSell",
+      "operator": "positive",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "moq_within_ats",
+      "path": "publicProfile.moqUnits",
+      "operator": "positive",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "slug_unique",
+      "path": "publicProfile.slug",
+      "operator": "uniqueAcrossSnapshot",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "title_safe",
+      "path": "publicProfile.title",
+      "operator": "noMarkup",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "description_safe",
+      "path": "publicProfile.shortDescription",
+      "operator": "noMarkup",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "images_https",
+      "path": "publicProfile.imageUrls",
+      "operator": "httpsUri",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "pricing_valid",
+      "path": "publicProfile.pricingMode",
+      "operator": "in",
+      "value": [
+        "public",
+        "rfq"
+      ],
+      "severity": "BLOCK"
+    },
+    {
+      "id": "phase1_rfq_enabled",
+      "path": "publicProfile.rfqEnabled",
+      "operator": "eq",
+      "value": true,
+      "severity": "BLOCK"
+    },
+    {
+      "id": "gtin_valid_when_present",
+      "path": "publicProfile.upc",
+      "operator": "gtin",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "privacy_scan",
+      "path": "mappedPublicRecord",
+      "operator": "noSensitivePattern",
+      "severity": "BLOCK"
+    }
+  ]
+}

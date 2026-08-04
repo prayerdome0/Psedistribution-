@@ -1,0 +1,18 @@
+Private Path,Public Field,Disposition,Reason
+dealId,dealId,PUBLISH,Stable public identity
+source.sourceVersion,sourceVersion,PUBLISH,Traceability without source identity
+publicProfile.termsVersion,termsVersion,PUBLISH,Terms traceability
+publicProfile.slug,slug,PUBLISH,Stable URL
+publicProfile.title,title,PUBLISH,Buyer-safe title
+publicProfile.shortDescription,shortDescription,PUBLISH,Buyer-safe description
+inventory.availableToSell,availableToSell,PUBLISH,Current sellable quantity
+inventory.onHandUnits,,BLOCK,Internal warehouse state
+inventory.reservedUnits,,BLOCK,Internal holds
+supplier.*,,BLOCK,Supplier identity/private commercial relationship
+privateCommercial.*,,BLOCK,"Acquisition cost, floor, margin, proof and notes"
+source.sourceRecordIds,,BLOCK,Private source identity
+source.sourceHashes,,BLOCK,Private evidence fingerprint
+source.proofEvidenceIds,,BLOCK,Private proof references
+audit.owner,,BLOCK,Internal ownership
+audit.reviewer,,BLOCK,Internal reviewer
+publicProfile.*,mapped allowlist,PUBLISH_WITH_VALIDATION,Only explicit public-profile keys may map
