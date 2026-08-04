@@ -8,7 +8,7 @@
     
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -388,10 +388,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="/seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="/track-order"><i class="fa-solid fa-truck"></i> Track</a>
+            <a href="/seller-dashboard"><i class="fa-solid fa-store"></i> Sell</a>
             <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/register" id="registerLink"><i class="fa-solid fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -438,7 +438,7 @@
         <a href="/about"><i class="fa-solid fa-info-circle"></i> About</a>
         <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
         <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="/become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/become-seller" class="wholesale-nav"><i class="fa-solid fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -472,7 +472,7 @@
                     <i class="fa-regular fa-user"></i> Profile
                 </button>
                 <button class="nav-item" onclick="showTab('orders')">
-                    <i class="fa-regular fa-receipt"></i> Orders
+                    <i class="fa-solid fa-receipt"></i> Orders
                     <span class="badge" id="orderBadge">0</span>
                 </button>
                 <button class="nav-item" onclick="showTab('wishlist')">
@@ -480,10 +480,10 @@
                     <span class="badge" id="wishlistBadge">0</span>
                 </button>
                 <button class="nav-item" onclick="showTab('addresses')">
-                    <i class="fa-regular fa-location-dot"></i> Addresses
+                    <i class="fa-solid fa-location-dot"></i> Addresses
                 </button>
                 <button class="nav-item" onclick="showTab('security')">
-                    <i class="fa-regular fa-shield"></i> Security
+                    <i class="fa-solid fa-shield"></i> Security
                 </button>
                 <button class="nav-item" onclick="showTab('credit')">
                     <i class="fa-solid fa-credit-card" style="color:#27ae60;"></i> Net-30 Credit
@@ -500,7 +500,7 @@
                 </button>
                 
                 <button class="logout-btn" onclick="logoutUser()">
-                    <i class="fa-regular fa-right-from-bracket"></i> Logout
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
                 </button>
             </aside>
 
@@ -511,7 +511,7 @@
                     <div class="section-title"><i class="fa-regular fa-user"></i> Profile Information</div>
                     
                     <div class="profile-upload-area" onclick="document.getElementById('profileImageInput').click()">
-                        <i class="fa-regular fa-cloud-upload"></i>
+                        <i class="fa-solid fa-cloud-upload"></i>
                         <p>Click to upload profile picture</p>
                         <span class="file-name" id="profileFileName">JPG, PNG, WebP (Max 2MB)</span>
                     </div>
@@ -564,7 +564,7 @@
 
                 <!-- Orders Tab -->
                 <div class="tab-content" id="tab-orders">
-                    <div class="section-title"><i class="fa-regular fa-receipt"></i> My Orders</div>
+                    <div class="section-title"><i class="fa-solid fa-receipt"></i> My Orders</div>
                     <div class="orders-list" id="ordersList">
                         <div class="no-orders">
                             <i class="fa-solid fa-spinner fa-spin"></i>
@@ -586,10 +586,10 @@
 
                 <!-- Addresses Tab -->
                 <div class="tab-content" id="tab-addresses">
-                    <div class="section-title"><i class="fa-regular fa-location-dot"></i> My Addresses</div>
+                    <div class="section-title"><i class="fa-solid fa-location-dot"></i> My Addresses</div>
                     <div id="addressesList">
                         <div class="no-orders">
-                            <i class="fa-regular fa-location-dot"></i>
+                            <i class="fa-solid fa-location-dot"></i>
                             <p>No addresses saved yet.</p>
                             <button onclick="showAddAddress()" style="margin-top:0.5rem; background:var(--primary); color:#fff; border:none; padding:0.4rem 1.5rem; border-radius:30px; cursor:pointer;">
                                 <i class="fa-solid fa-plus"></i> Add Address
@@ -658,7 +658,7 @@
 
                 <!-- Security Tab -->
                 <div class="tab-content" id="tab-security">
-                    <div class="section-title"><i class="fa-regular fa-shield"></i> Security Settings</div>
+                    <div class="section-title"><i class="fa-solid fa-shield"></i> Security Settings</div>
                     <div style="max-width:500px;">
                         <div class="form-group">
                             <label>Current Password</label>
@@ -677,7 +677,7 @@
                             <div id="securityPasswordMatch" style="font-size:0.7rem; margin-top:0.2rem;"></div>
                         </div>
                         <button onclick="changePassword()" style="background:var(--primary); color:#fff; border:none; padding:0.7rem 2rem; border-radius:50px; font-weight:700; cursor:pointer; transition:var(--transition);">
-                            <i class="fa-regular fa-lock"></i> Update Password
+                            <i class="fa-solid fa-lock"></i> Update Password
                         </button>
                     </div>
                 </div>
@@ -1197,7 +1197,7 @@
         const container = document.getElementById('ordersList');
         const user = getCurrentUser();
         if (!user) {
-            container.innerHTML = `<div class="no-orders"><i class="fa-regular fa-circle-exclamation"></i><p>Please login to view your orders</p></div>`;
+            container.innerHTML = `<div class="no-orders"><i class="fa-solid fa-circle-exclamation"></i><p>Please login to view your orders</p></div>`;
             return;
         }
         try {
@@ -1225,7 +1225,7 @@
             });
             
             if (orders.length === 0) {
-                container.innerHTML = `<div class="no-orders"><i class="fa-regular fa-box"></i><p>You haven't placed any orders yet.</p><a href="/products" style="color:var(--primary); font-weight:600;">Start shopping →</a></div>`;
+                container.innerHTML = `<div class="no-orders"><i class="fa-solid fa-box"></i><p>You haven't placed any orders yet.</p><a href="/products" style="color:var(--primary); font-weight:600;">Start shopping →</a></div>`;
                 return;
             }
             
@@ -1248,7 +1248,7 @@
             `).join('');
         } catch (error) {
             console.error('Error loading orders:', error);
-            container.innerHTML = `<div class="no-orders"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Failed to load orders.</p><button onclick="loadOrders()" style="margin-top:0.5rem; background:var(--primary); color:#fff; border:none; padding:0.3rem 1.2rem; border-radius:30px; cursor:pointer;">Retry</button></div>`;
+            container.innerHTML = `<div class="no-orders"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Failed to load orders.</p><button onclick="loadOrders()" style="margin-top:0.5rem; background:var(--primary); color:#fff; border:none; padding:0.3rem 1.2rem; border-radius:30px; cursor:pointer;">Retry</button></div>`;
         }
     }
 
@@ -1308,7 +1308,7 @@
             `).join('');
         } catch (error) {
             console.error('Error loading wishlist:', error);
-            grid.innerHTML = `<div class="no-orders" style="grid-column:1/-1;"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Failed to load wishlist.</p></div>`;
+            grid.innerHTML = `<div class="no-orders" style="grid-column:1/-1;"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Failed to load wishlist.</p></div>`;
         }
     }
 
@@ -1345,7 +1345,7 @@
             const container = document.getElementById('addressesList');
             
             if (addresses.length === 0) {
-                container.innerHTML = `<div class="no-orders"><i class="fa-regular fa-location-dot"></i><p>No addresses saved yet.</p><button onclick="showAddAddress()" style="margin-top:0.5rem; background:var(--primary); color:#fff; border:none; padding:0.4rem 1.5rem; border-radius:30px; cursor:pointer;"><i class="fa-solid fa-plus"></i> Add Address</button></div>`;
+                container.innerHTML = `<div class="no-orders"><i class="fa-solid fa-location-dot"></i><p>No addresses saved yet.</p><button onclick="showAddAddress()" style="margin-top:0.5rem; background:var(--primary); color:#fff; border:none; padding:0.4rem 1.5rem; border-radius:30px; cursor:pointer;"><i class="fa-solid fa-plus"></i> Add Address</button></div>`;
                 return;
             }
             
@@ -1364,7 +1364,7 @@
                             <i class="fa-regular fa-star"></i> Set default
                         </button>` : ''}
                         <button onclick="editAddress('${addr.id}')" style="background:none; border:none; color:var(--secondary); cursor:pointer; font-size:0.8rem;">
-                            <i class="fa-regular fa-pen"></i> Edit
+                            <i class="fa-solid fa-pen"></i> Edit
                         </button>
                         <button onclick="deleteAddress('${addr.id}')" style="background:none; border:none; color:#c0392b; cursor:pointer; font-size:0.8rem;">
                             <i class="fa-regular fa-trash-can"></i> Remove

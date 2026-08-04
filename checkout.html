@@ -8,7 +8,7 @@
     
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -308,10 +308,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="/seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="/track-order"><i class="fa-solid fa-truck"></i> Track</a>
+            <a href="/seller-dashboard"><i class="fa-solid fa-store"></i> Sell</a>
             <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/register" id="registerLink"><i class="fa-solid fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -358,7 +358,7 @@
         <a href="/about"><i class="fa-solid fa-info-circle"></i> About</a>
         <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
         <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="/become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/become-seller" class="wholesale-nav"><i class="fa-solid fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -707,7 +707,7 @@
 
             <!-- SUMMARY -->
             <div class="order-summary animate-on-scroll" style="animation-delay:0.1s;">
-                <h3><i class="fa-regular fa-receipt"></i> Order Summary</h3>
+                <h3><i class="fa-solid fa-receipt"></i> Order Summary</h3>
                 <div id="orderItems">
                     <div style="text-align:center; padding:1rem; color:var(--text-light);">
                         <i class="fa-solid fa-spinner fa-spin"></i>
@@ -1060,7 +1060,7 @@
             if (items.length === 0) {
                 container.innerHTML = `
                     <div style="text-align:center; padding:1rem 0; color:var(--text-light);">
-                        <i class="fa-regular fa-cart-shopping" style="font-size:2rem;"></i>
+                        <i class="fa-solid fa-cart-shopping" style="font-size:2rem;"></i>
                         <p style="margin-top:0.5rem;">Your cart is empty</p>
                         <a href="/products" style="color:var(--primary); font-size:0.85rem;">Browse products</a>
                     </div>
@@ -1097,7 +1097,7 @@
             console.error('Error loading checkout:', error);
             container.innerHTML = `
                 <div style="text-align:center; padding:1rem; color:var(--text-light);">
-                    <i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i>
+                    <i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i>
                     <p style="margin-top:0.3rem;">Failed to load cart.</p>
                     <button onclick="loadCheckout()" style="margin-top:0.5rem; background:var(--primary); color:#fff; border:none; padding:0.3rem 1.2rem; border-radius:30px; cursor:pointer;">Retry</button>
                 </div>

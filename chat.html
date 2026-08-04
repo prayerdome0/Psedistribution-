@@ -19,7 +19,7 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -511,7 +511,7 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="/home"><i class="fa-regular fa-house"></i> Home</a>
+            <a href="/home"><i class="fa-solid fa-house"></i> Home</a>
             <a href="/account"><i class="fa-regular fa-user"></i> Account</a>
         </div>
     </div>
@@ -615,7 +615,7 @@
 <!-- ============================================ -->
 <div class="modal-overlay" id="newChatModal" style="display:none;">
     <div class="modal-box" style="max-width:400px;">
-        <h3><i class="fa-regular fa-plus"></i> Start New Chat</h3>
+        <h3><i class="fa-solid fa-plus"></i> Start New Chat</h3>
         <p style="color:var(--text-light); font-size:0.9rem; margin-bottom:1rem;">
             Enter the seller's email or name to start a conversation.
         </p>
@@ -754,7 +754,7 @@ async function loadChatList() {
     if (!user) {
         list.innerHTML = `
             <div class="empty-state">
-                <i class="fa-regular fa-circle-exclamation"></i>
+                <i class="fa-solid fa-circle-exclamation"></i>
                 <p>Please login to view messages</p>
                 <a href="/login" style="color:var(--primary); font-weight:600;">Login →</a>
             </div>
@@ -854,7 +854,7 @@ async function loadChatList() {
         console.error('Error loading chats:', error);
         list.innerHTML = `
             <div class="empty-state">
-                <i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i>
+                <i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i>
                 <p>Failed to load chats</p>
                 <p style="font-size:0.8rem; color:var(--text-light);">${error.message || 'Unknown error'}</p>
                 <button onclick="loadChatList()" style="margin-top:0.5rem; background:var(--primary); color:#fff; border:none; padding:0.3rem 1.2rem; border-radius:30px; cursor:pointer;">
@@ -974,7 +974,7 @@ function loadMessages(chatId) {
             console.error('Messages listener error:', error);
             body.innerHTML = `
                 <div class="empty-chat">
-                    <i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i>
+                    <i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i>
                     <p>Failed to load messages</p>
                     <button onclick="loadMessages('${chatId}')" style="margin-top:0.5rem; background:var(--primary); color:#fff; border:none; padding:0.3rem 1.2rem; border-radius:30px; cursor:pointer;">
                         Retry
@@ -1276,7 +1276,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (list) {
                     list.innerHTML = `
                         <div class="empty-state">
-                            <i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i>
+                            <i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i>
                             <p>Firebase is not available. Please refresh the page.</p>
                         </div>
                     `;

@@ -8,7 +8,7 @@
     
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -471,8 +471,8 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="/home"><i class="fa-regular fa-house"></i> Home</a>
-            <a href="#" onclick="logoutSeller()"><i class="fa-regular fa-right-from-bracket"></i> Logout</a>
+            <a href="/home"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="#" onclick="logoutSeller()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
         </div>
     </div>
 </div>
@@ -504,7 +504,7 @@
         <a href="/about"><i class="fa-solid fa-info-circle"></i> About</a>
         <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
         <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="/become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/become-seller" class="wholesale-nav"><i class="fa-solid fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -520,19 +520,19 @@
             </div>
 
             <div class="nav-item active" onclick="showTab('dashboard')">
-                <i class="fa-regular fa-chart-simple"></i> Dashboard
+                <i class="fa-solid fa-chart-simple"></i> Dashboard
             </div>
             <div class="nav-item" onclick="showTab('products')">
-                <i class="fa-regular fa-box"></i> Products
+                <i class="fa-solid fa-box"></i> Products
             </div>
             <div class="nav-item" onclick="showTab('orders')">
-                <i class="fa-regular fa-receipt"></i> Orders
+                <i class="fa-solid fa-receipt"></i> Orders
             </div>
             <div class="nav-item" onclick="showTab('analytics')">
-                <i class="fa-regular fa-chart-line"></i> Analytics
+                <i class="fa-solid fa-chart-line"></i> Analytics
             </div>
             <div class="nav-item" onclick="showTab('settings')">
-                <i class="fa-regular fa-gear"></i> Settings
+                <i class="fa-solid fa-gear"></i> Settings
             </div>
             <div class="nav-item" onclick="showTab('membership')">
                 <i class="fa-solid fa-crown" style="color:#f1c40f;"></i> VIP Membership &amp; Ads
@@ -542,7 +542,7 @@
             </div>
 
             <div class="logout-btn" onclick="logoutSeller()">
-                <i class="fa-regular fa-right-from-bracket"></i> Logout
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
             </div>
         </aside>
 
@@ -552,23 +552,23 @@
             <!-- DASHBOARD -->
             <div class="tab-content active" id="tab-dashboard">
                 <div class="page-header">
-                    <h2><i class="fa-regular fa-chart-simple"></i> Dashboard Overview</h2>
+                    <h2><i class="fa-solid fa-chart-simple"></i> Dashboard Overview</h2>
                     <span class="time" id="currentTime"></span>
                 </div>
 
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-icon"><i class="fa-regular fa-box"></i></div>
+                        <div class="stat-icon"><i class="fa-solid fa-box"></i></div>
                         <div class="stat-number green" id="statProducts">0</div>
                         <div class="stat-label">Total Products</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon"><i class="fa-regular fa-receipt"></i></div>
+                        <div class="stat-icon"><i class="fa-solid fa-receipt"></i></div>
                         <div class="stat-number orange" id="statOrders">0</div>
                         <div class="stat-label">Total Orders</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon"><i class="fa-regular fa-dollar-sign"></i></div>
+                        <div class="stat-icon"><i class="fa-solid fa-dollar-sign"></i></div>
                         <div class="stat-number green" id="statRevenue">$0</div>
                         <div class="stat-label">Total Revenue</div>
                     </div>
@@ -581,7 +581,7 @@
 
                 <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
                     <button class="btn-add-product" onclick="showTab('products')">
-                        <i class="fa-regular fa-plus"></i> Add Product
+                        <i class="fa-solid fa-plus"></i> Add Product
                     </button>
                     <button class="btn-add-product" onclick="showTab('orders')" style="background:#2980b9;">
                         <i class="fa-regular fa-eye"></i> View Orders
@@ -592,7 +592,7 @@
             <!-- PRODUCTS -->
             <div class="tab-content" id="tab-products">
                 <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8rem;">
-                    <h2><i class="fa-regular fa-box"></i> My Products</h2>
+                    <h2><i class="fa-solid fa-box"></i> My Products</h2>
                     <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
                         <button type="button" class="btn-add-product" onclick="downloadCSVTemplate()" style="background:var(--secondary);font-size:0.82rem;padding:0.5rem 1rem;">
                             <i class="fa-solid fa-file-csv"></i> Template
@@ -604,7 +604,7 @@
                             <i class="fa-solid fa-download"></i> Export CSV
                         </button>
                         <button class="btn-add-product" onclick="openAddProduct()">
-                            <i class="fa-regular fa-plus"></i> Add Product
+                            <i class="fa-solid fa-plus"></i> Add Product
                         </button>
                     </div>
                 </div>
@@ -622,7 +622,7 @@
                             </tr>
                         </thead>
                         <tbody id="productTableBody">
-                            <tr><td colspan="6" style="text-align:center; color:var(--text-light); padding:2rem;"><i class="fa-regular fa-spinner fa-spin"></i> Loading products...</td></tr>
+                            <tr><td colspan="6" style="text-align:center; color:var(--text-light); padding:2rem;"><i class="fa-solid fa-spinner fa-spin"></i> Loading products...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -631,7 +631,7 @@
             <!-- ORDERS -->
             <div class="tab-content" id="tab-orders">
                 <div class="page-header">
-                    <h2><i class="fa-regular fa-receipt"></i> My Orders</h2>
+                    <h2><i class="fa-solid fa-receipt"></i> My Orders</h2>
                     <span class="time" id="orderCount">0 orders</span>
                 </div>
 
@@ -649,7 +649,7 @@
                             </tr>
                         </thead>
                         <tbody id="orderTableBody">
-                            <tr><td colspan="7" style="text-align:center; color:var(--text-light); padding:2rem;"><i class="fa-regular fa-spinner fa-spin"></i> Loading orders...</td></tr>
+                            <tr><td colspan="7" style="text-align:center; color:var(--text-light); padding:2rem;"><i class="fa-solid fa-spinner fa-spin"></i> Loading orders...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -658,7 +658,7 @@
             <!-- ANALYTICS -->
             <div class="tab-content" id="tab-analytics">
                 <div class="page-header">
-                    <h2><i class="fa-regular fa-chart-line"></i> Analytics</h2>
+                    <h2><i class="fa-solid fa-chart-line"></i> Analytics</h2>
                     <span class="time">Performance Insights</span>
                 </div>
 
@@ -684,7 +684,7 @@
             <!-- SETTINGS -->
             <div class="tab-content" id="tab-settings">
                 <div class="page-header">
-                    <h2><i class="fa-regular fa-gear"></i> Store Settings</h2>
+                    <h2><i class="fa-solid fa-gear"></i> Store Settings</h2>
                 </div>
 
                 <form id="settingsForm" style="max-width:600px;">
@@ -809,7 +809,7 @@
 <!-- ADD PRODUCT MODAL -->
 <div class="modal-overlay" id="addProductModal">
     <div class="modal-box">
-        <h3><i class="fa-regular fa-plus"></i> Add New Product</h3>
+        <h3><i class="fa-solid fa-plus"></i> Add New Product</h3>
         <form id="addProductForm" enctype="multipart/form-data">
             <div class="form-group">
                 <label>Product Title *</label>
@@ -861,7 +861,7 @@
             <div class="form-group">
                 <label>Product Images</label>
                 <div class="image-upload-box" onclick="document.getElementById('productImages').click()">
-                    <i class="fa-regular fa-cloud-upload"></i>
+                    <i class="fa-solid fa-cloud-upload"></i>
                     <p>Click to upload images or drag and drop</p>
                     <p style="font-size:0.7rem; color:var(--text-light);">JPG, PNG, WebP supported (Max 5MB each)</p>
                     <span class="file-name" id="imageFileName">No files selected</span>
@@ -886,7 +886,7 @@
 
             <div class="btn-group">
                 <button type="submit" class="btn-submit" id="productSubmitBtn">
-                    <i class="fa-regular fa-plus"></i> Add Product
+                    <i class="fa-solid fa-plus"></i> Add Product
                 </button>
                 <button type="button" class="btn-close" onclick="closeAddProduct()">Cancel</button>
             </div>
@@ -1334,7 +1334,7 @@
             showToast('❌ Error: ' + error.message, 'error');
         } finally {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = editingProductId ? '<i class="fa-regular fa-floppy-disk"></i> Update Product' : '<i class="fa-regular fa-plus"></i> Add Product';
+            submitBtn.innerHTML = editingProductId ? '<i class="fa-regular fa-floppy-disk"></i> Update Product' : '<i class="fa-solid fa-plus"></i> Add Product';
         }
     });
 
@@ -1373,7 +1373,7 @@
                 }
             });
         } else {
-            document.getElementById('productSubmitBtn').innerHTML = '<i class="fa-regular fa-plus"></i> Add Product';
+            document.getElementById('productSubmitBtn').innerHTML = '<i class="fa-solid fa-plus"></i> Add Product';
         }
     }
 
@@ -1398,7 +1398,7 @@
 
             if (allProducts.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-light); padding:2rem;">
-                    <i class="fa-regular fa-box" style="font-size:2rem; color:var(--primary);"></i>
+                    <i class="fa-solid fa-box" style="font-size:2rem; color:var(--primary);"></i>
                     <p style="margin-top:0.5rem;">No products yet.</p>
                     <p style="font-size:0.85rem;">Click "Add Product" to get started.</p>
                 </td></tr>`;
@@ -1431,7 +1431,7 @@
                         ${stockCell(p)}
                         <td><span class="status-badge ${p.status === 'active' || p.status === 'approved' ? 'active' : p.status === 'pending' ? 'pending' : 'inactive'}">${p.status || 'pending'}</span></td>
                         <td>
-                            <button class="btn-action edit" onclick="openAddProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
+                            <button class="btn-action edit" onclick="openAddProduct('${p.id}')"><i class="fa-solid fa-pen"></i></button>
                             <button class="btn-action delete" onclick="deleteProduct('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
                             <button class="btn-action" style="background:rgba(211,84,0,0.1);color:#d35400;margin-left:4px;" title="Sponsor Listing" onclick="openSponsorModal('${p.id}', '${esc(p.title || 'Product')}')"><i class="fa-solid fa-rocket"></i></button>
                         </td>
@@ -1503,7 +1503,7 @@
 
             if (allOrders.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-light); padding:2rem;">
-                    <i class="fa-regular fa-receipt" style="font-size:2rem; color:var(--primary);"></i>
+                    <i class="fa-solid fa-receipt" style="font-size:2rem; color:var(--primary);"></i>
                     <p style="margin-top:0.5rem;">No orders yet</p>
                 </td></tr>`;
                 return;

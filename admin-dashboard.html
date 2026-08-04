@@ -7,7 +7,7 @@
     
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -713,8 +713,8 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="/home"><i class="fa-regular fa-house"></i> Home</a>
-            <a href="#" onclick="logoutAdmin()"><i class="fa-regular fa-right-from-bracket"></i> Logout</a>
+            <a href="/home"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="#" onclick="logoutAdmin()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
         </div>
     </div>
 </div>
@@ -755,10 +755,10 @@
             </div>
 
             <button class="nav-item active" onclick="showTab('dashboard')">
-                <i class="fa-regular fa-chart-simple"></i> Overview
+                <i class="fa-solid fa-chart-simple"></i> Overview
             </button>
             <button class="nav-item" onclick="showTab('customers')">
-                <i class="fa-regular fa-users"></i> Customers
+                <i class="fa-solid fa-users"></i> Customers
                 <span class="badge blue" id="customerBadge">0</span>
             </button>
             <button class="nav-item" onclick="showTab('messages')">
@@ -766,11 +766,11 @@
                 <span class="badge" id="messageBadge">0</span>
             </button>
             <button class="nav-item" onclick="showTab('orders')">
-                <i class="fa-regular fa-receipt"></i> Orders
+                <i class="fa-solid fa-receipt"></i> Orders
                 <span class="badge orange" id="orderBadge">0</span>
             </button>
             <button class="nav-item" onclick="showTab('products')">
-                <i class="fa-regular fa-box"></i> Products
+                <i class="fa-solid fa-box"></i> Products
                 <span class="badge green" id="productBadge">0</span>
             </button>
             <button class="nav-item" onclick="showTab('rfqs')">
@@ -778,15 +778,15 @@
                 <span class="badge purple" id="rfqBadge">0</span>
             </button>
             <button class="nav-item" onclick="showTab('sellers')">
-                <i class="fa-regular fa-store"></i> Sellers
+                <i class="fa-solid fa-store"></i> Sellers
                 <span class="badge orange" id="sellerBadge">0</span>
             </button>
             <button class="nav-item" onclick="showTab('applications')">
-                <i class="fa-regular fa-file-signature"></i> Applications
+                <i class="fa-solid fa-file-signature"></i> Applications
                 <span class="badge orange" id="applicationBadge" style="display:none;">0</span>
             </button>
             <button class="nav-item" onclick="showTab('support')">
-                <i class="fa-regular fa-headset"></i> Live Support
+                <i class="fa-solid fa-headset"></i> Live Support
                 <span class="badge red" id="supportBadge">0</span>
             </button>
             <button class="nav-item" onclick="showTab('subscribers')">
@@ -802,7 +802,7 @@
                 <span class="badge green" id="reviewBadge">0</span>
             </button>
             <button class="nav-item" onclick="showTab('trust')">
-                <i class="fa-regular fa-shield-halved"></i> Trust & Safety
+                <i class="fa-solid fa-shield-halved"></i> Trust & Safety
                 <span class="badge red" id="reportBadge">0</span>
             </button>
             <button class="nav-item" onclick="showTab('holidays')">
@@ -810,11 +810,11 @@
                 <span class="badge purple">🎉</span>
             </button>
             <button class="nav-item" onclick="showTab('analytics')">
-                <i class="fa-regular fa-chart-line"></i> Analytics
+                <i class="fa-solid fa-chart-line"></i> Analytics
                 <span class="badge gold">NEW</span>
             </button>
             <button class="nav-item" onclick="showTab('settings')">
-                <i class="fa-regular fa-gear"></i> Settings
+                <i class="fa-solid fa-gear"></i> Settings
             </button>
 
             <!-- ─── PREMIUM SUITE (admin-managed) ─── -->
@@ -837,7 +837,7 @@
             </button>
 
             <button class="logout-btn" onclick="logoutAdmin()">
-                <i class="fa-regular fa-right-from-bracket"></i> Logout
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
             </button>
         </aside>
 
@@ -847,13 +847,13 @@
             <!-- DASHBOARD -->
             <div class="tab-content active" id="tab-dashboard">
                 <div class="page-header">
-                    <h2><i class="fa-regular fa-chart-simple"></i> Dashboard Overview</h2>
+                    <h2><i class="fa-solid fa-chart-simple"></i> Dashboard Overview</h2>
                     <span class="time" id="currentTime"></span>
                 </div>
 
                 <div class="stats-grid" id="statsGrid">
                     <div class="stat-card" onclick="showTab('customers')">
-                        <div class="stat-icon"><i class="fa-regular fa-users"></i></div>
+                        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
                         <div class="stat-info">
                             <div class="stat-number blue" id="statCustomers">0</div>
                             <div class="stat-label">Total Customers</div>
@@ -867,7 +867,7 @@
                         </div>
                     </div>
                     <div class="stat-card" onclick="showTab('orders')">
-                        <div class="stat-icon"><i class="fa-regular fa-receipt"></i></div>
+                        <div class="stat-icon"><i class="fa-solid fa-receipt"></i></div>
                         <div class="stat-info">
                             <div class="stat-number orange" id="statOrders">0</div>
                             <div class="stat-label">Pending Orders</div>
@@ -881,21 +881,21 @@
                         </div>
                     </div>
                     <div class="stat-card" onclick="showTab('products')">
-                        <div class="stat-icon"><i class="fa-regular fa-box"></i></div>
+                        <div class="stat-icon"><i class="fa-solid fa-box"></i></div>
                         <div class="stat-info">
                             <div class="stat-number green" id="statProducts">0</div>
                             <div class="stat-label">Total Products</div>
                         </div>
                     </div>
                     <div class="stat-card" onclick="showTab('sellers')">
-                        <div class="stat-icon"><i class="fa-regular fa-store"></i></div>
+                        <div class="stat-icon"><i class="fa-solid fa-store"></i></div>
                         <div class="stat-info">
                             <div class="stat-number blue" id="statSellers">0</div>
                             <div class="stat-label">Active Sellers</div>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon"><i class="fa-regular fa-dollar-sign"></i></div>
+                        <div class="stat-icon"><i class="fa-solid fa-dollar-sign"></i></div>
                         <div class="stat-info">
                             <div class="stat-number green" id="statRevenue">$0</div>
                             <div class="stat-label">Total Revenue</div>
@@ -916,7 +916,7 @@
                         </div>
                     </div>
                     <div class="stat-card" onclick="showTab('trust')">
-                        <div class="stat-icon"><i class="fa-regular fa-shield-halved"></i></div>
+                        <div class="stat-icon"><i class="fa-solid fa-shield-halved"></i></div>
                         <div class="stat-info">
                             <div class="stat-number red" id="statReports">0</div>
                             <div class="stat-label">Open Scam Reports</div>
@@ -926,7 +926,7 @@
 
                 <div style="background:#fff;border:1px solid #e5ebef;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;box-shadow:0 1px 3px rgba(11,42,59,0.06);">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
-                        <h3 style="font-size:0.95rem;color:var(--secondary);margin:0;"><i class="fa-regular fa-chart-line" style="color:var(--primary);"></i> Revenue — Last 30 Days</h3>
+                        <h3 style="font-size:0.95rem;color:var(--secondary);margin:0;"><i class="fa-solid fa-chart-line" style="color:var(--primary);"></i> Revenue — Last 30 Days</h3>
                         <span id="revenueChartTotal" style="font-size:0.8rem;color:var(--text-light);"></span>
                     </div>
                     <div style="position:relative;height:220px;"><canvas id="revenueChart"></canvas></div>
@@ -935,16 +935,16 @@
                 <h3 style="font-size:0.85rem; color:var(--secondary); margin-bottom:0.5rem;">Quick Actions</h3>
                 <div class="quick-actions">
                     <div class="action-btn" onclick="openAddProduct()">
-                        <i class="fa-regular fa-plus"></i> Add Product
+                        <i class="fa-solid fa-plus"></i> Add Product
                     </div>
                     <div class="action-btn" onclick="showTab('messages')">
                         <i class="fa-regular fa-envelope"></i> Messages
                     </div>
                     <div class="action-btn" onclick="showTab('orders')">
-                        <i class="fa-regular fa-receipt"></i> Orders
+                        <i class="fa-solid fa-receipt"></i> Orders
                     </div>
                     <div class="action-btn" onclick="showTab('customers')">
-                        <i class="fa-regular fa-users"></i> Customers
+                        <i class="fa-solid fa-users"></i> Customers
                     </div>
                     <div class="action-btn" onclick="showTab('emailcenter')">
                         <i class="fa-regular fa-paper-plane"></i> Email Center
@@ -953,13 +953,13 @@
                         <i class="fa-regular fa-calendar-days"></i> Festivals
                     </div>
                     <div class="action-btn" onclick="showTab('support')">
-                        <i class="fa-regular fa-headset"></i> Support
+                        <i class="fa-solid fa-headset"></i> Support
                     </div>
                     <div class="action-btn" onclick="showTab('trust')">
-                        <i class="fa-regular fa-shield-halved"></i> Trust
+                        <i class="fa-solid fa-shield-halved"></i> Trust
                     </div>
                     <div class="action-btn" onclick="showTab('analytics')">
-                        <i class="fa-regular fa-chart-line"></i> Analytics
+                        <i class="fa-solid fa-chart-line"></i> Analytics
                     </div>
                 </div>
             </div>
@@ -967,7 +967,7 @@
             <!-- CUSTOMERS -->
             <div class="tab-content" id="tab-customers">
                 <div class="page-header">
-                    <h2><i class="fa-regular fa-users"></i> Customers</h2>
+                    <h2><i class="fa-solid fa-users"></i> Customers</h2>
                     <span class="time" id="customerCount">0 users</span>
                 </div>
                 <div id="topBuyersCard" style="display:none;background:#fff;border:1px solid #e5ebef;border-radius:12px;padding:0.9rem 1.2rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(11,42,59,0.06);">
@@ -1007,7 +1007,7 @@
             <!-- ORDERS -->
             <div class="tab-content" id="tab-orders">
                 <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.6rem;">
-                    <h2><i class="fa-regular fa-receipt"></i> Orders</h2>
+                    <h2><i class="fa-solid fa-receipt"></i> Orders</h2>
                     <div style="display:flex;align-items:center;gap:0.6rem;">
                         <span class="time" id="orderCount">0 orders</span>
                         <button type="button" class="btn-action process" onclick="exportOrdersCSV()" title="Download all orders as CSV"><i class="fa-regular fa-file-excel"></i> Export CSV</button>
@@ -1033,7 +1033,7 @@
             <div class="tab-content" id="tab-products">
                 <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8rem;">
                     <div>
-                        <h2><i class="fa-regular fa-box"></i> Products</h2>
+                        <h2><i class="fa-solid fa-box"></i> Products</h2>
                         <span class="time" id="productCount">0 products</span>
                         <span class="time" id="inventoryValue" style="margin-left:0.8rem;color:var(--primary);font-weight:700;" title="Total on-hand inventory value (stock × price)"></span>
                     </div>
@@ -1048,7 +1048,7 @@
                             <i class="fa-solid fa-download"></i> Export CSV
                         </button>
                         <button class="btn-add-product" onclick="openAddProduct()">
-                            <i class="fa-regular fa-plus"></i> Add Product
+                            <i class="fa-solid fa-plus"></i> Add Product
                         </button>
                     </div>
                 </div>
@@ -1091,7 +1091,7 @@
             <!-- SELLERS -->
             <div class="tab-content" id="tab-sellers">
                 <div class="page-header">
-                    <h2><i class="fa-regular fa-store"></i> Sellers</h2>
+                    <h2><i class="fa-solid fa-store"></i> Sellers</h2>
                     <span class="time" id="sellerCount">0 sellers</span>
                 </div>
                 <div class="table-container">
@@ -1116,7 +1116,7 @@
             <!-- SELLER APPLICATIONS -->
             <div class="tab-content" id="tab-applications">
                 <div class="page-header">
-                    <h2><i class="fa-regular fa-file-signature"></i> Seller Applications</h2>
+                    <h2><i class="fa-solid fa-file-signature"></i> Seller Applications</h2>
                     <span class="time" id="applicationCount">0 pending</span>
                 </div>
                 <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:0.8rem;">
@@ -1130,7 +1130,7 @@
             <!-- LIVE SUPPORT -->
             <div class="tab-content" id="tab-support">
                 <div class="page-header">
-                    <h2><i class="fa-regular fa-headset"></i> Live Support Tickets</h2>
+                    <h2><i class="fa-solid fa-headset"></i> Live Support Tickets</h2>
                     <span class="time" id="supportCount">0 open</span>
                 </div>
                 <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:0.8rem;">
@@ -1151,10 +1151,10 @@
                 </div>
                 <div style="display:flex;gap:0.5rem;margin-bottom:0.8rem;flex-wrap:wrap;">
                     <button class="btn-add-product" onclick="AdminExt.exportSubscribersCsv()">
-                        <i class="fa-regular fa-file-csv"></i> Export CSV
+                        <i class="fa-solid fa-file-csv"></i> Export CSV
                     </button>
                     <button class="btn-add-product" style="background:#2980b9;" onclick="AdminExt.loadSubscribers()">
-                        <i class="fa-regular fa-rotate"></i> Refresh
+                        <i class="fa-solid fa-rotate"></i> Refresh
                     </button>
                     <button class="btn-add-product" style="background:#8e44ad;" onclick="showTab('emailcenter'); setTimeout(function(){var a=document.getElementById('emailAudience'); if(a){a.value='subscribers'; AdminExt.onAudienceChange();}},150);">
                         <i class="fa-regular fa-paper-plane"></i> Email All Subscribers
@@ -1222,7 +1222,7 @@
                         <div id="emailSendProgress" style="font-size:0.75rem;color:var(--text-light);margin-top:0.5rem;"></div>
                     </div>
                     <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;">
-                        <h4 style="margin-bottom:0.7rem;color:var(--secondary);"><i class="fa-regular fa-clock-rotate-left"></i> Send History <span style="font-size:0.7rem;color:var(--text-light);" id="emailLogCount"></span></h4>
+                        <h4 style="margin-bottom:0.7rem;color:var(--secondary);"><i class="fa-solid fa-clock-rotate-left"></i> Send History <span style="font-size:0.7rem;color:var(--text-light);" id="emailLogCount"></span></h4>
                         <div class="table-container" style="max-height:430px;overflow-y:auto;">
                             <table>
                                 <thead>
@@ -1269,7 +1269,7 @@
             <!-- TRUST & SAFETY -->
             <div class="tab-content" id="tab-trust">
                 <div class="page-header">
-                    <h2><i class="fa-regular fa-shield-halved"></i> Trust & Safety</h2>
+                    <h2><i class="fa-solid fa-shield-halved"></i> Trust & Safety</h2>
                     <span class="time" id="reportCount">0 open reports</span>
                 </div>
                 <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:0.8rem;">
@@ -1304,7 +1304,7 @@
 
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;">
                     <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;">
-                        <h4 style="margin-bottom:0.7rem;color:var(--secondary);"><i class="fa-regular fa-hourglass-half"></i> Coming up next</h4>
+                        <h4 style="margin-bottom:0.7rem;color:var(--secondary);"><i class="fa-solid fa-hourglass-half"></i> Coming up next</h4>
                         <div id="holidayUpcomingList"></div>
 
                         <h4 style="margin:1rem 0 0.6rem;color:var(--secondary);"><i class="fa-regular fa-calendar-plus"></i> Add custom festival</h4>
@@ -1327,7 +1327,7 @@
                         <textarea id="hMessage" rows="2" placeholder="Greeting message (optional)" style="width:100%;padding:0.5rem 0.6rem;border:1px solid var(--border-dark);border-radius:8px;font-size:0.8rem;resize:vertical;margin-bottom:0.4rem;"></textarea>
                         <div style="display:flex;gap:0.4rem;margin-bottom:0.6rem;">
                             <input type="text" id="hCta" placeholder="Button text e.g. Shop Deals" style="flex:1;padding:0.5rem 0.6rem;border:1px solid var(--border-dark);border-radius:8px;font-size:0.8rem;" />
-                            <button class="btn-add-product" style="white-space:nowrap;" onclick="AdminExt.addHolidayFromForm()"><i class="fa-regular fa-plus"></i> Add</button>
+                            <button class="btn-add-product" style="white-space:nowrap;" onclick="AdminExt.addHolidayFromForm()"><i class="fa-solid fa-plus"></i> Add</button>
                         </div>
                     </div>
                     <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;max-height:560px;overflow-y:auto;">
@@ -1340,7 +1340,7 @@
             <!-- ANALYTICS -->
             <div class="tab-content" id="tab-analytics">
                 <div class="page-header">
-                    <h2><i class="fa-regular fa-chart-line"></i> Analytics</h2>
+                    <h2><i class="fa-solid fa-chart-line"></i> Analytics</h2>
                     <span class="time">Performance Insights</span>
                 </div>
                 <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
@@ -1368,7 +1368,7 @@
             <!-- SETTINGS -->
             <div class="tab-content" id="tab-settings">
                 <div class="page-header">
-                    <h2><i class="fa-regular fa-gear"></i> Settings</h2>
+                    <h2><i class="fa-solid fa-gear"></i> Settings</h2>
                 </div>
                 <form id="settingsForm" style="max-width:500px;">
                     <div class="form-group" style="margin-bottom:1rem;">
@@ -1524,7 +1524,7 @@
 <!-- ADD PRODUCT MODAL -->
 <div class="modal-overlay" id="addProductModal">
     <div class="modal-box">
-        <h3><i class="fa-regular fa-plus"></i> Add Product</h3>
+        <h3><i class="fa-solid fa-plus"></i> Add Product</h3>
         <form id="addProductForm">
             <div class="form-group">
                 <label>Title *</label>
@@ -1575,7 +1575,7 @@
             <div class="form-group">
                 <label>Images</label>
                 <div class="image-upload-box" onclick="document.getElementById('productImages').click()">
-                    <i class="fa-regular fa-cloud-upload"></i>
+                    <i class="fa-solid fa-cloud-upload"></i>
                     <p>Click to upload images</p>
                     <span class="file-name" id="imageFileName">No files</span>
                 </div>
@@ -1596,7 +1596,7 @@
             </div>
             <div class="btn-group">
                 <button type="submit" class="btn-submit" id="productSubmitBtn">
-                    <i class="fa-regular fa-plus"></i> Add Product
+                    <i class="fa-solid fa-plus"></i> Add Product
                 </button>
                 <button type="button" class="btn-close" onclick="closeAddProduct()">Cancel</button>
             </div>
@@ -1612,7 +1612,7 @@
             <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading...</p></div>
         </div>
         <div class="btn-group">
-            <button class="btn-submit" onclick="replyToMessage()"><i class="fa-regular fa-reply"></i> Reply</button>
+            <button class="btn-submit" onclick="replyToMessage()"><i class="fa-solid fa-reply"></i> Reply</button>
             <button class="btn-close" onclick="closeViewMessage()">Close</button>
         </div>
     </div>
@@ -1621,7 +1621,7 @@
 <!-- REPLY MODAL -->
 <div class="modal-overlay" id="replyModal">
     <div class="modal-box">
-        <h3><i class="fa-regular fa-reply"></i> Reply to Message</h3>
+        <h3><i class="fa-solid fa-reply"></i> Reply to Message</h3>
         <div class="form-group">
             <label>To</label>
             <input type="email" id="replyTo" disabled style="background:var(--light);" />
@@ -1652,7 +1652,7 @@
         <img class="holiday-preview-img" id="holidayPreviewImg" alt="Festival card preview" />
         <div class="btn-group">
             <button type="button" class="btn-submit" id="holidayPreviewDownload" onclick="AdminExt.downloadHolidayCard(this)">
-                <i class="fa-regular fa-download"></i> Download PNG
+                <i class="fa-solid fa-download"></i> Download PNG
             </button>
             <button type="button" class="btn-submit" id="holidayPreviewSend" style="background:#8e44ad;" onclick="AdminExt.sendHolidayNow(this.dataset.key)">
                 <i class="fa-regular fa-paper-plane"></i> Send Emails Now
@@ -1664,7 +1664,7 @@
 
 <div class="modal-overlay" id="viewOrderModal">
     <div class="modal-box">
-        <h3><i class="fa-regular fa-receipt"></i> Order Details</h3>
+        <h3><i class="fa-solid fa-receipt"></i> Order Details</h3>
         <div id="orderDetailContent">
             <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading...</p></div>
         </div>
@@ -1892,7 +1892,7 @@
             document.getElementById('customerCount').textContent = `${allUsers.length} users`;
 
             if (allUsers.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-regular fa-users"></i><p>No users registered yet</p></div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-users"></i><p>No users registered yet</p></div></td></tr>`;
                 return;
             }
 
@@ -1915,8 +1915,8 @@
                         ${u.trade_credit_status === 'approved' ? `<button class="btn-action" style="background:#c0392b;color:#fff;font-size:0.72rem;padding:2px 6px;border-radius:12px;margin-right:3px;" onclick="revokeNet30Credit('${u.id}')" title="Revoke Net-30 Credit">× Net-30</button>` : ''}
                         ${u.role === 'seller'
                             ? `<button class="btn-action approve" onclick="AdminExt.setUserRole('${u.id}','buyer')" title="Change to buyer"><i class="fa-regular fa-user"></i></button>`
-                            : `<button class="btn-action approve" onclick="AdminExt.setUserRole('${u.id}','seller')" title="Make seller"><i class="fa-regular fa-store"></i></button>`}
-                        ${u.status !== 'suspended' ? `<button class="btn-action ban" onclick="suspendUser('${u.id}')" title="Suspend"><i class="fa-regular fa-ban"></i></button>` : `<button class="btn-action unban" onclick="unsuspendUser('${u.id}')" title="Reactivate"><i class="fa-regular fa-circle-check"></i></button>`}
+                            : `<button class="btn-action approve" onclick="AdminExt.setUserRole('${u.id}','seller')" title="Make seller"><i class="fa-solid fa-store"></i></button>`}
+                        ${u.status !== 'suspended' ? `<button class="btn-action ban" onclick="suspendUser('${u.id}')" title="Suspend"><i class="fa-solid fa-ban"></i></button>` : `<button class="btn-action unban" onclick="unsuspendUser('${u.id}')" title="Reactivate"><i class="fa-regular fa-circle-check"></i></button>`}
                         <button class="btn-action delete" onclick="AdminExt.deleteUser('${u.id}')" title="Delete user record"><i class="fa-regular fa-trash-can"></i></button>
                     </td>
                 </tr>
@@ -1924,7 +1924,7 @@
             }).join('');
 
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading customers</p></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading customers</p></div></td></tr>`;
         }
     }
 
@@ -1988,14 +1988,14 @@
                     </div>
                     <div style="display:flex; gap:0.3rem; margin-top:0.5rem;">
                         <button class="btn-action view" onclick="viewMessage('${m.id}')"><i class="fa-regular fa-eye"></i> View</button>
-                        <button class="btn-action reply" onclick="openReplyModal('${m.id}')"><i class="fa-regular fa-reply"></i> Reply</button>
+                        <button class="btn-action reply" onclick="openReplyModal('${m.id}')"><i class="fa-solid fa-reply"></i> Reply</button>
                         <button class="btn-action delete" onclick="deleteMessage('${m.id}')"><i class="fa-regular fa-trash-can"></i></button>
                     </div>
                 </div>
             `).join('');
 
         } catch (error) {
-            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading messages</p></div>`;
+            container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading messages</p></div>`;
         }
     }
 
@@ -2140,14 +2140,14 @@
             try { renderRevenueChart(); } catch (e) { /* chart is optional */ }
 
             if (allOrders.length === 0) {
-                container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-receipt"></i><p>No orders placed yet</p></div>`;
+                container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-receipt"></i><p>No orders placed yet</p></div>`;
                 return;
             }
 
             renderOrdersList();
             try { renderTopBuyers(); } catch (e) { /* optional */ }
         } catch (error) {
-            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading orders</p></div>`;
+            container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading orders</p></div>`;
         }
     }
 
@@ -2165,7 +2165,7 @@
             const countEl = document.getElementById('orderCount');
             if (countEl) countEl.textContent = orderFilter.status === 'all' && !q ? `${allOrders.length} orders` : `${list.length} of ${allOrders.length} orders`;
             if (list.length === 0) {
-                container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-magnifying-glass"></i><p>No orders match this filter</p></div>`;
+                container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-magnifying-glass"></i><p>No orders match this filter</p></div>`;
                 return;
             }
             container.innerHTML = list.slice(0, 20).map(o => {
@@ -2194,8 +2194,8 @@
                             <button class="btn-action view" onclick="viewOrder('${o.id}')"><i class="fa-regular fa-eye"></i> View</button>
                             ${(status === 'processing' || status === 'shipped') ? `<button class="btn-action" style="background:#eef2f6;color:#0b2a3b;border:1px solid #d5dee6;" onclick="downloadPackingSlip('${o.id}')" title="Printable warehouse packing slip — no prices"><i class="fa-solid fa-box-open"></i> Slip</button>` : ''}
                             ${o.customer?.phone ? `<button class="btn-action" style="background:#25D366;color:#fff;" onclick="notifyOrderWhatsApp('${o.id}')" title="Send order status update to buyer on WhatsApp"><i class="fa-brands fa-whatsapp"></i> Notify</button>` : ''}
-                            ${status === 'pending' ? `<button class="btn-action process" onclick="updateOrderStatus('${o.id}', 'processing')"><i class="fa-regular fa-gear"></i> Process</button>` : ''}
-                            ${status === 'processing' ? `<button class="btn-action ship" onclick="updateOrderStatus('${o.id}', 'shipped')"><i class="fa-regular fa-truck"></i> Ship</button>` : ''}
+                            ${status === 'pending' ? `<button class="btn-action process" onclick="updateOrderStatus('${o.id}', 'processing')"><i class="fa-solid fa-gear"></i> Process</button>` : ''}
+                            ${status === 'processing' ? `<button class="btn-action ship" onclick="updateOrderStatus('${o.id}', 'shipped')"><i class="fa-solid fa-truck"></i> Ship</button>` : ''}
                             ${status === 'shipped' ? `<button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'delivered')"><i class="fa-regular fa-circle-check"></i> Deliver</button>` : ''}
                         </div>
                     </div>
@@ -2267,9 +2267,9 @@
         const content = document.getElementById('orderDetailContent');
         
         const statusSteps = [
-            { key: 'pending', label: 'Order Received', icon: 'fa-regular fa-receipt' },
-            { key: 'processing', label: 'Processing', icon: 'fa-regular fa-gear' },
-            { key: 'shipped', label: 'Shipped', icon: 'fa-regular fa-truck' },
+            { key: 'pending', label: 'Order Received', icon: 'fa-solid fa-receipt' },
+            { key: 'processing', label: 'Processing', icon: 'fa-solid fa-gear' },
+            { key: 'shipped', label: 'Shipped', icon: 'fa-solid fa-truck' },
             { key: 'delivered', label: 'Delivered', icon: 'fa-regular fa-circle-check' }
         ];
         
@@ -2418,13 +2418,13 @@
             if (invEl) invEl.textContent = '📦 $' + inv.toLocaleString('en-US', { maximumFractionDigits: 0 }) + ' on hand';
 
             if (products.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-box"></i><p>No products added yet</p></div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-box"></i><p>No products added yet</p></div></td></tr>`;
                 return;
             }
 
             renderAdminProducts();
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading products</p></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading products</p></div></td></tr>`;
         }
     }
 
@@ -2446,7 +2446,7 @@
             else if (productFilter === 'low') list = list.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= (p.moq || 10));
             else if (productFilter === 'out') list = list.filter(p => (p.stock || 0) <= 0);
             if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-regular fa-magnifying-glass"></i><p>No products match this filter</p></div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-magnifying-glass"></i><p>No products match this filter</p></div></td></tr>`;
                 return;
             }
             tbody.innerHTML = list.slice(0, 20).map(p => `
@@ -2461,7 +2461,7 @@
                     <td>${(p.stock || 0) <= 0 ? '<span style="background:#fdecea;color:#c0392b;border-radius:12px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;">0 — Out</span>' : (p.stock || 0) <= (p.moq || 10) ? `<span style="background:#fff4e5;color:#d35400;border-radius:12px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;" title="At or below MOQ (${p.moq || 10})">${p.stock} — Low</span>` : (p.stock || 0)}</td>
                     <td><span class="status-badge ${p.status === 'active' || p.status === 'approved' ? 'active' : 'inactive'}">${p.status || 'pending'}</span></td>
                     <td>
-                        <button class="btn-action edit" onclick="openAddProduct('${p.id}')"><i class="fa-regular fa-pen"></i></button>
+                        <button class="btn-action edit" onclick="openAddProduct('${p.id}')"><i class="fa-solid fa-pen"></i></button>
                         <button class="btn-action delete" onclick="deleteProduct('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
                     </td>
                 </tr>
@@ -2512,7 +2512,7 @@
                     </div>
                     <div style="display:flex; gap:0.3rem; margin-top:0.5rem; flex-wrap:wrap;">
                         <button class="btn-action view" onclick="viewRFQ('${rfq.id}')"><i class="fa-regular fa-eye"></i> View</button>
-                        ${rfq.status === 'pending' ? `<button class="btn-action" style="background:#3498db;color:#fff;" onclick="updateRFQStatus('${rfq.id}', 'reviewing')"><i class="fa-regular fa-check"></i> Review</button>` : ''}
+                        ${rfq.status === 'pending' ? `<button class="btn-action" style="background:#3498db;color:#fff;" onclick="updateRFQStatus('${rfq.id}', 'reviewing')"><i class="fa-solid fa-check"></i> Review</button>` : ''}
                         ${['pending', 'reviewing'].includes(rfq.status || 'pending') ? `<button class="btn-action approve" onclick="openQuoteModal('${rfq.id}')"><i class="fa-solid fa-file-invoice-dollar"></i> Quote</button>` : ''}
                         ${rfq.quote ? `
                             <button class="btn-action" style="background:var(--secondary);color:#fff;" onclick="openQuoteModal('${rfq.id}')" title="Edit & re-send quote"><i class="fa-regular fa-pen-to-square"></i> Re-quote</button>
@@ -2523,7 +2523,7 @@
             `).join('');
 
         } catch (error) {
-            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading RFQs</p></div>`;
+            container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading RFQs</p></div>`;
         }
     }
 
@@ -2692,7 +2692,7 @@
             document.getElementById('sellerCount').textContent = `${sellers.length} sellers`;
 
             if (sellers.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-regular fa-store"></i><p>No sellers registered yet</p></div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-store"></i><p>No sellers registered yet</p></div></td></tr>`;
                 return;
             }
 
@@ -2729,14 +2729,14 @@
                         ${!s.verified
                             ? `<button class="btn-action reply" onclick="AdminExt.verifySeller('${s.id}')" title="Grant Verified Seller badge"><i class="fa-solid fa-award"></i></button>`
                             : `<button class="btn-action ban" onclick="AdminExt.unverifySeller('${s.id}')" title="Remove Verified badge" style="background:#8e44ad;"><i class="fa-solid fa-award"></i></button>`}
-                        ${s.status === 'approved' ? `<button class="btn-action ban" onclick="suspendUser('${s.id}')" title="Suspend"><i class="fa-regular fa-ban"></i></button>` : ''}
+                        ${s.status === 'approved' ? `<button class="btn-action ban" onclick="suspendUser('${s.id}')" title="Suspend"><i class="fa-solid fa-ban"></i></button>` : ''}
                     </td>
                 </tr>
             `;
             }).join('');
 
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading sellers</p></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading sellers</p></div></td></tr>`;
         }
     }
 
@@ -2777,7 +2777,7 @@
             }
 
             if (allApplications.length === 0) {
-                list.innerHTML = `<div class="empty-state"><i class="fa-regular fa-file-signature"></i><p>No seller applications yet</p></div>`;
+                list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-file-signature"></i><p>No seller applications yet</p></div>`;
                 return;
             }
 
@@ -2786,7 +2786,7 @@
                 const cats = Array.isArray(a.categories) ? a.categories.join(', ') : (a.categories || 'N/A');
                 const profileImg = a.profileImage
                     ? `<img src="${a.profileImage}" alt="${a.businessName || 'Seller'}" style="width:54px;height:54px;border-radius:10px;object-fit:cover;border:2px solid var(--border);" />`
-                    : `<div style="width:54px;height:54px;border-radius:10px;background:var(--light);display:flex;align-items:center;justify-content:center;color:var(--text-light);font-size:1.4rem;"><i class="fa-regular fa-store"></i></div>`;
+                    : `<div style="width:54px;height:54px;border-radius:10px;background:var(--light);display:flex;align-items:center;justify-content:center;color:var(--text-light);font-size:1.4rem;"><i class="fa-solid fa-store"></i></div>`;
                 return `
                 <div style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:0.8rem;">
                     <div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;">
@@ -2822,7 +2822,7 @@
             }).join('');
         } catch (error) {
             console.error('Applications error:', error);
-            list.innerHTML = `<div class="empty-state"><i class="fa-regular fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading applications</p></div>`;
+            list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Error loading applications</p></div>`;
         }
     }
 
@@ -3157,7 +3157,7 @@
             showToast('❌ Error: ' + error.message, 'error');
         } finally {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = editingProductId ? '<i class="fa-regular fa-floppy-disk"></i> Update' : '<i class="fa-regular fa-plus"></i> Add';
+            submitBtn.innerHTML = editingProductId ? '<i class="fa-regular fa-floppy-disk"></i> Update' : '<i class="fa-solid fa-plus"></i> Add';
         }
     });
 
@@ -3186,7 +3186,7 @@
                 }
             });
         } else {
-            document.getElementById('productSubmitBtn').innerHTML = '<i class="fa-regular fa-plus"></i> Add';
+            document.getElementById('productSubmitBtn').innerHTML = '<i class="fa-solid fa-plus"></i> Add';
         }
     }
 

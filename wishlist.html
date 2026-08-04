@@ -8,7 +8,7 @@
     
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -309,10 +309,10 @@
             </div>
         </div>
         <div class="top-links">
-            <a href="/track-order"><i class="fa-regular fa-truck"></i> Track</a>
-            <a href="/seller-dashboard"><i class="fa-regular fa-store"></i> Sell</a>
+            <a href="/track-order"><i class="fa-solid fa-truck"></i> Track</a>
+            <a href="/seller-dashboard"><i class="fa-solid fa-store"></i> Sell</a>
             <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="/register" id="registerLink"><i class="fa-regular fa-user-plus"></i> Register</a>
+            <a href="/register" id="registerLink"><i class="fa-solid fa-user-plus"></i> Register</a>
         </div>
     </div>
 </div>
@@ -359,7 +359,7 @@
         <a href="/about"><i class="fa-solid fa-info-circle"></i> About</a>
         <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
         <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="/become-seller" class="wholesale-nav"><i class="fa-regular fa-store"></i> Sell</a>
+        <a href="/become-seller" class="wholesale-nav"><i class="fa-solid fa-store"></i> Sell</a>
     </div>
 </nav>
 
@@ -515,13 +515,13 @@
                 }
             }
             if (products.length === 0) {
-                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);"><i class="fa-regular fa-box" style="font-size:2rem; color:var(--primary);"></i><p style="margin-top:0.5rem;">No products found in wishlist.</p></div>`;
+                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);"><i class="fa-solid fa-box" style="font-size:2rem; color:var(--primary);"></i><p style="margin-top:0.5rem;">No products found in wishlist.</p></div>`;
                 return;
             }
             renderProducts(products);
         } catch (error) {
             console.error('Error loading wishlist:', error);
-            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);"><i class="fa-regular fa-circle-exclamation" style="font-size:2rem; color:#c0392b;"></i><p style="margin-top:0.5rem;">Failed to load wishlist.</p><button onclick="loadWishlist()" style="margin-top:0.5rem; background:var(--primary); color:#fff; border:none; padding:0.3rem 1.2rem; border-radius:30px; cursor:pointer;">Retry</button></div>`;
+            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light);"><i class="fa-solid fa-circle-exclamation" style="font-size:2rem; color:#c0392b;"></i><p style="margin-top:0.5rem;">Failed to load wishlist.</p><button onclick="loadWishlist()" style="margin-top:0.5rem; background:var(--primary); color:#fff; border:none; padding:0.3rem 1.2rem; border-radius:30px; cursor:pointer;">Retry</button></div>`;
         }
     }
 
