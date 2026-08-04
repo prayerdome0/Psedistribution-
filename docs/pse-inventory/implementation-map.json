@@ -1,0 +1,22 @@
+{
+  "websiteMode": "ADAPT_EXISTING",
+  "sourceAuthority": "PrivateCanonicalMaster; authoritative SalesMax runtime/database is NOT connected in this session (packet blocker B-002 OPEN); until runtime inspection occurs, the packet's dated sanitized baseline (2026-08-03: 2 canonical tracker records, 73 candidate rows, 0 publish-approved records) is the controlled evidence and no record may publish without fresh owner approval",
+  "sourceVersionStrategy": "sha256-prefixed canonical-JSON version per canonical record (publisher.compute_record_version); combined snapshot sourceVersion computed by publisher v4.0.0 over dealId|sourceVersion pairs",
+  "websiteRepository": "https://github.com/prayerdome0/Psedistribution-",
+  "websiteCommit": "9437022e0bc580f55c4432bc54cf06370869e102",
+  "buildCommand": "none (static HTML/CSS/JS site with CDN Firebase SDK; no build step exists)",
+  "testCommand": ".venv/bin/python -m pytest -q && node --test apps/pse-inventory-catalog/catalog.test.mjs",
+  "deploymentProject": "PENDING_OWNER_PROVISIONING (firebase.json and vercel.json present in repository; live hosting project IDs were not exposed in this session and must be recorded by the owner before staging)",
+  "stagingUrl": "PENDING_OWNER_PROVISIONING",
+  "productionUrl": "https://pilotsalesdistribution.com",
+  "secretStore": "PENDING_OWNER_PROVISIONING (server-side secret manager only; no secret, sheet ID or HMAC key may reach client bundles)",
+  "backupArtifact": "services/pse-inventory/data snapshot store (current.json + history/), produced by scripts/pse-inventory-backup.sh",
+  "restoreCommand": "scripts/pse-inventory-restore.sh",
+  "rollbackCommand": "scripts/pse-inventory-rollback.sh",
+  "ownerApprover": "Caden (owner) or a documented owner delegate; every publication requires per-record publishApproval with approvalVersion bound to the exact source version",
+  "catalogRoute": "/products -> products.html",
+  "productDetailRoute": "/product/{slug} -> product-detail.html",
+  "rfqRoute": "/rfq -> rfq.html",
+  "inventoryApiBase": "/api/inventory served by services/pse-inventory (single API replica until the shared-state adapters are approved)",
+  "productionStatus": "NOT_DEPLOYED"
+}

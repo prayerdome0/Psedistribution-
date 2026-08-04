@@ -1,0 +1,14 @@
+{
+  "authorizationId": "EMPTY-AUTH-EXAMPLE-001",
+  "reason": "Intentional catalog maintenance window with owner-approved temporary empty state.",
+  "approvers": [
+    {
+      "id": "owner-1",
+      "approvedAt": "2026-08-03T19:50:00Z"
+    },
+    {
+      "id": "owner-2",
+      "approvedAt": "2026-08-03T19:52:00Z"
+    }
+  ]
+}

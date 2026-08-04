@@ -1,0 +1,21 @@
+groups:
+  - name: pse-inventory
+    rules:
+      - alert: PseInventoryApiUnavailable
+        expr: up{job="pse-inventory-api"} == 0
+        for: 2m
+        labels: {severity: critical}
+        annotations:
+          summary: PSE inventory API is unavailable
+      - alert: PseInventoryHighServerErrorRate
+        expr: sum(rate(pse_inventory_http_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(pse_inventory_http_requests_total[5m])), 1) > 0.02
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: PSE inventory API error rate exceeds 2 percent
+      - alert: PseInventorySnapshotEmpty
+        expr: pse_inventory_snapshot_records == 0
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: Active public inventory snapshot is empty

@@ -1,0 +1,9 @@
+ID,Type,Statement,Status,Owner,Resolution Evidence
+A-001,Assumption,The website stack can support server-only reads and cache revalidation.,UNVERIFIED,Engineering,Phase 0 stack inspection
+A-002,Assumption,The SalesMax Hub can expose a stable canonical identifier and current availability timestamp.,UNVERIFIED,Engineering/Sales Ops,Runtime/database inspection
+D-001,Decision,"Use a separate public feed or database view, not a public tab in the private workbook.",APPROVED ARCHITECTURE,Owner/Engineering,Master gameplan
+D-002,Decision,Phase 1 is RFQ-first; no inventory decrement or checkout commitment.,APPROVED ARCHITECTURE,Owner/Sales Leadership,Master gameplan
+D-003,Decision,Records over 72 hours old are unpublished by default.,RECOMMENDED POLICY,Owner/Sales Ops,Freshness policy approval required
+B-001,Blocker,Website repository/hosting not connected in this session.,OPEN,Owner/Engineering,Provide access
+B-002,Blocker,SalesMax Hub runtime/database not connected in this session.,OPEN,Owner/Engineering,Provide access
+B-003,Blocker,No current record has explicit Publish Approved evidence.,OPEN,Owner/Sales Ops,Complete canonical migration and approval

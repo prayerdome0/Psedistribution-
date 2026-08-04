@@ -1,0 +1,11 @@
+Control,Purpose,Packet Evidence,Production Evidence Required
+Separate identities,Least privilege,Access matrix,IAM policy/readback
+No browser credentials,Prevent direct private access,Architecture and website spec,Built bundle/network inspection
+Allowlist public mapper,Prevent property-level leakage,publisher.py and schema,Production integration tests
+Resource limits,Prevent unrestricted consumption,OpenAPI and API behavior,Rate/load test results
+Signed revalidation,Prevent forged/replayed internal actions,HMAC spec/module/tests,Shared nonce store and live tests
+HTTPS asset policy,Prevent unsafe URL schemes,Schema regression tests,Approved host/CSP tests
+Endpoint inventory,Prevent forgotten debug routes,OpenAPI contract,Route inventory and security review
+Safe upstream handling,Protect from Sheets/feed failures,last-known-good rules,Fault-injection results
+Secret management,Prevent leakage/overexposure,env template and secret scan,Secret manager/IAM evidence
+Audit/change log,Non-repudiation and traceability,templates and publish report,Live immutable logs

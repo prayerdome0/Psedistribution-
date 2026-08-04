@@ -1,0 +1,12 @@
+Activity,Owner/Caden,Sales Leadership,Sales Ops,Receiving/Warehouse,Engineering,QA/Release
+Define public price/MOQ/terms,A,R,C,C,I,I
+Verify proof and source,A,C,R,R,I,C
+Confirm on-hand/reserved/ATS,I,C,R,R,I,C
+Approve publication,A,C,R,I,I,C
+Build publisher/API/site,I,C,C,I,R,C
+Manage identities/secrets,I,I,C,I,R,C
+Run packet gauntlet,I,I,C,I,R,A/R
+Run production acceptance,A,C,R,C,R,A/R
+Authorize intentional empty catalog,A,C,R,I,C,C
+Authorize release,A,C,C,I,R,R
+Authorize rollback,A,I,C,I,R,R

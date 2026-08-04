@@ -1,0 +1,45 @@
+OPEN-SOURCE RUNTIME REQUIREMENT
+No proprietary AI or hosted LLM belongs in the inventory path. Use deterministic open-source components and contracts. OpenAPI is an open API standard, not OpenAI.
+
+MISSION
+Wire pilotsalesdistribution.com to verified PSE/SalesMax inventory without exposing private data, publishing stale deals, or creating an unrecoverable deployment.
+
+FIRST ACTION
+Read 00_START_HERE.md and execute 02_IMPLEMENTATION/03_PHASE_0_DISCOVERY_WORKSHEET.md. Do not write production code until the repository, framework, host, current data source, deployment path and rollback method are evidenced.
+
+MANDATORY ARCHITECTURE
+Private intake -> evidence quarantine -> reconciliation -> private canonical master -> explicit publish gate -> separate public snapshot -> server-only API/cache -> website.
+
+AUTHORITATIVE CONTRACTS
+- 03_CONTRACTS/canonical_inventory_record.schema.json
+- 03_CONTRACTS/public_inventory_item.schema.json
+- 03_CONTRACTS/public_inventory_snapshot.schema.json
+- 03_CONTRACTS/public_inventory_api.openapi.yaml
+- 03_CONTRACTS/publish_gate_rules.json
+- 03_CONTRACTS/freshness_policy.json
+
+PROHIBITED
+- Browser or client bundle access to private Sheets/Hub credentials.
+- Returning supplier, acquisition cost, sell floor, margin, proof, owner, reviewer or private notes.
+- Treating NOW() or page-load time as inventory verification.
+- Publishing without explicit approval, positive ATS, source IDs/hashes, current confirmation, approved public terms and HTTPS assets.
+- Public prices in RFQ/login mode; null prices in public mode.
+- Duplicate Deal IDs, public slugs, source record IDs or source hashes across approved deals.
+- Replacing a valid non-empty snapshot with empty/malformed output without an explicit, separately authorized action.
+- Enabling checkout before holds/reservations and order commitment controls exist.
+
+IMPLEMENTATION ORDER
+1. Evidence Phase 0 discovery, backup and rollback.
+2. Reconcile current source rows into one canonical record per deal.
+3. Add all required private and public fields from the canonical data dictionary.
+4. Build the allowlist publisher; adapt the tested reference behavior to the actual stack.
+5. Create a separate public feed/database view and distinct machine identities.
+6. Implement list/detail API, ETag, pagination, rate limits, last-known-good and fail-closed behavior.
+7. Implement signed revalidation exactly per 05_INTEGRATION/05_HMAC_REVALIDATION_SPEC.md.
+8. Wire catalog/detail/RFQ and remove unsupported claims/filters.
+9. Add monitoring, incident and rollback controls.
+10. Run the packet gauntlet, then the live production acceptance matrix.
+11. Perform two clean end-to-end runs and prove rollback.
+
+NO COMPLETION CLAIM
+Do not call the production integration complete until feed/API/site parity, privacy, freshness, sold/withdrawn, RFQ identity, monitoring, rollback and clean repeatability all pass with stored evidence.

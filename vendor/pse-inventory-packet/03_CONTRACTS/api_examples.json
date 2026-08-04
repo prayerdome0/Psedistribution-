@@ -1,0 +1,100 @@
+{
+  "listResponse": {
+    "data": [
+      {
+        "termsVersion": "terms-v1",
+        "slug": "example-product-lot",
+        "title": "Example Product Lot",
+        "shortDescription": "Factory-sealed example inventory offered by quote, subject to final availability confirmation.",
+        "brand": "Example Brand",
+        "category": "other",
+        "moqUnits": 12,
+        "moqCases": 1,
+        "pricingMode": "rfq",
+        "currency": "USD",
+        "condition": "new",
+        "upc": "036000291452",
+        "fob": "Los Angeles, CA",
+        "freightTerms": "quote-required",
+        "inspectionTerms": "Inspection before release is available by appointment.",
+        "returnTerms": "Final sale unless otherwise stated in the executed invoice.",
+        "imageUrls": [
+          "https://cdn.pilotsalesdistribution.com/inventory/example-product-lot/main.jpg"
+        ],
+        "specSheetUrl": "https://cdn.pilotsalesdistribution.com/inventory/example-product-lot/spec.pdf",
+        "rfqEnabled": true,
+        "seo": {
+          "metaTitle": "Example Product Lot - Wholesale RFQ",
+          "metaDescription": "Request a wholesale quote for the Example Product Lot, FOB Los Angeles."
+        },
+        "quantityMode": "exact",
+        "availableToSell": 900,
+        "casesAvailable": 75,
+        "unitsPerCase": 12,
+        "schemaVersion": "4.0.0",
+        "dealId": "PSE-EXAMPLE-001",
+        "sourceVersion": "sha256:080c58fa55405749ad8ebf7998adec6b68a4a69731c748999420541440794f0f",
+        "status": "available",
+        "lastSourceVerifiedAt": "2026-08-03T19:45:00Z",
+        "lastAvailabilityConfirmedAt": "2026-08-03T20:00:00Z",
+        "availabilityExpiresAt": "2026-08-06T20:00:00Z",
+        "publishedAt": "2026-08-03T20:05:00Z"
+      }
+    ],
+    "meta": {
+      "totalCount": 1,
+      "pageCount": 1,
+      "generatedAt": "2026-08-03T20:05:00Z",
+      "snapshotVersion": "sha256:9c29853c35ea8c25b61da6813006236613d506848b8cdaf5f8df6e7c2803aed5",
+      "sourceVersion": "sha256:83567e8a61ca4c70df02318cd4fdbe4924c0007b27146ac6c525535af79decb8",
+      "freshness": "fresh",
+      "nextCursor": null
+    }
+  },
+  "detailResponse": {
+    "termsVersion": "terms-v1",
+    "slug": "example-product-lot",
+    "title": "Example Product Lot",
+    "shortDescription": "Factory-sealed example inventory offered by quote, subject to final availability confirmation.",
+    "brand": "Example Brand",
+    "category": "other",
+    "moqUnits": 12,
+    "moqCases": 1,
+    "pricingMode": "rfq",
+    "currency": "USD",
+    "condition": "new",
+    "upc": "036000291452",
+    "fob": "Los Angeles, CA",
+    "freightTerms": "quote-required",
+    "inspectionTerms": "Inspection before release is available by appointment.",
+    "returnTerms": "Final sale unless otherwise stated in the executed invoice.",
+    "imageUrls": [
+      "https://cdn.pilotsalesdistribution.com/inventory/example-product-lot/main.jpg"
+    ],
+    "specSheetUrl": "https://cdn.pilotsalesdistribution.com/inventory/example-product-lot/spec.pdf",
+    "rfqEnabled": true,
+    "seo": {
+      "metaTitle": "Example Product Lot - Wholesale RFQ",
+      "metaDescription": "Request a wholesale quote for the Example Product Lot, FOB Los Angeles."
+    },
+    "quantityMode": "exact",
+    "availableToSell": 900,
+    "casesAvailable": 75,
+    "unitsPerCase": 12,
+    "schemaVersion": "4.0.0",
+    "dealId": "PSE-EXAMPLE-001",
+    "sourceVersion": "sha256:080c58fa55405749ad8ebf7998adec6b68a4a69731c748999420541440794f0f",
+    "status": "available",
+    "lastSourceVerifiedAt": "2026-08-03T19:45:00Z",
+    "lastAvailabilityConfirmedAt": "2026-08-03T20:00:00Z",
+    "availabilityExpiresAt": "2026-08-06T20:00:00Z",
+    "publishedAt": "2026-08-03T20:05:00Z"
+  },
+  "revalidateRequest": {
+    "runId": "RUN-EXAMPLE-001",
+    "releaseId": "REL-EXAMPLE-001",
+    "sourceVersion": "sha256:83567e8a61ca4c70df02318cd4fdbe4924c0007b27146ac6c525535af79decb8",
+    "snapshotVersion": "sha256:9c29853c35ea8c25b61da6813006236613d506848b8cdaf5f8df6e7c2803aed5",
+    "publishedAt": "2026-08-03T20:05:00Z"
+  }
+}

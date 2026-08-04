@@ -1,0 +1,29 @@
+{
+  "version": "4.0.0",
+  "timezone": "UTC",
+  "futureClockSkewSeconds": 300,
+  "freshSeconds": 86400,
+  "confirmOnlyAfterSeconds": 86400,
+  "unpublishAfterSeconds": 259200,
+  "rules": [
+    {
+      "fromAgeSeconds": 0,
+      "toAgeSecondsExclusive": 86401,
+      "publicStatus": "source-status",
+      "pricingModePolicy": "configured"
+    },
+    {
+      "fromAgeSeconds": 86401,
+      "toAgeSecondsInclusive": 259200,
+      "publicStatus": "confirm-availability",
+      "pricingModePolicy": "force-rfq"
+    },
+    {
+      "fromAgeSeconds": 259201,
+      "publicStatus": "unpublished",
+      "pricingModePolicy": "not-applicable"
+    }
+  ],
+  "expirationRule": "availabilityExpiresAt must be after publication time and after lastAvailabilityConfirmedAt",
+  "failureMode": "fail-closed"
+}

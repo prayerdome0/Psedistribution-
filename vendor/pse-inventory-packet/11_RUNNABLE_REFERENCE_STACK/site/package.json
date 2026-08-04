@@ -1,0 +1,1 @@
+{"name":"pse-public-inventory-reference-site","private":true,"type":"module","scripts":{"test":"node --test catalog.test.mjs"}}

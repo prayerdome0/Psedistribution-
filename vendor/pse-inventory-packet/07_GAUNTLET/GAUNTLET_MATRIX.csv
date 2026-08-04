@@ -1,0 +1,63 @@
+ID,Scope,Pillar,Test,Status,Evidence / Production Requirement
+SG-001,PACKET,Artifact inventory,Required files and directory structure,PASS,run_super_gauntlet.py
+SG-002,PACKET,Artifact integrity,No generated caches or unexpected bytecode,PASS,run_super_gauntlet.py
+SG-003,PACKET,Documentation,No unresolved TODO/TBD/FIXME/LINK PENDING outside templates,PASS,run_super_gauntlet.py
+SG-004,PACKET,Documentation,All packet-local file references resolve,PASS,run_super_gauntlet.py
+SG-005,PACKET,Security,No embedded private keys/cloud tokens detected,PASS,run_super_gauntlet.py
+SG-006,PACKET,Contracts,Public schema valid Draft 2020-12,PASS,unit tests
+SG-007,PACKET,Contracts,Private canonical schema valid,PASS,unit tests
+SG-008,PACKET,Contracts,Snapshot schema valid and external ref resolves,PASS,unit tests
+SG-009,PACKET,Contracts,Known examples validate,PASS,unit tests
+SG-010,PACKET,Privacy,Public contract is closed/additionalProperties false,PASS,unit + gauntlet
+SG-011,PACKET,Privacy,Forbidden/private keys rejected,PASS,adversarial gauntlet
+SG-012,PACKET,Privacy,Generated forbidden-fragment mutations rejected,PASS,adversarial gauntlet
+SG-013,PACKET,Pricing,Public mode requires positive price,PASS,unit + gauntlet
+SG-014,PACKET,Pricing,RFQ/login mode rejects public price fields,PASS,unit + gauntlet
+SG-015,PACKET,Pricing,Case price requires case metadata,PASS,unit + gauntlet
+SG-016,PACKET,Assets,Public assets require HTTPS,PASS,unit + gauntlet
+SG-017,PACKET,Inventory,ATS formula mismatch blocks run,PASS,unit + gauntlet
+SG-018,PACKET,Inventory,Reserved units cannot exceed on-hand,PASS,gauntlet
+SG-019,PACKET,Inventory,MOQ cannot exceed ATS,PASS,unit + gauntlet
+SG-020,PACKET,Identity,Duplicate Deal ID blocks run,PASS,unit + gauntlet
+SG-021,PACKET,Identity,Duplicate public slug blocks run,PASS,unit + gauntlet
+SG-022,PACKET,Identity,Duplicate source record/hash blocks run,PASS,unit + gauntlet
+SG-023,PACKET,Approval,Non-approved record does not publish,PASS,unit tests
+SG-024,PACKET,Approval,Phase 1 RFQ remains enabled,PASS,unit + gauntlet
+SG-025,PACKET,Freshness,24-hour boundary behavior,PASS,unit + gauntlet
+SG-026,PACKET,Freshness,72-hour boundary and stale block,PASS,unit + gauntlet
+SG-027,PACKET,Freshness,Future clock skew/expired cutoff rejected,PASS,gauntlet
+SG-028,PACKET,Resilience,Malformed record blocks entire run,PASS,unit + gauntlet
+SG-029,PACKET,Resilience,Unexpected empty snapshot replacement blocked,PASS,unit + gauntlet
+SG-030,PACKET,Repeatability,Fixed input produces identical snapshot hash,PASS,unit tests
+SG-031,PACKET,HMAC,Exact-body content hash,PASS,unit tests
+SG-032,PACKET,HMAC,Timestamp skew enforced,PASS,unit + gauntlet
+SG-033,PACKET,HMAC,Nonce replay rejected,PASS,unit + gauntlet
+SG-034,PACKET,HMAC,Unknown key ID/signature tampering rejected,PASS,unit + gauntlet
+SG-035,PACKET,OpenAPI,Required endpoints and external refs valid,PASS,unit + packet runner
+SG-036,PACKET,OpenAPI,Revalidation headers/body/error contract complete,PASS,unit + packet runner
+SG-037,PACKET,Visual,PPTX ZIP/slide structure valid,PASS,packet runner
+SG-038,PACKET,Visual,PDF page parity/preflight/font check,PASS,packet runner
+SG-039,PACKET,Packaging,Manifest exactly matches files,PASS,packet runner
+SG-040,PACKET,Packaging,SHA-256 verification,PASS,packet runner
+SG-041,PACKET,Packaging,Deterministic ZIP builds match,PASS,clean-room release evidence
+SG-042,PACKET,Clean room,Independent extraction/run A passes,PASS,clean-room release evidence
+SG-043,PACKET,Clean room,Independent extraction/run B passes,PASS,clean-room release evidence
+PA-001,PRODUCTION,Live acceptance,Repository build/test from clean checkout,BLOCKED,Repository access and command output
+PA-002,PRODUCTION,Live acceptance,SalesMax runtime/database source audit,BLOCKED,Runtime schema/readback
+PA-003,PRODUCTION,Live acceptance,Backup and staging restore,BLOCKED,Restore evidence
+PA-004,PRODUCTION,Live acceptance,Deployment rollback proof,BLOCKED,Deployment IDs and logs
+PA-005,PRODUCTION,Live acceptance,Live feed/API/site count and Deal-ID parity,BLOCKED,Live requests/readbacks
+PA-006,PRODUCTION,Live acceptance,Live public API private-field scan,BLOCKED,Production response corpus scan
+PA-007,PRODUCTION,Live acceptance,Live stale/sold/withdrawn lifecycle,BLOCKED,Time/fault simulation
+PA-008,PRODUCTION,Live acceptance,Live RFQ Deal ID/version preservation,BLOCKED,Submitted/readback RFQ evidence
+PA-009,PRODUCTION,Live acceptance,Live monitoring/alert fault injection,BLOCKED,Alert events
+PA-010,PRODUCTION,Live acceptance,Two clean production publish/deploy runs,BLOCKED,Release evidence and hashes
+SG-044,PACKET,Open source,No proprietary AI runtime dependency,PASS,test_open_source_policy + packet scanner
+SG-045,PACKET,Open source,OpenAPI explicitly identified as vendor-neutral open standard,PASS,clarification + deck + source register
+SG-046,PACKET,Supply chain,All registered required components have open-source licenses,PASS,dependency license register
+SG-047,PACKET,Supply chain,Python harness dependencies exactly pinned and SBOM present,PASS,requirements.lock + SPDX SBOM
+SG-048,PACKET,Architecture,No LLM in publication/approval/quantity/price/hold path,PASS,policy + stack blueprint + tests
+SG-049,PACKET,Open source,Gauntlet has no proprietary product-specific filesystem dependency,PASS,self-contained runner test
+SG-050,PACKET,Supply chain,Installed Python gauntlet versions match exact lock and SPDX SBOM,PASS,packet runner
+SG-051,PACKET,HMAC,One canonical key-ID revalidation implementation and contract,PASS,unit + packet runner
+SG-052,PACKET,Visual,Editable PPTX re-renders pixel-identically to shipped PDF,PASS,LibreOffice + Poppler + Pillow

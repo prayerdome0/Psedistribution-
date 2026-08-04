@@ -1,0 +1,13 @@
+PSE SalesMax Inventory Wiring - Open-Source Super Gauntlet v4.0.0
+Copyright 2026 PSE Distribution.
+
+The reference code and packet-authored technical materials are made available
+under the Apache License, Version 2.0. Business data, trademarks, logos,
+credentials, supplier records, customer information, and third-party source
+materials are not granted under that license unless their owner expressly says
+otherwise.
+
+Third-party components are not bundled as source code in this packet. Their
+licenses, tested versions, and evidence links are recorded in
+10_OPEN_SOURCE/02_DEPENDENCY_LICENSE_REGISTER.csv and
+10_OPEN_SOURCE/03_SBOM.spdx.json.

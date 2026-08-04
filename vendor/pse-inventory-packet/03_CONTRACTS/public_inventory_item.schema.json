@@ -1,0 +1,523 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pilotsalesdistribution.com/schemas/public_inventory_item.schema.json",
+  "title": "PSE Public Inventory Item v4.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "dealId",
+    "sourceVersion",
+    "termsVersion",
+    "slug",
+    "title",
+    "shortDescription",
+    "category",
+    "status",
+    "quantityMode",
+    "moqUnits",
+    "pricingMode",
+    "currency",
+    "condition",
+    "fob",
+    "freightTerms",
+    "inspectionTerms",
+    "returnTerms",
+    "imageUrls",
+    "rfqEnabled",
+    "lastSourceVerifiedAt",
+    "lastAvailabilityConfirmedAt",
+    "availabilityExpiresAt",
+    "publishedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "4.0.0"
+    },
+    "dealId": {
+      "type": "string",
+      "pattern": "^[A-Z0-9][A-Z0-9-]{5,79}$"
+    },
+    "sourceVersion": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "termsVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[^<>\\u0000-\\u001F\\u007F]+$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "maxLength": 120
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 180,
+      "pattern": "^[^<>\\u0000-\\u001F\\u007F]+$"
+    },
+    "shortDescription": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 600,
+      "pattern": "^[^<>\\u0000-\\u001F\\u007F]+$"
+    },
+    "brand": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "pattern": "^[^<>\\u0000-\\u001F\\u007F]+$"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "electronics",
+        "apparel",
+        "grocery",
+        "home-kitchen",
+        "beauty-personal-care",
+        "health",
+        "sports",
+        "automotive",
+        "baby",
+        "office",
+        "industrial",
+        "books",
+        "pets",
+        "toys-seasonal",
+        "trading-cards",
+        "beverages",
+        "candy-snacks",
+        "mixed-truckload",
+        "other"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "available",
+        "limited",
+        "confirm-availability"
+      ]
+    },
+    "quantityMode": {
+      "type": "string",
+      "enum": [
+        "exact",
+        "range",
+        "confirm"
+      ]
+    },
+    "availableToSell": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "quantityRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimum",
+        "maximum"
+      ],
+      "properties": {
+        "minimum": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maximum": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "casesAvailable": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "unitsPerCase": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "moqUnits": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "moqCases": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "pricingMode": {
+      "type": "string",
+      "enum": [
+        "public",
+        "rfq"
+      ]
+    },
+    "publicUnitPrice": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "publicCasePrice": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "publicLotPrice": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "currency": {
+      "type": "string",
+      "const": "USD"
+    },
+    "condition": {
+      "type": "string",
+      "enum": [
+        "new",
+        "new-retail-box",
+        "shelf-pull",
+        "overstock",
+        "closeout",
+        "mixed",
+        "other"
+      ]
+    },
+    "upc": {
+      "type": "string",
+      "pattern": "^(?:[0-9]{8}|[0-9]{12}|[0-9]{13}|[0-9]{14})$"
+    },
+    "bestBy": {
+      "type": "string",
+      "format": "date"
+    },
+    "fob": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 120,
+      "pattern": "^[^<>\\u0000-\\u001F\\u007F]+$"
+    },
+    "freightTerms": {
+      "type": "string",
+      "enum": [
+        "freight-extra",
+        "freight-included",
+        "pickup-only",
+        "quote-required"
+      ]
+    },
+    "inspectionTerms": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 500,
+      "pattern": "^[^<>\\u0000-\\u001F\\u007F]+$"
+    },
+    "returnTerms": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 500,
+      "pattern": "^[^<>\\u0000-\\u001F\\u007F]+$"
+    },
+    "imageUrls": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "^https://[^\\s]+$"
+      }
+    },
+    "specSheetUrl": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://[^\\s]+$"
+    },
+    "rfqEnabled": {
+      "type": "boolean",
+      "const": true
+    },
+    "lastSourceVerifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastAvailabilityConfirmedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "availabilityExpiresAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "publishedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "seo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "metaTitle": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 70,
+          "pattern": "^[^<>\\u0000-\\u001F\\u007F]+$"
+        },
+        "metaDescription": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 180,
+          "pattern": "^[^<>\\u0000-\\u001F\\u007F]+$"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "quantityMode": {
+              "const": "exact"
+            },
+            "status": {
+              "enum": [
+                "available",
+                "limited"
+              ]
+            }
+          },
+          "required": [
+            "quantityMode",
+            "availableToSell"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "quantityRange"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "quantityMode": {
+              "const": "range"
+            },
+            "status": {
+              "enum": [
+                "available",
+                "limited"
+              ]
+            }
+          },
+          "required": [
+            "quantityMode",
+            "quantityRange"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "availableToSell"
+                ]
+              },
+              {
+                "required": [
+                  "casesAvailable"
+                ]
+              },
+              {
+                "required": [
+                  "unitsPerCase"
+                ]
+              },
+              {
+                "required": [
+                  "moqCases"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "quantityMode": {
+              "const": "confirm"
+            },
+            "status": {
+              "const": "confirm-availability"
+            },
+            "pricingMode": {
+              "const": "rfq"
+            }
+          },
+          "required": [
+            "quantityMode",
+            "status",
+            "pricingMode"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "availableToSell"
+                ]
+              },
+              {
+                "required": [
+                  "quantityRange"
+                ]
+              },
+              {
+                "required": [
+                  "casesAvailable"
+                ]
+              },
+              {
+                "required": [
+                  "unitsPerCase"
+                ]
+              },
+              {
+                "required": [
+                  "moqCases"
+                ]
+              },
+              {
+                "required": [
+                  "publicUnitPrice"
+                ]
+              },
+              {
+                "required": [
+                  "publicCasePrice"
+                ]
+              },
+              {
+                "required": [
+                  "publicLotPrice"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "pricingMode": {
+              "const": "rfq"
+            }
+          },
+          "required": [
+            "pricingMode"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "publicUnitPrice"
+                ]
+              },
+              {
+                "required": [
+                  "publicCasePrice"
+                ]
+              },
+              {
+                "required": [
+                  "publicLotPrice"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "pricingMode": {
+              "const": "public"
+            }
+          },
+          "required": [
+            "pricingMode",
+            "publicUnitPrice"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "publicCasePrice"
+                ]
+              },
+              {
+                "required": [
+                  "publicLotPrice"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "pricingMode": {
+              "const": "public"
+            }
+          },
+          "required": [
+            "pricingMode",
+            "publicCasePrice",
+            "casesAvailable",
+            "unitsPerCase"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "publicUnitPrice"
+                ]
+              },
+              {
+                "required": [
+                  "publicLotPrice"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "pricingMode": {
+              "const": "public"
+            }
+          },
+          "required": [
+            "pricingMode",
+            "publicLotPrice"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "publicUnitPrice"
+                ]
+              },
+              {
+                "required": [
+                  "publicCasePrice"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
