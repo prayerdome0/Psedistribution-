@@ -951,6 +951,8 @@
 
             let products = [];
             window.PSE_INVENTORY_META = null;
+            
+            // 1) Try the public inventory API first
             try {
                 const feed = await fetchInventoryFeed();
                 window.PSE_INVENTORY_META = feed.meta;
@@ -959,17 +961,90 @@
                 const priceFilter = document.getElementById('priceFilterGroup');
                 if (priceFilter) priceFilter.style.display = hasPublicPrice ? '' : 'none';
             } catch (feedError) {
-                console.error('Inventory feed unavailable:', feedError);
+                console.log('Inventory API unavailable, loading from Firestore...');
+            }
+
+            // 2) FALLBACK: Load from Firestore `products` collection
+            if (products.length === 0) {
+                try {
+                    const snapshot = await db.collection('products')
+                        .where('status', 'in', ['active', 'approved'])
+                        .orderBy('created_at', 'desc')
+                        .limit(100)
+                        .get();
+                    
+                    if (!snapshot.empty) {
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            const imageUrl = window.getProductImage ? window.getProductImage(data, '') : (data.image_url || '');
+                            products.push({
+                                id: doc.id,
+                                dealId: doc.id,
+                                slug: data.slug || generateSlug(data.title || 'product'),
+                                title: data.title || 'Product',
+                                brand: data.brand || 'Pilot Distribution',
+                                moq: data.moq || 1,
+                                category: data.category || 'other',
+                                pricingMode: 'public',
+                                price: data.price || 0,
+                                old_price: data.old_price || 0,
+                                image_url: imageUrl,
+                                availability: (data.stock || 0) > 0 ? 'in-stock' : 'unavailable',
+                                stock: data.stock || 0,
+                                rfqEnabled: true,
+                                condition: data.condition || '',
+                                fob: data.fob || '',
+                                freightTerms: data.freightTerms || 'Freight quoted separately',
+                                sku: data.sku || ''
+                            });
+                        });
+                        console.log(`✅ Loaded ${products.length} products from Firestore`);
+                        const priceFilter = document.getElementById('priceFilterGroup');
+                        if (priceFilter) priceFilter.style.display = '';
+                    }
+                } catch (dbError) {
+                    console.error('Firestore product load error:', dbError);
+                }
+            }
+
+            // 3) Last resort: catalog-data.js static products
+            if (products.length === 0 && window.PSE_CATALOG_DATA && window.PSE_CATALOG_DATA.products) {
+                products = window.PSE_CATALOG_DATA.products.map((p, i) => ({
+                    id: 'catalog-' + i,
+                    dealId: 'catalog-' + i,
+                    slug: generateSlug(p.title),
+                    title: p.title,
+                    brand: p.brand || 'Pilot Distribution',
+                    moq: p.moq || 1,
+                    category: p.category || 'other',
+                    pricingMode: 'public',
+                    price: p.price || 0,
+                    old_price: p.old_price || 0,
+                    image_url: p.image_url || '',
+                    availability: 'in-stock',
+                    stock: 100,
+                    rfqEnabled: true,
+                    condition: '',
+                    fob: '',
+                    freightTerms: 'Freight quoted separately',
+                    sku: p.sku || ''
+                }));
+            }
+
+            if (products.length === 0) {
                 grid.innerHTML = `
                     <div style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:var(--text-light);">
-                        <i class="fa-regular fa-clock" style="font-size:3rem;color:var(--primary);"></i>
-                        <h3 style="margin-top:1rem;color:var(--secondary);">Verified inventory is temporarily unavailable</h3>
-                        <p style="margin:0.5rem 0 1.5rem;">Please try again shortly, or send a general request for quote.</p>
-                        <a href="/rfq" style="display:inline-block;background:var(--primary);color:#fff;padding:0.6rem 2rem;border-radius:30px;text-decoration:none;font-weight:600;">
+                        <i class="fa-solid fa-box" style="font-size:3rem;color:var(--primary);"></i>
+                        <h3 style="margin-top:1rem;color:var(--secondary);">No products in inventory yet</h3>
+                        <p style="margin:0.5rem 0 1.5rem;">Add inventory manually or send a general request for quote.</p>
+                        <a href="/inventory-upload" style="display:inline-block;background:var(--primary);color:#fff;padding:0.6rem 2rem;border-radius:30px;text-decoration:none;font-weight:600;margin-right:0.5rem;">
+                            <i class="fa-solid fa-cloud-upload"></i> Upload Inventory
+                        </a>
+                        <a href="/rfq" style="display:inline-block;background:var(--secondary);color:#fff;padding:0.6rem 2rem;border-radius:30px;text-decoration:none;font-weight:600;">
                             <i class="fa-regular fa-file-lines"></i> General RFQ
                         </a>
                     </div>`;
-                document.getElementById('resultCount').innerHTML = 'Inventory temporarily unavailable';
+                document.getElementById('resultCount').innerHTML = 'No products yet';
                 return;
             }
 
