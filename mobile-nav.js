@@ -1,5 +1,6 @@
 /* ==========================================================================
    PSE Mobile Navigation — Hamburger menu icon (bottom navigation removed)
+   Styled like the Admin Dashboard menu: dark slide-out panel + overlay.
    ========================================================================== */
 (function () {
     'use strict';
@@ -11,92 +12,129 @@
         const style = document.createElement('style');
         style.id = MENU_STYLE_ID;
         style.textContent = `
+            /* Hamburger trigger — same look as the admin dashboard menu button */
             .mobile-hamburger {
-                display: none;
-                background: none;
-                border: none;
-                font-size: 1.6rem;
-                color: #1a3a2a;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+                background: var(--light, #f0f4f8);
+                border: 1px solid var(--border, #e9edf2);
                 cursor: pointer;
+                transition: 0.3s ease;
+                color: var(--secondary, #0b2a3b);
+                font-size: 1.1rem;
+                flex-shrink: 0;
                 margin-left: auto;
-                padding: 0.3rem 0.5rem;
-                border-radius: 10px;
+                padding: 0;
                 line-height: 1;
                 z-index: 1001;
             }
-            .mobile-hamburger:hover { background: #f0f4f8; }
-            @media (max-width: 768px) {
-                .mobile-hamburger { display: block; }
+            .mobile-hamburger:hover { background: var(--primary-light, #e8f5f0); color: var(--primary, #1a7b6b); border-color: var(--primary, #1a7b6b); }
+            .header .container .mobile-hamburger { margin-left: 0; }
+
+            /* Overlay — matches admin menu */
+            .pse-mobile-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.3);
+                backdrop-filter: blur(2px);
+                z-index: 900;
             }
+            .pse-mobile-overlay.show { display: block; }
+
+            /* Slide-out panel — matches admin menu */
             .pse-mobile-menu {
                 position: fixed;
                 top: 0;
-                right: 0;
-                bottom: 0;
-                width: min(320px, 84vw);
-                background: #ffffff;
-                box-shadow: -12px 0 40px rgba(0,0,0,0.18);
-                z-index: 10000;
-                transform: translateX(105%);
-                transition: transform 0.25s ease;
+                left: -320px;
+                width: 290px;
+                height: 100%;
+                background: var(--secondary, #0b2a3b);
+                z-index: 950;
                 overflow-y: auto;
-                padding: 1rem 1.1rem 2rem;
+                transition: left 0.3s ease;
+                padding: 1rem;
+                border-radius: 0;
             }
-            .pse-mobile-menu.open { transform: translateX(0); }
+            .pse-mobile-menu.open { left: 0; box-shadow: 4px 0 30px rgba(0,0,0,0.2); }
+
             .pse-mobile-menu .menu-head {
+                color: #ffffff;
+                padding-bottom: 0.8rem;
+                border-bottom: 1px solid #1a4055;
+                margin-bottom: 0.8rem;
                 display: flex;
-                align-items: center;
                 justify-content: space-between;
-                padding-bottom: 0.7rem;
-                border-bottom: 1px solid #e9edf2;
-                margin-bottom: 0.6rem;
+                align-items: flex-start;
             }
-            .pse-mobile-menu .menu-head strong { font-size: 1rem; color: #0b2a3b; }
+            .pse-mobile-menu .menu-head strong { font-size: 0.95rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; }
+            .pse-mobile-menu .menu-head strong i { color: var(--accent, #f1c40f); margin-right: 0.4rem; }
+            .pse-mobile-menu .menu-head .menu-sub { font-size: 0.65rem; opacity: 0.7; margin-top: 0.1rem; font-weight: 400; }
             .pse-mobile-menu .menu-close {
-                background: #f0f4f8;
+                background: none;
                 border: none;
-                width: 34px;
-                height: 34px;
-                border-radius: 50%;
-                font-size: 1.1rem;
-                color: #0b2a3b;
+                color: #b4d0e0;
+                font-size: 1.2rem;
                 cursor: pointer;
+                padding: 0.2rem;
+                transition: 0.3s ease;
+                line-height: 1;
             }
-            .pse-mobile-menu a {
-                display: flex;
-                align-items: center;
-                gap: 0.7rem;
-                padding: 0.65rem 0.6rem;
-                border-radius: 10px;
-                color: #1a3340;
-                font-weight: 600;
-                font-size: 0.92rem;
-                text-decoration: none;
-            }
-            .pse-mobile-menu a:hover { background: #e8f5f0; color: #0f4f43; }
-            .pse-mobile-menu a i { width: 20px; text-align: center; color: #1a7b6b; }
+            .pse-mobile-menu .menu-close:hover { color: #ffffff; }
+
             .pse-mobile-menu .menu-section {
-                margin: 0.7rem 0 0.2rem;
-                font-size: 0.65rem;
+                color: #6a889a;
+                font-size: 0.6rem;
                 letter-spacing: 0.12em;
                 text-transform: uppercase;
-                color: #6a889a;
+                font-weight: 700;
+                margin-top: 0.8rem;
+                padding: 0.3rem 0.7rem 0.2rem;
+            }
+
+            /* Nav items — same as admin menu */
+            .pse-mobile-menu .nav-item {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+                padding: 0.55rem 0.7rem;
+                border-radius: 6px;
+                color: #b4d0e0;
+                cursor: pointer;
+                transition: 0.3s ease;
+                margin-bottom: 0.1rem;
+                font-size: 0.78rem;
+                border: none;
+                background: none;
+                width: 100%;
+                text-align: left;
+                font-family: inherit;
+                text-decoration: none;
+                box-sizing: border-box;
+            }
+            .pse-mobile-menu .nav-item:hover { background: rgba(255,255,255,0.05); color: #ffffff; }
+            .pse-mobile-menu .nav-item.active { background: rgba(255,255,255,0.1); color: #ffffff; font-weight: 600; }
+            .pse-mobile-menu .nav-item i { width: 18px; text-align: center; font-size: 0.9rem; }
+            .pse-mobile-menu .nav-item .badge {
+                margin-left: auto;
+                background: #c0392b;
+                color: #ffffff;
+                font-size: 0.5rem;
+                padding: 0.05rem 0.4rem;
+                border-radius: 30px;
+                min-width: 18px;
+                text-align: center;
                 font-weight: 700;
             }
-            .pse-mobile-menu .menu-highlight {
-                background: #e8f5f0;
-                color: #0f4f43;
-            }
-            .pse-mobile-overlay {
-                position: fixed;
-                inset: 0;
-                background: rgba(11,26,42,0.45);
-                z-index: 9999;
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity 0.25s ease;
-            }
-            .pse-mobile-overlay.show { opacity: 1; pointer-events: auto; }
+            .pse-mobile-menu .nav-item .badge.gold { background: #f39c12; }
+            .pse-mobile-menu .nav-item .badge.green { background: var(--primary, #1a7b6b); }
         `;
         document.head.appendChild(style);
     }
@@ -119,29 +157,42 @@
         const accountLink = user
             ? { href: '/account', icon: 'fa-regular fa-user', label: 'My Account' }
             : { href: '/login', icon: 'fa-regular fa-user', label: 'Login / Register' };
+        const escapeHtml = function (s) {
+            return String(s).replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        };
+        const sub = escapeHtml(user ? (user.email || (user.displayName || 'Signed in')) : 'Guest');
 
         menu.innerHTML = `
             <div class="menu-head">
-                <strong><i class="fa-solid fa-bars" style="color:#1a7b6b;margin-right:0.4rem;"></i> Menu</strong>
+                <div>
+                    <strong><i class="fa-solid fa-bars"></i> Menu</strong>
+                    <div class="menu-sub"><i class="fa-regular fa-user" style="margin-right:0.3rem;"></i>${sub}</div>
+                </div>
                 <button class="menu-close" aria-label="Close menu">&times;</button>
             </div>
-            <a href="/"><i class="fa-solid fa-home"></i> Home</a>
-            <a href="/products"><i class="fa-solid fa-box"></i> Products</a>
-            <a href="/catalogs"><i class="fa-solid fa-file-pdf"></i> Catalogs</a>
-            <a href="/rfq"><i class="fa-regular fa-file-lines"></i> Request Quote</a>
-            <a href="/inventory-upload" class="menu-highlight"><i class="fa-solid fa-cloud-upload"></i> Upload Inventory</a>
+            <a class="nav-item" href="/"><i class="fa-solid fa-home"></i> Home</a>
+            <div class="menu-section">Browse</div>
+            <a class="nav-item active" data-view="all" href="/products"><i class="fa-solid fa-grid-2"></i> All Products</a>
+            <a class="nav-item" data-view="available" href="/products"><i class="fa-solid fa-circle-check"></i> In Stock</a>
+            <a class="nav-item" data-view="rfq" href="/rfq"><i class="fa-regular fa-file-lines"></i> RFQ Deals</a>
+            <a class="nav-item" href="/products"><i class="fa-solid fa-box"></i> All</a>
+            <a class="nav-item" href="/catalogs"><i class="fa-solid fa-file-pdf"></i> Catalogs</a>
+            <a class="nav-item" href="/rfq"><i class="fa-regular fa-file-lines"></i> RFQ</a>
+            <a class="nav-item" href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
+            <a class="nav-item" href="/inventory-upload"><i class="fa-solid fa-cloud-upload"></i> Upload Inventory <span class="badge gold">NEW</span></a>
             <div class="menu-section">Shopping</div>
-            <a href="/cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
-            <a href="/wishlist"><i class="fa-regular fa-heart"></i> Wishlist</a>
-            <a href="/track-order"><i class="fa-solid fa-truck"></i> Track Order</a>
+            <a class="nav-item" href="/cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+            <a class="nav-item" href="/wishlist"><i class="fa-regular fa-heart"></i> Wishlist</a>
+            <a class="nav-item" href="/track-order"><i class="fa-solid fa-truck"></i> Track Order</a>
             <div class="menu-section">Account</div>
-            <a href="${accountLink.href}"><i class="${accountLink.icon}"></i> ${accountLink.label}</a>
-            <a href="/seller-dashboard"><i class="fa-solid fa-store"></i> Seller Dashboard</a>
-            <a href="/become-seller"><i class="fa-solid fa-handshake"></i> Become a Seller</a>
+            <a class="nav-item" href="${accountLink.href}"><i class="${accountLink.icon}"></i> ${accountLink.label}</a>
+            <a class="nav-item" href="/seller-dashboard"><i class="fa-solid fa-store"></i> Seller Dashboard</a>
+            <a class="nav-item" href="/become-seller"><i class="fa-solid fa-handshake"></i> Become a Seller</a>
             <div class="menu-section">Support</div>
-            <a href="/about"><i class="fa-solid fa-circle-info"></i> About</a>
-            <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
-            <a href="/help-center"><i class="fa-regular fa-circle-question"></i> Help Center</a>
+            <a class="nav-item" href="/about"><i class="fa-solid fa-circle-info"></i> About</a>
+            <a class="nav-item" href="/help-center"><i class="fa-regular fa-circle-question"></i> Help Center</a>
         `;
         return menu;
     }
@@ -176,6 +227,7 @@
         hamburger.id = 'mobileHamburger';
         hamburger.className = 'mobile-hamburger';
         hamburger.setAttribute('aria-label', 'Open menu');
+        hamburger.title = 'Menu';
         hamburger.innerHTML = '<i class="fa-solid fa-bars"></i>';
 
         hamburger.addEventListener('click', function (e) {
@@ -185,11 +237,23 @@
         menu.querySelector('.menu-close').addEventListener('click', closeMenu);
         overlay.addEventListener('click', closeMenu);
         menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
-        window.addEventListener('resize', function () {
-            if (window.innerWidth > 768) closeMenu();
+
+        // Home-page view tabs (All Products / In Stock / RFQ Deals):
+        // use the home page filter when available, otherwise follow the link.
+        menu.querySelectorAll('.nav-item[data-view]').forEach(function (item) {
+            item.addEventListener('click', function (e) {
+                if (typeof window.setProductView === 'function') {
+                    e.preventDefault();
+                    window.setProductView(item.dataset.view);
+                    closeMenu();
+                }
+            });
         });
 
-        header.appendChild(hamburger);
+        // Place the hamburger right after the logo, like the admin header
+        const logo = header.querySelector('.logo');
+        if (logo && logo.nextSibling) header.insertBefore(hamburger, logo.nextSibling);
+        else header.appendChild(hamburger);
     }
 
     if (document.readyState === 'loading') {

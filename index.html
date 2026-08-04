@@ -177,88 +177,6 @@
         }
         @keyframes badgePop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
-        .product-toggle-bar {
-            background: var(--white);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            padding: 0.5rem 0;
-            position: sticky;
-            top: 75px;
-            z-index: 99;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .product-toggle-bar .container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .toggle-label {
-            font-weight: 700;
-            font-size: 0.8rem;
-            color: var(--secondary);
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-        .toggle-label i { color: var(--primary); }
-        .toggle-switches {
-            display: flex;
-            gap: 0.35rem;
-            flex-wrap: wrap;
-        }
-        .toggle-btn {
-            padding: 0.4rem 0.9rem;
-            border-radius: 30px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1.5px solid var(--border-dark);
-            background: var(--white);
-            color: var(--text);
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-        .toggle-btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-        .toggle-btn.active {
-            background: var(--primary);
-            color: var(--white);
-            border-color: var(--primary);
-        }
-        .toggle-btn.upload-btn {
-            background: var(--secondary);
-            color: var(--white);
-            border-color: var(--secondary);
-        }
-        .toggle-btn.upload-btn:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-        .toggle-links {
-            display: flex;
-            gap: 0.8rem;
-            margin-left: auto;
-            font-size: 0.72rem;
-            font-weight: 500;
-        }
-        .toggle-links a {
-            color: var(--text-light);
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-        .toggle-links a:hover {
-            color: var(--primary);
-        }
-        .toggle-links a i {
-            margin-right: 0.2rem;
-            color: var(--primary);
-            opacity: 0.6;
-        }
-
         /* ─── IMAGE CAROUSEL (images only — auto-scrolls horizontally, swipeable) ─── */
         .banner-slider {
             position: relative;
@@ -636,9 +554,6 @@
         .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
 
         @media (max-width: 992px) {
-            .product-toggle-bar .container { flex-direction: column; gap: 0.5rem; align-items: stretch; }
-            .toggle-switches { justify-content: center; }
-            .toggle-links { margin-left: 0; justify-content: center; }
             .banner-slider { height: 330px; }
             .stats-section { grid-template-columns: repeat(2, 1fr); }
             .stat-item .number { font-size: 2.2rem; }
@@ -754,32 +669,8 @@
 </header>
 
 <!-- NAVIGATION TABS -->
-<!-- PRODUCT TOGGLE BAR (replaces old nav tabs) -->
-<div class="product-toggle-bar" id="productToggleBar">
-    <div class="container">
-        <div class="toggle-label"><i class="fa-solid fa-boxes-stacked"></i> Live Inventory</div>
-        <div class="toggle-switches">
-            <button class="toggle-btn active" data-view="all" onclick="setProductView('all')">
-                <i class="fa-solid fa-grid-2"></i> All Products
-            </button>
-            <button class="toggle-btn" data-view="available" onclick="setProductView('available')">
-                <i class="fa-solid fa-circle-check"></i> In Stock
-            </button>
-            <button class="toggle-btn" data-view="rfq" onclick="setProductView('rfq')">
-                <i class="fa-regular fa-file-lines"></i> RFQ Deals
-            </button>
-            <a href="/inventory-upload" class="toggle-btn upload-btn">
-                <i class="fa-solid fa-cloud-upload"></i> Upload Inventory
-            </a>
-        </div>
-        <div class="toggle-links">
-            <a href="/products"><i class="fa-solid fa-box"></i> All</a>
-            <a href="/catalogs"><i class="fa-solid fa-file-pdf"></i> Catalogs</a>
-            <a href="/rfq"><i class="fa-regular fa-file-lines"></i> RFQ</a>
-            <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
-        </div>
-    </div>
-</div>
+<!-- The product toggle bar (Live Inventory) was removed from the home page;
+     those tabs now live in the hamburger menu icon (mobile-nav.js). -->
 
 <!-- MAIN CONTENT -->
 <div class="container">
@@ -1453,7 +1344,8 @@
 
     function setProductView(view) {
         currentProductView = view;
-        document.querySelectorAll('.toggle-btn[data-view]').forEach(b => {
+        // Keep the hamburger menu (admin-style) view tabs in sync
+        document.querySelectorAll('#pseMobileMenu .nav-item[data-view]').forEach(b => {
             b.classList.toggle('active', b.dataset.view === view);
         });
         renderProducts(featuredProductsCache);
