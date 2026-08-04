@@ -1026,7 +1026,7 @@
             const formData = new FormData();
             formData.append('file', file);
             formData.append('upload_preset', CLOUDINARY.uploadPreset);
-            formData.append('folder', 'profiles');
+            formData.append('folder', 'products'); // all uploads use the shared Cloudinary "products" folder
 
             const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/image/upload`, {
                 method: 'POST',

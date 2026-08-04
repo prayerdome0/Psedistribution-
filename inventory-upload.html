@@ -252,6 +252,50 @@
             margin-bottom: 0.8rem;
         }
         .template-download:hover { background: var(--primary-light); }
+
+        /* Cloudinary image upload */
+        .img-upload-box {
+            border: 2px dashed var(--border-dark);
+            border-radius: 10px;
+            padding: 1.2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            background: var(--light);
+        }
+        .img-upload-box:hover { border-color: var(--primary); background: var(--primary-light); }
+        .img-upload-box i { font-size: 1.6rem; color: var(--primary); margin-bottom: 0.4rem; }
+        .img-upload-box .cta { font-weight: 700; color: var(--secondary); font-size: 0.85rem; }
+        .img-upload-box p { color: var(--text-light); font-size: 0.78rem; margin-bottom: 0; }
+        .img-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.6rem;
+        }
+        .img-preview .preview-item {
+            position: relative;
+            width: 76px;
+            height: 76px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .img-preview .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .img-preview .preview-item .remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 18px;
+            height: 18px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(192,57,43,0.9);
+            color: #fff;
+            font-size: 0.75rem;
+            line-height: 1;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -262,13 +306,18 @@
             <img src="/logo.webp" alt="PSE" />
             PSE <span>Distribution</span>
         </a>
-        <a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+        <span id="uploaderBadge" style="display:none;align-items:center;gap:0.35rem;background:var(--primary-light);color:var(--primary-dark);font-size:0.75rem;font-weight:700;padding:0.35rem 0.8rem;border-radius:30px;border:1px solid var(--border);"></span>
+        <a href="/" class="back-link" id="headerBackLink"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
     </div>
 </div>
 
 <div class="container page">
     <h1><i class="fa-solid fa-cloud-upload"></i> Upload Live Inventory</h1>
     <p class="subtitle">Manually add your wholesale products — one at a time or bulk import via CSV</p>
+    <div class="status-msg error" id="authNotice" style="display:none;margin-top:-0.6rem;margin-bottom:1.2rem;">
+        <i class="fa-solid fa-lock"></i> You must be signed in as a <strong>seller or admin</strong> to upload inventory.
+        <a href="/login" style="color:inherit;text-decoration:underline;font-weight:700;">Sign in</a>
+    </div>
 
     <div class="tab-bar">
         <button class="tab-btn active" data-tab="single" onclick="switchTab('single')">
@@ -344,7 +393,18 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Image URL (optional)</label>
+                    <label>Product Images (upload to Cloudinary — <strong>products</strong> folder)</label>
+                    <div class="img-upload-box" onclick="document.getElementById('sImageFiles').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p class="cta">Click to upload image files</p>
+                        <p>JPG, PNG, WebP — stored in the Cloudinary <strong>products</strong> folder</p>
+                        <input type="file" id="sImageFiles" accept="image/*" multiple style="display:none;" onchange="handleInventoryImagePreview(event)" />
+                    </div>
+                    <div class="img-preview" id="imagePreview"></div>
+                    <div id="imageFileName" style="font-size:0.8rem;color:var(--text-light);margin-top:0.3rem;">No files selected</div>
+                </div>
+                <div class="form-group">
+                    <label>Or paste Image URL (optional)</label>
                     <input type="url" id="sImageUrl" placeholder="https://images.unsplash.com/photo-..." />
                 </div>
                 <div class="form-group">
@@ -435,13 +495,54 @@
         appId: "1:729127273727:web:402d67be8346257755f8ca"
     };
 
-    let db;
+    // ─── CLOUDINARY CONFIG — same cloud/preset/folder used for products & catalog ───
+    const CLOUDINARY = {
+        cloudName: 'nqyylkmd',
+        uploadPreset: 'pse_products',
+        folder: 'products' // every upload lands in the shared Cloudinary "products" folder
+    };
+
+    let db, auth;
+    let currentUploader = null; // { id, name, role } when a seller/admin is signed in
 
     function initFirebase() {
         if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
+        auth = firebase.auth();
         console.log('✅ Firebase ready for inventory upload');
+
+        auth.onAuthStateChanged((user) => {
+            const notice = document.getElementById('authNotice');
+            if (!user) {
+                if (notice) notice.style.display = 'block';
+                return;
+            }
+            if (notice) notice.style.display = 'none';
+            db.collection('users').doc(user.uid).get().then((doc) => {
+                if (!doc.exists) { if (notice) notice.style.display = 'block'; return; }
+                const data = doc.data();
+                if (data.role === 'seller' || data.role === 'admin') {
+                    currentUploader = {
+                        id: user.uid,
+                        name: data.full_name || data.display_name || user.email || 'Partner',
+                        role: data.role
+                    };
+                    const who = document.getElementById('uploaderBadge');
+                    if (who) {
+                        who.style.display = 'inline-flex';
+                        who.innerHTML = '<i class="fa-solid fa-circle-check"></i> Uploading as ' + (data.role === 'admin' ? 'Admin' : currentUploader.name);
+                    }
+                    const back = document.getElementById('headerBackLink');
+                    if (back) {
+                        back.href = data.role === 'admin' ? '/admin-dashboard' : '/seller-dashboard';
+                        back.innerHTML = '<i class="fa-solid fa-arrow-left"></i> Back to Dashboard';
+                    }
+                } else {
+                    if (notice) notice.style.display = 'block';
+                }
+            }).catch(() => {});
+        });
     }
 
     function toast(msg, type) {
@@ -469,6 +570,59 @@
         document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab));
     }
 
+    // ═══════════ CLOUDINARY UPLOAD (products folder — same as products & catalog) ═══════════
+    async function uploadToCloudinary(file, folder = CLOUDINARY.folder) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY.uploadPreset);
+        formData.append('folder', folder);
+
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/image/upload`, {
+            method: 'POST',
+            body: formData
+        });
+        if (!response.ok) throw new Error('Cloudinary upload failed (' + response.status + ')');
+        const data = await response.json();
+        return { secure_url: data.secure_url, public_id: data.public_id };
+    }
+
+    // ─── IMAGE FILE PREVIEW ───
+    function handleInventoryImagePreview(event) {
+        const files = event.target.files;
+        const preview = document.getElementById('imagePreview');
+        const fileName = document.getElementById('imageFileName');
+
+        preview.innerHTML = '';
+        if (!files || files.length === 0) {
+            fileName.textContent = 'No files selected';
+            return;
+        }
+        fileName.textContent = `${files.length} file(s) selected — upload to Cloudinary "products" folder`;
+
+        Array.from(files).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview ${index + 1}" />
+                    <button type="button" class="remove-btn" onclick="removeInventoryPreviewImage(${index})">&times;</button>
+                `;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function removeInventoryPreviewImage(index) {
+        const input = document.getElementById('sImageFiles');
+        const dt = new DataTransfer();
+        const files = Array.from(input.files);
+        files.filter((_, i) => i !== index).forEach(f => dt.items.add(f));
+        input.files = dt.files;
+        handleInventoryImagePreview({ target: input });
+    }
+
     // ═══════════ SINGLE PRODUCT ═══════════
     async function submitSingleProduct(e) {
         e.preventDefault();
@@ -478,6 +632,20 @@
         showStatus('singleStatus', '', 'info');
 
         try {
+            // 1) Upload selected image files to the Cloudinary "products" folder
+            const imageUrls = [];
+            const files = document.getElementById('sImageFiles').files;
+            if (files && files.length > 0) {
+                showStatus('singleStatus', '📤 Uploading ' + files.length + ' image(s) to Cloudinary (products folder)...', 'info');
+                for (const file of files) {
+                    const result = await uploadToCloudinary(file, CLOUDINARY.folder);
+                    if (result) imageUrls.push(result.secure_url);
+                }
+            }
+            // 2) Optional pasted image URL appended after uploaded images
+            const pastedUrl = document.getElementById('sImageUrl').value.trim();
+            if (pastedUrl && !imageUrls.includes(pastedUrl)) imageUrls.push(pastedUrl);
+
             const product = {
                 title: document.getElementById('sTitle').value.trim(),
                 brand: document.getElementById('sBrand').value.trim() || 'Pilot Distribution',
@@ -487,12 +655,16 @@
                 stock: parseInt(document.getElementById('sStock').value) || 0,
                 category: document.getElementById('sCategory').value,
                 sku: document.getElementById('sSku').value.trim() || '',
-                image_url: document.getElementById('sImageUrl').value.trim() || '',
+                images: imageUrls,
+                image_url: imageUrls.length > 0 ? imageUrls[0] : '',
                 description: document.getElementById('sDescription').value.trim() || '',
                 slug: generateSlug(document.getElementById('sTitle').value),
                 status: 'active',
                 type: 'Wholesale',
                 supplier_verified: true,
+                supplier_id: currentUploader ? currentUploader.id : 'admin',
+                supplier_name: currentUploader ? currentUploader.name : 'Pilot Distribution',
+                uploaded_by_role: currentUploader ? currentUploader.role : 'public',
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             };
@@ -521,6 +693,8 @@
         document.getElementById('singleProductForm').reset();
         document.getElementById('sMoq').value = '1';
         document.getElementById('sStock').value = '100';
+        document.getElementById('imagePreview').innerHTML = '';
+        document.getElementById('imageFileName').textContent = 'No files selected';
         document.getElementById('singleStatus').className = 'status-msg';
     }
 
@@ -615,12 +789,16 @@
                     stock: parseInt(p.stock) || 100,
                     category: p.category || 'other',
                     sku: p.sku || '',
+                    images: p.image_url ? [p.image_url] : [],
                     image_url: p.image_url || '',
                     description: p.description || '',
                     slug: p.slug || generateSlug(p.title),
                     status: 'active',
                     type: 'Wholesale',
                     supplier_verified: true,
+                    supplier_id: currentUploader ? currentUploader.id : 'admin',
+                    supplier_name: currentUploader ? currentUploader.name : 'Pilot Distribution',
+                    uploaded_by_role: currentUploader ? currentUploader.role : 'public',
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                 });
@@ -714,10 +892,14 @@
             for (const p of pastedProducts) {
                 await db.collection('products').add({
                     ...p,
+                    images: p.image_url ? [p.image_url] : [],
                     slug: generateSlug(p.title),
                     status: 'active',
                     type: 'Wholesale',
                     supplier_verified: true,
+                    supplier_id: currentUploader ? currentUploader.id : 'admin',
+                    supplier_name: currentUploader ? currentUploader.name : 'Pilot Distribution',
+                    uploaded_by_role: currentUploader ? currentUploader.role : 'public',
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                 });

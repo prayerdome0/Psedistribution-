@@ -525,6 +525,9 @@
             <div class="nav-item" onclick="showTab('products')">
                 <i class="fa-solid fa-box"></i> Products
             </div>
+            <div class="nav-item" onclick="window.location.href='/inventory-upload'">
+                <i class="fa-solid fa-cloud-upload" style="color:#f1c40f;"></i> Upload Inventory
+            </div>
             <div class="nav-item" onclick="showTab('orders')">
                 <i class="fa-solid fa-receipt"></i> Orders
             </div>
@@ -599,6 +602,9 @@
                         </button>
                         <button type="button" class="btn-add-product" onclick="openCSVImportModal()" style="background:#27ae60;font-size:0.82rem;padding:0.5rem 1rem;">
                             <i class="fa-solid fa-upload"></i> Bulk Import (CSV)
+                        </button>
+                        <button type="button" class="btn-add-product" onclick="window.location.href='/inventory-upload'" style="background:#8e44ad;font-size:0.82rem;padding:0.5rem 1rem;">
+                            <i class="fa-solid fa-cloud-upload"></i> Upload Inventory
                         </button>
                         <button type="button" class="btn-add-product" onclick="exportProductsCSV()" style="background:#2980b9;font-size:0.82rem;padding:0.5rem 1rem;">
                             <i class="fa-solid fa-download"></i> Export CSV
