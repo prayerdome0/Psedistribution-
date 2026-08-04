@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "4.0.0",
+  "capturedAt": "2026-08-04T18:20:00Z",
+  "environment": "engineering-session sandbox (preview harness)",
+  "productionStatus": "NOT_DEPLOYED",
+  "demoDataset": {
+    "disclaimer": "Demo records are staging fixtures only; they are not SalesMax inventory and carry no owner approval for production publication.",
+    "records": ["PSE-DEMO-0001 (rfq mode)", "PSE-DEMO-0002 (public price mode)"],
+    "snapshotVersion": "sha256:d81cd244e9a8fb2b29a093bd7461cdfc2922245801a111807e767ec52517bec4",
+    "sourceVersion": "sha256:36a2b16545db8d6a071061dfde1f89d33cebd3258d47ff7166266b68a90206e9"
+  },
+  "checks": {
+    "contractLockByteParity": "PASS (services/pse-inventory/contracts vs vendor packet)",
+    "packetGauntletBootstrap": "PASS except environmental visual-PDF tooling (poppler/libreoffice unavailable in sandbox); 103 legacy + 3 node tests pass",
+    "serviceTestSuite": "PASS (pytest services/pse-inventory/tests; 1 live-DB test skipped without PSE_TEST_DATABASE_URL)",
+    "websiteWiringTests": "PASS (tests/pse_inventory + node --test apps/pse-inventory-catalog/catalog.test.mjs)",
+    "publishGateOwnerApprovalBinding": "PASS (source-version and record-version mismatch tests)",
+    "privacyMutationSuite": "PASS (injected private keys/values rejected; public output scanned clean)",
+    "freshnessBoundaries": "PASS (stale availability blocked beyond 72h window)",
+    "emptySnapshotDualControl": "PASS (blocked without structured authorization)",
+    "hmacRevalidation": "PASS (valid accepted, tampered/stale/unknown-key rejected, nonce replay 409, version mismatch 409)",
+    "etagAndCursorBinding": "PASS (304 on If-None-Match; cursor invalidated on snapshot change)",
+    "lastKnownGoodFailClosed": "PASS (malformed feed degrades; expired last-good returns 503)",
+    "rateLimits": "PASS (fixed-window limiter 429)",
+    "feedApiSiteParity": "PASS in preview (API totalCount == rendered feed source; site consumes only /api/inventory)",
+    "rfqIdentityPreservation": "PASS (dealId/slug/sourceVersion/snapshotVersion/quantity through URL, form and persistence payload)",
+    "claimsCleanup": "PASS (unsupported counters/terms removed from index.html and products.html)",
+    "backupRestoreRollback": "PASS (drills recorded in rollback-evidence.md)",
+    "postgresControlPlane": "IMPLEMENTED, integration blocked (no PostgreSQL in sandbox; fake-connection transaction tests pass; live gate requires PSE_TEST_DATABASE_URL)",
+    "valkeySharedState": "IMPLEMENTED, multi-replica gate blocked (no Valkey in sandbox; fake-client atomicity tests pass; staging two-replica proof required)"
+  },
+  "openBlockers": [
+    "B-001 hosting project access PENDING_OWNER_PROVISIONING",
+    "B-002 SalesMax runtime/database access PENDING_OWNER_PROVISIONING",
+    "B-003 zero publish-approved production records; owner approval required per record against the exact post-migration source version"
+  ]
+}

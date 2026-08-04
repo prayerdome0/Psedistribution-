@@ -7,9 +7,15 @@ code cannot weaken the contracts.
 from __future__ import annotations
 
 import importlib.util
+import os
 import sys
 from pathlib import Path
 from types import ModuleType
+
+# Never contaminate the vendored packet with bytecode caches: the packet must
+# stay byte-clean for its own package-QA gauntlet.
+os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
+sys.dont_write_bytecode = True
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_PACKET_ROOT = REPO_ROOT / "vendor" / "pse-inventory-packet"
