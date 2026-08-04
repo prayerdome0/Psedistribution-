@@ -281,7 +281,7 @@
         bell.className = 'pse-notif-bell';
         bell.id = 'pse-notif-bell';
         bell.setAttribute('aria-label', 'Notifications');
-        bell.innerHTML = '<i class="fa-regular fa-bell"></i><span class="pse-notif-badge pse-notif-badge--bell"></span>';
+        bell.innerHTML = '<i class="fa-regular fa-bell"></i><span>Alerts</span><span class="pse-notif-badge pse-notif-badge--bell"></span>';
         bell.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -325,7 +325,9 @@
         var host = document.querySelector('.header-actions');
         if (host) {
             root.style.display = 'inline-flex';
-            host.appendChild(root);
+            var before = host.querySelector('#wishlistBtn');
+            if (before) host.insertBefore(root, before);
+            else host.appendChild(root);
             root.classList.add('pse-notif-in-header');
         } else {
             root.classList.add('pse-notif-floating');
