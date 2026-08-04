@@ -1,0 +1,9 @@
+:root { color-scheme: light; }
+body { font-family: system-ui, sans-serif; margin: 0 auto; max-width: 960px; padding: 2rem 1rem; color: #10222e; }
+h1 { font-size: 1.6rem; }
+.inventory-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); margin-top: 1rem; }
+.inventory-card { border: 1px solid #d7e2e8; border-radius: 10px; padding: 1rem; background: #fff; }
+.inventory-card h2 { font-size: 1.05rem; margin: 0 0 .5rem; }
+.inventory-card p { margin: .25rem 0; font-size: .9rem; color: #33505f; }
+.inventory-card a { display: inline-block; margin-top: .6rem; color: #0a5c8a; font-weight: 600; text-decoration: none; }
+.terms { font-size: .8rem; color: #55707e; margin-top: 2rem; }

@@ -353,10 +353,19 @@
 
         <div class="rfq-form animate-on-scroll">
             <div class="info-box">
-                <p><i class="fa-regular fa-circle-info"></i> Submit your requirements and we'll connect you with verified suppliers who can fulfill your order.</p>
+                <p><i class="fa-regular fa-circle-info"></i> Submit your requirements and we'll confirm availability and quote you per offer. An RFQ does not commit inventory; sales confirms availability before any hold.</p>
+            </div>
+
+            <div class="info-box" id="rfqInventoryContext" style="display:none;border-left:4px solid var(--primary);">
+                <p style="margin:0;"><i class="fa-regular fa-box"></i> <strong>Regarding a verified inventory offer:</strong> <span id="rfqInventoryLabel"></span><br />
+                <span style="font-size:0.8rem;color:var(--text-light);">Deal ID <code id="rfqDealIdLabel"></code> · quoted against source version <code id="rfqSourceVersionLabel"></code></span></p>
             </div>
 
             <form id="rfqForm">
+                <input type="hidden" id="rfqDealId" />
+                <input type="hidden" id="rfqSlug" />
+                <input type="hidden" id="rfqSourceVersion" />
+                <input type="hidden" id="rfqSnapshotVersion" />
                 <div class="form-group">
                     <label>What are you looking for? <span class="required">*</span></label>
                     <input type="text" id="rfqTitle" placeholder="e.g., 500 wireless keyboards, custom packaging, etc." required />
@@ -582,10 +591,24 @@
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
 
+        // Inventory identity (Deal ID, slug, sourceVersion, snapshotVersion) is
+        // preserved end-to-end so sales can match the RFQ to the exact offer.
+        const dealId = document.getElementById('rfqDealId').value.trim();
+        const dealSlug = document.getElementById('rfqSlug').value.trim();
+        const sourceVersion = document.getElementById('rfqSourceVersion').value.trim();
+        const snapshotVersion = document.getElementById('rfqSnapshotVersion').value.trim();
+        const requestedQuantity = quantity;
+
         try {
             const docRef = await db.collection('rfqs').add({
                 title, description, quantity, budget, category, urgency, notes,
                 purchase_order_number: document.getElementById('rfqPoNumber')?.value.trim() || '',
+                deal_id: dealId || null,
+                deal_slug: dealSlug || null,
+                source_version: sourceVersion || null,
+                snapshot_version: snapshotVersion || null,
+                requested_quantity: requestedQuantity,
+                referring_url: window.location.href,
                 user_id: user.id,
                 user_email: user.email,
                 status: 'pending',
@@ -593,12 +616,15 @@
                 responses: []
             });
 
+            const identityLines = dealId
+                ? `\nDeal ID: ${dealId}\nSource Version: ${sourceVersion || 'n/a'}\nSnapshot Version: ${snapshotVersion || 'n/a'}`
+                : '';
             await db.collection('messages').add({
                 firstName: user.full_name || 'User',
                 lastName: '',
                 email: user.email,
                 subject: `New RFQ: ${title}`,
-                message: `A new RFQ has been submitted.\n\nTitle: ${title}\nQuantity: ${quantity}\nCategory: ${category}`,
+                message: `A new RFQ has been submitted.\n\nTitle: ${title}\nQuantity: ${quantity}\nCategory: ${category}${identityLines}`,
                 userId: user.id,
                 userEmail: user.email,
                 status: 'unread',
@@ -900,8 +926,40 @@
         window.location.href = '/wishlist';
     }
 
+    // ─── INVENTORY RFQ PREFILL ───
+    // When arriving from a product card/detail page, preserve Deal ID, slug,
+    // sourceVersion, snapshotVersion and requested quantity (packet W4-03).
+    function prefillFromInventoryLink() {
+        const params = new URLSearchParams(window.location.search);
+        const dealId = params.get('dealId') || '';
+        const slug = params.get('slug') || '';
+        const sourceVersion = params.get('sourceVersion') || '';
+        const snapshotVersion = params.get('snapshotVersion') || '';
+        const product = params.get('product') || '';
+        const quantity = parseInt(params.get('quantity'));
+
+        document.getElementById('rfqDealId').value = dealId;
+        document.getElementById('rfqSlug').value = slug;
+        document.getElementById('rfqSourceVersion').value = sourceVersion;
+        document.getElementById('rfqSnapshotVersion').value = snapshotVersion;
+
+        if (product) document.getElementById('rfqTitle').value = product;
+        if (Number.isFinite(quantity) && quantity > 0) {
+            document.getElementById('rfqQuantity').value = String(quantity);
+        }
+        if (dealId) {
+            const box = document.getElementById('rfqInventoryContext');
+            box.style.display = '';
+            document.getElementById('rfqInventoryLabel').textContent = product || dealId;
+            document.getElementById('rfqDealIdLabel').textContent = dealId;
+            document.getElementById('rfqSourceVersionLabel').textContent =
+                sourceVersion ? sourceVersion.slice(0, 20) + '…' : 'n/a';
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         initFirebase();
+        prefillFromInventoryLink();
         document.getElementById('year').textContent = new Date().getFullYear();
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });

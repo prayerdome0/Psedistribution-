@@ -1,0 +1,48 @@
+Current Master Items Column,Canonical Path,Public Field,Action / Blocking Rule
+Deal ID,dealId,dealId,Preserve exactly; immutable primary key
+Status,status,status via freshness mapping,Normalize to private enum; Sold/Hold/Archived never publish
+Company/Supplier,supplier.name,,PRIVATE; never public
+Product Name,publicProfile.title,title,Owner-approved buyer-safe title required
+Description,publicProfile.shortDescription,shortDescription,Review for supplier/private language
+Units Available,inventory.onHandUnits,,Do not call ATS until reservedUnits is established
+Cases,inventory.casesAvailable,casesAvailable,Publish only when verified
+Units/Case,inventory.unitsPerCase,unitsPerCase,Publish only when verified
+UPC,publicProfile.upc,upc,Exact verified value only
+Expiration/Best-By,publicProfile.bestBy,bestBy,Exact date only; ambiguous VERIFY blocks
+Case Condition,publicProfile.condition,condition,Map to approved enum; VERIFY blocks
+FOB Point,publicProfile.fob,fob,Buyer-safe exact location required
+Wholesale Cost / Unit,privateCommercial.acquisitionCostPerUnit,,PRIVATE; never public price
+Wholesale Cost / Case,privateCommercial.*,,PRIVATE; derive only with verified case pack
+Total Deal Value,privateCommercial.*,,PRIVATE analytical field
+Retail/Market Ref / Unit,privateCommercial.marketReferencePerUnit,,PRIVATE reference; recheck before use
+Est. Retail Value,privateCommercial.*,,PRIVATE analytical field
+Spread / Unit,privateCommercial.*,,PRIVATE
+Spread %,privateCommercial.*,,PRIVATE
+Market Source,privateCommercial.*,,PRIVATE
+Market Link,privateCommercial.*,,PRIVATE unless separately approved as a public spec/source
+Sales Page File / Link,publicProfile.specSheetUrl,specSheetUrl,Only approved public HTTPS document
+Image / Proof Link,privateCommercial.proofLinks / publicProfile.imageUrls,imageUrls,Proof stays private; copy only approved public image URLs
+Last Source Check,source.lastSourceVerifiedAt,,Source check is not availability confirmation
+Last Hub Sync,audit.lastApiSyncAt,,Replace Pending with actual connector event timestamp
+Review Status,reviewStatus,,Ready is necessary but not Publish Approved
+Owner,audit.owner,,PRIVATE
+Notes,privateCommercial.internalNotes,,PRIVATE
+MISSING,inventory.reservedUnits,,Required; default only with explicit business rule and evidence
+MISSING,inventory.availableToSell,availableToSell,Formula = onHandUnits - reservedUnits
+MISSING,publishApproved,,Explicit owner/delegate boolean required
+MISSING,publishBlockers,,Must be empty
+MISSING,source.sourceRecordIds,,Required traceability
+MISSING,source.sourceHashes,,Required SHA-256 evidence integrity
+MISSING,source.sourceVersion,sourceVersion,Required parity/version identity
+MISSING,source.lastAvailabilityConfirmedAt,lastAvailabilityConfirmedAt,Required live availability timestamp
+MISSING,source.availabilityExpiresAt,availabilityExpiresAt,Required hard cutoff
+MISSING,publicProfile.termsVersion,termsVersion,Approved commercial terms version
+MISSING,publicProfile.slug,slug,Unique stable public slug
+MISSING,publicProfile.moqUnits,moqUnits,Positive and <= ATS
+MISSING,publicProfile.pricingMode,pricingMode,Public/RFQ
+MISSING,publicProfile.public*Price,public*Price,Required only for public mode; prohibited in RFQ/login
+MISSING,publicProfile.currency,currency,USD at launch
+MISSING,publicProfile.freightTerms,freightTerms,Product-specific terms
+MISSING,publicProfile.inspectionTerms,inspectionTerms,Product-specific approved text
+MISSING,publicProfile.rfqEnabled,rfqEnabled,TRUE during Phase 1
+MISSING,audit.reviewer,,Independent reviewer required

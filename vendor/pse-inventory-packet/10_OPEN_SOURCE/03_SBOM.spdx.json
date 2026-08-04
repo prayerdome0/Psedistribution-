@@ -1,0 +1,633 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "PSE-SalesMax-Inventory-Wiring-Mastered-Open-Source-v4.0.0",
+  "documentNamespace": "https://pilotsalesdistribution.com/sbom/pse-salesmax-inventory-wiring-v4.0.0",
+  "creationInfo": {
+    "created": "2026-08-03T23:00:00Z",
+    "creators": [
+      "Organization: PSE Distribution",
+      "Tool: PSE Super Gauntlet v4.0.0"
+    ]
+  },
+  "packages": [
+    {
+      "name": "Python",
+      "SPDXID": "SPDXRef-Package-Python",
+      "versionInfo": "3.13.5",
+      "downloadLocation": "https://www.python.org/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "PSF-2.0",
+      "licenseDeclared": "PSF-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "Python-container-base",
+      "SPDXID": "SPDXRef-Package-Python-container-base",
+      "versionInfo": "3.13.7",
+      "downloadLocation": "https://hub.docker.com/_/python",
+      "filesAnalyzed": false,
+      "licenseConcluded": "PSF-2.0",
+      "licenseDeclared": "PSF-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "pip",
+      "SPDXID": "SPDXRef-Package-pip",
+      "versionInfo": "25.2",
+      "downloadLocation": "https://github.com/pypa/pip",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "annotated-doc",
+      "SPDXID": "SPDXRef-Package-annotated-doc",
+      "versionInfo": "0.0.4",
+      "downloadLocation": "https://github.com/fastapi/annotated-doc",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "annotated-types",
+      "SPDXID": "SPDXRef-Package-annotated-types",
+      "versionInfo": "0.7.0",
+      "downloadLocation": "https://github.com/annotated-types/annotated-types",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "anyio",
+      "SPDXID": "SPDXRef-Package-anyio",
+      "versionInfo": "4.13.0",
+      "downloadLocation": "https://github.com/agronholm/anyio",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "attrs",
+      "SPDXID": "SPDXRef-Package-attrs",
+      "versionInfo": "26.1.0",
+      "downloadLocation": "https://github.com/python-attrs/attrs",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "certifi",
+      "SPDXID": "SPDXRef-Package-certifi",
+      "versionInfo": "2026.5.20",
+      "downloadLocation": "https://github.com/certifi/python-certifi",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MPL-2.0",
+      "licenseDeclared": "MPL-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "click",
+      "SPDXID": "SPDXRef-Package-click",
+      "versionInfo": "8.1.8",
+      "downloadLocation": "https://github.com/pallets/click",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "fastapi",
+      "SPDXID": "SPDXRef-Package-fastapi",
+      "versionInfo": "0.128.2",
+      "downloadLocation": "https://github.com/fastapi/fastapi",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "h11",
+      "SPDXID": "SPDXRef-Package-h11",
+      "versionInfo": "0.16.0",
+      "downloadLocation": "https://github.com/python-hyper/h11",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "httpcore",
+      "SPDXID": "SPDXRef-Package-httpcore",
+      "versionInfo": "1.0.9",
+      "downloadLocation": "https://github.com/encode/httpcore",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "httpx",
+      "SPDXID": "SPDXRef-Package-httpx",
+      "versionInfo": "0.28.1",
+      "downloadLocation": "https://github.com/encode/httpx",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "idna",
+      "SPDXID": "SPDXRef-Package-idna",
+      "versionInfo": "3.17",
+      "downloadLocation": "https://github.com/kjd/idna",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "iniconfig",
+      "SPDXID": "SPDXRef-Package-iniconfig",
+      "versionInfo": "2.3.0",
+      "downloadLocation": "https://github.com/pytest-dev/iniconfig",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "jsonschema",
+      "SPDXID": "SPDXRef-Package-jsonschema",
+      "versionInfo": "4.26.0",
+      "downloadLocation": "https://github.com/python-jsonschema/jsonschema",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "jsonschema-specifications",
+      "SPDXID": "SPDXRef-Package-jsonschema-specifications",
+      "versionInfo": "2025.9.1",
+      "downloadLocation": "https://github.com/python-jsonschema/jsonschema-specifications",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "packaging",
+      "SPDXID": "SPDXRef-Package-packaging",
+      "versionInfo": "25.0",
+      "downloadLocation": "https://github.com/pypa/packaging",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Apache-2.0 OR BSD-2-Clause",
+      "licenseDeclared": "Apache-2.0 OR BSD-2-Clause",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "Pillow",
+      "SPDXID": "SPDXRef-Package-Pillow",
+      "versionInfo": "12.2.0",
+      "downloadLocation": "https://github.com/python-pillow/Pillow",
+      "filesAnalyzed": false,
+      "licenseConcluded": "HPND",
+      "licenseDeclared": "HPND",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "pluggy",
+      "SPDXID": "SPDXRef-Package-pluggy",
+      "versionInfo": "1.6.0",
+      "downloadLocation": "https://github.com/pytest-dev/pluggy",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "prometheus-client",
+      "SPDXID": "SPDXRef-Package-prometheus-client",
+      "versionInfo": "0.25.0",
+      "downloadLocation": "https://github.com/prometheus/client_python",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "pydantic",
+      "SPDXID": "SPDXRef-Package-pydantic",
+      "versionInfo": "2.13.4",
+      "downloadLocation": "https://github.com/pydantic/pydantic",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "pydantic-core",
+      "SPDXID": "SPDXRef-Package-pydantic-core",
+      "versionInfo": "2.46.4",
+      "downloadLocation": "https://github.com/pydantic/pydantic-core",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "Pygments",
+      "SPDXID": "SPDXRef-Package-Pygments",
+      "versionInfo": "2.20.0",
+      "downloadLocation": "https://github.com/pygments/pygments",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-2-Clause",
+      "licenseDeclared": "BSD-2-Clause",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "PyYAML",
+      "SPDXID": "SPDXRef-Package-PyYAML",
+      "versionInfo": "6.0.3",
+      "downloadLocation": "https://github.com/yaml/pyyaml",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "pytest",
+      "SPDXID": "SPDXRef-Package-pytest",
+      "versionInfo": "9.0.2",
+      "downloadLocation": "https://github.com/pytest-dev/pytest",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "referencing",
+      "SPDXID": "SPDXRef-Package-referencing",
+      "versionInfo": "0.37.0",
+      "downloadLocation": "https://github.com/python-jsonschema/referencing",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "rpds-py",
+      "SPDXID": "SPDXRef-Package-rpds-py",
+      "versionInfo": "2026.5.1",
+      "downloadLocation": "https://github.com/crate-py/rpds",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "starlette",
+      "SPDXID": "SPDXRef-Package-starlette",
+      "versionInfo": "0.50.0",
+      "downloadLocation": "https://github.com/Kludex/starlette",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "typing-extensions",
+      "SPDXID": "SPDXRef-Package-typing-extensions",
+      "versionInfo": "4.15.0",
+      "downloadLocation": "https://github.com/python/typing_extensions",
+      "filesAnalyzed": false,
+      "licenseConcluded": "PSF-2.0",
+      "licenseDeclared": "PSF-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "typing-inspection",
+      "SPDXID": "SPDXRef-Package-typing-inspection",
+      "versionInfo": "0.4.2",
+      "downloadLocation": "https://github.com/pydantic/typing-inspection",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "uvicorn",
+      "SPDXID": "SPDXRef-Package-uvicorn",
+      "versionInfo": "0.48.0",
+      "downloadLocation": "https://github.com/encode/uvicorn",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "PostgreSQL",
+      "SPDXID": "SPDXRef-Package-PostgreSQL",
+      "versionInfo": "18.4",
+      "downloadLocation": "https://www.postgresql.org/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "PostgreSQL",
+      "licenseDeclared": "PostgreSQL",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "Valkey",
+      "SPDXID": "SPDXRef-Package-Valkey",
+      "versionInfo": "9.1.0",
+      "downloadLocation": "https://github.com/valkey-io/valkey",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "Caddy",
+      "SPDXID": "SPDXRef-Package-Caddy",
+      "versionInfo": "2.11.4",
+      "downloadLocation": "https://github.com/caddyserver/caddy",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "Prometheus",
+      "SPDXID": "SPDXRef-Package-Prometheus",
+      "versionInfo": "3.12.0",
+      "downloadLocation": "https://github.com/prometheus/prometheus",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "Alertmanager",
+      "SPDXID": "SPDXRef-Package-Alertmanager",
+      "versionInfo": "0.32.1",
+      "downloadLocation": "https://github.com/prometheus/alertmanager",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "OpenAPI-Specification",
+      "SPDXID": "SPDXRef-Package-OpenAPI-Specification",
+      "versionInfo": "3.1.0",
+      "downloadLocation": "https://github.com/OAI/OpenAPI-Specification",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "Node.js",
+      "SPDXID": "SPDXRef-Package-Node-js",
+      "versionInfo": "22.16.0",
+      "downloadLocation": "https://github.com/nodejs/node",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "LibreOffice",
+      "SPDXID": "SPDXRef-Package-LibreOffice",
+      "versionInfo": "25.2.3.2",
+      "downloadLocation": "https://www.libreoffice.org/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MPL-2.0",
+      "licenseDeclared": "MPL-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "Poppler",
+      "SPDXID": "SPDXRef-Package-Poppler",
+      "versionInfo": "25.06.0",
+      "downloadLocation": "https://poppler.freedesktop.org/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "GPL-2.0-or-later",
+      "licenseDeclared": "GPL-2.0-or-later",
+      "copyrightText": "NOASSERTION"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-Python"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-Python-container-base"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-pip"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-annotated-doc"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-annotated-types"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-anyio"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-attrs"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-certifi"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-click"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-fastapi"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-h11"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-httpcore"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-httpx"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-idna"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-iniconfig"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-jsonschema"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-jsonschema-specifications"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-packaging"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-Pillow"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-pluggy"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-prometheus-client"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-pydantic"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-pydantic-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-Pygments"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-PyYAML"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-pytest"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-referencing"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-rpds-py"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-starlette"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-typing-extensions"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-typing-inspection"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-uvicorn"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-PostgreSQL"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-Valkey"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-Caddy"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-Prometheus"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-Alertmanager"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-OpenAPI-Specification"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-Node-js"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-LibreOffice"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-Poppler"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "generatedAt": "2026-08-04T18:16:15Z",
+  "items": [
+    {
+      "availabilityExpiresAt": "2026-08-07T18:16:15Z",
+      "availableToSell": 1080,
+      "brand": "Demo Brand",
+      "casesAvailable": 90,
+      "category": "grocery",
+      "condition": "closeout",
+      "currency": "USD",
+      "dealId": "PSE-DEMO-0001",
+      "fob": "Los Angeles, CA",
+      "freightTerms": "freight-extra",
+      "imageUrls": [
+        "https://pilotsalesdistribution.com/logo.webp"
+      ],
+      "inspectionTerms": "Inspection before release is available by appointment.",
+      "lastAvailabilityConfirmedAt": "2026-08-04T17:16:15Z",
+      "lastSourceVerifiedAt": "2026-08-04T16:16:15Z",
+      "moqCases": 1,
+      "moqUnits": 12,
+      "pricingMode": "rfq",
+      "publishedAt": "2026-08-04T18:16:15Z",
+      "quantityMode": "exact",
+      "returnTerms": "Final sale unless otherwise stated in the executed invoice.",
+      "rfqEnabled": true,
+      "schemaVersion": "4.0.0",
+      "seo": {
+        "metaDescription": "Staging demo lot used to verify the inventory wiring. Offered by quote; availability subject to final confirmation.",
+        "metaTitle": "DEMO — Closeout Beverage Lot (Case-Good) - Wholesale"
+      },
+      "shortDescription": "Staging demo lot used to verify the inventory wiring. Offered by quote; availability subject to final confirmation.",
+      "slug": "demo-closeout-beverage-lot",
+      "sourceVersion": "sha256:cf2730df9330a3b0c33afacc7054b3cd1650f601f1c4ac1dabf19093d6c2a649",
+      "status": "available",
+      "termsVersion": "demo-terms-v1",
+      "title": "DEMO — Closeout Beverage Lot (Case-Good)",
+      "unitsPerCase": 12,
+      "upc": "036000291452"
+    },
+    {
+      "availabilityExpiresAt": "2026-08-07T18:16:15Z",
+      "availableToSell": 640,
+      "brand": "Demo Brand",
+      "casesAvailable": 16,
+      "category": "electronics",
+      "condition": "overstock",
+      "currency": "USD",
+      "dealId": "PSE-DEMO-0002",
+      "fob": "Dallas, TX",
+      "freightTerms": "freight-extra",
+      "imageUrls": [
+        "https://pilotsalesdistribution.com/logo.webp"
+      ],
+      "inspectionTerms": "Inspection before release is available by appointment.",
+      "lastAvailabilityConfirmedAt": "2026-08-04T17:16:15Z",
+      "lastSourceVerifiedAt": "2026-08-04T16:16:15Z",
+      "moqCases": 1,
+      "moqUnits": 40,
+      "pricingMode": "public",
+      "publicUnitPrice": 4.75,
+      "publishedAt": "2026-08-04T18:16:15Z",
+      "quantityMode": "exact",
+      "returnTerms": "Final sale unless otherwise stated in the executed invoice.",
+      "rfqEnabled": true,
+      "schemaVersion": "4.0.0",
+      "seo": {
+        "metaDescription": "Staging demo lot with public unit pricing, used to verify price-mode rendering. Freight quoted separately.",
+        "metaTitle": "DEMO — Overstock Electronics Accessories Lot - Wholesale"
+      },
+      "shortDescription": "Staging demo lot with public unit pricing, used to verify price-mode rendering. Freight quoted separately.",
+      "slug": "demo-overstock-electronics-lot",
+      "sourceVersion": "sha256:f2f2f0a2c6380aa5cab64cdbcf9ff4bfc02f655154a29bd73c95a64cb7d9a191",
+      "status": "available",
+      "termsVersion": "demo-terms-v1",
+      "title": "DEMO — Overstock Electronics Accessories Lot",
+      "unitsPerCase": 40
+    }
+  ],
+  "previousSnapshotVersion": null,
+  "publisherVersion": "4.0.0",
+  "recordCount": 2,
+  "releaseId": "demo-release-1",
+  "runId": "demo-run-1",
+  "schemaVersion": "4.0.0",
+  "snapshotVersion": "sha256:d81cd244e9a8fb2b29a093bd7461cdfc2922245801a111807e767ec52517bec4",
+  "sourceVersion": "sha256:36a2b16545db8d6a071061dfde1f89d33cebd3258d47ff7166266b68a90206e9"
+}

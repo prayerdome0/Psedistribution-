@@ -1,0 +1,22 @@
+Source ID,Source,Authority,Accessed,Supports,Limitations
+SRC-WEB-HOME,pilotsalesdistribution.com homepage,Primary public site,2026-08-03,Public claims and live counters,Does not prove backend implementation
+SRC-WEB-PRODUCTS,pilotsalesdistribution.com/products,Primary public site,2026-08-03,Zero-product state and filters,Dynamic behavior requires runtime test
+SRC-WEB-RFQ,pilotsalesdistribution.com/rfq,Primary public site,2026-08-03,Generic RFQ fields,Persistence/notifications not inspected
+SRC-HUB,PSE Wholesale Hub Live Deal Tracker,Connected operating source,2026-08-03,Canonical tracker structure/current rows,Live runtime connector not inspected
+SRC-STATUS,PSE Caden Share Deal Intake + Outreach Status,Connected candidate source,2026-08-03,Candidate count/review blockers,Not current sellable inventory
+SRC-GS-QUOTA,Google Sheets API usage limits,Primary vendor documentation,2026-08-03,Quota/payload/backoff guidance,May change; recheck at implementation
+SRC-IAM,Google Cloud IAM key guidance,Primary vendor documentation,2026-08-03,Credential-risk controls,Actual host identity capabilities unknown
+SRC-OWASP,OWASP API Security Top 10 2023,Primary security guidance,2026-08-03,Threat/control framing,Not a substitute for stack-specific testing
+SRC-OAS,OpenAPI Initiative / Specification,Primary standard source,2026-08-03,"Open standard, vendor-neutral API description and Apache-2.0 license",Implementation still requires stack-specific tests
+SRC-PG,PostgreSQL project/license,Primary project source,2026-08-03,OSI-approved permissive database license,Operational version must be pinned after Phase 0
+SRC-FASTAPI,FastAPI documentation,Primary project source,2026-08-03,MIT-licensed API framework,Reference default; existing framework may remain
+SRC-VALKEY,Valkey project,Primary project source,2026-08-03,BSD open-source cache,Version/digest require release review
+SRC-CADDY,Caddy repository,Primary project source,2026-08-03,Apache-2.0 TLS/reverse proxy,Admin endpoint must be isolated
+SRC-PROM,Prometheus project,Primary project source,2026-08-03,Apache-2.0 metrics and alerting,Dashboard and retention require configuration
+SRC-AUDIT-CANDIDATE,Sanitized candidate audit extract,Packet-controlled evidence,2026-08-03,"73-row count, quantity gaps and deterministic title clusters",Buyer-safe audit fields only; not a live availability source
+SRC-AUDIT-CANONICAL,Sanitized canonical audit extract,Packet-controlled evidence,2026-08-03,"2 canonical records, 12,700 units, review and sync states",Excludes supplier and cost; not a publication authorization
+SRC-PG-18-4,PostgreSQL 18.4 release notes,Primary project source,2026-08-03,Reference database version,Container digest still requires Phase 0 evidence
+SRC-VALKEY-9-1,Valkey 9.1.0 release,Primary project source,2026-08-03,Reference cache version,Container digest still requires Phase 0 evidence
+SRC-CADDY-2-11-4,Caddy 2.11.4 release,Primary project source,2026-08-03,Reference proxy version,Container digest still requires Phase 0 evidence
+SRC-PROM-3-12,Prometheus 3.12.0 release,Primary project source,2026-08-03,Reference metrics version,Container digest still requires Phase 0 evidence
+SRC-AM-0-32-1,Alertmanager 0.32.1 release,Primary project source,2026-08-03,Reference alerting version,Container digest still requires Phase 0 evidence

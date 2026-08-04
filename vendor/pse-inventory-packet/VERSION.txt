@@ -1,0 +1,3 @@
+packetVersion=4.0.0
+contractVersion=4.0.0
+releaseProfile=OPEN_SOURCE_SUPER_GAUNTLET

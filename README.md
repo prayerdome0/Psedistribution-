@@ -1,15 +1,78 @@
 # Pilot Sales Distribution (PSE Distribution)
 
-Premium B2B wholesale marketplace — static frontend deployed on Vercel with Firebase Auth + Firestore.
+Premium B2B wholesale marketplace — static frontend deployed on Vercel with Firebase Auth + Firestore, wired to a controlled inventory publication service.
 
 ## Stack
 
 - **Frontend:** HTML, CSS, vanilla JavaScript
+- **Inventory API:** `services/pse-inventory/` — deterministic, self-hostable FastAPI service implementing packet contract **v4.0.0** (vendored at `vendor/pse-inventory-packet/`)
 - **Auth / DB:** Firebase Authentication + Cloud Firestore
 - **Hosting:** Vercel (`vercel.json` clean URLs + security headers)
 - **Email:** Resend API via `email.js` + HTML templates in `Email Template/` (auto-falls back to free keyless FormSubmit → mailto)
 - **AI Assistant + Live Support:** `ai-assistant.js` — 100% client-side rule/knowledge-base engine, **no API key, no cost**
 - **Notifications:** `notifications.js` — in-app notification center + browser notifications, no server required
+
+## Inventory wiring (SalesMax → website)
+
+The catalog, product detail and RFQ pages read **only** from the buyer-safe
+public inventory API (`GET /api/inventory`, `GET /api/inventory/{slug}`). The
+browser never touches the private inventory master. Pipeline:
+
+```text
+Source intake → evidence quarantine + reconciliation
+  → private canonical records → owner approval + publish gate
+  → deterministic allowlist publisher → separate public snapshot
+  → read-only FastAPI (ETag, cursor, rate limit, last-known-good)
+  → storefront catalog / detail / RFQ (Deal ID + source version preserved)
+```
+
+Key paths:
+
+| Path | Purpose |
+|------|---------|
+| `vendor/pse-inventory-packet/` | Vendored v4.0.0 blueprint (contracts, reference impl, gauntlet) |
+| `services/pse-inventory/` | Production service (API, publisher, store, deploy assets, tests) |
+| `services/pse-inventory/data/current.json` | Active validated public snapshot |
+| `apps/pse-inventory-catalog/` | Static reference catalog + RFQ payload tests |
+| `docs/pse-inventory/` | Phase-0 evidence, implementation map, acceptance evidence |
+| `scripts/pse-inventory-{backup,restore,rollback}.sh` | Feed recovery automation |
+
+### Run the local preview (API + storefront in one process)
+
+```bash
+python3 -m venv .venv
+./.venv/bin/python -m pip install -r services/pse-inventory/requirements.runtime.lock -r services/pse-inventory/requirements.test.lock
+# generate the staging demo snapshot (demo records — NOT real SalesMax inventory)
+./.venv/bin/python services/pse-inventory/fixtures/generate_demo_snapshot.py \
+    --operator you --run-id local-1 --release-id local-1
+# serve API + site together on :8080
+./.venv/bin/python -m uvicorn pse_inventory.preview:app --app-dir services/pse-inventory --host 0.0.0.0 --port 8080
+```
+
+Then open `/products`, `/product/demo-closeout-beverage-lot`, and
+`/rfq?dealId=PSE-DEMO-0001`.
+
+### Run the tests
+
+```bash
+./.venv/bin/python -m pytest -q                                  # service + website contract tests
+node --test apps/pse-inventory-catalog/catalog.test.mjs           # RFQ identity tests
+```
+
+The packet gauntlet must run from a **clean-room extraction** (its runtime test
+suite is otherwise affected by this repository's `pytest.ini`):
+
+```bash
+rm -rf /tmp/pse-gauntlet && mkdir -p /tmp/pse-gauntlet \
+  && unzip -q PSE_SalesMax_Inventory_Wiring_MASTERED_OPEN_SOURCE_v4.0.0_2026-08-03.zip -d /tmp/pse-gauntlet \
+  && cd /tmp/pse-gauntlet \
+  && PYTHONDONTWRITEBYTECODE=1 /path/to/repo/.venv/bin/python 07_GAUNTLET/run_super_gauntlet.py . --bootstrap
+```
+
+> **Production status: `NOT_DEPLOYED`.** Live cutover is blocked until hosting
+> access, the authoritative SalesMax runtime, per-record owner approvals, and
+> the multi-replica PostgreSQL/Valkey gates are evidenced. See
+> `docs/pse-inventory/phase-0-evidence.md` and `staging-acceptance.json`.
 
 ## Local development
 

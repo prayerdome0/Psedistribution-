@@ -6,3 +6,9 @@ node_modules/
 .vscode/
 *.log
 .arena/
+
+.venv/
+__pycache__/
+*.pyc
+
+services/pse-inventory/data/backups/

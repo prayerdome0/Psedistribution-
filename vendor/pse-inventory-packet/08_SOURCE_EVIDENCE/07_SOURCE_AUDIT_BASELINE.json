@@ -1,0 +1,19 @@
+{
+  "auditDate": "2026-08-03",
+  "candidateWorkbookSha256": "0cf96d5e85d86160b529566859a656c2b1ccc1fc03cd636a38e5416aa6203428",
+  "canonicalWorkbookSha256": "6ce38e0baf09254df58317f217f41b8b3f4fbeafe79453d96f2999fa62517106",
+  "expected": {
+    "candidateRows": 73,
+    "canonicalRecords": 2,
+    "canonicalUnits": 12700,
+    "duplicateRowsBeyondFirst": 40,
+    "largestNormalizedCluster": 35,
+    "missingUsableQuantity": 15,
+    "normalizedTitleClusters": 33,
+    "publishApprovedRecords": 0,
+    "readyRecords": 1,
+    "reviewGatedCandidateRows": 73
+  },
+  "normalizationRule": "casefold; collapse whitespace; repeatedly strip RE/FWD/FW/Automatic reply prefixes; strip trailing 'We Got Your Message' auto-response text; exact cluster on resulting title",
+  "truthBoundary": "Title clustering is duplicate triage only and never authorizes an automatic merge or publication."
+}

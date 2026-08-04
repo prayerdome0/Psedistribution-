@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "4.0.0",
+  "dealId": "PSE-EXAMPLE-001",
+  "canonicalProductId": "PRODUCT-EXAMPLE-001",
+  "status": "available",
+  "reviewStatus": "ready",
+  "publishApproved": true,
+  "publishApproval": {
+    "approvedBy": "owner-delegate",
+    "approvedAt": "2026-08-03T20:02:00Z",
+    "approvalVersion": "sha256:04bbb45bb3cea3dab169cb4ef3f9d5b6ee19ae1bda63941b4ce200e0d022aa3c"
+  },
+  "publishBlockers": [],
+  "source": {
+    "sourceRecordIds": [
+      "SRC-EXAMPLE-001"
+    ],
+    "sourceHashes": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ],
+    "sourceVersion": "sha256:080c58fa55405749ad8ebf7998adec6b68a4a69731c748999420541440794f0f",
+    "lastSourceVerifiedAt": "2026-08-03T19:45:00Z",
+    "lastAvailabilityConfirmedAt": "2026-08-03T20:00:00Z",
+    "availabilityExpiresAt": "2026-08-06T20:00:00Z",
+    "proofEvidenceIds": [
+      "EVID-EXAMPLE-001"
+    ]
+  },
+  "inventory": {
+    "onHandUnits": 1000,
+    "reservedUnits": 100,
+    "availableToSell": 900,
+    "casesAvailable": 75,
+    "unitsPerCase": 12
+  },
+  "supplier": {
+    "name": "PRIVATE SUPPLIER - MUST NOT PUBLISH",
+    "supplierSku": "SUP-EX-001",
+    "contactReference": "PRIVATE CONTACT - MUST NOT PUBLISH"
+  },
+  "privateCommercial": {
+    "acquisitionCostPerUnit": 1.0,
+    "internalSellFloorPerUnit": 1.5,
+    "marketReferencePerUnit": 3.0,
+    "internalNotes": "INTERNAL ONLY SECRET SENTINEL - MUST NOT PUBLISH",
+    "proofLinks": [
+      "https://private.example.invalid/proof/001"
+    ]
+  },
+  "publicProfile": {
+    "termsVersion": "terms-v1",
+    "slug": "example-product-lot",
+    "title": "Example Product Lot",
+    "shortDescription": "Factory-sealed example inventory offered by quote, subject to final availability confirmation.",
+    "brand": "Example Brand",
+    "category": "other",
+    "moqUnits": 12,
+    "moqCases": 1,
+    "pricingMode": "rfq",
+    "currency": "USD",
+    "condition": "new",
+    "upc": "036000291452",
+    "fob": "Los Angeles, CA",
+    "freightTerms": "quote-required",
+    "inspectionTerms": "Inspection before release is available by appointment.",
+    "returnTerms": "Final sale unless otherwise stated in the executed invoice.",
+    "imageUrls": [
+      "https://cdn.pilotsalesdistribution.com/inventory/example-product-lot/main.jpg"
+    ],
+    "specSheetUrl": "https://cdn.pilotsalesdistribution.com/inventory/example-product-lot/spec.pdf",
+    "rfqEnabled": true,
+    "seo": {
+      "metaTitle": "Example Product Lot - Wholesale RFQ",
+      "metaDescription": "Request a wholesale quote for the Example Product Lot, FOB Los Angeles."
+    },
+    "quantityMode": "exact"
+  },
+  "audit": {
+    "owner": "Caden / owner delegate",
+    "reviewer": "Inventory reviewer",
+    "recordUpdatedAt": "2026-08-03T20:01:00Z",
+    "lastPublishedAt": null,
+    "lastApiSyncAt": null,
+    "lastSiteRevalidatedAt": null
+  },
+  "recordVersion": "sha256:04bbb45bb3cea3dab169cb4ef3f9d5b6ee19ae1bda63941b4ce200e0d022aa3c"
+}

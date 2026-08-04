@@ -1,0 +1,9 @@
+Component,Approved Version,Immutable Digest,License Verified,CVE Scan,Approved By,Approved At,Rollback Version,Evidence Link
+PostgreSQL,,,,,,,,
+FastAPI adapter image,,,,,,,,
+Valkey,,,,,,,,
+Caddy,,,,,,,,
+Prometheus,,,,,,,,
+Alertmanager,,,,,,,,
+Perses,,,,,,,,
+"Keycloak, if used",,,,,,,,

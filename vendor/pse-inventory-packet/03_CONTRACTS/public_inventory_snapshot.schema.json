@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pilotsalesdistribution.com/schemas/public_inventory_snapshot.schema.json",
+  "title": "PSE Public Inventory Snapshot v4.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "publisherVersion",
+    "snapshotVersion",
+    "sourceVersion",
+    "runId",
+    "releaseId",
+    "generatedAt",
+    "recordCount",
+    "items"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "4.0.0"
+    },
+    "publisherVersion": {
+      "type": "string",
+      "const": "4.0.0"
+    },
+    "snapshotVersion": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "sourceVersion": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "releaseId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "previousSnapshotVersion": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "emptyOverrideAuthorizationId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "recordCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "./public_inventory_item.schema.json"
+      }
+    }
+  }
+}

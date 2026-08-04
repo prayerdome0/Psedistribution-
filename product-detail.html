@@ -1161,10 +1161,59 @@
         return null;
     }
 
+    // ─── MAP PUBLIC INVENTORY ITEM TO PAGE MODEL ───
+    // Buyer-safe fields only (packet public_inventory_item schema). RFQ/login
+    // pricing modes never display a fabricated price.
+    function mapInventoryDetail(item) {
+        const isPublicPrice = item.pricingMode === 'public' && Number.isFinite(Number(item.publicUnitPrice));
+        const inStock = item.status !== 'confirm-availability'
+            && Number.isInteger(item.availableToSell) && item.availableToSell > 0;
+        const terms = [
+            item.fob ? `FOB: ${item.fob}` : null,
+            item.freightTerms ? `Freight: ${item.freightTerms}` : 'Freight quoted separately unless explicitly included.',
+            item.inspectionTerms ? `Inspection: ${item.inspectionTerms}` : null,
+            item.returnTerms ? `Returns: ${item.returnTerms}` : null,
+            'Availability subject to prior sale and final confirmation.'
+        ].filter(Boolean).join('\n');
+        return {
+            id: item.dealId,
+            dealId: item.dealId,
+            slug: item.slug,
+            title: item.title || 'Product',
+            brand: item.brand || 'Pilot Distribution',
+            category: item.category || 'other',
+            condition: item.condition || '',
+            description: [item.shortDescription || '', '', terms].join('\n'),
+            price: isPublicPrice ? Number(item.publicUnitPrice) : 0,
+            rfqOnly: !isPublicPrice,
+            pricingMode: item.pricingMode || 'rfq',
+            moq: item.moqUnits || 1,
+            stock: inStock ? item.availableToSell : 0,
+            confirmAvailability: item.status === 'confirm-availability',
+            image_url: (item.imageUrls && item.imageUrls[0]) || '',
+            images: item.imageUrls || [],
+            sourceVersion: item.sourceVersion || '',
+            snapshotVersion: item.snapshotVersion || '',
+            upc: item.upc || '',
+            status: 'active'
+        };
+    }
+
     // ─── LOAD PRODUCT BY SLUG ───
     async function loadProductBySlug(slug) {
+        // First: the verified public inventory API (buyer-safe snapshot).
         try {
-            // First try to find by slug field
+            const response = await fetch('/api/inventory/' + encodeURIComponent(slug), {
+                headers: { 'Accept': 'application/json' }
+            });
+            if (response.ok) {
+                return mapInventoryDetail(await response.json());
+            }
+        } catch (apiError) {
+            console.warn('Inventory API unavailable; falling back:', apiError);
+        }
+        try {
+            // Legacy fallback for non-inventory catalog content.
             const snapshot = await db.collection('products')
                 .where('slug', '==', slug)
                 .get();
@@ -1377,11 +1426,12 @@
         document.getElementById('ratingStars').textContent = starsHtml;
         document.getElementById('ratingReviews').textContent = `${(product.reviews || 0)} reviews`;
 
-        // Price
+        // Price — RFQ/login pricing modes never display a fabricated price.
         const price = product.price || 0;
         const oldPrice = product.old_price || 0;
-        const discount = oldPrice > price ? Math.round((1 - price / oldPrice) * 100) : 0;
-        document.getElementById('productPrice').textContent = `$${price.toFixed(2)}`;
+        const discount = !product.rfqOnly && oldPrice > price ? Math.round((1 - price / oldPrice) * 100) : 0;
+        document.getElementById('productPrice').textContent = product.rfqOnly ? 'Quote required' : `$${price.toFixed(2)}`;
+        document.getElementById('productPrice').style.fontSize = product.rfqOnly ? '1.4rem' : '';
         document.getElementById('productOldPrice').textContent = oldPrice > 0 ? `$${oldPrice.toFixed(2)}` : '';
         document.getElementById('productOldPrice').style.display = oldPrice > 0 ? 'inline' : 'none';
         if (discount > 0) {
@@ -1393,8 +1443,11 @@
         document.getElementById('productSku').textContent = product.sku || 'N/A';
         document.getElementById('productCategory').textContent = product.category || 'N/A';
         const stockStatus = document.getElementById('productStockStatus');
-        if (product.stock > 0) {
-            stockStatus.textContent = `In Stock (${product.stock} units)`;
+        if (product.confirmAvailability) {
+            stockStatus.textContent = 'Confirm availability — quoted on request';
+            stockStatus.className = 'stock-in';
+        } else if (product.stock > 0) {
+            stockStatus.textContent = `In Stock (${Number(product.stock).toLocaleString()} units)`;
             stockStatus.className = 'stock-in';
         } else {
             stockStatus.textContent = 'Out of Stock';
@@ -1562,6 +1615,13 @@
     }
 
     function renderBulkPricing(product) {
+        const container = document.getElementById('bulkPricing');
+        if (product.rfqOnly) {
+            // No public price: never fabricate volume-discount tiers.
+            if (container) container.style.display = 'none';
+            return;
+        }
+        if (container) container.style.display = '';
         const tbody = document.getElementById('bulkPricingBody');
         if (!tbody) return;
         const price = product.price || 0;
@@ -1907,6 +1967,19 @@
     function requestQuote() {
         const qty = parseInt(document.getElementById('qtyInput').value) || 1;
         const product = currentProduct;
+        // Inventory items route through the RFQ form with full identity
+        // (Deal ID, slug, sourceVersion, snapshotVersion, quantity).
+        if (product && product.dealId) {
+            const url = new URL('/rfq', window.location.origin);
+            url.searchParams.set('dealId', product.dealId);
+            if (product.slug) url.searchParams.set('slug', product.slug);
+            if (product.sourceVersion) url.searchParams.set('sourceVersion', product.sourceVersion);
+            if (product.snapshotVersion) url.searchParams.set('snapshotVersion', product.snapshotVersion);
+            url.searchParams.set('product', product.title || product.dealId);
+            url.searchParams.set('quantity', String(qty));
+            window.location.href = url.pathname + url.search;
+            return;
+        }
         const message = `📋 *RFQ REQUEST*%0A%0A*Product:* ${product.title}%0A*Brand:* ${product.brand || 'N/A'}%0A*Quantity:* ${qty} units%0A*Price:* $${(product.price || 0).toFixed(2)} per unit%0A*Total:* $${((product.price || 0) * qty).toFixed(2)}%0A*MOQ:* ${product.moq || 1}%0A%0APlease send me a quote.`;
         // Route to the seller's own WhatsApp when available, else the platform number
         const sellerWa = (currentSellerContact.whatsapp || currentSellerContact.phone || '').replace(/[^0-9]/g, '');

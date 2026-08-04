@@ -1,0 +1,10 @@
+# Exact test-only dependency closure used by the v4.0.0 runnable-stack suite.
+certifi==2026.5.20
+httpcore==1.0.9
+httpx==0.28.1
+iniconfig==2.3.0
+packaging==25.0
+pluggy==1.6.0
+Pygments==2.20.0
+pytest==9.0.2
+PyYAML==6.0.3

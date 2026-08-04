@@ -1,0 +1,20 @@
+Component,Purpose,License,Open Source,Required at Runtime,Verified Reference Version,Verification Date,Evidence Source,Notes
+Python,Reference publisher and API language,PSF-2.0,YES,YES,"3.13.7 container; 3.13.5 gauntlet",2026-08-03,https://docs.python.org/3/license.html,Pin the production image by digest during Phase 0
+FastAPI,Reference HTTP API framework,MIT,YES,YES,0.128.2,2026-08-03,https://github.com/fastapi/fastapi,Tested packet pin; not represented as latest
+Pydantic,Runtime validation for FastAPI adapter,MIT,YES,YES,2.13.4,2026-08-03,https://github.com/pydantic/pydantic,Exact runtime closure is pinned
+Starlette,ASGI framework used by FastAPI,BSD-3-Clause,YES,YES,0.50.0,2026-08-03,https://github.com/Kludex/starlette,Exact runtime closure is pinned
+Uvicorn,ASGI server,BSD-3-Clause,YES,YES,0.48.0,2026-08-03,https://github.com/encode/uvicorn,Exact runtime closure is pinned
+PostgreSQL,Private canonical and public snapshot databases,PostgreSQL,YES,RECOMMENDED,18.4,2026-08-03,https://www.postgresql.org/docs/release/18.4/,Pin resolved image digest in deployment evidence
+Valkey,"Cache, last-known-good and replay state",BSD-3-Clause,YES,RECOMMENDED,9.1.0,2026-08-03,https://github.com/valkey-io/valkey/releases/tag/9.1.0,Pin resolved image digest in deployment evidence
+Caddy,TLS and reverse proxy,Apache-2.0,YES,RECOMMENDED,2.11.4,2026-08-03,https://github.com/caddyserver/caddy/releases/tag/v2.11.4,Restrict admin endpoint and pin digest
+Prometheus,Metrics and alert rules,Apache-2.0,YES,RECOMMENDED,3.12.0,2026-08-03,https://github.com/prometheus/prometheus/releases/tag/v3.12.0,Pin resolved image digest
+Alertmanager,Alert routing,Apache-2.0,YES,RECOMMENDED,0.32.1,2026-08-03,https://github.com/prometheus/alertmanager/releases/tag/v0.32.1,Pin resolved image digest
+OpenAPI Specification,Vendor-neutral API contract,Apache-2.0,YES,YES,3.1.0,2026-08-03,https://spec.openapis.org/oas/v3.1.0.html,Unrelated to OpenAI
+jsonschema,Reference contract validation,MIT,YES,YES,4.26.0,2026-08-03,https://github.com/python-jsonschema/jsonschema,Pinned in both packet and runtime closures
+PyYAML,OpenAPI YAML parsing in verification,MIT,YES,GAUNTLET ONLY,6.0.3,2026-08-03,https://github.com/yaml/pyyaml,Pinned in packet and test locks
+pytest,Runnable-stack test runner,MIT,YES,GAUNTLET ONLY,9.0.2,2026-08-03,https://github.com/pytest-dev/pytest,Excluded from production container
+httpx,ASGI/API test client,BSD-3-Clause,YES,GAUNTLET ONLY,0.28.1,2026-08-03,https://github.com/encode/httpx,Excluded from production container
+Pillow,Image validation and PDF/PPTX raster parity,HPND,YES,GAUNTLET ONLY,12.2.0,2026-08-03,https://python-pillow.github.io/,Pinned in packet verification lock
+LibreOffice,Headless rendering of editable PPTX,MPL-2.0,YES,GAUNTLET ONLY,25.2.3.2,2026-08-03,https://www.libreoffice.org/about-us/licenses/,Verification-environment evidence; pin container/image in CI
+Poppler utilities,"PDF metadata, font, text and raster checks",GPL-2.0-or-later,YES,GAUNTLET ONLY,25.06.0,2026-08-03,https://poppler.freedesktop.org/,Verification-environment evidence; pin container/image in CI
+Node.js,Browser-module test runtime,MIT,YES,GAUNTLET ONLY,22.16.0,2026-08-03,https://github.com/nodejs/node,No external JavaScript packages required

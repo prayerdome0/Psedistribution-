@@ -1,0 +1,8 @@
+Identity/Role,Private Master,Public Feed,API Cache,Deployment,Secrets,Audit Logs
+Owner/Admin,Admin,Admin,Admin,Approve/Admin,Approve/Manage,Read
+Inventory Publisher,Read,Write,Trigger revalidation only,None,Read active signing secret only,Append
+Storefront Reader,None,Read,Read/refresh,Runtime only,None except feed auth reference,Append runtime logs
+Sales Ops,Approved UI/edit path,Read,None,None,None,Read
+Warehouse/Receiving,Quantity/proof workflow only,None,None,None,None,Read own events
+QA/Release,Read sanitized/test data,Read,Read/test,Staging/approved release,No plaintext,Read
+Browser/Public,None,None directly,Public API only,None,None,None

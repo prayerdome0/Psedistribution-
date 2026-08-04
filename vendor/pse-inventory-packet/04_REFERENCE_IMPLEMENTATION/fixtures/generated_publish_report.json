@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "4.0.0",
+  "runId": "RUN-EXAMPLE-001",
+  "releaseId": "REL-EXAMPLE-001",
+  "operator": "engineering-test",
+  "generatedAt": "2026-08-03T20:05:00Z",
+  "result": "PASS",
+  "inputCount": 1,
+  "approvedCount": 1,
+  "ignoredCount": 0,
+  "publishedCount": 1,
+  "sourceVersion": "sha256:83567e8a61ca4c70df02318cd4fdbe4924c0007b27146ac6c525535af79decb8",
+  "snapshotVersion": "sha256:9c29853c35ea8c25b61da6813006236613d506848b8cdaf5f8df6e7c2803aed5",
+  "previousSnapshotVersion": null,
+  "emptyOverrideAuthorizationId": null
+}

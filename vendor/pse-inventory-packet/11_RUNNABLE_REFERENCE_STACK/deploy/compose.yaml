@@ -1,0 +1,111 @@
+name: pse-inventory-single-process-reference
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: 11_RUNNABLE_REFERENCE_STACK/deploy/Dockerfile
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    environment:
+      PSE_PACKET_ROOT: /packet
+      PSE_SNAPSHOT_FILE: /data/current.json
+      PSE_CURSOR_SECRET: ${PSE_CURSOR_SECRET:?set PSE_CURSOR_SECRET}
+      PSE_REVALIDATION_KEYS_JSON: ${PSE_REVALIDATION_KEYS_JSON:?set PSE_REVALIDATION_KEYS_JSON}
+      PSE_ALLOWED_ORIGINS: ${PSE_ALLOWED_ORIGINS:-https://pilotsalesdistribution.com}
+      PSE_MAX_LAST_GOOD_AGE_SECONDS: ${PSE_MAX_LAST_GOOD_AGE_SECONDS:-300}
+      PSE_RATE_LIMIT_PER_MINUTE: ${PSE_RATE_LIMIT_PER_MINUTE:-120}
+    volumes:
+      - ../data:/data:ro
+    expose: ["8080"]
+    networks: [edge, private]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/internal/readyz', timeout=2)"]
+      interval: 15s
+      timeout: 3s
+      retries: 4
+      start_period: 15s
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+
+  postgres:
+    profiles: ["control-plane-preview"]
+    image: postgres:18.4-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pse_inventory}
+      POSTGRES_USER: ${POSTGRES_USER:-pse_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../db:/docker-entrypoint-initdb.d:ro
+    networks: [private]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+    security_opt: ["no-new-privileges:true"]
+
+  valkey:
+    profiles: ["shared-state-preview"]
+    image: valkey/valkey:9.1.0-alpine
+    restart: unless-stopped
+    command: ["valkey-server", "--appendonly", "yes", "--requirepass", "${VALKEY_PASSWORD:?set VALKEY_PASSWORD}"]
+    volumes: ["valkey_data:/data"]
+    networks: [private]
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli -a $$VALKEY_PASSWORD ping | grep PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 8
+    environment:
+      VALKEY_PASSWORD: ${VALKEY_PASSWORD:?set VALKEY_PASSWORD}
+    security_opt: ["no-new-privileges:true"]
+
+  caddy:
+    image: caddy:2.11.4-alpine
+    restart: unless-stopped
+    depends_on:
+      api: {condition: service_healthy}
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ../site:/srv:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [edge]
+    security_opt: ["no-new-privileges:true"]
+
+  prometheus:
+    image: prom/prometheus:v3.12.0
+    restart: unless-stopped
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.retention.time=30d"]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alert_rules.yml:/etc/prometheus/alert_rules.yml:ro
+      - prometheus_data:/prometheus
+    networks: [private]
+    security_opt: ["no-new-privileges:true"]
+
+  alertmanager:
+    image: prom/alertmanager:v0.32.1
+    restart: unless-stopped
+    command: ["--config.file=/etc/alertmanager/alertmanager.yml"]
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    networks: [private]
+    security_opt: ["no-new-privileges:true"]
+
+networks:
+  edge: {}
+  private:
+    internal: true
+volumes:
+  postgres_data: {}
+  valkey_data: {}
+  caddy_data: {}
+  caddy_config: {}
+  prometheus_data: {}
+  alertmanager_data: {}

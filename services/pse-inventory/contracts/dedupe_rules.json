@@ -1,0 +1,45 @@
+{
+  "version": "4.0.0",
+  "automaticMergeKeys": [
+    "dealId",
+    "sourceThreadId",
+    "exactSourceHash"
+  ],
+  "reviewMergeKeys": [
+    "gtin+brand+model",
+    "supplierSku+quantity+fob",
+    "normalizedTitle+quantity+fob"
+  ],
+  "rules": [
+    {
+      "priority": 1,
+      "key": "dealId",
+      "action": "block duplicate canonical records"
+    },
+    {
+      "priority": 2,
+      "key": "source message/thread id",
+      "action": "link evidence to one canonical deal"
+    },
+    {
+      "priority": 3,
+      "key": "GTIN + brand + model",
+      "action": "review candidate merge"
+    },
+    {
+      "priority": 4,
+      "key": "supplier SKU + quantity + FOB",
+      "action": "review candidate merge"
+    },
+    {
+      "priority": 5,
+      "key": "source SHA-256",
+      "action": "link exact duplicate evidence"
+    },
+    {
+      "priority": 6,
+      "key": "fuzzy title",
+      "action": "suggest review only; never auto-merge"
+    }
+  ]
+}

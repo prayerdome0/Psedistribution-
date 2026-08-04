@@ -1,0 +1,10 @@
+{
+  "version": "4.0.0",
+  "requiredScheme": "https",
+  "defaultAllowedHosts": [
+    "cdn.pilotsalesdistribution.com",
+    "pilotsalesdistribution.com",
+    "www.pilotsalesdistribution.com"
+  ],
+  "deploymentRule": "Set PSE_ALLOWED_MEDIA_HOSTS explicitly after Phase 0 host discovery; do not permit arbitrary server-side URL fetching."
+}
