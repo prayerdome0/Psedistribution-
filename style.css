@@ -2011,7 +2011,7 @@ input, select, textarea { font-family: var(--font-body); }
 
 /* ─── MOBILE HAMBURGER (injected by mobile-nav.js) ─── */
 .mobile-hamburger {
-    display: none;
+    display: inline-flex;
     width: 42px;
     height: 42px;
     border-radius: var(--radius-sm);
