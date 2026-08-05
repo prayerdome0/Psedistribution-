@@ -1,0 +1,168 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Pilot Sales Distribution — self-hosted stack (optional)
+# ─────────────────────────────────────────────────────────────────────────────
+# Use this compose file when you want to run the entire stack on your own
+# infrastructure (VPS, K8s, on-prem). The primary production deployment
+# uses Vercel for the storefront and a managed container for the inventory
+# service (see services/pse-inventory/deploy/compose.production.yaml).
+#
+# Usage:
+#   cp .env.example .env
+#   # fill in all the replace-with-… placeholders
+#   docker compose up -d
+#   # Tear down
+#   docker compose down
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: pse-distribution
+
+services:
+  # ── Storefront (static site served by hardened nginx) ────────────────
+  storefront:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    image: pse/storefront:latest
+    container_name: pse-storefront
+    restart: unless-stopped
+    ports:
+      - "8080:80"            # bind to localhost; terminate TLS at the edge
+    depends_on:
+      inventory:
+        condition: service_healthy
+    networks:
+      - frontend
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1/404.html"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    security_opt:
+      - "no-new-privileges:true"
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, NET_BIND_SERVICE]
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx:size=32m
+      - /var/run:size=4m
+      - /var/log/nginx:size=32m
+
+  # ── Inventory API (FastAPI vendored service) ─────────────────────────
+  inventory:
+    build:
+      context: services/pse-inventory
+      dockerfile: deploy/Dockerfile
+    image: pse/inventory:latest
+    container_name: pse-inventory
+    restart: unless-stopped
+    environment:
+      PSE_PACKET_ROOT: /app/vendor/pse-inventory-packet
+      PSE_SNAPSHOT_FILE: /data/current.json
+      PSE_CURSOR_SECRET: ${PSE_CURSOR_SECRET:?PSE_CURSOR_SECRET required}
+      PSE_REVALIDATION_KEYS_JSON: ${PSE_REVALIDATION_KEYS_JSON:?PSE_REVALIDATION_KEYS_JSON required}
+      PSE_ALLOWED_ORIGINS: ${PSE_ALLOWED_ORIGINS:-https://pilotsalesdistribution.com}
+      PSE_MAX_LAST_GOOD_AGE_SECONDS: ${PSE_MAX_LAST_GOOD_AGE_SECONDS:-300}
+      PSE_RATE_LIMIT_PER_MINUTE: ${PSE_RATE_LIMIT_PER_MINUTE:-120}
+      PSE_RUNTIME_MODE: production
+      PSE_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      PSE_VALKEY_URL: redis://:${VALKEY_PASSWORD}@valkey:6379/0
+    volumes:
+      - ./services/pse-inventory/data:/data:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    networks:
+      - frontend
+      - private
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/internal/readyz', timeout=2)"]
+      interval: 15s
+      timeout: 3s
+      retries: 4
+      start_period: 20s
+    security_opt:
+      - "no-new-privileges:true"
+    cap_drop: [ALL]
+
+  # ── Postgres (control-plane state) ───────────────────────────────────
+  postgres:
+    image: postgres:18.4-alpine
+    container_name: pse-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pse_inventory}
+      POSTGRES_USER: ${POSTGRES_USER:-pse_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD required}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./services/pse-inventory/migrations:/docker-entrypoint-initdb.d:ro
+    networks:
+      - private
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pse_admin} -d ${POSTGRES_DB:-pse_inventory}"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
+    security_opt:
+      - "no-new-privileges:true"
+
+  # ── Valkey (shared rate-limit + replay state) ────────────────────────
+  valkey:
+    image: valkey/valkey:9.1.0-alpine
+    container_name: pse-valkey
+    restart: unless-stopped
+    command:
+      - "valkey-server"
+      - "--appendonly"
+      - "yes"
+      - "--requirepass"
+      - "${VALKEY_PASSWORD:?VALKEY_PASSWORD required}"
+      - "--maxmemory"
+      - "256mb"
+      - "--maxmemory-policy"
+      - "allkeys-lru"
+    volumes:
+      - valkey_data:/data
+    networks:
+      - private
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli -a ${VALKEY_PASSWORD} ping | grep -q PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    security_opt:
+      - "no-new-privileges:true"
+
+  # ── Firebase emulator (LOCAL DEV ONLY — do not deploy to production) ─
+  firebase-emulator:
+    image: node:20-bookworm-slim
+    container_name: pse-firebase-emulator
+    profiles: ["dev"]
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: ["npx", "--yes", "firebase-tools@13.29.1", "emulators:start", "--only", "auth,firestore,storage", "--project", "pilot-sales-distribution"]
+    ports:
+      - "4000:4000"   # emulator UI
+      - "9099:9099"   # auth
+      - "8080:8080"   # firestore
+      - "9199:9199"   # storage
+    networks:
+      - private
+
+networks:
+  frontend:
+    driver: bridge
+  private:
+    driver: bridge
+    internal: false   # the inventory API needs to reach Stripe/Resend
+
+volumes:
+  postgres_data:
+  valkey_data:
