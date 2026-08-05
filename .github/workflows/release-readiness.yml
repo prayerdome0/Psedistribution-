@@ -1,0 +1,75 @@
+name: Release readiness
+
+# Strict production-readiness check. Run manually before tagging a
+# release (v*.*.*) or via the API before a deploy. Fails on warnings,
+# not just failures.
+#
+# Use this workflow to gate a release. The non-strict check runs on
+# every PR (see ci.yml); the strict one is a deliberate pre-release
+# step.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to verify (e.g. v4.1.0)'
+        required: false
+        type: string
+  push:
+    tags: ['v*.*.*']
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  strict-check:
+    name: Strict production readiness
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run strict readiness check
+        # In strict mode, any warning is treated as a failure. The build
+        # blocks the release until every gate is clean.
+        run: |
+          set +e
+          python scripts/production-readiness-check.py --strict
+          rc=$?
+          if [ $rc -ne 0 ]; then
+            echo "::error::Strict production-readiness check failed."
+            echo "Remediate the warnings listed above, then re-run this workflow."
+            exit $rc
+          fi
+          echo "✓ Strict production-readiness check passed."
+
+      - name: Verify all Python tests pass
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install --quiet --upgrade pip
+          .venv/bin/pip install --quiet -r services/pse-inventory/requirements.runtime.lock
+          .venv/bin/pip install --quiet -r services/pse-inventory/requirements.test.lock
+          .venv/bin/python -m pytest -o addopts='' \
+              services/pse-inventory/tests \
+              tests/pse_inventory \
+              tests/test_env_hygiene.py \
+              tests/test_static_site.py 2>&1 | tail -10
+
+      - name: Regenerate OpenAPI export
+        run: |
+          .venv/bin/python scripts/export-openapi.py
+
+      - name: Verify OpenAPI export is up to date
+        run: |
+          git diff --exit-code docs/api/openapi.json

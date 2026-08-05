@@ -130,6 +130,9 @@ def main() -> int:
     n += insert_block("about.html", "breadcrumb-about", breadcrumb_ld([("Home", "/"), ("About", "/about")]))
     n += insert_block("contact.html", "breadcrumb-contact", breadcrumb_ld([("Home", "/"), ("Contact", "/contact")]))
     n += insert_block("rfq.html", "breadcrumb-rfq", breadcrumb_ld([("Home", "/"), ("Request Quote", "/rfq")]))
+    n += insert_block("help-center.html", "breadcrumb-help", breadcrumb_ld([("Home", "/"), ("Help Center", "/help-center")]))
+    n += insert_block("privacy.html", "breadcrumb-privacy", breadcrumb_ld([("Home", "/"), ("Privacy Policy", "/privacy")]))
+    n += insert_block("terms.html", "breadcrumb-terms", breadcrumb_ld([("Home", "/"), ("Terms & Conditions", "/terms")]))
     print(f"\nUpdated {n} structured-data blocks.")
     return 0
 

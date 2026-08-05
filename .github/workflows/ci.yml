@@ -197,7 +197,30 @@ jobs:
           python -m pytest -o addopts='' \
               services/pse-inventory/tests \
               tests/pse_inventory \
-              tests/test_env_hygiene.py 2>&1 | tail -40
+              tests/test_env_hygiene.py \
+              tests/test_static_site.py 2>&1 | tail -40
+
+  # ──────────────────────────────────────────────────────────────────────
+  # LANE 2.5: Production readiness check
+  # ──────────────────────────────────────────────────────────────────────
+  readiness-check:
+    name: Production readiness check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run readiness check
+        # Non-strict: failures = fail the build, warnings = log only.
+        # A separate "release-readiness" workflow (workflow_dispatch only)
+        # runs in --strict mode before tagging a release.
+        run: |
+          python scripts/production-readiness-check.py
 
   # ──────────────────────────────────────────────────────────────────────
   # LANE 3: Security audit
