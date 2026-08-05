@@ -52,10 +52,39 @@
     <script src="catalog-data.js"></script>
     <script src="/inventory-client.js"></script>
 
+    <!-- Immediately neutralize floating WhatsApp injected by main.js -->
+    <script>
+        (function() {
+            function killWaFloat() {
+                const floats = document.querySelectorAll('#pseWaFloat, [id*="wa-float"], .pse-wa-float, a[href*="wa.me"][style*="fixed"]');
+                floats.forEach(el => { 
+                    if (el && el.parentNode) el.parentNode.removeChild(el); 
+                    else if (el) el.style.display = 'none';
+                });
+            }
+            // Run immediately and on load
+            killWaFloat();
+            document.addEventListener('DOMContentLoaded', killWaFloat);
+            setTimeout(killWaFloat, 400);
+            setTimeout(killWaFloat, 1200);
+            // Also kill any future injections
+            const observer = new MutationObserver(killWaFloat);
+            observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
+
+            // Hide the global dark-mode toggle (bottom) on homepage — we use top toggle
+            function hideBottomDarkToggle() {
+                const toggles = document.querySelectorAll('#darkModeToggle, .dark-mode-toggle');
+                toggles.forEach(t => t && (t.style.display = 'none'));
+            }
+            hideBottomDarkToggle();
+            document.addEventListener('DOMContentLoaded', hideBottomDarkToggle);
+            setTimeout(hideBottomDarkToggle, 800);
+        })();
+    </script>
+
     <!-- Premium Design System (shared) -->
     <link rel="stylesheet" href="/style.css" />
-    <!-- Homepage v3 — dark industrial "command center" (premium) -->
-    <link rel="stylesheet" href="/home-redesign.css" />
+    <!-- Professional clean light homepage design -->
 
     <!-- Display + body + data typefaces -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -242,6 +271,187 @@
             animation: pulse-dot 1.4s infinite;
         }
         @keyframes pulse-dot { 0% { opacity: 0.6; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0.6; transform: scale(0.9); } }
+
+        /* ============================================
+           PROFESSIONAL LIGHT HOMEPAGE OVERRIDES
+           Clean, modern B2B professional design
+        ============================================ */
+        body.pse-home {
+            background: #f8fafc !important;
+            color: #0f172a !important;
+        }
+        body.pse-home .top-bar {
+            background: #0f172a !important;
+            color: #e2e8f0 !important;
+        }
+        body.pse-home .header {
+            background: #fff !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            box-shadow: 0 1px 0 rgba(15,23,42,.03);
+        }
+        body.pse-home .pse-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e2937 100%) !important;
+            color: #fff !important;
+            border-bottom: 1px solid #334155;
+        }
+        body.pse-home .pse-hero h1,
+        body.pse-home .pse-hero .pse-hero-sub,
+        body.pse-home .pse-hero-meta {
+            color: #fff !important;
+        }
+        body.pse-home .pse-hero-kicker {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
+            color: #e0f0ff;
+        }
+        body.pse-home .pse-btn-primary {
+            background: #0ea47a;
+            color: #fff;
+            box-shadow: 0 4px 14px -2px rgba(14,164,122,0.35);
+        }
+        body.pse-home .pse-btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-color: rgba(255,255,255,0.3);
+        }
+        body.pse-home .pse-trust .pt,
+        body.pse-home .pse-prod,
+        body.pse-home .ph,
+        body.pse-home .op {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            box-shadow: 0 2px 6px rgba(15,23,42,0.04);
+        }
+        body.pse-home .pse-prod:hover {
+            box-shadow: 0 10px 25px -8px rgba(15,23,42,0.1);
+            border-color: #cbd5e1;
+        }
+        body.pse-home .pse-prod .pp-title,
+        body.pse-home .pse-prod .pp-brand,
+        body.pse-home .pp-price {
+            color: #0f172a;
+        }
+        body.pse-home .pse-prod .pp-specs,
+        body.pse-home .pse-prod .pp-updated {
+            color: #64748b;
+        }
+        body.pse-home .pse-sec-head h2,
+        body.pse-home h2 {
+            color: #0f172a;
+        }
+        body.pse-home .pse-sec-head p {
+            color: #475569;
+        }
+        body.pse-home .newsletter-section {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(15,23,42,0.05);
+        }
+
+        /* PROFESSIONAL LIGHT FOOTER */
+        body.pse-home .footer {
+            background: #0f172a !important;
+            color: #94a3b8 !important;
+        }
+
+        /* TOP-PLACED THEME TOGGLE (professional, clean) */
+        .theme-toggle-top {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all .2s ease;
+            margin-left: 4px;
+        }
+        .theme-toggle-top:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #fff;
+        }
+        .top-bar .top-links .theme-toggle-top {
+            margin-left: 0.35rem;
+        }
+
+        /* REMOVE FLOATING WHATSAPP on homepage */
+        #pseWaFloat,
+        a[href*="wa.me"]#pseWaFloat,
+        .pse-wa-float,
+        [id*="wa-float"],
+        [class*="whatsapp-float"],
+        .whatsapp-float,
+        .fab-whatsapp,
+        .wa-float {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            opacity: 0 !important;
+        }
+
+        /* Hide any bottom fixed toggles or WA floats injected by other scripts */
+        body.pse-home #darkModeToggle,
+        body.pse-home .dark-mode-toggle,
+        body.pse-home [style*="bottom:"]#pseWaFloat,
+        body.pse-home [style*="position:fixed"][style*="bottom"],
+        body.pse-home #pseWaFloat {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        /* Professional light homepage refinements */
+        body.pse-home .pse-hero-copy h1 {
+            font-weight: 800;
+            line-height: 1.05;
+        }
+        body.pse-home .pse-hero-panel {
+            background: rgba(255,255,255,0.06) !important;
+            border-color: rgba(255,255,255,0.15);
+        }
+        body.pse-home .pse-hero-panel .php-row .k,
+        body.pse-home .pse-hero-panel .php-row .v {
+            color: #f1f5f9;
+        }
+
+        /* Extra professional polish */
+        body.pse-home .pse-trust .pt {
+            box-shadow: 0 1px 3px rgba(15,23,42,0.06);
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        }
+        body.pse-home .pse-trust .pt:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(15,23,42,0.09);
+        }
+        body.pse-home .pse-prod .pp-body {
+            padding: 1.05rem 1.1rem 1.2rem;
+        }
+        body.pse-home .pse-prod .pp-price {
+            font-size: 1.22rem;
+            font-weight: 700;
+        }
+        body.pse-home .pse-sec-head {
+            margin: 3.1rem 0 1.45rem;
+        }
+
+        /* Professional refinements */
+        body.pse-home .pse-prod-grid {
+            gap: 1.35rem;
+        }
+        body.pse-home .pse-trust {
+            gap: 1.35rem;
+        }
+        body.pse-home .pse-how,
+        body.pse-home .pse-ops {
+            gap: 1.35rem;
+        }
+        body.pse-home .pse-prod .pp-actions a {
+            font-weight: 600;
+        }
     </style>
 <!-- SEO:STRUCTURED-DATA -->organization
 <script type="application/ld+json">
@@ -288,6 +498,12 @@
             <a href="/seller-dashboard" class="top-cta"><i class="fa-solid fa-store"></i> <span>Sell With Us</span></a>
             <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> <span>Login</span></a>
             <a href="/register" id="registerLink"><i class="fa-solid fa-user-plus"></i> <span>Register</span></a>
+            
+            <!-- TOP PLACED THEME TOGGLE -->
+            <button id="topThemeToggle" class="theme-toggle-top" aria-label="Toggle theme" title="Toggle light / dark">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+
             <!-- hidden on mobile, shown as drawer items -->
             <a href="/products" class="desktop-only"><i class="fa-solid fa-boxes-stacked"></i> <span>Products</span></a>
             <a href="/rfq" class="desktop-only"><i class="fa-regular fa-file-lines"></i> <span>RFQ</span></a>
@@ -935,7 +1151,7 @@
     window.loadCartCount = loadCartCount;
     window.loadFeaturedInventory = loadFeaturedInventory;
 
-    // MOBILE TOGGLE
+        // MOBILE TOGGLE
     document.addEventListener('DOMContentLoaded', function () {
         const toggle = document.getElementById('menuToggle');
         const drawer = document.getElementById('mobileNavDrawer');
@@ -960,6 +1176,40 @@
         }
 
         if (typeof initFirebase === 'function') initFirebase();
+
+        /* ============================================
+           PROFESSIONAL TOP THEME TOGGLE (Light-first professional)
+        ============================================ */
+        const topToggle = document.getElementById('topThemeToggle');
+        if (topToggle) {
+            const root = document.documentElement;
+            const saved = localStorage.getItem('pse_home_theme') || 'light';
+            
+            function applyHomeTheme(mode) {
+                if (mode === 'dark') {
+                    root.classList.add('pse-home-dark');
+                    root.setAttribute('data-home-theme', 'dark');
+                    topToggle.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+                    // subtle dark overrides for hero / sections
+                    document.body.style.background = '#0f172a';
+                } else {
+                    root.classList.remove('pse-home-dark');
+                    root.setAttribute('data-home-theme', 'light');
+                    topToggle.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+                    document.body.style.background = '';
+                }
+            }
+            
+            // initial state
+            applyHomeTheme(saved);
+            
+            topToggle.addEventListener('click', () => {
+                const current = root.getAttribute('data-home-theme') === 'dark' ? 'dark' : 'light';
+                const next = current === 'dark' ? 'light' : 'dark';
+                applyHomeTheme(next);
+                localStorage.setItem('pse_home_theme', next);
+            });
+        }
 
         // Sticky header shadow
         var header = document.querySelector('.header');
