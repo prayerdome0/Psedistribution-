@@ -74,28 +74,28 @@
     
     <style>
         :root {
-            --primary: #1a7b6b;
-            --primary-dark: #0f4f43;
-            --primary-light: #e8f5f0;
-            --secondary: #0b2a3b;
-            --accent: #f1c40f;
-            --text-light: #6a889a;
+            --primary: #0e7c68;
+            --primary-dark: #0a5a4a;
+            --primary-light: #e6f4ef;
+            --secondary: #0b2138;
+            --accent: #e0a62e;
+            --text-light: #698093;
             --white: #ffffff;
             --radius: 1.5rem;
             --transition: 0.3s ease;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
-        body { background: #f0f4f8; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
+        body { background: #f5f8fa; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
         
         .error-container { text-align: center; max-width: 560px; width: 100%; }
-        .error-container .code { font-size: 8rem; font-weight: 900; color: #1a7b6b; line-height: 1; }
+        .error-container .code { font-size: 8rem; font-weight: 900; color: #0e7c68; line-height: 1; }
         .error-container .logo { width: 80px; height: 80px; margin: 0 auto 1rem; }
         .error-container .logo img { width: 100%; height: 100%; object-fit: contain; }
-        .error-container h2 { font-size: 1.8rem; color: #0b2a3b; margin: 0.5rem 0; }
-        .error-container p { color: #6a889a; margin-bottom: 1.5rem; }
-        .error-container .btn-home { display: inline-block; background: #1a7b6b; color: #fff; padding: 0.7rem 2.5rem; border-radius: 50px; font-weight: 600; text-decoration: none; transition: 0.3s; }
-        .error-container .btn-home:hover { background: #0f4f43; transform: translateY(-2px); }
+        .error-container h2 { font-size: 1.8rem; color: #0b2138; margin: 0.5rem 0; }
+        .error-container p { color: #698093; margin-bottom: 1.5rem; }
+        .error-container .btn-home { display: inline-block; background: #0e7c68; color: #fff; padding: 0.7rem 2.5rem; border-radius: 50px; font-weight: 600; text-decoration: none; transition: 0.3s; }
+        .error-container .btn-home:hover { background: #0a5a4a; transform: translateY(-2px); }
 
         .error-search {
             display: flex; background: #fff; border-radius: 50px; border: 2px solid #e2e8ef;
@@ -111,7 +111,7 @@
 
         .help-links { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin-top: 1.2rem; }
         .help-links a {
-            display: inline-flex; align-items: center; gap: 0.45rem; background: #fff; color: #2c5a6b;
+            display: inline-flex; align-items: center; gap: 0.45rem; background: #fff; color: #33475b;
             padding: 0.55rem 1.2rem; border-radius: 40px; font-size: 0.83rem; font-weight: 600; text-decoration: none;
             border: 1px solid #e2e8ef; transition: all 0.25s;
         }
@@ -125,6 +125,7 @@
             .error-container h2 { font-size: 1.4rem; }
         }
     </style>
+    <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
     <div class="error-container">
@@ -142,7 +143,7 @@
 
         <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-top:0.8rem;">
             <a href="/" class="btn-home">🏠 Back to Home</a>
-            <a href="/products" class="btn-home" style="background:#0b2a3b;">Browse Products</a>
+            <a href="/products" class="btn-home" style="background:#0b2138;">Browse Products</a>
         </div>
 
         <div class="help-links">

@@ -1,4 +1,74 @@
-<!DOCTYPE html>
+#!/usr/bin/env python3
+"""Build the redesigned index.html for Pilot Sales Distribution."""
+import re
+
+old = open('index.html', encoding='utf-8', errors='replace').read()
+
+# ---- Extract the two inline script blocks verbatim ----
+# 1) main inline script (firebase config, banner, flash timer, wishlist, logos...)
+m = re.search(r'<script>\s*\n\s*const firebaseConfig = .*?</script>', old, re.S)
+main_script = m.group(0)
+assert 'initFlashTimer' in main_script
+
+# 2) popup IIFE script
+m2 = re.search(r'<script>\s*\n\s*// ─── CENTER POPUP LOGIC ───.*?</script>', old, re.S)
+popup_script = m2.group(0)
+assert 'pseClosePopup' in popup_script
+
+# 3) the popup <style> block (we replace it with new-palette styles inline instead)
+m3 = re.search(r'<style>\s*\n\s*#psePopupOverlay \{.*?</style>', old, re.S)
+old_popup_style = m3.group(0) if m3 else None
+
+boot = """<script>
+    // ─── REDESIGN BOOT ───
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof initFirebase === 'function') initFirebase();
+        if (typeof initBanner === 'function') initBanner();
+        if (typeof initFlashTimer === 'function') initFlashTimer();
+        // Sticky header shadow
+        var header = document.querySelector('.header');
+        if (header && 'IntersectionObserver' in window) {
+            var sentinel = document.createElement('div');
+            sentinel.style.position = 'absolute';
+            sentinel.style.top = '0';
+            sentinel.style.height = '1px';
+            sentinel.style.width = '1px';
+            document.body.prepend(sentinel);
+            new IntersectionObserver(function (entries) {
+                header.classList.toggle('scrolled', !entries[0].isIntersecting);
+            }).observe(sentinel);
+        }
+    });
+</script>
+"""
+
+new_popup_style = """<style>
+    /* Popup — premium restyle (tokens from /style.css) */
+    #psePopupImg { width: 100%; display: block; }
+    #psePopupBody { padding: 1.4rem 1.5rem 1.5rem; text-align: center; }
+    #psePopupCtas { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+    .pse-popup-btn {
+        display: inline-block; padding: 0.72rem 1.5rem; border-radius: 999px; font-weight: 700;
+        font-size: 0.85rem; cursor: pointer; border: none; transition: 0.25s; text-decoration: none;
+    }
+    .pse-popup-btn.primary { background: var(--primary, #0e7c68); color: #fff; }
+    .pse-popup-btn.primary:hover { background: var(--primary-dark, #0a5a4a); transform: translateY(-1px); }
+    .pse-popup-btn.gold { background: var(--accent, #e0a62e); color: var(--secondary, #0b2138); }
+    .pse-popup-btn.gold:hover { background: var(--accent-hover, #c8901f); transform: translateY(-1px); }
+</style>
+"""
+
+# ---- New head fonts + stylesheet link ----
+head_extra = """    <!-- Premium Design System -->
+    <link rel="stylesheet" href="/style.css" />
+    <!-- Display + body typefaces -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+"""
+
+# ---- Assemble the new document ----
+html = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -35,13 +105,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="main.js"></script>
-    <!-- Premium Design System -->
-    <link rel="stylesheet" href="/style.css" />
-    <!-- Display + body typefaces -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-
+""" + head_extra + """
 </head>
 <body>
 
@@ -403,11 +467,7 @@
         </div>
         <div class="footer-bottom">
             <span>&copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.</span>
-            <span class="footer-payments">
-                <img src="/visa.png" alt="Visa" loading="lazy" />
-                <img src="/mastercard.png" alt="Mastercard" loading="lazy" />
-                <img src="/Paypal.png" alt="PayPal" loading="lazy" />
-            </span>
+            <span class="footer-payments"><i class="fa-brands fa-cc-visa"></i><i class="fa-brands fa-cc-mastercard"></i><i class="fa-brands fa-cc-paypal"></i></span>
         </div>
     </div>
 </footer>
@@ -416,404 +476,12 @@
 <div id="toast" class="toast"></div>
 
 <!-- JAVASCRIPT -->
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
-        authDomain: "pilot-sales-distribution.firebaseapp.com",
-        projectId: "pilot-sales-distribution",
-        storageBucket: "pilot-sales-distribution.firebasestorage.app",
-        messagingSenderId: "729127273727",
-        appId: "1:729127273727:web:402d67be8346257755f8ca"
-    };
+""" + main_script + """
 
-
-
-    const COMPANY_LOGOS = [
-        { name: 'Samsung', image: 'samsung.png' },
-        { name: 'Sony', image: 'sony.png' },
-        { name: 'Nike', image: 'nike.png' },
-        { name: 'Adidas', image: 'adidas.png' },
-        { name: 'Apple', image: 'apple.png' },
-        { name: 'Google', image: 'google.png' },
-        { name: 'Dell', image: 'dell.png' },
-        { name: 'HP', image: 'hp.png' },
-        { name: 'Intel', image: 'intel.png' },
-        { name: 'NVIDIA', image: 'nvidia.png' },
-        { name: 'Lenovo', image: 'lenovo.png' },
-        { name: 'LG', image: 'lg.png' },
-        { name: 'Huawei', image: 'huawei.png' },
-        { name: 'Xiaomi', image: 'xiaomi.png' },
-        { name: 'Tesla', image: 'tesla.png' },
-        { name: 'BMW', image: 'bmw.png' },
-        { name: 'Toyota', image: 'Toyota.png' },
-        { name: 'Cisco', image: 'cisco.png' }
-    ];
-
-    let currentSlide = 0;
-    let slideInterval = null;
-
-    function initFirebase() {
-        if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        window.db = firebase.firestore();
-        window.auth = firebase.auth();
-        setupAuthListener();
-        loadCartCount();
-        loadWishlistCount();
-        renderLogos();
-    }
-
-    function setupAuthListener() {
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                db.collection('users').doc(user.uid).get().then((doc) => {
-                    if (doc.exists) {
-                        const data = doc.data();
-                        localStorage.setItem('pilot_user', JSON.stringify({
-                            id: user.uid,
-                            email: user.email,
-                            full_name: data.full_name || user.displayName || '',
-                            role: data.role || 'buyer'
-                        }));
-                    }
-                });
-            } else {
-                localStorage.removeItem('pilot_user');
-            }
-            updateAuthUI();
-        });
-    }
-
-    function getCurrentUser() {
-        const user = localStorage.getItem('pilot_user');
-        return user ? JSON.parse(user) : null;
-    }
-
-    function updateAuthUI() {
-        const user = getCurrentUser();
-        const loginLink = document.getElementById('loginLink');
-        const registerLink = document.getElementById('registerLink');
-        const accountLabel = document.getElementById('accountLabel');
-        
-        if (user) {
-            if (loginLink) loginLink.style.display = 'none';
-            if (registerLink) registerLink.style.display = 'none';
-            if (accountLabel) accountLabel.textContent = user.full_name || 'Account';
-        } else {
-            if (loginLink) loginLink.style.display = 'inline';
-            if (registerLink) registerLink.style.display = 'inline';
-            if (accountLabel) accountLabel.textContent = 'Account';
-        }
-    }
-
-    function showToast(message, type = 'info') {
-        let toast = document.getElementById('toast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'toast';
-            toast.className = 'toast';
-            document.body.appendChild(toast);
-        }
-        toast.textContent = message;
-        toast.className = 'toast ' + type + ' show';
-        clearTimeout(toast._timeout);
-        toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
-    }
-
-    function generateSlug(title) {
-        if (!title) return '';
-        return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
-    }
-
-    // RFQ identity link for featured inventory offers (Deal ID, slug,
-    // sourceVersion, snapshotVersion, MOQ quantity).
-    function buildFeaturedRfqUrl(product) {
-        const url = new URL('/rfq', window.location.origin);
-        if (product.dealId) url.searchParams.set('dealId', product.dealId);
-        if (product.slug) url.searchParams.set('slug', product.slug);
-        if (product.sourceVersion) url.searchParams.set('sourceVersion', product.sourceVersion);
-        if (product.snapshotVersion) url.searchParams.set('snapshotVersion', product.snapshotVersion);
-        url.searchParams.set('product', product.title || product.slug || product.dealId || '');
-        if (product.moq) url.searchParams.set('quantity', String(product.moq));
-        return url.pathname + url.search;
-    }
-
-    function animateCounter(element, target, duration = 2000) {
-        const start = 0;
-        const startTime = performance.now();
-        const isDecimal = target % 1 !== 0;
-        
-        function updateCounter(currentTime) {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            const currentValue = start + (target - start) * eased;
-            
-            if (isDecimal) {
-                element.textContent = currentValue.toFixed(1);
-            } else {
-                element.textContent = Math.floor(currentValue);
-            }
-            
-            if (progress < 1) {
-                requestAnimationFrame(updateCounter);
-            } else {
-                if (isDecimal) {
-                    element.textContent = target.toFixed(1);
-                } else {
-                    element.textContent = target;
-                }
-            }
-        }
-        requestAnimationFrame(updateCounter);
-    }
-
-    function renderLogos() {
-        const track = document.getElementById('logoTrack');
-        if (!track) return;
-        const allLogos = [...COMPANY_LOGOS, ...COMPANY_LOGOS];
-        track.innerHTML = allLogos.map(logo => `
-            <div class="logo-item">
-                <img src="${logo.image}" alt="${logo.name}" loading="lazy" onerror="this.style.display='none'" />
-                <span>${logo.name}</span>
-            </div>
-        `).join('');
-    }
-
-    async function toggleWishlist(productId) {
-        if (!productId) {
-            window.location.href = '/wishlist';
-            return;
-        }
-        const user = getCurrentUser();
-        if (!user) {
-            showToast('Please login first', 'error');
-            setTimeout(() => window.location.href = '/login', 1500);
-            return;
-        }
-
-        const btn = document.querySelector(`.btn-wish[data-wishlist-id="${productId}"]`);
-        
-        try {
-            const snapshot = await db.collection('wishlist')
-                .where('user_id', '==', user.id)
-                .where('product_id', '==', productId)
-                .get();
-
-            if (!snapshot.empty) {
-                await snapshot.docs[0].ref.delete();
-                showToast('Removed from wishlist', 'info');
-                if (btn) btn.classList.remove('liked');
-            } else {
-                await db.collection('wishlist').add({
-                    user_id: user.id,
-                    product_id: productId,
-                    created_at: new Date().toISOString()
-                });
-                showToast('✅ Added to wishlist!', 'success');
-                if (btn) btn.classList.add('liked');
-            }
-            loadWishlistCount();
-        } catch (error) {
-            showToast('❌ Failed to update wishlist', 'error');
-        }
-    }
-
-    async function loadCartCount() {
-        const user = getCurrentUser();
-        if (!user) {
-            try {
-                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
-                const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-                document.querySelectorAll('.cart-count').forEach(el => {
-                    el.textContent = count;
-                    el.style.display = count > 0 ? 'inline' : 'none';
-                });
-            } catch (e) {
-                document.querySelectorAll('.cart-count').forEach(el => el.textContent = '0');
-            }
-            return;
-        }
-
-        try {
-            const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
-            let count = 0;
-            snapshot.forEach(doc => { count += doc.data().quantity || 1; });
-            document.querySelectorAll('.cart-count').forEach(el => {
-                el.textContent = count;
-                el.style.display = count > 0 ? 'inline' : 'none';
-            });
-        } catch (error) {
-            document.querySelectorAll('.cart-count').forEach(el => el.textContent = '0');
-        }
-    }
-
-    async function loadWishlistCount() {
-        const user = getCurrentUser();
-        if (!user) {
-            document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
-            return;
-        }
-
-        try {
-            const snapshot = await db.collection('wishlist').where('user_id', '==', user.id).get();
-            const count = snapshot.size;
-            document.querySelectorAll('.wishlist-count').forEach(el => { el.textContent = count; });
-        } catch (error) {
-            document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
-        }
-    }
-
-    function initBanner() {
-        const track = document.getElementById('bannerTrack');
-        const slider = document.getElementById('bannerSlider');
-        const dots = document.getElementById('bannerDots');
-        if (!track || !slider || !dots) return;
-
-        const slides = track.querySelectorAll('.slide');
-        if (slides.length === 0) return;
-
-        dots.innerHTML = Array.from(slides).map((_, i) =>
-            `<span class="dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></span>`
-        ).join('');
-
-        startBannerAuto();
-
-        // Pause auto-scroll while the visitor hovers over the images
-        slider.addEventListener('mouseenter', stopBannerAuto);
-        slider.addEventListener('mouseleave', startBannerAuto);
-
-        // Swipe support on touch devices
-        let touchStartX = 0;
-        slider.addEventListener('touchstart', (e) => {
-            touchStartX = e.touches[0].clientX;
-            stopBannerAuto();
-        }, { passive: true });
-        slider.addEventListener('touchend', (e) => {
-            const diff = e.changedTouches[0].clientX - touchStartX;
-            if (Math.abs(diff) > 40) {
-                if (diff < 0) { nextSlide(); } else { prevSlide(); }
-            }
-            startBannerAuto();
-        }, { passive: true });
-    }
-
-    function startBannerAuto() {
-        stopBannerAuto();
-        slideInterval = setInterval(() => nextSlide(), 5000);
-    }
-
-    function stopBannerAuto() {
-        if (slideInterval) { clearInterval(slideInterval); slideInterval = null; }
-    }
-
-    function goToSlide(index) {
-        const track = document.getElementById('bannerTrack');
-        if (!track) return;
-        const slides = track.querySelectorAll('.slide');
-        const dots = document.querySelectorAll('#bannerDots .dot');
-        if (slides.length === 0) return;
-        if (index < 0) index = slides.length - 1;
-        if (index >= slides.length) index = 0;
-        currentSlide = index;
-        track.style.transform = `translateX(-${index * 100}%)`;
-        dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-    }
-
-    function nextSlide() { goToSlide(currentSlide + 1); }
-    function prevSlide() { goToSlide(currentSlide - 1); }
-
-    function renderRecentViews() {
-        const section = document.getElementById('recentViewsSection');
-        const grid = document.getElementById('recentViewsGrid');
-        if (!section || !grid) return;
-        let list = [];
-        try { list = JSON.parse(localStorage.getItem('pse_recent_views') || '[]'); } catch (e) {}
-        if (!list.length) return;
-        grid.innerHTML = list.slice(0, 4).map(p => `
-            <div class="product-card animate-on-scroll">
-                <div class="product-image" onclick="window.location.href='/product/${p.slug || p.id}'" style="cursor:pointer;">
-                    ${p.image ? `<img src="${p.image}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'" />` : `<span class="placeholder"><i class="fa-solid fa-box"></i></span>`}
-                </div>
-                <div class="product-title">${p.title || 'Product'}</div>
-                <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
-                <div class="product-price">$${(p.price || 0).toFixed(2)}</div>
-                <div class="product-actions">
-                    <button class="btn-add" onclick="window.location.href='/product/${p.slug || p.id}'"><i class="fa-regular fa-eye"></i> View</button>
-                </div>
-            </div>
-        `).join('');
-        section.style.display = 'block';
-        section.querySelectorAll('.animate-on-scroll').forEach(el => el.classList.add('visible'));
-    }
-
-    function clearRecentViews() {
-        localStorage.removeItem('pse_recent_views');
-        document.getElementById('recentViewsSection').style.display = 'none';
-        if (typeof showToast === 'function') showToast('Recently viewed cleared', 'info');
-    }
-
-    // Flash timer countdown
-    function initFlashTimer() {
-        let hours = 2, minutes = 45, seconds = 30;
-        setInterval(() => {
-            seconds--;
-            if (seconds < 0) { seconds = 59; minutes--; }
-            if (minutes < 0) { minutes = 59; hours--; }
-            if (hours < 0) { hours = 23; minutes = 59; seconds = 59; }
-            document.getElementById('flashHours').textContent = String(hours).padStart(2, '0');
-            document.getElementById('flashMinutes').textContent = String(minutes).padStart(2, '0');
-            document.getElementById('flashSeconds').textContent = String(seconds).padStart(2, '0');
-        }, 1000);
-    }
-
-    window.toggleWishlist = toggleWishlist;
-    window.goToSlide = goToSlide;
-    window.nextSlide = nextSlide;
-    window.prevSlide = prevSlide;
-    window.showToast = showToast;
-    window.getCurrentUser = getCurrentUser;
-</script>
-
-<script>
-    // ─── REDESIGN BOOT ───
-    document.addEventListener('DOMContentLoaded', function () {
-        if (typeof initFirebase === 'function') initFirebase();
-        if (typeof initBanner === 'function') initBanner();
-        if (typeof initFlashTimer === 'function') initFlashTimer();
-        // Sticky header shadow
-        var header = document.querySelector('.header');
-        if (header && 'IntersectionObserver' in window) {
-            var sentinel = document.createElement('div');
-            sentinel.style.position = 'absolute';
-            sentinel.style.top = '0';
-            sentinel.style.height = '1px';
-            sentinel.style.width = '1px';
-            document.body.prepend(sentinel);
-            new IntersectionObserver(function (entries) {
-                header.classList.toggle('scrolled', !entries[0].isIntersecting);
-            }).observe(sentinel);
-        }
-    });
-</script>
-
+""" + boot + """
 
 <!-- ═══════════ CENTER POPUP (promo + festival greeting) ═══════════ -->
-<style>
-    /* Popup — premium restyle (tokens from /style.css) */
-    #psePopupImg { width: 100%; display: block; }
-    #psePopupBody { padding: 1.4rem 1.5rem 1.5rem; text-align: center; }
-    #psePopupCtas { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
-    .pse-popup-btn {
-        display: inline-block; padding: 0.72rem 1.5rem; border-radius: 999px; font-weight: 700;
-        font-size: 0.85rem; cursor: pointer; border: none; transition: 0.25s; text-decoration: none;
-    }
-    .pse-popup-btn.primary { background: var(--primary, #0e7c68); color: #fff; }
-    .pse-popup-btn.primary:hover { background: var(--primary-dark, #0a5a4a); transform: translateY(-1px); }
-    .pse-popup-btn.gold { background: var(--accent, #e0a62e); color: var(--secondary, #0b2138); }
-    .pse-popup-btn.gold:hover { background: var(--accent-hover, #c8901f); transform: translateY(-1px); }
-</style>
-
+""" + new_popup_style + """
 
 <div id="psePopupOverlay" role="dialog" aria-modal="true" aria-label="Special announcement">
     <div id="psePopupBox">
@@ -843,99 +511,7 @@
     </div>
 </div>
 
-<script>
-    // ─── CENTER POPUP LOGIC ───
-    (function () {
-        var OVERLAY_ID = 'psePopupOverlay';
-
-        function todayKey() {
-            var d = new Date();
-            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-        }
-        function dismissedToday() {
-            try { return localStorage.getItem('pse_popup_hide') === todayKey(); } catch (e) { return false; }
-        }
-
-        window.pseClosePopup = function (forToday) {
-            var el = document.getElementById(OVERLAY_ID);
-            if (el) el.classList.remove('show');
-            if (forToday) { try { localStorage.setItem('pse_popup_hide', todayKey()); } catch (e) {} }
-        };
-
-        window.psePopupSubscribe = function () {
-            var input = document.getElementById('psePopupEmail');
-            if (!input) return;
-            var done = function (res) {
-                if (res && res.success) {
-                    window.pseClosePopup(true);
-                }
-            };
-            if (typeof window.pseSubscribe === 'function') {
-                window.pseSubscribe(input.value, '', 'home-popup').then(done);
-            } else {
-                window.showToast && window.showToast('✅ Subscribed!', 'success');
-                window.pseClosePopup(true);
-            }
-        };
-
-        function openFestivePopup(holiday) {
-            var titleEl = document.getElementById('psePopupTitle');
-            var textEl = document.getElementById('psePopupText');
-            var imgEl = document.getElementById('psePopupImg');
-            var ctaWrap = document.getElementById('psePopupCtas');
-            titleEl.textContent = holiday.emoji + ' ' + holiday.name + '!';
-            textEl.innerHTML = holiday.message + '<br><strong>— with love from Pilot Sales Distribution</strong>';
-            ctaWrap.innerHTML = '<a href="/products" class="pse-popup-btn primary" onclick="pseClosePopup(false)">' +
-                '<i class="fa-solid fa-gift"></i> ' + (holiday.cta || 'Shop Festival Deals') + '</a>';
-            // Auto-generated branded festival image (canvas)
-            try {
-                if (window.PseHolidays && typeof PseHolidays.generateCard === 'function') {
-                    PseHolidays.generateCard(holiday).then(function (card) {
-                        imgEl.src = card.dataUrl;
-                        imgEl.style.display = 'block';
-                        imgEl.alt = holiday.name + ' — Pilot Sales Distribution';
-                    }).catch(function () {});
-                }
-            } catch (e) {}
-        }
-
-        function maybeOpen() {
-            if (dismissedToday()) return;
-            var el = document.getElementById(OVERLAY_ID);
-            if (!el) return;
-            var show = function (holiday) {
-                if (holiday) openFestivePopup(holiday);
-                el.classList.add('show');
-            };
-            try {
-                if (window.PseHolidays && typeof PseHolidays.todayHoliday === 'function') {
-                    // Ensure admin-added festivals are loaded before checking today
-                    PseHolidays.loadCustom()
-                        .then(function () { show(PseHolidays.todayHoliday()); })
-                        .catch(function () { show(PseHolidays.todayHoliday()); });
-                    return;
-                }
-            } catch (e) {}
-            show(null);
-        }
-
-        // Escape key closes
-        document.addEventListener('keydown', function (ev) {
-            if (ev.key === 'Escape') window.pseClosePopup(false);
-        });
-        // Click outside closes
-        document.addEventListener('click', function (ev) {
-            if (ev.target && ev.target.id === OVERLAY_ID) window.pseClosePopup(false);
-        });
-
-        // Open shortly after load (wait for custom holidays to load for festival match)
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function () { setTimeout(maybeOpen, 1600); });
-        } else {
-            setTimeout(maybeOpen, 1600);
-        }
-    })();
-</script>
+""" + popup_script + """
 
     <script src="newsletter.js"></script>
     <script src="email.js"></script>
@@ -950,3 +526,16 @@
     <script src="recently-viewed.js"></script>
 </body>
 </html>
+"""
+
+open('index.html', 'w', encoding='utf-8').write(html)
+print('index.html rebuilt:', len(html), 'bytes')
+
+# sanity checks
+for token in ['id="bannerTrack"', 'id="bannerDots"', 'id="logoTrack"', 'id="flashTimer"', 'id="flashHours"',
+              'id="recentlyViewedSection"', 'id="newsletterForm"', 'id="searchBar"', 'id="cartBtn"',
+              'id="wishlistBtn"', 'id="accountLabel"', 'id="loginLink"', 'id="registerLink"',
+              'id="psePopupOverlay"', 'psePopupSubscribe', 'pseNewsletterSubmit', 'toggleWishlist',
+              'initFirebase', 'initBanner', 'initFlashTimer', 'COMPANY_LOGOS', 'style.css', 'Sora']:
+    assert token in open('index.html', encoding='utf-8').read(), f'MISSING: {token}'
+print('All sanity tokens present ✔')

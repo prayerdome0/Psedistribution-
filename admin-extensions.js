@@ -138,7 +138,7 @@
             }
             container.innerHTML = cachedTickets.map(function (t) {
                 var resolved = t.status === 'resolved';
-                return '<div class="message-preview" style="border-left:3px solid ' + (resolved ? 'var(--border)' : '#e67e22') + ';">' +
+                return '<div class="message-preview" style="border-left:3px solid ' + (resolved ? 'var(--border)' : '#e0a62e') + ';">' +
                     '<div class="msg-header">' +
                         '<span class="sender">🎧 ' + esc(t.name || 'Customer') + '</span>' +
                         '<span class="date">' + fmtDate(t.created_at) + '</span>' +
@@ -368,7 +368,7 @@
             tbody.innerHTML = reviews.map(function (r) {
                 var stars = '★'.repeat(r.rating || 5) + '☆'.repeat(5 - (r.rating || 5));
                 return '<tr>' +
-                    '<td><span style="color:#f1c40f;">' + stars + '</span><br><strong>' + (r.rating || 5) + '/5</strong></td>' +
+                    '<td><span style="color:#e0a62e;">' + stars + '</span><br><strong>' + (r.rating || 5) + '/5</strong></td>' +
                     '<td style="max-width:280px;">' + esc(r.text || '') + '</td>' +
                     '<td>' + esc(r.user_name || 'Buyer') + '</td>' +
                     '<td><span class="status-badge">' + esc(r.product_title || r.product_id || '—') + '</span></td>' +

@@ -16,7 +16,7 @@
             <div style="background:#fff;border-radius:20px;max-width:720px;width:95%;max-height:90vh;overflow:auto;box-shadow:0 25px 60px rgba(0,0,0,0.3);">
                 <div style="padding:1.5rem 2rem;border-bottom:1px solid #e2e8ef;display:flex;justify-content:space-between;align-items:center;">
                     <div>
-                        <h3 style="margin:0;font-size:1.35rem;color:#0b2a3b;">Bulk CSV Product Import</h3>
+                        <h3 style="margin:0;font-size:1.35rem;color:#0b2138;">Bulk CSV Product Import</h3>
                         <p style="margin:4px 0 0;color:#64748b;font-size:0.9rem;">Upload or paste CSV • Max 500 products per import</p>
                     </div>
                     <button onclick="PSE.bulkImport.close()" style="background:none;border:none;font-size:1.6rem;color:#64748b;cursor:pointer;">×</button>
@@ -25,14 +25,14 @@
                 <div style="padding:2rem;">
                     <!-- Download template -->
                     <div style="margin-bottom:1.5rem;">
-                        <a href="/pse_wholesale_products_template.csv" download style="display:inline-flex;align-items:center;gap:8px;background:#f1f5f9;color:#1a7b6b;padding:8px 18px;border-radius:50px;font-weight:600;text-decoration:none;font-size:0.9rem;">
+                        <a href="/pse_wholesale_products_template.csv" download style="display:inline-flex;align-items:center;gap:8px;background:#f1f5f9;color:#0e7c68;padding:8px 18px;border-radius:50px;font-weight:600;text-decoration:none;font-size:0.9rem;">
                             <i class="fa-solid fa-download"></i> Download CSV Template
                         </a>
                     </div>
 
                     <!-- Upload area -->
                     <div id="csvDropZone" style="border:2px dashed #cbd5e1;border-radius:16px;padding:2.5rem;text-align:center;cursor:pointer;transition:all .2s;">
-                        <i class="fa-solid fa-file-csv" style="font-size:3rem;color:#1a7b6b;margin-bottom:1rem;"></i>
+                        <i class="fa-solid fa-file-csv" style="font-size:3rem;color:#0e7c68;margin-bottom:1rem;"></i>
                         <p style="margin:0 0 8px;font-weight:600;color:#0f172a;">Drop CSV file here or click to browse</p>
                         <p style="margin:0;font-size:0.85rem;color:#64748b;">Supports: title, brand, price, moq, category, etc.</p>
                         <input type="file" id="csvFileInput" accept=".csv" style="display:none;">
@@ -45,7 +45,7 @@
                     </div>
 
                     <div style="margin-top:1.5rem;display:flex;gap:12px;">
-                        <button onclick="PSE.bulkImport.parseAndPreview()" class="btn-add-product" style="flex:1;background:#1a7b6b;color:#fff;padding:12px 24px;border-radius:50px;font-weight:700;border:none;">
+                        <button onclick="PSE.bulkImport.parseAndPreview()" class="btn-add-product" style="flex:1;background:#0e7c68;color:#fff;padding:12px 24px;border-radius:50px;font-weight:700;border:none;">
                             <i class="fa-solid fa-magnifying-glass"></i> Preview Import
                         </button>
                         <button onclick="PSE.bulkImport.close()" style="flex:1;background:#f1f5f9;color:#334155;padding:12px 24px;border-radius:50px;font-weight:700;border:none;">
@@ -82,7 +82,7 @@
         };
 
         // Drag & drop
-        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = '#1a7b6b'; };
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = '#0e7c68'; };
         dropZone.ondragleave = () => dropZone.style.borderColor = '#cbd5e1';
         dropZone.ondrop = (e) => {
             e.preventDefault();

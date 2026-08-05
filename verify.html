@@ -14,10 +14,10 @@
     <script src="main.js"></script>
     <style>
         :root {
-            --primary: #1a7b6b; --primary-dark: #0f4f43; --primary-light: #e8f5f0;
-            --secondary: #0b2a3b; --secondary-light: #1a4b5e; --accent: #f1c40f;
-            --text-light: #6a889a; --border: #e9edf2; --border-dark: #dce3e9;
-            --light: #f0f4f8; --white: #ffffff; --radius: 1.2rem; --radius-sm: 0.8rem;
+            --primary: #0e7c68; --primary-dark: #0a5a4a; --primary-light: #e6f4ef;
+            --secondary: #0b2138; --secondary-light: #16334f; --accent: #e0a62e;
+            --text-light: #698093; --border: #e9edf2; --border-dark: #d3dce5;
+            --light: #f5f8fa; --white: #ffffff; --radius: 1.2rem; --radius-sm: 0.8rem;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
         body { background: var(--light); color: #0b1a2a; line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
@@ -54,6 +54,7 @@
         .loading { display: none; text-align: center; padding: 1rem; color: var(--text-light); }
         .loading.show { display: block; }
     </style>
+    <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
 
@@ -160,7 +161,7 @@
                 body.innerHTML = `<p style="font-size:0.85rem;color:#7b2c24;">No official PSE Distribution document exists with reference <strong>${esc(ref)}</strong>.</p>` +
                     '<ul style="font-size:0.8rem;color:#7b2c24;margin:0.6rem 0 0 1.1rem;">' +
                     '<li>Double-check the reference for typos (letters vs numbers).</li>' +
-                    '<li>Documents issued before this registry launched verify by <a href="https://wa.me/19099384682" target="_blank" style="color:#1a7b6b;font-weight:700;">WhatsApp</a> only.</li>' +
+                    '<li>Documents issued before this registry launched verify by <a href="https://wa.me/19099384682" target="_blank" style="color:#0e7c68;font-weight:700;">WhatsApp</a> only.</li>' +
                     '<li>If you received this document from an unverified third party, <strong>do not pay</strong>.</li></ul>';
                 result.classList.add('unknown');
             }
@@ -168,7 +169,7 @@
         } catch (error) {
             loading.classList.remove('show');
             verdict.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Verification temporarily unavailable';
-            body.innerHTML = '<p style="font-size:0.85rem;">Please try again in a moment, or confirm manually via <a href="https://wa.me/19099384682" target="_blank" style="color:#1a7b6b;font-weight:700;">WhatsApp</a>.</p>';
+            body.innerHTML = '<p style="font-size:0.85rem;">Please try again in a moment, or confirm manually via <a href="https://wa.me/19099384682" target="_blank" style="color:#0e7c68;font-weight:700;">WhatsApp</a>.</p>';
             result.classList.add('unknown', 'show');
         }
     }

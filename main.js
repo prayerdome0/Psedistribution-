@@ -397,7 +397,7 @@
         a.addEventListener('mouseleave', function () { a.style.transform = 'scale(1)'; });
         var tip = document.createElement('span');
         tip.textContent = 'Chat with us';
-        tip.style.cssText = 'position:absolute;right:60px;background:#0b2a3b;color:#fff;font:600 11px Inter,sans-serif;padding:5px 10px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none;';
+        tip.style.cssText = 'position:absolute;right:60px;background:#0b2138;color:#fff;font:600 11px Inter,sans-serif;padding:5px 10px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none;';
         a.appendChild(tip);
         a.addEventListener('mouseenter', function () { tip.style.opacity = '1'; });
         a.addEventListener('mouseleave', function () { tip.style.opacity = '0'; });
@@ -410,11 +410,11 @@
     function pseCookieConsent() {
         try { if (localStorage.getItem('pse_cookie_consent')) return; } catch (e) { return; }
         var bar = document.createElement('div');
-        bar.style.cssText = 'position:fixed;left:0;right:0;bottom:0;background:#0b2a3b;color:#d4e2ed;padding:0.7rem 1rem;display:flex;align-items:center;justify-content:center;gap:0.8rem;flex-wrap:wrap;z-index:9995;font:400 12.5px Inter,sans-serif;box-shadow:0 -4px 20px rgba(0,0,0,.25);';
+        bar.style.cssText = 'position:fixed;left:0;right:0;bottom:0;background:#0b2138;color:#d4e2ed;padding:0.7rem 1rem;display:flex;align-items:center;justify-content:center;gap:0.8rem;flex-wrap:wrap;z-index:9995;font:400 12.5px Inter,sans-serif;box-shadow:0 -4px 20px rgba(0,0,0,.25);';
         bar.innerHTML = '<span>🍪 We use cookies to keep you signed in, save your cart and improve your shopping experience.</span>' +
-            '<a href="/privacy" style="color:#f1c40f;font-weight:600;">Privacy Policy</a>' +
-            '<button id="pseCookieOk" style="background:#1a7b6b;color:#fff;border:none;padding:0.45rem 1.3rem;border-radius:30px;font-weight:700;cursor:pointer;font-size:12.5px;">Accept</button>' +
-            '<button id="pseCookieNo" style="background:transparent;color:#b4d0e0;border:1px solid #4a6b80;padding:0.45rem 1rem;border-radius:30px;cursor:pointer;font-size:12.5px;">Decline</button>';
+            '<a href="/privacy" style="color:#e0a62e;font-weight:600;">Privacy Policy</a>' +
+            '<button id="pseCookieOk" style="background:#0e7c68;color:#fff;border:none;padding:0.45rem 1.3rem;border-radius:30px;font-weight:700;cursor:pointer;font-size:12.5px;">Accept</button>' +
+            '<button id="pseCookieNo" style="background:transparent;color:#a9c3d6;border:1px solid #4a6b80;padding:0.45rem 1rem;border-radius:30px;cursor:pointer;font-size:12.5px;">Decline</button>';
         document.body.appendChild(bar);
         function done(v) { try { localStorage.setItem('pse_cookie_consent', v); } catch (e) {} bar.remove(); }
         bar.querySelector('#pseCookieOk').addEventListener('click', function () { done('accepted'); });

@@ -15,9 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="main.js"></script>
     <script src="search-pro.js"></script>
-    <link rel="stylesheet" href="/style.css">
-    
-    <style>
+<style>
         .auth-page { max-width: 560px; margin: 2rem auto; background: var(--white); border-radius: var(--radius); padding: 2.5rem; border: 1px solid var(--border); }
         .auth-page .auth-header { text-align: center; margin-bottom: 1.5rem; }
         .auth-page .auth-header h2 { font-size: 1.8rem; color: var(--secondary); }
@@ -53,14 +51,15 @@
         .password-strength { height: 4px; background: var(--border-dark); border-radius: 4px; margin-top: 0.3rem; overflow: hidden; }
         .password-strength .bar { height: 100%; width: 0%; border-radius: 4px; transition: var(--transition); }
         .password-strength .bar.weak { width: 25%; background: #c0392b; }
-        .password-strength .bar.medium { width: 50%; background: #e67e22; }
-        .password-strength .bar.strong { width: 75%; background: #f1c40f; }
+        .password-strength .bar.medium { width: 50%; background: #e0a62e; }
+        .password-strength .bar.strong { width: 75%; background: #e0a62e; }
         .password-strength .bar.very-strong { width: 100%; background: #27ae60; }
         .password-hint { font-size: 0.7rem; color: var(--text-light); margin-top: 0.2rem; }
         #sellerFields { display: none; animation: slideDown 0.3s ease; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 480px) { .auth-page { padding: 1.5rem; margin: 1rem; } .auth-page .form-row { grid-template-columns: 1fr; } .auth-page .social-login { flex-direction: column; } .role-selector { flex-direction: column; } }
     </style>
+    <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
 
@@ -399,8 +398,8 @@
         if (/\d/.test(password)) strength++;
         if (/[^a-zA-Z0-9]/.test(password)) strength++;
         if (strength <= 1) { level = 'weak'; hint.textContent = 'Weak - Add more characters, numbers, and symbols'; hint.style.color = '#c0392b'; }
-        else if (strength === 2) { level = 'medium'; hint.textContent = 'Medium - Add uppercase letters and symbols'; hint.style.color = '#e67e22'; }
-        else if (strength === 3) { level = 'strong'; hint.textContent = 'Strong - Good password!'; hint.style.color = '#f1c40f'; }
+        else if (strength === 2) { level = 'medium'; hint.textContent = 'Medium - Add uppercase letters and symbols'; hint.style.color = '#e0a62e'; }
+        else if (strength === 3) { level = 'strong'; hint.textContent = 'Strong - Good password!'; hint.style.color = '#e0a62e'; }
         else if (strength >= 4) { level = 'very-strong'; hint.textContent = 'Very Strong - Excellent password!'; hint.style.color = '#27ae60'; }
         bar.className = 'bar ' + level;
     });

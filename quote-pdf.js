@@ -18,10 +18,10 @@
     'use strict';
 
     // ─── BRAND PALETTE (mirrors site CSS variables) ───
-    var NAVY = [11, 42, 59];        // --secondary #0b2a3b
-    var TEAL = [26, 123, 107];      // --primary    #1a7b6b
+    var NAVY = [11, 42, 59];        // --secondary #0b2138
+    var TEAL = [26, 123, 107];      // --primary    #0e7c68
     var TEAL_DARK = [15, 79, 67];   // --primary-dark
-    var ACCENT = [241, 196, 15];    // --accent     #f1c40f
+    var ACCENT = [241, 196, 15];    // --accent     #e0a62e
     var LIGHT = [240, 244, 248];    // --light
     var ROW_ALT = [248, 249, 250];
     var DARK_TXT = [34, 34, 34];

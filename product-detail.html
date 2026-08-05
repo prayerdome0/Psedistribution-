@@ -17,19 +17,19 @@
     
     <style>
         :root {
-            --primary: #1a7b6b;
-            --primary-dark: #0f4f43;
-            --primary-light: #e8f5f0;
-            --secondary: #0b2a3b;
-            --secondary-light: #1a4b5e;
-            --accent: #f1c40f;
-            --accent-hover: #e0b50e;
+            --primary: #0e7c68;
+            --primary-dark: #0a5a4a;
+            --primary-light: #e6f4ef;
+            --secondary: #0b2138;
+            --secondary-light: #16334f;
+            --accent: #e0a62e;
+            --accent-hover: #c8901f;
             --dark: #0b1a2a;
-            --text: #2c5a6b;
-            --text-light: #6a889a;
+            --text: #33475b;
+            --text-light: #698093;
             --border: #e9edf2;
-            --border-dark: #dce3e9;
-            --light: #f0f4f8;
+            --border-dark: #d3dce5;
+            --light: #f5f8fa;
             --white: #ffffff;
             --shadow: 0 4px 20px rgba(0,0,0,0.06);
             --shadow-hover: 0 20px 50px -10px rgba(0,20,30,0.12);
@@ -51,7 +51,7 @@
             color: #d4e2ed;
             font-size: 0.75rem;
             padding: 0.4rem 0;
-            border-bottom: 1px solid #1a4055;
+            border-bottom: 1px solid #16334f;
             overflow: hidden;
             position: sticky;
             top: 0;
@@ -64,7 +64,7 @@
         .moving-words .words-track span i { color: var(--accent); margin-right: 0.3rem; }
         @keyframes scrollWords { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
         .top-links { display: flex; gap: 1rem; flex-shrink: 0; }
-        .top-links a { color: #b4d0e0; transition: var(--transition); cursor: pointer; }
+        .top-links a { color: #a9c3d6; transition: var(--transition); cursor: pointer; }
         .top-links a:hover { color: var(--white); }
         .top-links i { color: var(--accent); margin-right: 0.2rem; }
 
@@ -126,7 +126,7 @@
             flex-direction: column;
             align-items: center;
             font-size: 0.6rem;
-            color: #1a3340;
+            color: #33475b;
             cursor: pointer;
             transition: var(--transition);
             padding: 0.2rem 0.3rem;
@@ -164,7 +164,7 @@
         }
         .nav-categories::-webkit-scrollbar { height: 3px; }
         .nav-categories::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #1a3340; }
+        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #33475b; }
         .nav-tab { padding: 0.3rem 0; border-bottom: 3px solid transparent; transition: var(--transition); cursor: pointer; position: relative; flex-shrink: 0; }
         .nav-tab::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 3px; background: var(--primary); transition: width 0.4s ease; }
         .nav-tab:hover::after, .nav-tab.active::after { width: 100%; }
@@ -279,7 +279,7 @@
             gap: 0.5rem;
             margin-bottom: 0.5rem;
         }
-        .product-info .product-rating .stars { color: #f1c40f; font-size: 1rem; }
+        .product-info .product-rating .stars { color: #e0a62e; font-size: 1rem; }
         .product-info .product-rating .reviews { color: var(--text-light); font-size: 0.85rem; }
         
         .product-info .product-price { display: flex; align-items: center; gap: 0.8rem; margin: 0.8rem 0; flex-wrap: wrap; }
@@ -566,18 +566,18 @@
 
         .footer {
             background: var(--secondary);
-            color: #b4d0e0;
+            color: #a9c3d6;
             padding: 2rem 0 1rem;
             margin-top: 3rem;
         }
         .footer .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
         .footer .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
-        .footer .footer-links a { color: #b4d0e0; font-size: 0.85rem; transition: var(--transition); }
+        .footer .footer-links a { color: #a9c3d6; font-size: 0.85rem; transition: var(--transition); }
         .footer .footer-links a:hover { color: var(--white); }
-        .footer .footer-bottom { border-top: 1px solid #1a4055; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
+        .footer .footer-bottom { border-top: 1px solid #16334f; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
         .footer .footer-bottom strong { color: var(--white); }
         .footer .footer-social { display: flex; gap: 1rem; }
-        .footer .footer-social a { color: #b4d0e0; transition: var(--transition); font-size: 1.1rem; }
+        .footer .footer-social a { color: #a9c3d6; transition: var(--transition); font-size: 1.1rem; }
         .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
 
         @media (max-width: 992px) {
@@ -616,6 +616,7 @@
             .share-section { justify-content: center; }
         }
     </style>
+    <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
 
@@ -735,7 +736,7 @@
                         <i class="fa-regular fa-bell" style="color:var(--primary);"></i> Stock Alert
                     </button>
                     <button type="button" onclick="createProductAlert('price')" title="Get notified when the price drops to your target" style="background:var(--light);border:1.5px solid var(--border-dark);color:var(--secondary);padding:0.35rem 0.9rem;border-radius:30px;font-size:0.75rem;font-weight:700;cursor:pointer;">
-                        <i class="fa-solid fa-bullseye" style="color:#e67e22;"></i> Price Watch
+                        <i class="fa-solid fa-bullseye" style="color:#e0a62e;"></i> Price Watch
                     </button>
                 </div>
 
@@ -857,8 +858,8 @@
                     <button class="btn-buy-now" onclick="buyNow()">
                         <i class="fa-solid fa-bolt"></i> Buy Now
                     </button>
-                    <button type="button" class="btn-add-cart" onclick="orderEvaluationSample()" style="background:#0b2a3b;color:#fff;border:1px solid #1a4b5e;" title="Order 1 sample at retail rate for quality evaluation without MOQ">
-                        <i class="fa-solid fa-flask" style="color:#f1c40f;"></i> Order 1 Sample ($35)
+                    <button type="button" class="btn-add-cart" onclick="orderEvaluationSample()" style="background:#0b2138;color:#fff;border:1px solid #16334f;" title="Order 1 sample at retail rate for quality evaluation without MOQ">
+                        <i class="fa-solid fa-flask" style="color:#e0a62e;"></i> Order 1 Sample ($35)
                     </button>
                     <button class="btn-wishlist" onclick="toggleWishlistFromDetail()" id="wishlistBtn">
                         <i class="fa-regular fa-heart"></i>
@@ -907,11 +908,11 @@
         <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;background:#fff;border:1px solid var(--border);border-radius:12px;padding:0.8rem 1rem;margin-top:1.5rem;font-size:0.78rem;color:var(--text);">
             <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> <strong>PSE Buyer Protection</strong> — full refund if the order isn't delivered or isn't as described</span>
             <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-lock" style="color:var(--secondary);"></i> Secure checkout — payments protected</span>
-            <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-rotate-left" style="color:#e67e22;"></i> 30-day easy returns</span>
+            <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-rotate-left" style="color:#e0a62e;"></i> 30-day easy returns</span>
         </div>
 
         <!-- REPORT MODAL (anti-scam) -->
-        <div id="reportModal" style="display:none;position:fixed;inset:0;background:rgba(11,26,42,0.55);z-index:100002;align-items:center;justify-content:center;padding:1rem;">
+        <div id="reportModal" style="display:none;position:fixed;inset:0;background:rgba(8,16,26,0.55);z-index:100002;align-items:center;justify-content:center;padding:1rem;">
             <div style="background:#fff;border-radius:16px;max-width:440px;width:100%;padding:1.4rem;box-shadow:0 30px 80px rgba(0,20,40,0.35);position:relative;">
                 <button onclick="closeReportModal()" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;color:var(--text-light);cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
                 <h3 style="font-size:1.05rem;color:var(--secondary);margin-bottom:0.3rem;"><i class="fa-regular fa-flag" style="color:#c0392b;margin-right:0.4rem;"></i> Report to Trust & Safety</h3>
@@ -937,7 +938,7 @@
 
         <!-- REVIEWS SECTION -->
         <div class="reviews-section" style="margin-top:2rem;padding:1.5rem;background:var(--light);border-radius:var(--radius-sm);border:1px solid var(--border);">
-            <h3 style="font-size:1.2rem;color:var(--secondary);margin-bottom:1rem;"><i class="fa-solid fa-star" style="color:#f1c40f;margin-right:0.5rem;"></i> Customer Reviews</h3>
+            <h3 style="font-size:1.2rem;color:var(--secondary);margin-bottom:1rem;"><i class="fa-solid fa-star" style="color:#e0a62e;margin-right:0.5rem;"></i> Customer Reviews</h3>
             <div id="reviewsList" style="margin-bottom:1rem;">
                 <p style="color:var(--text-light);font-size:0.9rem;">No reviews yet for this product.</p>
             </div>
@@ -1369,7 +1370,7 @@
         const callBtn = currentSellerContact.phone
             ? `<button class="seller-contact-btn" style="background:var(--secondary);color:#fff;" onclick="contactSellerPhone()"><i class="fa-solid fa-phone"></i> Call</button>`
             : '';
-        const storeBtn = `<button class="seller-contact-btn" style="background:#0b2a3b;color:#fff;" onclick="visitSupplierStorefront()"><i class="fa-solid fa-store"></i> Supplier Storefront</button>`;
+        const storeBtn = `<button class="seller-contact-btn" style="background:#0b2138;color:#fff;" onclick="visitSupplierStorefront()"><i class="fa-solid fa-store"></i> Supplier Storefront</button>`;
         box.innerHTML = waBtn + emailBtn + callBtn + storeBtn;
         box.style.display = 'flex';
     }
@@ -1410,7 +1411,7 @@
         const tierBadge = product.supplier_tier === 'platinum' || product.membership_tier === 'platinum' ?
             `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#8e44ad;color:#fff;font-weight:700;margin-left:8px;"><i class="fa-solid fa-crown"></i> Platinum Supplier</span>` :
             product.supplier_tier === 'gold' || product.membership_tier === 'gold' ?
-            `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#f39c12;color:#fff;font-weight:700;margin-left:8px;"><i class="fa-solid fa-crown"></i> Gold Supplier</span>` : '';
+            `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#e0a62e;color:#fff;font-weight:700;margin-left:8px;"><i class="fa-solid fa-crown"></i> Gold Supplier</span>` : '';
         const sponsorBadge = product.sponsored ?
             `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#d35400;color:#fff;font-weight:700;margin-left:8px;"><i class="fa-solid fa-rocket"></i> Sponsored Deal</span>` : '';
         const trustBadge = product.supplier_verified ?
@@ -2177,7 +2178,7 @@
         currentReviewRating = n;
         const stars = document.querySelectorAll('#starInput span');
         stars.forEach((s, i) => {
-            s.style.color = i < n ? '#f1c40f' : '#ddd';
+            s.style.color = i < n ? '#e0a62e' : '#ddd';
         });
         document.getElementById('ratingText').textContent = n + ' star' + (n > 1 ? 's' : '');
     };
@@ -2270,8 +2271,8 @@
                 const starsHtml = '★'.repeat(r.rating || 5) + '☆'.repeat(5 - (r.rating || 5));
                 return `<div style="padding:0.8rem 0;border-bottom:1px solid var(--border);margin-bottom:0.5rem;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem;">
-                        <strong style="font-size:0.9rem;color:var(--secondary);">${esc(r.user_name || 'Buyer')} <span style="font-size:0.6rem;background:#e8f5f0;color:var(--primary);border-radius:10px;padding:0.05rem 0.4rem;margin-left:0.2rem;"><i class="fa-solid fa-circle-check"></i> Verified customer</span></strong>
-                        <span style="color:#f1c40f;font-size:0.85rem;">${starsHtml}</span>
+                        <strong style="font-size:0.9rem;color:var(--secondary);">${esc(r.user_name || 'Buyer')} <span style="font-size:0.6rem;background:#e6f4ef;color:var(--primary);border-radius:10px;padding:0.05rem 0.4rem;margin-left:0.2rem;"><i class="fa-solid fa-circle-check"></i> Verified customer</span></strong>
+                        <span style="color:#e0a62e;font-size:0.85rem;">${starsHtml}</span>
                     </div>
                     <p style="font-size:0.85rem;color:var(--text);line-height:1.5;">${esc(r.text || '')}</p>
                     <div style="font-size:0.7rem;color:var(--text-light);margin-top:0.3rem;">${r.created_at ? new Date(r.created_at).toLocaleDateString() : ''}</div>
@@ -2425,7 +2426,7 @@
             const meta = document.getElementById('alertMetaItem');
             if (meta) {
                 meta.style.display = 'inline';
-                meta.innerHTML = `<i class="fa-solid fa-bell" style="color:#e67e22;"></i> ${hits[0].hit}`;
+                meta.innerHTML = `<i class="fa-solid fa-bell" style="color:#e0a62e;"></i> ${hits[0].hit}`;
             }
             showToast(hits[0].hit, 'success');
             if (typeof window.pushNotification === 'function') {

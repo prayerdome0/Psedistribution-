@@ -34,7 +34,7 @@
     var DEFAULT_TIERS = [
         { name: 'Bronze',   min_points: 0,    multiplier: 1.0, color: '#cd7f32', perks: 'Standard earn rate • Members-only coupons' },
         { name: 'Silver',   min_points: 1000, multiplier: 1.25, color: '#95a5a6', perks: '1.25× points • Free sample shipping' },
-        { name: 'Gold',     min_points: 5000, multiplier: 1.5, color: '#f1c40f', perks: '1.5× points • Priority support • Early flash-sale access' },
+        { name: 'Gold',     min_points: 5000, multiplier: 1.5, color: '#e0a62e', perks: '1.5× points • Priority support • Early flash-sale access' },
         { name: 'Platinum', min_points: 15000, multiplier: 2.0, color: '#9b59b6', perks: '2× points • Dedicated account manager • Concierge RFQ' }
     ];
 
@@ -414,7 +414,7 @@
                 '<td>' + (c.expires_at ? new Date(c.expires_at).toLocaleDateString() : '—') + '</td>' +
                 '<td><span class="status-badge ' + statusCls + '">' + status + '</span></td>' +
                 '<td>' +
-                    '<button class="btn-action" style="background:#f39c12;color:#fff;" title="Toggle" onclick="PremiumAdmin.toggleCoupon(\'' + c.id + '\',' + (!c.active) + ')"><i class="fa-solid fa-power-off"></i></button> ' +
+                    '<button class="btn-action" style="background:#e0a62e;color:#fff;" title="Toggle" onclick="PremiumAdmin.toggleCoupon(\'' + c.id + '\',' + (!c.active) + ')"><i class="fa-solid fa-power-off"></i></button> ' +
                     '<button class="btn-action delete" title="Delete" onclick="PremiumAdmin.deleteCoupon(\'' + c.id + '\')"><i class="fa-regular fa-trash-can"></i></button>' +
                 '</td>' +
                 '</tr>';
@@ -522,7 +522,7 @@
                     '<strong style="flex:1;">' + esc(s.name || 'Flash Sale') + ' — ' + esc(s.discount_percent) + '% off</strong>' +
                     '<span style="font-size:0.72rem;color:#666;">' + (s.start_at ? new Date(s.start_at).toLocaleString() : 'now') + ' → ' + (s.end_at ? new Date(s.end_at).toLocaleString() : '∞') + '</span>' +
                     (live ? '<span class="status-badge active">LIVE</span>' : '<span class="status-badge inactive">Off</span>') +
-                    '<button class="btn-action" style="background:#f39c12;color:#fff;" title="Toggle" onclick="PremiumAdmin.toggleFlash(\'' + s.id + '\',' + (!s.active) + ')"><i class="fa-solid fa-power-off"></i></button>' +
+                    '<button class="btn-action" style="background:#e0a62e;color:#fff;" title="Toggle" onclick="PremiumAdmin.toggleFlash(\'' + s.id + '\',' + (!s.active) + ')"><i class="fa-solid fa-power-off"></i></button>' +
                     '<button class="btn-action delete" title="Delete" onclick="PremiumAdmin.deleteFlash(\'' + s.id + '\')"><i class="fa-regular fa-trash-can"></i></button>' +
                     '</div>';
             }).join('');

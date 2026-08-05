@@ -293,7 +293,7 @@
             .pse-launcher {
                 position: fixed; right: 22px; bottom: 24px; z-index: 2147483000;
                 display: flex; align-items: center; gap: 10px; cursor: pointer;
-                background: linear-gradient(135deg, #1a7b6b, #0f4f43); color: #fff;
+                background: linear-gradient(135deg, #0e7c68, #0a5a4a); color: #fff;
                 border: none; border-radius: 50px; padding: 14px 22px;
                 font-family: 'Inter','Segoe UI',system-ui,sans-serif; font-size: 0.95rem; font-weight: 700;
                 box-shadow: 0 12px 35px rgba(15,79,67,.45); transition: transform .25s ease, box-shadow .25s ease;
@@ -321,11 +321,11 @@
             .pse-panel.open { display: flex; animation: pseIn .28s ease; }
             @keyframes pseIn { from { opacity: 0; transform: translateY(16px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
             .pse-panel-head {
-                background: linear-gradient(135deg, #0b2a3b, #1a4b5e); color: #fff; padding: 0.9rem 1rem;
+                background: linear-gradient(135deg, #0b2138, #16334f); color: #fff; padding: 0.9rem 1rem;
                 display: flex; align-items: center; gap: 0.7rem;
             }
             .pse-panel-head .pse-avatar {
-                width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #1a7b6b, #2ecc9a);
+                width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #0e7c68, #0e7c68);
                 display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0;
             }
             .pse-panel-head .pse-head-txt { flex: 1; min-width: 0; }
@@ -336,12 +336,12 @@
                 border-radius: 50%; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;
             }
             .pse-panel-head .pse-head-close:hover { background: rgba(255,255,255,.25); }
-            .pse-tabs { display: flex; background: #f0f4f8; border-bottom: 1px solid #e9edf2; }
+            .pse-tabs { display: flex; background: #f5f8fa; border-bottom: 1px solid #e9edf2; }
             .pse-tab {
                 flex: 1; text-align: center; padding: 0.65rem 0; font-size: 0.8rem; font-weight: 700; cursor: pointer;
-                color: #6a889a; border-bottom: 3px solid transparent; transition: all .25s; background: none; border-top: none; border-left: none; border-right: none;
+                color: #698093; border-bottom: 3px solid transparent; transition: all .25s; background: none; border-top: none; border-left: none; border-right: none;
             }
-            .pse-tab.active { color: #1a7b6b; border-bottom-color: #1a7b6b; background: #fff; }
+            .pse-tab.active { color: #0e7c68; border-bottom-color: #0e7c68; background: #fff; }
             .pse-tab i { margin-right: 4px; }
             .pse-ai-body { display: flex; flex-direction: column; flex: 1; min-height: 0; }
             .pse-chat {
@@ -350,45 +350,45 @@
             }
             .pse-msg { max-width: 85%; padding: 0.6rem 0.85rem; border-radius: 16px; font-size: 0.83rem; line-height: 1.55; word-wrap: break-word; }
             .pse-msg.bot { align-self: flex-start; background: #fff; border: 1px solid #e9edf2; border-bottom-left-radius: 5px; color: #123; }
-            .pse-msg.user { align-self: flex-end; background: linear-gradient(135deg, #1a7b6b, #14815f); color: #fff; border-bottom-right-radius: 5px; }
-            .pse-msg .pse-link { color: #1a7b6b; font-weight: 600; text-decoration: underline; }
+            .pse-msg.user { align-self: flex-end; background: linear-gradient(135deg, #0e7c68, #0e7c68); color: #fff; border-bottom-right-radius: 5px; }
+            .pse-msg .pse-link { color: #0e7c68; font-weight: 600; text-decoration: underline; }
             .pse-msg.user .pse-link { color: #d5f5ec; }
             .pse-typing { display: none; align-self: flex-start; background: #fff; border: 1px solid #e9edf2; border-radius: 16px; padding: 0.7rem 1rem; }
-            .pse-typing span { width: 7px; height: 7px; background: #1a7b6b; border-radius: 50%; display: inline-block; margin: 0 2px; animation: pseTyping 1.2s infinite; }
+            .pse-typing span { width: 7px; height: 7px; background: #0e7c68; border-radius: 50%; display: inline-block; margin: 0 2px; animation: pseTyping 1.2s infinite; }
             .pse-typing span:nth-child(2) { animation-delay: .2s; }
             .pse-typing span:nth-child(3) { animation-delay: .4s; }
             @keyframes pseTyping { 0%,60%,100% { transform: translateY(0); opacity:.4;} 30% { transform: translateY(-5px); opacity:1;} }
             .pse-quick { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 1rem 0.4rem; background: #f8fbfd; }
             .pse-chip {
-                background: #eef7f3; color: #1a7b6b; border: 1px solid #cde9df; border-radius: 30px;
+                background: #f0f8f5; color: #0e7c68; border: 1px solid #cfe9e0; border-radius: 30px;
                 padding: 0.35rem 0.8rem; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all .2s;
                 font-family: inherit;
             }
-            .pse-chip:hover { background: #1a7b6b; color: #fff; }
+            .pse-chip:hover { background: #0e7c68; color: #fff; }
             .pse-input-row { display: flex; gap: 8px; padding: 0.7rem 1rem 1rem; background: #f8fbfd; border-top: 1px solid #e9edf2; }
             .pse-input-row input {
                 flex: 1; border: 2px solid #e9edf2; border-radius: 40px; padding: 0.6rem 1rem; font-size: 0.85rem;
                 outline: none; font-family: inherit; transition: border-color .25s;
             }
-            .pse-input-row input:focus { border-color: #1a7b6b; }
+            .pse-input-row input:focus { border-color: #0e7c68; }
             .pse-send-btn {
-                background: linear-gradient(135deg, #1a7b6b, #0f4f43); color: #fff; border: none; width: 44px; height: 44px;
+                background: linear-gradient(135deg, #0e7c68, #0a5a4a); color: #fff; border: none; width: 44px; height: 44px;
                 border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;
                 transition: transform .2s; flex-shrink: 0;
             }
             .pse-send-btn:hover { transform: scale(1.08); }
             .pse-support-body { display: none; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; padding: 1.2rem; gap: 0.8rem; background: #f8fbfd; }
             .pse-support-body.active { display: flex; }
-            .pse-support-body .pse-support-intro { font-size: 0.85rem; color: #2c5a6b; line-height: 1.6; }
-            .pse-support-body label { font-size: 0.75rem; font-weight: 700; color: #0b2a3b; }
+            .pse-support-body .pse-support-intro { font-size: 0.85rem; color: #33475b; line-height: 1.6; }
+            .pse-support-body label { font-size: 0.75rem; font-weight: 700; color: #0b2138; }
             .pse-support-body input, .pse-support-body textarea {
                 width: 100%; border: 2px solid #e9edf2; border-radius: 12px; padding: 0.65rem 0.9rem;
                 font-size: 0.85rem; font-family: inherit; outline: none; box-sizing: border-box; transition: border-color .25s;
             }
-            .pse-support-body input:focus, .pse-support-body textarea:focus { border-color: #1a7b6b; }
+            .pse-support-body input:focus, .pse-support-body textarea:focus { border-color: #0e7c68; }
             .pse-support-body textarea { min-height: 90px; resize: vertical; }
             .pse-support-btn {
-                background: linear-gradient(135deg, #1a7b6b, #0f4f43); color: #fff; border: none; border-radius: 40px;
+                background: linear-gradient(135deg, #0e7c68, #0a5a4a); color: #fff; border: none; border-radius: 40px;
                 padding: 0.75rem 1.2rem; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit;
                 transition: transform .2s, box-shadow .2s;
             }
@@ -399,12 +399,12 @@
                 padding: 0.75rem 1.2rem; font-size: 0.85rem; font-weight: 700; display: block; transition: transform .2s;
             }
             .pse-wa-btn:hover { transform: translateY(-2px); }
-            .pse-support-note { font-size: 0.7rem; color: #6a889a; text-align: center; }
-            .pse-support-success { display: none; text-align: center; padding: 1.4rem 1rem; background: #eef7f3; border: 1px solid #cde9df; border-radius: 14px; }
+            .pse-support-note { font-size: 0.7rem; color: #698093; text-align: center; }
+            .pse-support-success { display: none; text-align: center; padding: 1.4rem 1rem; background: #f0f8f5; border: 1px solid #cfe9e0; border-radius: 14px; }
             .pse-support-success.show { display: block; }
-            .pse-support-success i { font-size: 2.2rem; color: #1a7b6b; }
-            .pse-support-success h4 { margin: 0.5rem 0 0.3rem; color: #0b2a3b; }
-            .pse-support-success p { font-size: 0.8rem; color: #2c5a6b; margin: 0; }
+            .pse-support-success i { font-size: 2.2rem; color: #0e7c68; }
+            .pse-support-success h4 { margin: 0.5rem 0 0.3rem; color: #0b2138; }
+            .pse-support-success p { font-size: 0.8rem; color: #33475b; margin: 0; }
             @media (max-width: 480px) {
                 .pse-launcher { padding: 12px 16px; font-size: 0.85rem; }
                 .pse-launcher .pse-launcher-label { display: none; }
@@ -468,11 +468,11 @@
                     <button class="pse-support-btn" id="pse-support-send" style="margin-top:0.9rem;"><i class="fa-regular fa-paper-plane"></i> Send to support</button>
                     <div style="display:flex;align-items:center;gap:0.6rem;margin:0.7rem 0;">
                         <span style="flex:1;height:1px;background:#e9edf2;"></span>
-                        <span style="font-size:0.7rem;color:#6a889a;">or</span>
+                        <span style="font-size:0.7rem;color:#698093;">or</span>
                         <span style="flex:1;height:1px;background:#e9edf2;"></span>
                     </div>
                     <a class="pse-wa-btn" href="https://wa.me/19099384682" target="_blank"><i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp</a>
-                    <p class="pse-support-note">Email us anytime at <a href="mailto:support@pilotsalesdistribution.com" style="color:#1a7b6b;">support@pilotsalesdistribution.com</a></p>
+                    <p class="pse-support-note">Email us anytime at <a href="mailto:support@pilotsalesdistribution.com" style="color:#0e7c68;">support@pilotsalesdistribution.com</a></p>
                 </div>
             </div>
         `;

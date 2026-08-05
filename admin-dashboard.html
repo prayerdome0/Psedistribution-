@@ -24,19 +24,19 @@
     
     <style>
         :root {
-            --primary: #1a7b6b;
-            --primary-dark: #0f4f43;
-            --primary-light: #e8f5f0;
-            --secondary: #0b2a3b;
-            --secondary-light: #1a4b5e;
-            --accent: #f1c40f;
-            --accent-hover: #e0b50e;
+            --primary: #0e7c68;
+            --primary-dark: #0a5a4a;
+            --primary-light: #e6f4ef;
+            --secondary: #0b2138;
+            --secondary-light: #16334f;
+            --accent: #e0a62e;
+            --accent-hover: #c8901f;
             --dark: #0b1a2a;
-            --text: #2c5a6b;
-            --text-light: #6a889a;
+            --text: #33475b;
+            --text-light: #698093;
             --border: #e9edf2;
-            --border-dark: #dce3e9;
-            --light: #f0f4f8;
+            --border-dark: #d3dce5;
+            --light: #f5f8fa;
             --white: #ffffff;
             --shadow: 0 4px 20px rgba(0,0,0,0.06);
             --shadow-hover: 0 20px 50px -10px rgba(0,20,30,0.12);
@@ -62,7 +62,7 @@
             color: #d4e2ed;
             font-size: 0.7rem;
             padding: 0.3rem 0;
-            border-bottom: 1px solid #1a4055;
+            border-bottom: 1px solid #16334f;
             overflow: hidden;
             position: sticky;
             top: 0;
@@ -75,7 +75,7 @@
         .moving-words .words-track span i { color: var(--accent); margin-right: 0.3rem; }
         @keyframes scrollWords { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
         .top-links { display: flex; gap: 0.8rem; flex-shrink: 0; }
-        .top-links a { color: #b4d0e0; transition: var(--transition); cursor: pointer; font-size: 0.7rem; }
+        .top-links a { color: #a9c3d6; transition: var(--transition); cursor: pointer; font-size: 0.7rem; }
         .top-links a:hover { color: var(--white); }
         .top-links i { color: var(--accent); margin-right: 0.2rem; }
 
@@ -101,7 +101,7 @@
             align-items: center;
             gap: 0.3rem;
             font-size: 0.7rem;
-            color: #1a3340;
+            color: #33475b;
             cursor: pointer;
             transition: var(--transition);
             padding: 0.2rem 0.5rem;
@@ -197,7 +197,7 @@
         .admin-menu-panel .sidebar-header {
             color: var(--white);
             padding-bottom: 0.8rem;
-            border-bottom: 1px solid #1a4055;
+            border-bottom: 1px solid #16334f;
             margin-bottom: 0.8rem;
             display: flex;
             justify-content: space-between;
@@ -209,7 +209,7 @@
         .admin-menu-panel .close-menu-btn {
             background: none;
             border: none;
-            color: #b4d0e0;
+            color: #a9c3d6;
             font-size: 1.2rem;
             cursor: pointer;
             padding: 0.2rem;
@@ -223,7 +223,7 @@
             gap: 0.6rem;
             padding: 0.55rem 0.7rem;
             border-radius: 6px;
-            color: #b4d0e0;
+            color: #a9c3d6;
             cursor: pointer;
             transition: var(--transition);
             margin-bottom: 0.1rem;
@@ -246,17 +246,17 @@
             min-width: 18px;
             text-align: center;
         }
-        .admin-menu-panel .nav-item .badge.orange { background: #e67e22; }
+        .admin-menu-panel .nav-item .badge.orange { background: #e0a62e; }
         .admin-menu-panel .nav-item .badge.green { background: var(--primary); }
         .admin-menu-panel .nav-item .badge.purple { background: #8e44ad; }
         .admin-menu-panel .nav-item .badge.blue { background: #2980b9; }
-        .admin-menu-panel .nav-item .badge.gold { background: #f39c12; }
+        .admin-menu-panel .nav-item .badge.gold { background: #e0a62e; }
 
         .admin-menu-panel .logout-btn {
             margin-top: 0.8rem;
             padding-top: 0.8rem;
-            border-top: 1px solid #1a4055;
-            color: #b4d0e0;
+            border-top: 1px solid #16334f;
+            color: #a9c3d6;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
@@ -323,10 +323,10 @@
         .stat-card .stat-number { font-size: 1.4rem; font-weight: 800; color: var(--secondary); line-height: 1.2; }
         .stat-card .stat-number.green { color: var(--primary); }
         .stat-card .stat-number.blue { color: #2980b9; }
-        .stat-card .stat-number.orange { color: #e67e22; }
+        .stat-card .stat-number.orange { color: #e0a62e; }
         .stat-card .stat-number.red { color: #c0392b; }
         .stat-card .stat-number.purple { color: #8e44ad; }
-        .stat-card .stat-number.gold { color: #f39c12; }
+        .stat-card .stat-number.gold { color: #e0a62e; }
         .stat-card .stat-label { font-size: 0.65rem; color: var(--text-light); }
 
         .quick-actions {
@@ -426,7 +426,7 @@
         .btn-action.ship { background: #cce5ff; color: #004085; }
         .btn-action.process { background: #cce5ff; color: #004085; }
         .order-chip { border: 1.5px solid transparent; font-size: 0.75rem; }
-        .order-chip.active { border-color: #0b2a3b; box-shadow: 0 0 0 2px rgba(11,42,59,0.15); font-weight: 800; }
+        .order-chip.active { border-color: #0b2138; box-shadow: 0 0 0 2px rgba(11,42,59,0.15); font-weight: 800; }
 
         /* ─── MODAL ─── */
         .modal-overlay {
@@ -716,6 +716,7 @@
             .image-preview .preview-item { width: 50px; height: 50px; }
         }
     </style>
+    <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
 
@@ -1001,7 +1002,7 @@
                     <span class="time" id="customerCount">0 users</span>
                 </div>
                 <div id="topBuyersCard" style="display:none;background:#fff;border:1px solid #e5ebef;border-radius:12px;padding:0.9rem 1.2rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(11,42,59,0.06);">
-                    <h3 style="font-size:0.88rem;color:var(--secondary);margin:0 0 0.6rem;"><i class="fa-solid fa-trophy" style="color:#f1c40f;"></i> Top Buyers by Revenue</h3>
+                    <h3 style="font-size:0.88rem;color:var(--secondary);margin:0 0 0.6rem;"><i class="fa-solid fa-trophy" style="color:#e0a62e;"></i> Top Buyers by Revenue</h3>
                     <div id="topBuyersList" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:0.5rem;"></div>
                 </div>
                 <div class="table-container">
@@ -1391,7 +1392,7 @@
                         <div style="font-size:0.7rem; color:var(--text-light);">Total Orders</div>
                     </div>
                     <div style="background:var(--light); border-radius:var(--radius-sm); padding:1rem; text-align:center; border:1px solid var(--border);">
-                        <div style="font-size:1.8rem; font-weight:800; color:#e67e22;" id="analyticsCustomers">0</div>
+                        <div style="font-size:1.8rem; font-weight:800; color:#e0a62e;" id="analyticsCustomers">0</div>
                         <div style="font-size:0.7rem; color:var(--text-light);">Total Customers</div>
                     </div>
                 </div>
@@ -1983,7 +1984,7 @@
                 const net30Chip = u.trade_credit_status === 'approved' ?
                     `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#e8f8f0;color:#27ae60;font-size:0.7rem;font-weight:700;margin-left:6px;">💳 Net-30 ($${(u.trade_credit_limit || 15000).toLocaleString()})</span>` :
                     u.trade_credit_status === 'pending' ?
-                    `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#f39c12;color:#fff;font-size:0.7rem;font-weight:700;margin-left:6px;">💳 Net-30 Pending</span>` : '';
+                    `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#e0a62e;color:#fff;font-size:0.7rem;font-weight:700;margin-left:6px;">💳 Net-30 Pending</span>` : '';
                 return `
                 <tr>
                     <td><strong>${u.full_name || u.email || 'N/A'}</strong> ${net30Chip}</td>
@@ -2261,7 +2262,7 @@
                     cancelled: 'Cancelled'
                 };
                 return `
-                    <div class="message-preview" style="border-left: 3px solid ${status === 'pending' ? '#f39c12' : status === 'processing' ? '#3498db' : status === 'shipped' ? '#2ecc71' : '#95a5a6'};">
+                    <div class="message-preview" style="border-left: 3px solid ${status === 'pending' ? '#e0a62e' : status === 'processing' ? '#3498db' : status === 'shipped' ? '#2ecc71' : '#95a5a6'};">
                         <div class="msg-header">
                             <span class="sender">#${o.quoteNumber || o.orderNumber || 'N/A'}</span>
                             <span class="date">${o.created_at ? new Date(o.created_at).toLocaleString() : 'N/A'}</span>
@@ -2275,7 +2276,7 @@
                         </div>
                         <div style="display:flex; gap:0.3rem; margin-top:0.5rem; flex-wrap:wrap;">
                             <button class="btn-action view" onclick="viewOrder('${o.id}')"><i class="fa-regular fa-eye"></i> View</button>
-                            ${(status === 'processing' || status === 'shipped') ? `<button class="btn-action" style="background:#eef2f6;color:#0b2a3b;border:1px solid #d5dee6;" onclick="downloadPackingSlip('${o.id}')" title="Printable warehouse packing slip — no prices"><i class="fa-solid fa-box-open"></i> Slip</button>` : ''}
+                            ${(status === 'processing' || status === 'shipped') ? `<button class="btn-action" style="background:#eef2f6;color:#0b2138;border:1px solid #d5dee6;" onclick="downloadPackingSlip('${o.id}')" title="Printable warehouse packing slip — no prices"><i class="fa-solid fa-box-open"></i> Slip</button>` : ''}
                             ${o.customer?.phone ? `<button class="btn-action" style="background:#25D366;color:#fff;" onclick="notifyOrderWhatsApp('${o.id}')" title="Send order status update to buyer on WhatsApp"><i class="fa-brands fa-whatsapp"></i> Notify</button>` : ''}
                             ${status === 'pending' ? `<button class="btn-action process" onclick="updateOrderStatus('${o.id}', 'processing')"><i class="fa-solid fa-gear"></i> Process</button>` : ''}
                             ${status === 'processing' ? `<button class="btn-action ship" onclick="updateOrderStatus('${o.id}', 'shipped')"><i class="fa-solid fa-truck"></i> Ship</button>` : ''}
@@ -2541,7 +2542,7 @@
             };
             const categoryColors = {
                 electronics: '#2980b9', fashion: '#8e44ad', grocery: '#27ae60',
-                home: '#e67e22', beauty: '#e91e63', health: '#00bcd4', sports: '#ff5722',
+                home: '#e0a62e', beauty: '#e91e63', health: '#00bcd4', sports: '#ff5722',
                 automotive: '#607d8b', baby: '#f48fb1', office: '#795548',
                 industrial: '#455a64', books: '#3f51b5', pets: '#4caf50', other: '#9e9e9e'
             };
@@ -2772,7 +2773,7 @@
             }
 
             container.innerHTML = allRFQs.slice(0, 20).map(rfq => `
-                <div class="message-preview" style="border-left: 3px solid ${rfq.status === 'pending' ? '#f39c12' : rfq.status === 'reviewing' ? '#3498db' : rfq.status === 'quoted' ? '#2ecc71' : '#95a5a6'};">
+                <div class="message-preview" style="border-left: 3px solid ${rfq.status === 'pending' ? '#e0a62e' : rfq.status === 'reviewing' ? '#3498db' : rfq.status === 'quoted' ? '#2ecc71' : '#95a5a6'};">
                     <div class="msg-header">
                         <span class="sender">${rfq.title || 'N/A'}</span>
                         <span class="date">${rfq.created_at ? new Date(rfq.created_at).toLocaleString() : 'N/A'}</span>
@@ -2783,7 +2784,7 @@
                             <span class="status-badge ${rfq.status || 'pending'}">${rfq.status || 'Pending'}</span>
                         </div>
                         <div style="font-size:0.8rem; color:var(--text-light);">Category: ${rfq.category || 'N/A'}${rfq.budget ? ` | Budget: $${rfq.budget}` : ''}</div>
-                        ${rfq.quote ? `<div style="margin-top:0.35rem;background:#e8f5f0;border:1px solid #1a7b6b33;border-radius:6px;padding:0.35rem 0.6rem;font-size:0.78rem;color:#0f4f43;"><i class="fa-solid fa-file-invoice-dollar" style="color:#2ecc71;"></i> Quoted: <strong>$${Number(rfq.quote.unit_price || 0).toFixed(2)}/unit</strong> × ${rfq.quantity || 0} units = <strong>$${(Number(rfq.quote.unit_price || 0) * (rfq.quantity || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> • Lead: ${rfq.quote.lead_time_days || '—'} days</div>` : ''}
+                        ${rfq.quote ? `<div style="margin-top:0.35rem;background:#e6f4ef;border:1px solid #0e7c6833;border-radius:6px;padding:0.35rem 0.6rem;font-size:0.78rem;color:#0a5a4a;"><i class="fa-solid fa-file-invoice-dollar" style="color:#2ecc71;"></i> Quoted: <strong>$${Number(rfq.quote.unit_price || 0).toFixed(2)}/unit</strong> × ${rfq.quantity || 0} units = <strong>$${(Number(rfq.quote.unit_price || 0) * (rfq.quantity || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> • Lead: ${rfq.quote.lead_time_days || '—'} days</div>` : ''}
                         <div class="msg-preview-text">${rfq.description || 'No description'}</div>
                     </div>
                     <div style="display:flex; gap:0.3rem; margin-top:0.5rem; flex-wrap:wrap;">
@@ -2986,7 +2987,7 @@
                 const tierChip = s.membership_tier === 'platinum' || s.supplier_tier === 'platinum' ?
                     `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#8e44ad;color:#fff;font-size:0.7rem;font-weight:700;margin-left:6px;"><i class="fa-solid fa-crown"></i> Platinum (0%)</span>` :
                     s.membership_tier === 'gold' || s.supplier_tier === 'gold' ?
-                    `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#f39c12;color:#fff;font-size:0.7rem;font-weight:700;margin-left:6px;"><i class="fa-solid fa-crown"></i> Gold (5%)</span>` :
+                    `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#e0a62e;color:#fff;font-size:0.7rem;font-weight:700;margin-left:6px;"><i class="fa-solid fa-crown"></i> Gold (5%)</span>` :
                     `<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:var(--bg-main);color:var(--text-light);font-size:0.7rem;font-weight:600;margin-left:6px;">Basic (10%)</span>`;
                 return `
                 <tr>
@@ -3589,7 +3590,7 @@
         if (revenueChartInstance) { revenueChartInstance.destroy(); revenueChartInstance = null; }
         revenueChartInstance = new Chart(canvas.getContext('2d'), {
             type: 'line',
-            data: { labels, datasets: [{ label: 'Revenue', data: totals, borderColor: '#1a7b6b', backgroundColor: 'rgba(26,123,107,0.12)', fill: true, tension: 0.35, pointRadius: 2, borderWidth: 2 }] },
+            data: { labels, datasets: [{ label: 'Revenue', data: totals, borderColor: '#0e7c68', backgroundColor: 'rgba(26,123,107,0.12)', fill: true, tension: 0.35, pointRadius: 2, borderWidth: 2 }] },
             options: {
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' $' + (+c.parsed.y).toFixed(2) } } },

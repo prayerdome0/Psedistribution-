@@ -4,8 +4,8 @@
   "description": "Premium wholesale marketplace for bulk products from verified suppliers.",
   "start_url": "/home",
   "display": "standalone",
-  "background_color": "#0b2a3b",
-  "theme_color": "#1a7b6b",
+  "background_color": "#0b2138",
+  "theme_color": "#0b2138",
   "orientation": "portrait-primary",
   "icons": [
     {
