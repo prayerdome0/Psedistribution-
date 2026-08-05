@@ -698,8 +698,17 @@
         <p style="opacity:0.7;font-size:0.75rem;margin-top:0.8rem;"><i class="fa-solid fa-lock"></i> No spam — unsubscribe any time.</p>
     </div>
 
-    <!-- RECENTLY VIEWED -->
-    <div id="recentlyViewedSection" style="display:none;"></div>
+    <!-- RECENTLY VIEWED (Professional 2-col) -->
+    <section id="recentlyViewedSection" class="animate-on-scroll" style="margin-top: 3.5rem; display: none;">
+        <div class="pse-sec-head">
+            <div>
+                <span class="eyebrow"><i class="fa-solid fa-history"></i> Your activity</span>
+                <h2>Recently <span class="red">Viewed</span></h2>
+                <p>Quick access to products you explored earlier</p>
+            </div>
+        </div>
+        <div class="product-grid product-grid-2col professional-2" id="recentlyViewedGrid"></div>
+    </section>
 
 </div>
 
@@ -1380,5 +1389,59 @@
     <script src="mobile-nav.js"></script>
     <script src="dark-mode.js"></script>
     <script src="recently-viewed.js"></script>
+    <script src="quickview.js"></script>
+    <script>
+        // Enhanced recently viewed integration (professional 2-col cards)
+        function renderRecentlyViewed() {
+            const section = document.getElementById('recentlyViewedSection');
+            const grid = document.getElementById('recentlyViewedGrid');
+            if (!section || !grid) return;
+
+            try {
+                const recent = JSON.parse(localStorage.getItem('pse_recent_views') || '[]');
+                if (!recent.length) {
+                    section.style.display = 'none';
+                    return;
+                }
+
+                section.style.display = 'block';
+                grid.innerHTML = recent.slice(0, 4).map(item => {
+                    const price = item.price ? '$' + Number(item.price).toFixed(2) : 'Quote required';
+                    const slug = item.slug || (item.title ? item.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') : '');
+                    return `
+                        <div class="product-card">
+                            <div class="product-image" onclick="window.location.href='/product/${encodeURIComponent(slug)}'">
+                                <img src="${item.image || '/logo.webp'}" alt="${item.title}" loading="lazy" onerror="this.src='/logo.webp'">
+                            </div>
+                            <div class="product-title">${item.title}</div>
+                            <div class="product-brand">${item.brand || 'Pilot Distribution'}</div>
+                            <div class="product-price">${price}</div>
+                            <div class="product-actions">
+                                <a href="/product/${encodeURIComponent(slug)}" class="btn-add" style="text-align:center;text-decoration:none;">
+                                    <i class="fa-regular fa-eye"></i> View
+                                </a>
+                                <button onclick="event.preventDefault();window.openQuickView(${JSON.stringify(item).replace(/"/g,'&quot;')});" class="btn-wish">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>`;
+                }).join('');
+            } catch (e) {}
+        }
+
+        // Hook into existing recently viewed logic
+        setTimeout(() => {
+            if (typeof window.renderRecentlyViewed === 'function') {
+                // already handled
+            } else {
+                renderRecentlyViewed();
+            }
+        }, 1400);
+
+        // Re-render when user views a new product
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'pse_recent_views') renderRecentlyViewed();
+        });
+    </script>
 </body>
 </html>
