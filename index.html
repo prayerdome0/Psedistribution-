@@ -47,10 +47,191 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet" />
 
+    <!-- CRITICAL STYLE: top menu toggle, bottom nav removed -->
+    <style>
+        /* Remove bottom navigation completely */
+        .nav-categories {
+            display: none !important;
+        }
+
+        /* Top bar becomes the main menu with toggle */
+        .top-bar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem 1rem;
+        }
+
+        .top-bar .moving-words {
+            flex: 1 1 auto;
+            min-width: 180px;
+        }
+
+        .top-links {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem 1.2rem;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+        }
+
+        .top-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-weight: 500;
+        }
+
+        .top-links a:hover {
+            color: #fff;
+        }
+
+        .top-links .top-cta {
+            background: var(--red, #C92335);
+            color: #fff !important;
+            padding: 0.25rem 0.9rem;
+            border-radius: 30px;
+            font-weight: 700;
+        }
+
+        .top-links .top-cta:hover {
+            background: var(--red-dark, #a51d2c);
+            color: #fff !important;
+        }
+
+        /* Mobile toggle for top menu */
+        .menu-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            font-size: 1.2rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .menu-toggle:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        /* mobile nav drawer (hidden by default) */
+        .mobile-nav-drawer {
+            display: none;
+            background: #0b0e12;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding: 0.8rem 1rem 1.2rem;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .mobile-nav-drawer a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            padding: 0.4rem 0.2rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .mobile-nav-drawer a i {
+            width: 1.4rem;
+            color: var(--red, #C92335);
+        }
+
+        .mobile-nav-drawer a:hover {
+            color: #fff;
+        }
+
+        .mobile-nav-drawer.open {
+            display: flex;
+        }
+
+        /* Desktop: show top links as usual */
+        @media (max-width: 900px) {
+            .top-bar .moving-words {
+                display: none;
+            }
+
+            .top-links .desktop-only {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: inline-block;
+            }
+
+            .top-links {
+                gap: 0.4rem;
+            }
+
+            .top-links a {
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .top-bar .container {
+                flex-wrap: nowrap;
+            }
+
+            .top-links a span {
+                display: none;
+            }
+
+            .top-links a i {
+                font-size: 1.1rem;
+            }
+
+            .top-links .top-cta {
+                padding: 0.25rem 0.6rem;
+                font-size: 0.7rem;
+            }
+
+            .top-links .top-cta span {
+                display: inline;
+            }
+        }
+
+        /* keep header clean */
+        .header .container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .header .search-bar {
+            flex: 1 1 220px;
+        }
+
+        /* utility */
+        .red { color: var(--red, #C92335); }
+        .green { color: #4caf50; }
+        .live-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #4caf50;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse-dot 1.4s infinite;
+        }
+        @keyframes pulse-dot { 0% { opacity: 0.6; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0.6; transform: scale(0.9); } }
+    </style>
 </head>
 <body class="pse-home">
 
-<!-- TOP BAR (utility navigation) -->
+<!-- TOP BAR (utility navigation + menu toggle) -->
 <div class="top-bar">
     <div class="container">
         <div class="moving-words">
@@ -69,13 +250,37 @@
                 <span><i class="fa-solid fa-shield-halved"></i> Buyer-safe offers for serious bulk buyers</span>
             </div>
         </div>
-        <div class="top-links">
-            <a href="/track-order"><i class="fa-solid fa-truck"></i> Track</a>
-            <a href="/seller-dashboard" class="top-cta"><i class="fa-solid fa-store"></i> Sell With Us</a>
-            <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> Login</a>
-            <a href="/register" id="registerLink"><i class="fa-solid fa-user-plus"></i> Register</a>
+
+        <!-- MENU TOGGLE (mobile) -->
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="top-links" id="topLinks">
+            <a href="/track-order"><i class="fa-solid fa-truck"></i> <span>Track</span></a>
+            <a href="/seller-dashboard" class="top-cta"><i class="fa-solid fa-store"></i> <span>Sell With Us</span></a>
+            <a href="/login" id="loginLink"><i class="fa-regular fa-user"></i> <span>Login</span></a>
+            <a href="/register" id="registerLink"><i class="fa-solid fa-user-plus"></i> <span>Register</span></a>
+            <!-- hidden on mobile, shown as drawer items -->
+            <a href="/products" class="desktop-only"><i class="fa-solid fa-boxes-stacked"></i> <span>Products</span></a>
+            <a href="/rfq" class="desktop-only"><i class="fa-regular fa-file-lines"></i> <span>RFQ</span></a>
+            <a href="/become-seller" class="desktop-only"><i class="fa-solid fa-handshake"></i> <span>Sell Wholesale</span></a>
+            <a href="/help-center" class="desktop-only"><i class="fa-regular fa-circle-question"></i> <span>Help</span></a>
         </div>
     </div>
+</div>
+
+<!-- MOBILE NAV DRAWER (all links, triggered by toggle) -->
+<div class="mobile-nav-drawer" id="mobileNavDrawer">
+    <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+    <a href="/products"><i class="fa-solid fa-boxes-stacked"></i> Products</a>
+    <a href="/rfq"><i class="fa-regular fa-file-lines"></i> Request a Quote</a>
+    <a href="/become-seller"><i class="fa-solid fa-handshake"></i> Sell Wholesale</a>
+    <a href="/track-order"><i class="fa-solid fa-truck-fast"></i> Track Order</a>
+    <a href="/help-center"><i class="fa-regular fa-circle-question"></i> Help Center</a>
+    <a href="/seller-dashboard"><i class="fa-solid fa-store"></i> Seller Dashboard</a>
+    <a href="/wishlist"><i class="fa-regular fa-heart"></i> Wishlist</a>
+    <a href="/cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
 </div>
 
 <!-- HEADER -->
@@ -114,17 +319,8 @@
     </div>
 </header>
 
-<!-- NAVIGATION TABS (hidden on home - hamburger menu on mobile) -->
-<nav class="nav-categories" aria-label="Main navigation" style="display:none;">
-    <div class="container">
-        <a href="/" class="nav-tab active">Home</a>
-        <a href="/products" class="nav-tab">Products</a>
-        <a href="/rfq" class="nav-tab"><i class="fa-regular fa-file-lines"></i> Request a Quote</a>
-        <a href="/become-seller" class="nav-tab wholesale-nav"><i class="fa-solid fa-handshake"></i> Sell Wholesale</a>
-        <a href="/track-order" class="nav-tab"><i class="fa-solid fa-truck-fast"></i> Track Order</a>
-        <a href="/help-center" class="nav-tab"><i class="fa-regular fa-circle-question"></i> Help Center</a>
-    </div>
-</nav>
+<!-- NAVIGATION TABS (hidden completely) -->
+<nav class="nav-categories" aria-label="Main navigation" style="display:none;"></nav>
 
 <!-- 1. HERO -->
 <section class="pse-hero" aria-labelledby="heroTitle">
@@ -342,7 +538,6 @@
 
     function initFirebase() {
         if (typeof firebase === 'undefined') {
-            // Public inventory must still render when Firebase/auth is blocked.
             loadFeaturedInventory();
             return;
         }
@@ -422,7 +617,6 @@
         }[c]));
     }
 
-    // RFQ identity link preserving Deal ID, slug, sourceVersion, snapshotVersion, MOQ.
     function buildFeaturedRfqUrl(product) {
         const url = new URL('/rfq', window.location.origin);
         if (product.dealId) url.searchParams.set('dealId', product.dealId);
@@ -434,10 +628,6 @@
         return url.pathname + url.search;
     }
 
-    // ── FEATURED LIVE INVENTORY ──────────────────────────────
-    // The homepage reads only the validated buyer-safe inventory API. Auth and
-    // Firestore remain available for account/cart features, never for public
-    // product discovery.
     let featuredProducts = [];
 
     function mapInv(item, meta) {
@@ -642,7 +832,6 @@
         const element = document.getElementById(id);
         if (!element) return;
         const text = String(value ?? '').trim();
-        // Count-up animation for pure numeric values (commas allowed).
         if (/^[\d,]+$/.test(text) && text !== element._lastValue) {
             element._lastValue = text;
             const target = Number(text.replace(/,/g, ''));
@@ -685,8 +874,6 @@
     }
 
     async function loadLiveOfferCount() {
-        // Kept as a public API-only metric hook for pages or integrations that
-        // call it directly. The featured loader supplies the complete metrics.
         try {
             const response = await fetch(new URL('/api/inventory?limit=100', window.PSEInventory ? window.PSEInventory.apiOrigin() : (window.PSE_INVENTORY_API_ORIGIN || window.location.origin)), { headers: { 'Accept': 'application/json' } });
             if (!response.ok) throw new Error('inventory API returned ' + response.status);
@@ -706,12 +893,33 @@
     window.initFirebase = initFirebase;
     window.loadCartCount = loadCartCount;
     window.loadFeaturedInventory = loadFeaturedInventory;
-</script>
 
-<script>
-    // ─── REDESIGN BOOT ───
+    // MOBILE TOGGLE
     document.addEventListener('DOMContentLoaded', function () {
+        const toggle = document.getElementById('menuToggle');
+        const drawer = document.getElementById('mobileNavDrawer');
+        if (toggle && drawer) {
+            toggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+                drawer.classList.toggle('open');
+                const icon = toggle.querySelector('i');
+                if (drawer.classList.contains('open')) {
+                    icon.className = 'fa-solid fa-xmark';
+                } else {
+                    icon.className = 'fa-solid fa-bars';
+                }
+            });
+            // close on outside click
+            document.addEventListener('click', function (ev) {
+                if (drawer.classList.contains('open') && !drawer.contains(ev.target) && ev.target !== toggle && !toggle.contains(ev.target)) {
+                    drawer.classList.remove('open');
+                    toggle.querySelector('i').className = 'fa-solid fa-bars';
+                }
+            });
+        }
+
         if (typeof initFirebase === 'function') initFirebase();
+
         // Sticky header shadow
         var header = document.querySelector('.header');
         if (header && 'IntersectionObserver' in window) {
@@ -725,7 +933,7 @@
                 header.classList.toggle('scrolled', !entries[0].isIntersecting);
             }).observe(sentinel);
         }
-        // Scroll reveal for .animate-on-scroll sections
+
         var revealEls = document.querySelectorAll('.animate-on-scroll');
         if (revealEls.length) {
             if (!('IntersectionObserver' in window)) {
