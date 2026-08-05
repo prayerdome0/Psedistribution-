@@ -6,17 +6,42 @@
         X-Content-Type-Options "nosniff"
         Referrer-Policy "strict-origin-when-cross-origin"
         Permissions-Policy "camera=(), microphone=(), geolocation=()"
-        Content-Security-Policy "default-src 'self'; img-src 'self' https://cdn.pilotsalesdistribution.com https://images.pilotsalesdistribution.com; style-src 'self'; script-src 'self'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+        # The existing static storefront uses Firebase and Font Awesome from
+        # pinned HTTPS CDNs and contains legacy inline handlers. The inventory
+        # API itself remains same-origin and no server secret is client-visible.
+        Content-Security-Policy "default-src 'self'; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://api.resend.com https://formsubmit.co; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://formsubmit.co"
         -Server
+    }
+
+    # The Caddy root is the repository checkout for the static storefront.
+    # Never expose source, packet, deployment, test or secret-template paths.
+    @blocked path /services/* /vendor/* /docs/* /tests/* /scripts/* /.git/* /.env* /firebase.json /firestore.rules /PSE_*
+    handle @blocked {
+        respond 404
+    }
+
+    @apiInternal path /api/internal/*
+    handle @apiInternal {
+        # Signed revalidation is a private control-plane route. Call it from a
+        # publisher job on the private network, never from a browser.
+        respond 404
     }
 
     handle /api/* {
         reverse_proxy api:8080
     }
 
+    # Preserve the Vercel clean URLs when the frontend is served by Caddy.
+    @product path /product /product/*
+    rewrite @product /product-detail.html
+    @products path /products /products/*
+    rewrite @products /products.html
+    @rfq path /rfq /rfq/*
+    rewrite @rfq /rfq.html
+
     handle {
         root * /srv
-        try_files {path} /index.html
+        try_files {path} {path}.html /404.html
         file_server
     }
 

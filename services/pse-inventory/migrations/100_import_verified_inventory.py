@@ -14,11 +14,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from pse_inventory.authority_export import AuthorityExportError, load_export  # noqa: E402
 from pse_inventory.source_adapter import ingest, reconcile_evidence  # noqa: E402
 from pse_inventory.source_hash import source_sha256  # noqa: E402
 
@@ -78,14 +80,22 @@ def draft_from_row(row: dict, canonical_deal_id: str) -> tuple[dict, list[str]]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source", required=True, type=Path, help="JSON array export from the authority")
+    parser.add_argument("--source", required=True, help="local JSON/CSV export or HTTPS authority endpoint")
     parser.add_argument("--authority", required=True, help="authority identifier recorded on every row")
     parser.add_argument("--output-dir", required=True, type=Path)
+    parser.add_argument("--format", choices=("json", "csv"), help="format override for the authority export")
+    parser.add_argument("--bearer-token-env", default="PSE_AUTHORITY_BEARER_TOKEN",
+                        help="server-side environment variable containing an optional HTTPS bearer token")
     args = parser.parse_args(argv)
 
-    rows = json.loads(args.source.read_text(encoding="utf-8"))
-    if not isinstance(rows, list):
-        raise SystemExit("--source must contain a JSON array")
+    try:
+        rows = load_export(
+            args.source,
+            bearer_token=os.environ.get(args.bearer_token_env),
+            format_hint=args.format,
+        )
+    except AuthorityExportError as exc:
+        raise SystemExit(f"authority export rejected: {exc}") from exc
 
     evidence = ingest(rows, authority=args.authority)
     reconciliation = reconcile_evidence(evidence)

@@ -12,11 +12,11 @@
  *   • Recent searches (localStorage, clearable) + Popular searches (derived)
  *   • Full keyboard navigation: ↑ / ↓ / Enter / Esc (ARIA listbox semantics)
  *   • Search-term highlighting, "See all N results" footer with match count
- *   • Catalog cached in sessionStorage (10 min) so suggestions are instant
- *   • Works even when Firebase is blocked — embedded fallback catalog
+ *   • Buyer-safe public inventory API cached in sessionStorage (10 min)
+ *   • Works when Firebase/auth is blocked because product discovery is API-only
  *   • Backwards-compatible window.handleSearch for legacy callers
  *
- * No frameworks, no API keys, no server. (c) PSE Distribution.
+ * No frameworks or API keys. Product discovery never queries Firestore. (c) PSE Distribution.
  * ==========================================================================*/
 (function () {
     'use strict';
@@ -27,12 +27,11 @@
         maxProducts: 6,             // product rows shown
         maxChips: 12,               // max chips in a chips row
         maxRecent: 6,               // recent searches kept
-        catalogCacheKey: 'pse_pro_search_catalog_v1',
+        catalogCacheKey: 'pse_pro_search_inventory_v2',
         catalogCacheTtlMs: 10 * 60 * 1000, // 10 minutes
         recentKey: 'pse_pro_recent_searches_v1',
-        firestoreLimit: 500,
-        dbWaitMs: 12000,            // how long to wait for the page's Firestore
-        dbPollMs: 250
+        apiLimit: 100,
+        apiPages: 10
     };
 
 
@@ -41,7 +40,7 @@
     var input = null, panel = null, bar = null, btn = null;
     var catalog = null;          // normalized merged catalog
     var catalogPromise = null;   // in-flight / cached load promise
-    var dbTimer = null;          // Firestore polling timer
+    var dbTimer = null;          // retained for backwards-compatible state only
     var debounceTimer = null;
     var activeIndex = -1;        // keyboard cursor over selectable nodes
     var lastQuery = '';          // query currently rendered
@@ -58,6 +57,7 @@
         return isNaN(n) ? 0 : n;
     }
     function money(v) {
+        if (v === null || v === undefined || v === '') return 'Quote required';
         var n = num(v);
         try {
             return n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
@@ -67,88 +67,80 @@
         return String(title || 'product').toLowerCase()
             .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
     }
-    function normalizeProduct(p) {
-        if (!p) return null;
-        var title = p.title || p.name || 'Product';
+    function normalizeProduct(p, meta) {
+        if (!p || typeof p !== 'object') return null;
+        var title = p.title || 'Product';
+        var publicPrice = p.pricingMode === 'public' && p.publicUnitPrice !== undefined
+            ? num(p.publicUnitPrice) : null;
+        var confirm = p.status === 'confirm-availability' || p.quantityMode === 'confirm';
+        var available = Number.isInteger(p.availableToSell) && p.availableToSell > 0;
         return {
-            id: String(p.id || title || Math.random().toString(36).slice(2)),
+            id: String(p.dealId || title),
+            dealId: String(p.dealId || ''),
             title: String(title),
             brand: String(p.brand || ''),
-            price: num(p.price),
-            old_price: num(p.old_price),
-            image_url: p.image_url || (Array.isArray(p.images) && p.images[0]) || p.image || '',
+            price: publicPrice,
+            pricingMode: String(p.pricingMode || 'rfq'),
+            image_url: Array.isArray(p.imageUrls) ? (p.imageUrls[0] || '') : '',
             slug: p.slug || slugify(title),
             category: String(p.category || 'other'),
-            rating: num(p.rating),
-            stock: num(p.stock),
-            moq: num(p.moq),
-            supplier_verified: !!p.supplier_verified,
-            supplier_tier: String(p.supplier_tier || p.membership_tier || 'basic'),
-            sponsored: !!p.sponsored,
-            sku: p.sku ? String(p.sku) : ''
+            rating: 0,
+            stock: available && !confirm ? num(p.availableToSell) : 0,
+            availability: confirm ? 'Confirm availability' : (available ? 'In stock' : 'Unavailable'),
+            moq: num(p.moqUnits),
+            sourceVersion: p.sourceVersion || (meta && meta.sourceVersion) || '',
+            snapshotVersion: p.snapshotVersion || (meta && meta.snapshotVersion) || ''
         };
     }
 
-    // ─── CATALOG LOADING (cache → Firestore → embedded fallback) ──────────────
+    // ─── CATALOG LOADING (cache → buyer-safe public API) ─────────────────────
     function readCache() {
         try {
             var raw = sessionStorage.getItem(CFG.catalogCacheKey);
             if (!raw) return null;
             var cached = JSON.parse(raw);
             if (cached && cached.ts && Date.now() - cached.ts < CFG.catalogCacheTtlMs
-                && Array.isArray(cached.items) && cached.items.length) {
-                return cached.items.map(normalizeProduct).filter(Boolean);
+                && Array.isArray(cached.items)) {
+                return cached.items.map(function (item) { return normalizeProduct(item, cached.meta); }).filter(Boolean);
             }
         } catch (e) { /* storage blocked / corrupt → ignore */ }
         return null;
     }
 
-    function writeCache(items) {
+    function writeCache(items, meta) {
         try {
             sessionStorage.setItem(CFG.catalogCacheKey,
-                JSON.stringify({ ts: Date.now(), items: items }));
+                JSON.stringify({ ts: Date.now(), items: items, meta: meta || null }));
         } catch (e) { /* non-fatal */ }
     }
 
-    // Wait until the page's inline script exposes window.db (its Firestore).
-    // If the Firebase SDK itself never loaded (blocked CDN / ad-blocker), bail
-    // out immediately so the embedded fallback catalog kicks in without delay.
-    function waitForDb(timeoutMs) {
-        return new Promise(function (resolve) {
-            if (typeof firebase === 'undefined') return resolve(null);
-            if (window.db) return resolve(window.db);
-            var waited = 0;
-            var t = setInterval(function () {
-                waited += CFG.dbPollMs;
-                if (window.db) { clearInterval(t); resolve(window.db); }
-                else if (waited >= timeoutMs) { clearInterval(t); resolve(null); }
-            }, CFG.dbPollMs);
-        });
-    }
-
-    function loadFromFirestore() {
-        return waitForDb(CFG.dbWaitMs).then(function (db) {
-            if (!db) {
-                // Try a self-owned named app as a second chance (page exposes
-                // `firebaseConfig` as a top-level const in its inline script).
-                try {
-                    if (typeof firebase !== 'undefined' && typeof firebaseConfig !== 'undefined') {
-                        var app = firebase.initializeApp(firebaseConfig, 'pse-pro-search');
-                        db = firebase.firestore(app);
+    function loadFromInventoryApi() {
+        var items = [];
+        var meta = null;
+        var cursor = null;
+        var page = 0;
+        function next() {
+            var url = new URL('/api/inventory', window.PSE_INVENTORY_API_ORIGIN || window.location.origin);
+            url.searchParams.set('limit', String(CFG.apiLimit));
+            if (cursor) url.searchParams.set('cursor', cursor);
+            return fetch(url.toString(), { headers: { 'Accept': 'application/json' } })
+                .then(function (response) {
+                    if (!response.ok) throw new Error('inventory API returned ' + response.status);
+                    return response.json();
+                })
+                .then(function (payload) {
+                    if (!payload || !Array.isArray(payload.data) || !payload.meta) {
+                        throw new Error('inventory API returned an invalid catalog response');
                     }
-                } catch (e) { db = null; }
-            }
-            if (!db) return null;
-            return db.collection('products')
-                .where('status', 'in', ['active', 'approved'])
-                .limit(CFG.firestoreLimit)
-                .get()
-                .then(function (snap) {
-                    var out = [];
-                    snap.forEach(function (doc) { out.push(doc.data()); });
-                    return out.length ? out : null;
+                    meta = payload.meta;
+                    items = items.concat(payload.data);
+                    cursor = payload.meta.nextCursor || null;
+                    page += 1;
+                    if (cursor && page < CFG.apiPages) return next();
+                    return { items: items, meta: meta };
                 });
-        });
+        }
+        return next();
     }
 
     function loadCatalog() {
@@ -159,18 +151,16 @@
             catalogPromise = Promise.resolve(cached);
             return catalogPromise;
         }
-        catalogPromise = loadFromFirestore()
-            .catch(function () { return []; })
-            .then(function (fireProducts) {
-                var normalized = [];
-                (fireProducts || []).forEach(function (p) {
-                    var n = normalizeProduct(p);
-                    if (n) normalized.push(n);
-                });
-                catalog = normalized;
-                writeCache(normalized);
-                return normalized;
-            });
+        catalogPromise = loadFromInventoryApi().then(function (result) {
+            var normalized = result.items.map(function (p) { return normalizeProduct(p, result.meta); }).filter(Boolean);
+            catalog = normalized;
+            writeCache(normalized, result.meta);
+            return normalized;
+        }).catch(function (error) {
+            console.error('Public inventory search unavailable:', error);
+            catalog = [];
+            return [];
+        });
         return catalogPromise;
     }
 
@@ -209,11 +199,6 @@
         if (cat.indexOf(qLower) === 0) score += 24;
         else if (cat.indexOf(qLower) !== -1) score += 10;
 
-        // slight tie-breaker — only boosts products that already matched
-        if (score > 0 && p.supplier_verified) score += 3;
-        if (score > 0 && p.sponsored) score += 20;
-        if (score > 0 && p.supplier_tier === 'platinum') score += 10;
-        else if (score > 0 && p.supplier_tier === 'gold') score += 5;
         return score;
     }
 
@@ -302,16 +287,8 @@
         var rating = p.rating > 0
             ? '<span class="pse-suggest__rate" title="Rating">★ ' + p.rating.toFixed(1) + '</span>'
             : '';
-        var stock = '';
-        if (p.stock > 0) {
-            var cls = p.stock <= 20 ? 'pse-suggest__stock--low' : '';
-            stock = '<span class="pse-suggest__stock ' + cls + '">' +
-                (p.stock <= 20 ? 'Low stock · ' : 'In stock · ') + p.stock + '</span>';
-        }
-        var badge = (p.sponsored ? '<span class="pse-suggest__badge" style="background:#d35400;color:#fff;border-color:#d35400;" title="Sponsored Listing">🚀 Sponsored</span> ' : '') +
-            (p.supplier_tier === 'platinum' ? '<span class="pse-suggest__badge" style="background:#8e44ad;color:#fff;border-color:#8e44ad;" title="Platinum Supplier">👑 Platinum</span> ' :
-             p.supplier_tier === 'gold' ? '<span class="pse-suggest__badge" style="background:#e0a62e;color:#fff;border-color:#e0a62e;" title="Gold Supplier">👑 Gold</span> ' :
-             p.supplier_verified ? '<span class="pse-suggest__badge" title="Verified seller">✓ Verified</span>' : '');
+        var stock = '<span class="pse-suggest__stock">' + esc(p.availability || 'Availability subject to confirmation') + '</span>';
+        var badge = '';
         return '<div class="pse-suggest__item" role="option" data-action="product" data-slug="' + esc(p.slug) + '" data-title="' + esc(p.title) + '">' +
             '<img src="' + esc(p.image_url || '') + '" alt="' + esc(p.title) + '" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
             '<div class="pse-suggest__info">' +
@@ -669,8 +646,8 @@
             }
         });
 
-        // If the page's inline script is still initializing Firestore, it may
-        // register later — harmless: we re-query lazily on each input.
+        // Firebase/auth availability does not affect public product discovery;
+        // the catalog above is sourced exclusively from the inventory API.
     }
 
     if (document.readyState === 'loading') {

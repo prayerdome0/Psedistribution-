@@ -21,6 +21,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="main.js"></script>
+    <script src="/inventory-client.js"></script>
     
     <style>
         :root {
@@ -540,7 +541,7 @@
         <div class="moving-words">
             <div class="words-track">
                 <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
-                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Verified Suppliers</span>
+                <span><i class="fa-solid fa-gem"></i> Buyer-safe wholesale offers with product-level terms</span>
                 <span><i class="fa-solid fa-circle-check"></i> Verified inventory — availability confirmed per offer</span>
                 <span><i class="fa-solid fa-truck"></i> Freight quoted separately unless explicitly included</span>
                 <span><i class="fa-solid fa-box"></i> Availability subject to prior sale and final confirmation</span>
@@ -782,10 +783,17 @@
 
 
     // ─── INIT ───
+    let firebaseRetries = 0;
+    let productsLoadStarted = false;
     function initFirebase() {
-        if (typeof firebase === 'undefined') { 
-            setTimeout(initFirebase, 500); 
-            return; 
+        if (typeof firebase === 'undefined') {
+            // The public catalog must not depend on Firebase/auth availability.
+            if (++firebaseRetries > 16) {
+                loadProducts();
+                return;
+            }
+            setTimeout(initFirebase, 500);
+            return;
         }
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
@@ -900,7 +908,7 @@
         let meta = null;
         let cursor = null;
         for (let page = 0; page < 10; page++) {
-            const url = new URL('/api/inventory', window.location.origin);
+            const url = new URL('/api/inventory', window.PSEInventory ? window.PSEInventory.apiOrigin() : (window.PSE_INVENTORY_API_ORIGIN || window.location.origin));
             url.searchParams.set('limit', '100');
             if (cursor) url.searchParams.set('cursor', cursor);
             const response = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
@@ -914,7 +922,7 @@
         return { items, meta };
     }
 
-    function mapInventoryItem(item) {
+    function mapInventoryItem(item, meta = null) {
         const isPublicPrice = item.pricingMode === 'public' && Number.isFinite(Number(item.publicUnitPrice));
         const availability = item.status === 'confirm-availability' || item.quantityMode === 'confirm'
             ? 'confirm'
@@ -922,8 +930,8 @@
         return {
             id: item.dealId,
             dealId: item.dealId,
-            sourceVersion: item.sourceVersion || '',
-            snapshotVersion: item.snapshotVersion || '',
+            sourceVersion: item.sourceVersion || (meta && meta.sourceVersion) || '',
+            snapshotVersion: item.snapshotVersion || (meta && meta.snapshotVersion) || '',
             slug: item.slug || generateSlug(item.title || 'product'),
             title: item.title || 'Product',
             shortDescription: item.shortDescription || '',
@@ -944,6 +952,8 @@
     }
 
     async function loadProducts() {
+        if (productsLoadStarted) return;
+        productsLoadStarted = true;
         const grid = document.getElementById('productGrid');
         try {
             const params = new URLSearchParams(window.location.search);
@@ -953,97 +963,24 @@
             let products = [];
             window.PSE_INVENTORY_META = null;
             
-            // 1) Try the public live-inventory API first
+            // The storefront has one authoritative source: the buyer-safe API.
+            // Firestore, static catalog data and seller-uploaded product documents
+            // are intentionally not read here. They are private/admin workflows,
+            // not a public inventory source.
             try {
                 const feed = await fetchInventoryFeed();
                 window.PSE_INVENTORY_META = feed.meta;
-                products = feed.items.map(mapInventoryItem);
+                products = feed.items.map(item => mapInventoryItem(item, feed.meta));
             } catch (feedError) {
-                console.log('Inventory API unavailable, loading current products...');
+                console.error('Inventory API unavailable:', feedError);
             }
 
-            // 2) ALWAYS merge the current products from the Firestore `products`
-            //    collection — the storefront shows both, never only the inventory feed
-            try {
-                const snapshot = await db.collection('products')
-                    .where('status', 'in', ['active', 'approved'])
-                    .orderBy('created_at', 'desc')
-                    .limit(100)
-                    .get();
-
-                if (!snapshot.empty) {
-                    const seen = new Set();
-                    products.forEach(p => {
-                        if (p.slug) seen.add('slug:' + p.slug);
-                        if (p.id) seen.add('id:' + p.id);
-                        seen.add('title:' + (p.title || '').toLowerCase());
-                    });
-                    let merged = 0;
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        const slug = data.slug || generateSlug(data.title || 'product');
-                        if (seen.has('id:' + doc.id) || seen.has('slug:' + slug) || seen.has('title:' + (data.title || '').toLowerCase())) return;
-                        seen.add('id:' + doc.id);
-                        seen.add('slug:' + slug);
-                        seen.add('title:' + (data.title || '').toLowerCase());
-                        const imageUrl = window.getProductImage ? window.getProductImage(data, '') : (data.image_url || '');
-                        products.push({
-                            id: doc.id,
-                            dealId: doc.id,
-                            slug: slug,
-                            title: data.title || 'Product',
-                            brand: data.brand || 'Pilot Distribution',
-                            moq: data.moq || 1,
-                            category: data.category || 'other',
-                            pricingMode: 'public',
-                            price: data.price || 0,
-                            old_price: data.old_price || 0,
-                            image_url: imageUrl,
-                            availability: (data.stock || 0) > 0 ? 'in-stock' : 'unavailable',
-                            stock: data.stock || 0,
-                            rfqEnabled: true,
-                            condition: data.condition || '',
-                            fob: data.fob || '',
-                            freightTerms: data.freightTerms || 'Freight quoted separately',
-                            sku: data.sku || ''
-                        });
-                        merged++;
-                    });
-                    console.log(`✅ Merged ${merged} current products with ${products.length - merged} live inventory items (${products.length} total)`);
-                }
-            } catch (dbError) {
-                console.error('Firestore product load error:', dbError);
-            }
-
-            // Price filter visibility after both sources are merged
+            // Price filters are meaningful only when the API returned a verified
+            // public price. RFQ/login offers remain visible and never get a fake 0.
             {
                 const hasPublicPrice = products.some(p => p.price !== null && p.price !== undefined);
                 const priceFilter = document.getElementById('priceFilterGroup');
                 if (priceFilter) priceFilter.style.display = hasPublicPrice ? '' : 'none';
-            }
-
-            // 3) Last resort: catalog-data.js static products
-            if (products.length === 0 && window.PSE_CATALOG_DATA && window.PSE_CATALOG_DATA.products) {
-                products = window.PSE_CATALOG_DATA.products.map((p, i) => ({
-                    id: 'catalog-' + i,
-                    dealId: 'catalog-' + i,
-                    slug: generateSlug(p.title),
-                    title: p.title,
-                    brand: p.brand || 'Pilot Distribution',
-                    moq: p.moq || 1,
-                    category: p.category || 'other',
-                    pricingMode: 'public',
-                    price: p.price || 0,
-                    old_price: p.old_price || 0,
-                    image_url: p.image_url || '',
-                    availability: 'in-stock',
-                    stock: 100,
-                    rfqEnabled: true,
-                    condition: '',
-                    fob: '',
-                    freightTerms: 'Freight quoted separately',
-                    sku: p.sku || ''
-                }));
             }
 
             if (products.length === 0) {
@@ -1291,69 +1228,12 @@
         applyFilters();
     }
 
-    // ─── ADD TO CART ───
+    // ─── RFQ-FIRST COMMITMENT BOUNDARY ───
     async function addToCart(productId) {
-        const user = getCurrentUser();
-        if (!user) {
-            // Guest user - save to localStorage
-            const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
-            const product = allProducts.find(p => p.id === productId) || 
-                            filteredProducts.find(p => p.id === productId);
-            
-            const existingIndex = cart.findIndex(item => item.product_id === productId);
-            if (existingIndex > -1) {
-                cart[existingIndex].quantity = (cart[existingIndex].quantity || 1) + 1;
-            } else {
-                cart.push({
-                    product_id: productId,
-                    title: product?.title || 'Product',
-                    price: product?.price || 0,
-                    old_price: product?.old_price || 0,
-                    image_url: window.getProductImage ? window.getProductImage(product, '') : (product?.image_url || ''),
-                    brand: product?.brand || 'Pilot Distribution',
-                    moq: product?.moq || 1,
-                    quantity: 1
-                });
-            }
-            localStorage.setItem('pilot_cart', JSON.stringify(cart));
-            showToast('✅ Added to cart!', 'success');
-            loadCartCount();
-            if (typeof window.pushNotification === 'function') {
-                window.pushNotification('Added to cart 🛒', (product?.title || 'Product') + ' — ready to checkout when you are.', { icon: 'fa-cart-shopping', url: '/cart', tag: 'cart' });
-            }
-            return;
-        }
-
-        try {
-            const snapshot = await db.collection('cart')
-                .where('user_id', '==', user.id)
-                .where('product_id', '==', productId)
-                .get();
-            
-            if (!snapshot.empty) {
-                const docRef = snapshot.docs[0].ref;
-                const currentQty = snapshot.docs[0].data().quantity || 1;
-                await docRef.update({
-                    quantity: currentQty + 1,
-                    updated_at: new Date().toISOString()
-                });
-            } else {
-                await db.collection('cart').add({
-                    user_id: user.id,
-                    product_id: productId,
-                    quantity: 1,
-                    created_at: new Date().toISOString()
-                });
-            }
-            showToast('✅ Added to cart!', 'success');
-            loadCartCount();
-            if (typeof window.pushNotification === 'function') {
-                const p = allProducts.find(x => x.id === productId);
-                window.pushNotification('Added to cart 🛒', (p?.title || 'Product') + ' — ready to checkout when you are.', { icon: 'fa-cart-shopping', url: '/cart', tag: 'cart' });
-            }
-        } catch (error) {
-            showToast('❌ Failed to add to cart', 'error');
-        }
+        const product = allProducts.find(item => item.id === productId);
+        if (product) window.location.href = buildInventoryRfqUrl(product);
+        else showToast('Inventory is RFQ-first until a controlled hold is created.', 'info');
+        return { success: false, reason: 'rfq-only' };
     }
 
     // ─── TOGGLE WISHLIST ───
@@ -1518,7 +1398,7 @@
                     </tr>
                     <tr>
                         <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Wholesale Unit Price</td>
-                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);font-weight:800;color:var(--primary);font-size:1.1rem;">$${Number(p.price || 0).toFixed(2)}</td>`).join('')}
+                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);font-weight:800;color:var(--primary);font-size:1.1rem;">${p.price === null || p.price === undefined ? 'Quote required' : '$' + Number(p.price).toFixed(2)}</td>`).join('')}
                     </tr>
                     <tr>
                         <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Min. Order Qty (MOQ)</td>
@@ -1526,25 +1406,21 @@
                     </tr>
                     <tr>
                         <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Est. Lead Time</td>
-                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);">${p.lead_time || '7–10 days'}</td>`).join('')}
+                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);">Confirmed in RFQ</td>`).join('')}
                     </tr>
                     <tr>
                         <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Brand / Supplier</td>
-                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);"><strong>${esc(p.brand || 'Pilot Distribution')}</strong><br><small style="color:var(--text-light);">${p.supplier_verified ? '✓ Verified Supplier' : ''}</small></td>`).join('')}
+                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);"><strong>${esc(p.brand || 'Public offer')}</strong></td>`).join('')}
                     </tr>
                     <tr>
-                        <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">VIP Supplier Tier</td>
-                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);">${p.supplier_tier === 'platinum' ? '<span style="color:#8e44ad;font-weight:700;">👑 Platinum (0% Fee)</span>' : p.supplier_tier === 'gold' ? '<span style="color:#e0a62e;font-weight:700;">👑 Gold (5% Fee)</span>' : 'Basic (10% Fee)'}</td>`).join('')}
-                    </tr>
-                    <tr>
-                        <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Incoterms Basis</td>
-                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);font-weight:600;color:var(--secondary);">DDP / FOB / EXW</td>`).join('')}
+                        <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Freight Terms</td>
+                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);font-weight:600;color:var(--secondary);">${esc(p.freightTerms || 'Confirmed in RFQ')}</td>`).join('')}
                     </tr>
                     <tr>
                         <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Actions</td>
                         ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);text-align:center;">
-                            <button type="button" class="btn-add-product" style="background:var(--primary);padding:6px 12px;font-size:0.8rem;width:100%;margin-bottom:6px;" onclick="addToCart('${p.id}')"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
-                            <a href="/product/${p.slug || generateSlug(p.title)}" class="btn-cancel" style="font-size:0.75rem;padding:4px 10px;display:inline-block;text-decoration:none;">View Specs</a>
+                            <a href="${buildInventoryRfqUrl(p)}" class="btn-add-product" style="background:var(--primary);padding:6px 12px;font-size:0.8rem;width:100%;margin-bottom:6px;display:inline-block;text-decoration:none;color:#fff;"><i class="fa-regular fa-file-lines"></i> Request Quote</a>
+                            <a href="/product/${encodeURIComponent(p.slug || generateSlug(p.title))}" class="btn-cancel" style="font-size:0.75rem;padding:4px 10px;display:inline-block;text-decoration:none;">View Specs</a>
                         </td>`).join('')}
                     </tr>
                 </tbody>

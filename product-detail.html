@@ -14,6 +14,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="main.js"></script>
+    <script src="/inventory-client.js"></script>
     
     <style>
         :root {
@@ -626,10 +627,10 @@
         <div class="moving-words">
             <div class="words-track">
                 <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
-                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Verified Suppliers</span>
-                <span><i class="fa-solid fa-handshake"></i> Verified Suppliers Worldwide — Trade Assurance</span>
-                <span><i class="fa-solid fa-box"></i> Verified Wholesale Inventory - Shop Now!</span>
-                <span><i class="fa-solid fa-star"></i> Escrow Protection & Inspection Available</span>
+                <span><i class="fa-solid fa-gem"></i> Product terms and availability confirmed per offer</span>
+                <span><i class="fa-solid fa-handshake"></i> RFQ-first purchasing — terms confirmed per offer</span>
+                <span><i class="fa-solid fa-box"></i> Public inventory — request a current quote</span>
+                <span><i class="fa-solid fa-star"></i> Inspection and return terms stated per offer</span>
                 <span><i class="fa-solid fa-truck"></i> Freight Quoted Per Product — No Surprises</span>
             </div>
         </div>
@@ -715,8 +716,8 @@
                 <div class="product-brand" id="productBrand">by <a href="#">Brand</a></div>
                 
                 <div class="product-rating" id="productRating">
-                    <span class="stars" id="ratingStars">★★★★★</span>
-                    <span class="reviews" id="ratingReviews">0 reviews</span>
+                    <span class="stars" id="ratingStars">Reviews pending</span>
+                    <span class="reviews" id="ratingReviews">No verified rating published</span>
                 </div>
                 
                 <div class="product-price">
@@ -782,62 +783,12 @@
                     <span>Total: <strong id="tierSummaryTotal">$0.00</strong></span>
                 </div>
 
-                <!-- Incoterms Trade Terms Selector -->
-                <div style="background:var(--light);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1.1rem;margin-bottom:1.4rem;font-size:0.85rem;">
-                    <div style="font-weight:700;color:var(--secondary);margin-bottom:0.4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
-                        <span><i class="fa-solid fa-globe" style="color:var(--primary);"></i> Global Trade Incoterms &amp; Lead Time</span>
-                        <span style="font-size:0.75rem;color:var(--primary);font-weight:700;">100% Escrow Protection</span>
-                    </div>
-                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.5rem;margin-top:0.5rem;">
-                        <label style="background:#fff;border:1px solid var(--border-dark);border-radius:6px;padding:0.5rem;cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600;">
-                            <input type="radio" name="pdpIncoterm" value="DDP" checked onchange="updateIncotermUI()" />
-                            <span>DDP <small style="display:block;font-weight:400;color:var(--text-light);font-size:0.72rem;">Delivered Duty Paid</small></span>
-                        </label>
-                        <label style="background:#fff;border:1px solid var(--border-dark);border-radius:6px;padding:0.5rem;cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600;">
-                            <input type="radio" name="pdpIncoterm" value="FOB" onchange="updateIncotermUI()" />
-                            <span>FOB <small style="display:block;font-weight:400;color:var(--text-light);font-size:0.72rem;">Free On Board Port</small></span>
-                        </label>
-                        <label style="background:#fff;border:1px solid var(--border-dark);border-radius:6px;padding:0.5rem;cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600;">
-                            <input type="radio" name="pdpIncoterm" value="EXW" onchange="updateIncotermUI()" />
-                            <span>EXW <small style="display:block;font-weight:400;color:var(--text-light);font-size:0.72rem;">Ex Works Factory</small></span>
-                        </label>
-                    </div>
-                    <div id="incotermExplanation" style="margin-top:0.5rem;font-size:0.78rem;color:var(--text-light);">
-                        <strong>DDP (Delivered Duty Paid):</strong> Supplier covers freight, import duties, and door-to-door delivery. Est. lead time: 10–14 days.
-                    </div>
-                </div>
-
-                <!-- BULK FREIGHT & LEAD TIME ESTIMATOR -->
-                <div style="background:var(--light);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1.1rem;margin-bottom:1.4rem;font-size:0.85rem;">
-                    <div style="font-weight:700;color:var(--secondary);margin-bottom:0.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
-                        <span><i class="fa-solid fa-ship" style="color:var(--primary);"></i> Bulk Freight &amp; Lead Time Estimator</span>
-                        <span style="font-size:0.75rem;color:var(--primary);font-weight:700;">Live Container Quotes</span>
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;">
-                        <div>
-                            <label style="font-size:0.75rem;font-weight:600;color:var(--text-light);display:block;margin-bottom:2px;">Destination Region</label>
-                            <select id="pdpFreightRegion" onchange="calculatePdpFreight()" style="width:100%;padding:0.4rem;border:1px solid var(--border-dark);border-radius:6px;font-size:0.82rem;background:#fff;">
-                                <option value="North America">North America</option>
-                                <option value="Western Europe">Western Europe</option>
-                                <option value="Eastern Europe">Eastern Europe</option>
-                                <option value="Middle East">Middle East</option>
-                                <option value="Africa">Africa</option>
-                                <option value="Latin America">Latin America</option>
-                                <option value="East Asia">East &amp; Southeast Asia</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="font-size:0.75rem;font-weight:600;color:var(--text-light);display:block;margin-bottom:2px;">Freight Method</label>
-                            <select id="pdpFreightMethod" onchange="calculatePdpFreight()" style="width:100%;padding:0.4rem;border:1px solid var(--border-dark);border-radius:6px;font-size:0.82rem;background:#fff;">
-                                <option value="Ocean">🚢 Ocean Freight / LCL (25–35 Days)</option>
-                                <option value="StandardAir">✈️ Standard Air Cargo (10–14 Days)</option>
-                                <option value="ExpressAir">✈️ Express Air Freight (5–7 Days)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div id="pdpFreightResult" style="background:#fff;border:1px solid var(--border-dark);border-radius:6px;padding:0.6rem 0.8rem;font-size:0.82rem;color:var(--secondary);font-weight:600;">
-                        🚢 Est. Ocean Freight to North America: <span style="color:var(--primary);">$0.45/unit</span> · Lead time: 25–35 days
-                    </div>
+                <!-- Offer terms are populated from the validated public API item.
+                     No generic freight, lead-time, escrow or Incoterm promise is
+                     rendered when the source did not publish it. -->
+                <div id="publicOfferTerms" style="background:var(--light);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1.1rem;margin-bottom:1.4rem;font-size:0.85rem;">
+                    <strong><i class="fa-solid fa-file-lines" style="color:var(--primary);"></i> Offer terms</strong>
+                    <div id="publicOfferTermsText" style="margin-top:0.5rem;color:var(--text-light);white-space:pre-line;">Terms are confirmed with your RFQ.</div>
                 </div>
 
                 <!-- Quantity -->
@@ -845,7 +796,7 @@
                     <label for="qtyInput">Quantity:</label>
                     <div class="qty-control">
                         <button onclick="updateQty(-1)">−</button>
-                        <input type="number" id="qtyInput" value="1" min="1" oninput="updateTierSummary(); calculatePdpFreight();" />
+                        <input type="number" id="qtyInput" value="1" min="1" oninput="updateTierSummary();" />
                         <button onclick="updateQty(1)">+</button>
                     </div>
                 </div>
@@ -855,11 +806,11 @@
                     <button class="btn-add-cart" onclick="addToCartFromDetail()" id="addToCartBtn">
                         <i class="fa-solid fa-cart-plus"></i> Add to Cart
                     </button>
-                    <button class="btn-buy-now" onclick="buyNow()">
+                    <button class="btn-buy-now" onclick="buyNow()" id="buyNowBtn">
                         <i class="fa-solid fa-bolt"></i> Buy Now
                     </button>
-                    <button type="button" class="btn-add-cart" onclick="orderEvaluationSample()" style="background:#0b2138;color:#fff;border:1px solid #16334f;" title="Order 1 sample at retail rate for quality evaluation without MOQ">
-                        <i class="fa-solid fa-flask" style="color:#e0a62e;"></i> Order 1 Sample ($35)
+                    <button type="button" class="btn-add-cart" onclick="orderEvaluationSample()" id="sampleBtn" style="background:#0b2138;color:#fff;border:1px solid #16334f;" title="Request an evaluation sample in your quote">
+                        <i class="fa-solid fa-flask" style="color:#e0a62e;"></i> Request Sample Quote
                     </button>
                     <button class="btn-wishlist" onclick="toggleWishlistFromDetail()" id="wishlistBtn">
                         <i class="fa-regular fa-heart"></i>
@@ -889,12 +840,10 @@
                 <!-- Seller Info -->
                 <div class="seller-info">
                     <h4>Seller Information</h4>
-                    <div class="seller-name" id="sellerName"><i class="fa-regular fa-building"></i> Pilot Sales Distribution</div>
+                    <div class="seller-name" id="sellerName"><i class="fa-regular fa-building"></i> Supplier details shared after RFQ review</div>
                     <div class="seller-stats">
-                        <span><i class="fa-regular fa-circle-check"></i> Verified Supplier</span>
-                        <span><i class="fa-regular fa-star"></i> <span id="sellerRating">4.8</span> rating</span>
-                        <span><i class="fa-regular fa-clock"></i> Responds in 2 hours</span>
-                        <span><i class="fa-solid fa-store"></i> <span id="sellerProducts">0</span> products</span>
+                        <span><i class="fa-regular fa-file-lines"></i> Supplier details shared after RFQ review</span>
+                        <span><i class="fa-regular fa-clock"></i> Availability confirmed per offer</span>
                     </div>
                     <div id="sellerContactBox" class="seller-contact-box" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.8rem;"></div>
                     <button onclick="openReportModal()" style="margin-top:0.7rem;background:none;border:1px solid #f5b7b1;color:#c0392b;padding:0.35rem 0.8rem;border-radius:50px;font-size:0.72rem;cursor:pointer;font-weight:600;transition:0.2s;" onmouseover="this.style.background='#fdecea'" onmouseout="this.style.background='none'">
@@ -1048,19 +997,12 @@
     }
 
     // ─── INIT ───
-    let firebaseRetries = 0;
     function initFirebase() {
         if (typeof firebase === 'undefined') {
-            // If the Firebase SDK never loads (blocked network/ad-blocker),
-            // stop retrying after ~8s and attempt to render.
-            if (++firebaseRetries > 16) {
-                console.warn('Firebase unavailable');
-                loadProductDetail();
-                loadCartCount();
-                loadWishlistCount();
-                return;
-            }
-            setTimeout(initFirebase, 500);
+            // Product discovery is API-only; render immediately even when the
+            // optional auth/Firestore CDN is blocked.
+            console.warn('Firebase unavailable; using public inventory API');
+            loadProductDetail();
             return;
         }
         if (!firebase.apps.length) {
@@ -1190,85 +1132,59 @@
             pricingMode: item.pricingMode || 'rfq',
             moq: item.moqUnits || 1,
             stock: inStock ? item.availableToSell : 0,
-            confirmAvailability: item.status === 'confirm-availability',
+            availableToSell: Number(item.availableToSell || 0),
+            confirmAvailability: item.status === 'confirm-availability' || item.quantityMode === 'confirm',
             image_url: (item.imageUrls && item.imageUrls[0]) || '',
             images: item.imageUrls || [],
+            imageUrls: item.imageUrls || [],
+            fob: item.fob || '',
+            freightTerms: item.freightTerms || 'Freight quoted separately unless explicitly included.',
+            inspectionTerms: item.inspectionTerms || '',
+            returnTerms: item.returnTerms || '',
+            lastAvailabilityConfirmedAt: item.lastAvailabilityConfirmedAt || '',
+            availabilityExpiresAt: item.availabilityExpiresAt || '',
             sourceVersion: item.sourceVersion || '',
             snapshotVersion: item.snapshotVersion || '',
             upc: item.upc || '',
-            status: 'active'
+            sku: item.dealId || 'N/A',
+            model: '',
+            warranty: '',
+            rating: 0,
+            reviews: 0,
+            status: item.status || 'available',
+            rfqEnabled: item.rfqEnabled !== false
         };
     }
 
-    // ─── LOAD PRODUCT BY SLUG ───
+    // ─── LOAD PRODUCT FROM THE PUBLIC INVENTORY API ───
     async function loadProductBySlug(slug) {
-        // First: the verified public inventory API (buyer-safe snapshot).
         try {
-            const response = await fetch('/api/inventory/' + encodeURIComponent(slug), {
+            const response = await fetch(new URL('/api/inventory/' + encodeURIComponent(slug), window.PSEInventory ? window.PSEInventory.apiOrigin() : (window.PSE_INVENTORY_API_ORIGIN || window.location.origin)), {
                 headers: { 'Accept': 'application/json' }
             });
-            if (response.ok) {
-                return mapInventoryDetail(await response.json());
-            }
+            if (!response.ok) return null;
+            return mapInventoryDetail(await response.json());
         } catch (apiError) {
-            console.warn('Inventory API unavailable; falling back:', apiError);
-        }
-        try {
-            // Legacy fallback for non-inventory catalog content.
-            const snapshot = await db.collection('products')
-                .where('slug', '==', slug)
-                .get();
-            if (!snapshot.empty) {
-                const doc = snapshot.docs[0];
-                return { id: doc.id, ...doc.data() };
-            }
-            
-            // If not found, try to find by title as fallback
-            const titleSnapshot = await db.collection('products').get();
-            let found = null;
-            titleSnapshot.forEach(doc => {
-                const data = doc.data();
-                const titleSlug = generateSlug(data.title || '');
-                if (titleSlug === slug) {
-                    found = { id: doc.id, ...data };
-                }
-            });
-            return found;
-        } catch (error) { 
-            console.error('Error loading by slug:', error);
-            return null; 
+            console.error('Inventory API unavailable:', apiError);
+            return null;
         }
     }
 
-    // ─── FETCH PRODUCT BY ID ───
+    // Legacy links sometimes contain `?id=<Deal ID>`. Resolve that identifier
+    // through the public API list endpoint; never query the private Firestore
+    // product collection from a buyer-facing page.
     async function fetchProductById(id) {
         try {
-            const doc = await db.collection('products').doc(id).get();
-            if (doc.exists) {
-                const data = doc.data();
-                const imageUrl = window.getProductImage ? window.getProductImage(data, '') : (data.image_url || data.images?.[0] || '');
-                return { 
-                    id: doc.id, 
-                    ...data, 
-                    image_url: imageUrl,
-                    slug: data.slug || generateSlug(data.title || 'product'),
-                    title: data.title || 'Product',
-                    price: data.price || 0,
-                    brand: data.brand || 'Pilot Distribution',
-                    moq: data.moq || 1,
-                    stock: data.stock || 0,
-                    status: data.status || 'pending',
-                    description: data.description || 'Premium quality product.',
-                    rating: data.rating || 0,
-                    sku: data.sku || 'N/A',
-                    model: data.model || 'N/A',
-                    warranty: data.warranty || 'Standard'
-                };
-            }
+            const response = await fetch(new URL('/api/inventory?q=' + encodeURIComponent(id) + '&limit=100', window.PSEInventory ? window.PSEInventory.apiOrigin() : (window.PSE_INVENTORY_API_ORIGIN || window.location.origin)), {
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!response.ok) return null;
+            const payload = await response.json();
+            const item = (payload.data || []).find(row => row.dealId === id);
+            return item ? mapInventoryDetail(item) : null;
+        } catch (error) {
+            console.error('Inventory API lookup failed:', error);
             return null;
-        } catch (error) { 
-            console.error('Error fetching product:', error);
-            return null; 
         }
     }
 
@@ -1325,33 +1241,17 @@
         renderBulkPricing(product);
         loadRelatedProducts(product);
         updateWishlistStatus(product.id);
-        if (product.supplier_id) { loadSellerContact(product.supplier_id); }
-        else { renderSellerContactBox(); }
+        // Supplier identity and private contact data never cross the public
+        // inventory boundary. Buyers use the RFQ route for seller contact.
+        renderSellerContactBox();
     }
 
     // --- LOAD SELLER CONTACT (so buyers are redirected to the seller's own contact) ---
-    async function loadSellerContact(supplierId) {
-        // Defaults pulled from the product document itself
-        const p = currentProduct || {};
-        currentSellerContact = {
-            whatsapp: p.supplier_whatsapp || '',
-            phone: p.supplier_phone || '',
-            email: p.supplier_email || p.contactEmail || '',
-            contactEmail: p.supplier_email || p.contactEmail || ''
-        };
-        if (!supplierId) { renderSellerContactBox(); return; }
-        try {
-            const doc = await db.collection('users').doc(supplierId).get();
-            if (doc.exists) {
-                const d = doc.data();
-                currentSellerContact = {
-                    whatsapp: d.whatsapp || currentSellerContact.whatsapp || '',
-                    phone: d.phone || currentSellerContact.phone || '',
-                    email: d.contactEmail || d.contact_email || d.email || currentSellerContact.email || '',
-                    contactEmail: d.contactEmail || d.contact_email || d.email || currentSellerContact.contactEmail || ''
-                };
-            }
-        } catch (e) { console.error('Seller contact load error:', e); }
+    async function loadSellerContact() {
+        // Deliberately empty: supplier identity/contact fields are private and
+        // are not present in the public inventory schema. RFQs are the contact
+        // boundary for buyer-facing inventory.
+        currentSellerContact = { whatsapp: '', phone: '', email: '', contactEmail: '' };
         renderSellerContactBox();
     }
 
@@ -1370,8 +1270,8 @@
         const callBtn = currentSellerContact.phone
             ? `<button class="seller-contact-btn" style="background:var(--secondary);color:#fff;" onclick="contactSellerPhone()"><i class="fa-solid fa-phone"></i> Call</button>`
             : '';
-        const storeBtn = `<button class="seller-contact-btn" style="background:#0b2138;color:#fff;" onclick="visitSupplierStorefront()"><i class="fa-solid fa-store"></i> Supplier Storefront</button>`;
-        box.innerHTML = waBtn + emailBtn + callBtn + storeBtn;
+        const rfqBtn = `<a class="seller-contact-btn" style="background:#0b2138;color:#fff;text-decoration:none;" href="${window.PSEInventory && window.PSEInventory.buildRfqUrl ? window.PSEInventory.buildRfqUrl(currentProduct || {}) : '/rfq'}"><i class="fa-regular fa-file-lines"></i> Request quote</a>`;
+        box.innerHTML = waBtn + emailBtn + callBtn + rfqBtn;
         box.style.display = 'flex';
     }
 
@@ -1408,24 +1308,17 @@
     function renderProduct(product) {
         document.getElementById('breadcrumbProduct').textContent = product.title || 'Product';
         document.getElementById('productTitle').textContent = product.title || 'Product';
-        const tierBadge = product.supplier_tier === 'platinum' || product.membership_tier === 'platinum' ?
-            `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#8e44ad;color:#fff;font-weight:700;margin-left:8px;"><i class="fa-solid fa-crown"></i> Platinum Supplier</span>` :
-            product.supplier_tier === 'gold' || product.membership_tier === 'gold' ?
-            `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#e0a62e;color:#fff;font-weight:700;margin-left:8px;"><i class="fa-solid fa-crown"></i> Gold Supplier</span>` : '';
-        const sponsorBadge = product.sponsored ?
-            `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#d35400;color:#fff;font-weight:700;margin-left:8px;"><i class="fa-solid fa-rocket"></i> Sponsored Deal</span>` : '';
-        const trustBadge = product.supplier_verified ?
-            `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:3px 10px;border-radius:20px;background:#e8f8f0;color:#27ae60;font-weight:700;margin-left:8px;"><i class="fa-solid fa-shield-halved"></i> 100% Escrow Trade Assurance</span>` : '';
-        document.getElementById('productBrand').innerHTML = `by <a href="/supplier-store.html?brand=${encodeURIComponent(product.brand || '')}" style="font-weight:700;color:var(--primary);">${product.brand || 'Pilot Distribution'}</a> ${tierBadge} ${sponsorBadge} ${trustBadge}`;
+        // Only public brand/title data is rendered here. Supplier identity,
+        // membership badges, sponsorship and ratings are private/unverified
+        // fields and must never be inferred or displayed from the API item.
+        document.getElementById('productBrand').textContent = product.brand
+            ? `Brand: ${product.brand}`
+            : 'Verified public inventory offer';
 
-        // Rating
-        const rating = product.rating || 0;
-        const fullStars = Math.floor(rating);
-        const halfStar = rating % 1 >= 0.5;
-        const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-        const starsHtml = '★'.repeat(fullStars) + (halfStar ? '½' : '') + '☆'.repeat(emptyStars);
-        document.getElementById('ratingStars').textContent = starsHtml;
-        document.getElementById('ratingReviews').textContent = `${(product.reviews || 0)} reviews`;
+        // The v4 inventory contract does not publish ratings. Keep the review
+        // component honest until a separately evidenced review aggregate exists.
+        document.getElementById('ratingStars').textContent = 'Reviews pending';
+        document.getElementById('ratingReviews').textContent = 'No verified rating published';
 
         // Price — RFQ/login pricing modes never display a fabricated price.
         const price = product.price || 0;
@@ -1435,6 +1328,12 @@
         document.getElementById('productPrice').style.fontSize = product.rfqOnly ? '1.4rem' : '';
         document.getElementById('productOldPrice').textContent = oldPrice > 0 ? `$${oldPrice.toFixed(2)}` : '';
         document.getElementById('productOldPrice').style.display = oldPrice > 0 ? 'inline' : 'none';
+        // Phase 1 inventory is RFQ-first: without a reservation/hold API the
+        // browser cannot commit, decrement or purchase public inventory.
+        ['addToCartBtn', 'buyNowBtn', 'sampleBtn'].forEach(id => {
+            const button = document.getElementById(id);
+            if (button) button.style.display = 'none';
+        });
         if (discount > 0) {
             document.getElementById('productDiscount').textContent = `-${discount}%`;
             document.getElementById('productDiscount').style.display = 'inline-block';
@@ -1462,34 +1361,35 @@
         qtyInput.min = moq;
         qtyInput.value = moq;
 
-        // Description
-        document.getElementById('productDescription').textContent = product.description || 'Premium quality product. Perfect for bulk orders.';
+        // Description and product-specific commercial terms. Never insert a
+        // generic freight/lead-time promise when the source omitted it.
+        document.getElementById('productDescription').textContent = product.description || 'Public description will be confirmed with the RFQ.';
+        const termsEl = document.getElementById('publicOfferTermsText');
+        if (termsEl) {
+            const terms = [
+                product.fob ? `FOB: ${product.fob}` : null,
+                product.freightTerms ? `Freight: ${product.freightTerms}` : null,
+                product.inspectionTerms ? `Inspection: ${product.inspectionTerms}` : null,
+                product.returnTerms ? `Returns: ${product.returnTerms}` : null,
+                product.lastAvailabilityConfirmedAt ? `Last availability confirmation: ${new Date(product.lastAvailabilityConfirmedAt).toLocaleString()}` : null,
+                product.availabilityExpiresAt ? `Availability expires: ${new Date(product.availabilityExpiresAt).toLocaleString()}` : null,
+                'Availability subject to prior sale and final confirmation.'
+            ].filter(Boolean);
+            termsEl.textContent = terms.join('\\n');
+        }
 
         // Specs
         document.getElementById('specBrand').textContent = product.brand || 'Pilot Distribution';
         document.getElementById('specModel').textContent = product.model || 'N/A';
         document.getElementById('specWarranty').textContent = product.warranty || 'Standard';
 
-        // Seller
-        const sellerName = product.supplier_name || 'Pilot Sales Distribution';
-        document.getElementById('sellerName').innerHTML = `<i class="fa-regular fa-building"></i> ${sellerName} ${product.supplier_verified ? '<span style="display:inline-flex;align-items:center;gap:0.2rem;background:#e8f6ff;color:#0b6bcb;border:1px solid #bfe3ff;border-radius:20px;padding:0.1rem 0.55rem;font-size:0.65rem;font-weight:700;vertical-align:middle;"><i class="fa-solid fa-circle-check"></i> VERIFIED</span>' : ''}`;
-
-        // Trust: dynamic verified badge (anti-scam)
+        // Supplier identity is intentionally withheld from the public item.
+        // The RFQ flow is the controlled handoff to the sales team.
+        document.getElementById('sellerName').textContent = 'Supplier details shared after RFQ review';
         const sellerStats = document.querySelector('.seller-info .seller-stats');
-        if (sellerStats) {
-            const v = !!product.supplier_verified;
-            sellerStats.innerHTML = (v
-                ? `<span style="color:#0b6bcb;font-weight:700;"><i class="fa-solid fa-circle-check"></i> Verified Supplier — ID & business license checked</span>
-                   <span><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> Buyer Protection covered</span>`
-                : `<span style="color:#856404;"><i class="fa-solid fa-triangle-exclamation"></i> Verification pending — still covered by PSE Buyer Protection</span>`
-            ) + `
-                   <span><i class="fa-regular fa-star"></i> <span id="sellerRating">${product.seller_rating || 4.8}</span> rating</span>
-                   <span><i class="fa-regular fa-clock"></i> Responds in 2 hours</span>
-                   <span><i class="fa-solid fa-store"></i> <span id="sellerProducts">${product.seller_products || 0}</span> products</span>`;
-        } else {
-            document.getElementById('sellerRating').textContent = product.seller_rating || 4.8;
-            document.getElementById('sellerProducts').textContent = product.seller_products || 0;
-        }
+        if (sellerStats) sellerStats.innerHTML = `
+            <span><i class="fa-regular fa-file-lines"></i> Supplier details shared after RFQ review</span>
+            <span><i class="fa-regular fa-clock"></i> Availability confirmed per offer</span>`;
 
         // Main Image
         if (productImages.length > 0) {
@@ -1501,15 +1401,11 @@
             currentImageIndex = 0;
         }
 
-        // Delivery estimate (lead time + transit buffer)
+        // No synthetic delivery estimate: the packet has no approved lead-time
+        // field in the public schema. Product-specific terms above are the
+        // complete buyer-visible logistics statement.
         const estEl = document.getElementById('deliveryEstimateLine');
-        if (estEl) {
-            const leadDays = parseInt(product.lead_time_days || product.lead_time || 14, 10) || 14;
-            const est = new Date();
-            est.setDate(est.getDate() + leadDays + 7);
-            estEl.innerHTML = `<i class="fa-solid fa-truck-fast" style="color:var(--primary);"></i> Ships within ${leadDays} days · Est. arrival <strong style="color:var(--secondary);">${est.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</strong>`;
-            estEl.style.display = 'block';
-        }
+        if (estEl) estEl.style.display = 'none';
 
         // Stock/price alerts + SEO structured data + recently-viewed tracking
         try { checkProductAlerts(product); } catch (e) { /* non-blocking */ }
@@ -1616,259 +1512,47 @@
     }
 
     function renderBulkPricing(product) {
+        // Volume discounts are commercial terms, not a client-side formula.
+        // Until approved tier fields are added to the public contract, buyers
+        // receive the exact unit price (if public) and request bulk terms via RFQ.
         const container = document.getElementById('bulkPricing');
-        if (product.rfqOnly) {
-            // No public price: never fabricate volume-discount tiers.
-            if (container) container.style.display = 'none';
-            return;
-        }
-        if (container) container.style.display = '';
-        const tbody = document.getElementById('bulkPricingBody');
-        if (!tbody) return;
-        const price = product.price || 0;
-        const tiers = getProductTiers(product);
-        tbody.innerHTML = tiers.map((tier, index) => {
-            const tierPrice = price * (1 - tier.discount);
-            return `<tr id="tierRow-${index}" class="${index === tiers.length - 1 ? 'best-value' : ''}" style="transition:all 0.2s ease;">
-                <td><strong>${tier.min}${tier.max ? ` – ${tier.max}` : '+'} units</strong></td>
-                <td><strong>$${tierPrice.toFixed(2)}</strong></td>
-                <td>${tier.discount > 0 ? `<span style="color:#27ae60;font-weight:700;">Save ${Math.round(tier.discount * 100)}%</span>` : 'Base price'}</td>
-            </tr>`;
-        }).join('');
-        updateTierSummary();
+        const summary = document.getElementById('activeTierSummary');
+        if (container) container.style.display = 'none';
+        if (summary) summary.style.display = 'none';
     }
 
     function updateTierSummary() {
-        const input = document.getElementById('qtyInput');
-        if (!input || !currentProduct) return;
-        const qty = parseInt(input.value) || (currentProduct.moq || 1);
-        const calc = computeTierPrice(currentProduct, qty);
-        const tiers = getProductTiers(currentProduct);
-
-        tiers.forEach((t, index) => {
-            const row = document.getElementById(`tierRow-${index}`);
-            if (row) {
-                if (qty >= t.min && (!t.max || qty <= t.max)) {
-                    row.style.background = 'rgba(26,123,107,0.12)';
-                    row.style.outline = '2px solid var(--primary)';
-                } else {
-                    row.style.background = '';
-                    row.style.outline = 'none';
-                }
-            }
-        });
-
-        const rateEl = document.getElementById('tierSummaryRate');
-        const totalEl = document.getElementById('tierSummaryTotal');
-        if (rateEl && totalEl) {
-            rateEl.textContent = `$${calc.unitPrice.toFixed(2)}/unit (${calc.label})`;
-            totalEl.textContent = `$${(calc.unitPrice * qty).toFixed(2)}`;
-        }
+        // Volume tiers are approved commercial data, not a client-side formula.
     }
-
-    function updateIncotermUI() {
-        const sel = document.querySelector('input[name="pdpIncoterm"]:checked')?.value || 'DDP';
-        const expEl = document.getElementById('incotermExplanation');
-        if (!expEl) return;
-        if (sel === 'DDP') {
-            expEl.innerHTML = `<strong>DDP (Delivered Duty Paid):</strong> Supplier covers freight, import duties, and door-to-door delivery. Est. lead time: 10–14 days.`;
-        } else if (sel === 'FOB') {
-            expEl.innerHTML = `<strong>FOB (Free On Board Port):</strong> Supplier delivers to departure port; buyer handles international freight. Est. lead time: 7–10 days.`;
-        } else {
-            expEl.innerHTML = `<strong>EXW (Ex Works Factory):</strong> Buyer arranges own carrier pickup directly from verified factory warehouse. Ready for pickup: 3–5 days.`;
-        }
-    }
-
-    function calculatePdpFreight() {
-        const region = document.getElementById('pdpFreightRegion')?.value || 'North America';
-        const method = document.getElementById('pdpFreightMethod')?.value || 'Ocean';
-        const qtyEl = document.getElementById('qtyInput');
-        const qty = parseInt(qtyEl ? qtyEl.value : '100') || 100;
-        const resultEl = document.getElementById('pdpFreightResult');
-        if (!resultEl) return;
-
-        let ratePerUnit = 0.45;
-        let days = '25–35 days';
-        let methodLabel = '🚢 Ocean Container Freight';
-
-        if (method === 'ExpressAir') {
-            ratePerUnit = 3.50;
-            days = '5–7 days';
-            methodLabel = '✈️ Express Air Freight';
-        } else if (method === 'StandardAir') {
-            ratePerUnit = 1.80;
-            days = '10–14 days';
-            methodLabel = '✈️ Standard Air Cargo';
-        }
-
-        if (region === 'Africa' || region === 'Latin America') ratePerUnit *= 1.15;
-        else if (region === 'East Asia') ratePerUnit *= 0.75;
-
-        const totalFreight = ratePerUnit * qty;
-        resultEl.innerHTML = `${methodLabel} to <strong>${region}</strong> (${qty} units): <span style="color:var(--primary);font-weight:700;">$${totalFreight.toFixed(2)} ($${ratePerUnit.toFixed(2)}/unit)</span> · Est. Lead Time: <strong>${days}</strong>`;
-    }
-
-    window.calculatePdpFreight = calculatePdpFreight;
 
     function orderEvaluationSample() {
         if (!currentProduct) return;
-        const samplePrice = currentProduct.price || 0;
-        const user = getCurrentUser();
-        const sampleItem = {
-            product_id: currentProduct.id,
-            title: `[EVALUATION SAMPLE] ${currentProduct.title || 'Product'}`,
-            price: samplePrice,
-            old_price: currentProduct.old_price || 0,
-            image_url: currentProduct.image_url || '',
-            brand: currentProduct.brand || 'Pilot Distribution',
-            moq: 1,
-            quantity: 1,
-            is_sample: true
-        };
-        if (!user) {
-            const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
-            const existingIndex = cart.findIndex(i => i.product_id === currentProduct.id && i.is_sample);
-            if (existingIndex > -1) {
-                showToast('🧪 Evaluation Sample is already in your cart!', 'info');
-                return;
-            }
-            cart.push(sampleItem);
-            localStorage.setItem('pilot_cart', JSON.stringify(cart));
-            loadCartCount();
-            showToast('🧪 Evaluation Sample added to cart (MOQ bypassed for quality testing)!', 'success');
-        } else {
-            db.collection('cart').add({
-                ...sampleItem,
-                user_id: user.id,
-                created_at: new Date().toISOString()
-            }).then(() => {
-                loadCartCount();
-                showToast('🧪 Evaluation Sample added to cart (MOQ bypassed for quality testing)!', 'success');
-            }).catch(() => showToast('Failed to add sample to cart', 'error'));
-        }
+        const url = window.PSEInventory && window.PSEInventory.buildRfqUrl
+            ? window.PSEInventory.buildRfqUrl(currentProduct, 1)
+            : '/rfq';
+        window.location.href = url + (url.includes('?') ? '&' : '?') + 'sample=true';
     }
 
     // ─── UPDATE QUANTITY ───
     function updateQty(change) {
         const input = document.getElementById('qtyInput');
-        let val = parseInt(input.value) || 1;
+        if (!input) return;
         const min = parseInt(input.min) || 1;
-        val = Math.max(min, val + change);
-        input.value = val;
-        updateTierSummary();
-        calculatePdpFreight();
+        input.value = Math.max(min, (parseInt(input.value) || min) + change);
     }
 
-    // ─── ADD TO CART ───
-    async function addToCart(productId, quantity) {
-        const user = getCurrentUser();
-        if (!user) {
-            const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
-            const existingIndex = cart.findIndex(item => item.product_id === productId && !item.is_sample);
-            if (existingIndex > -1) {
-                const newQty = (cart[existingIndex].quantity || 1) + quantity;
-                const tierCalc = computeTierPrice(currentProduct || cart[existingIndex], newQty);
-                cart[existingIndex].quantity = newQty;
-                cart[existingIndex].price = tierCalc.unitPrice;
-                cart[existingIndex].tier_label = tierCalc.label;
-            } else {
-                const product = currentProduct || await fetchProductById(productId);
-                const tierCalc = computeTierPrice(product || {}, quantity);
-                cart.push({
-                    product_id: productId,
-                    title: product?.title || 'Product',
-                    price: tierCalc.unitPrice,
-                    tier_label: tierCalc.label,
-                    old_price: product?.old_price || 0,
-                    image_url: window.getProductImage ? window.getProductImage(product, '') : (product?.image_url || ''),
-                    brand: product?.brand || 'Pilot Distribution',
-                    moq: product?.moq || 1,
-                    quantity: quantity
-                });
-            }
-            localStorage.setItem('pilot_cart', JSON.stringify(cart));
-            showToast('✅ Added to cart!', 'success');
-            loadCartCount();
-            if (typeof window.pushNotification === 'function') {
-                window.pushNotification('Added to cart 🛒', (currentProduct && currentProduct.title ? currentProduct.title + ' — ' : '') + 'Ready to checkout when you are.', { icon: 'fa-cart-shopping', url: '/cart', tag: 'cart' });
-            }
-            return { success: true };
-        }
-
-        try {
-            const snapshot = await db.collection('cart')
-                .where('user_id', '==', user.id)
-                .where('product_id', '==', productId)
-                .get();
-            
-            if (!snapshot.empty) {
-                const docRef = snapshot.docs[0].ref;
-                const currentQty = snapshot.docs[0].data().quantity || 1;
-                const newQty = currentQty + quantity;
-                const tierCalc = computeTierPrice(currentProduct || {}, newQty);
-                await docRef.update({
-                    quantity: newQty,
-                    price: tierCalc.unitPrice,
-                    tier_label: tierCalc.label,
-                    updated_at: new Date().toISOString()
-                });
-            } else {
-                const product = currentProduct || await fetchProductById(productId);
-                const tierCalc = computeTierPrice(product || {}, quantity);
-                await db.collection('cart').add({
-                    user_id: user.id,
-                    product_id: productId,
-                    title: product?.title || 'Product',
-                    price: tierCalc.unitPrice,
-                    tier_label: tierCalc.label,
-                    old_price: product?.old_price || 0,
-                    image_url: window.getProductImage ? window.getProductImage(product, '') : (product?.image_url || ''),
-                    brand: product?.brand || 'Pilot Distribution',
-                    moq: product?.moq || 1,
-                    quantity: quantity,
-                    created_at: new Date().toISOString()
-                });
-            }
-            showToast('✅ Added to cart!', 'success');
-            loadCartCount();
-            if (typeof window.pushNotification === 'function') {
-                window.pushNotification('Added to cart 🛒', (currentProduct && currentProduct.title ? currentProduct.title + ' — ' : '') + 'Ready to checkout when you are.', { icon: 'fa-cart-shopping', url: '/cart', tag: 'cart' });
-            }
-            return { success: true };
-        } catch (error) {
-            showToast('❌ Failed to add to cart', 'error');
-            return { success: false };
-        }
+    // ─── RFQ-FIRST COMMITMENT BOUNDARY ───
+    async function addToCart() {
+        showToast('Inventory is RFQ-first until a controlled hold is created.', 'info');
+        return { success: false, reason: 'rfq-only' };
     }
 
-    // ─── ADD TO CART FROM DETAIL ───
     async function addToCartFromDetail() {
-        if (!currentProductId) { 
-            showToast('Product not found', 'error'); 
-            return; 
-        }
-        const qty = parseInt(document.getElementById('qtyInput').value) || 1;
-        const btn = document.getElementById('addToCartBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
-        const result = await addToCart(currentProductId, qty);
-        btn.disabled = false;
-        if (result.success) {
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> Added!';
-            setTimeout(() => { 
-                btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart'; 
-            }, 2000);
-        } else {
-            btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
-        }
+        requestQuote();
     }
 
-    // ─── BUY NOW ───
     async function buyNow() {
-        const result = await addToCart(currentProductId, parseInt(document.getElementById('qtyInput').value) || 1);
-        if (result.success) {
-            setTimeout(() => window.location.href = '/checkout', 500);
-        }
+        requestQuote();
     }
 
     // ─── TOGGLE WISHLIST ───
@@ -2105,52 +1789,40 @@
     // ─── LOAD RELATED PRODUCTS ───
     async function loadRelatedProducts(product) {
         const grid = document.getElementById('relatedGrid');
+        if (!grid) return;
         try {
-            let products = [];
-            let snapshot;
-            try {
-                snapshot = await db.collection('products')
-                    .where('status', 'in', ['active', 'approved'])
-                    .limit(4)
-                    .get();
-            } catch (statusError) {
-                snapshot = await db.collection('products').limit(4).get();
-            }
-            
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                if (doc.id !== product.id) {
-                    products.push({ 
-                        id: doc.id, 
-                        ...data, 
-                        image_url: window.getProductImage ? window.getProductImage(data, '') : (data.image_url || data.images?.[0] || ''),
-                        slug: data.slug || generateSlug(data.title || 'product'),
-                        title: data.title || 'Product',
-                        price: data.price || 0
-                    });
-                }
+            const response = await fetch(new URL('/api/inventory?category=' + encodeURIComponent(product.category || '') + '&limit=100', window.PSEInventory ? window.PSEInventory.apiOrigin() : (window.PSE_INVENTORY_API_ORIGIN || window.location.origin)), {
+                headers: { 'Accept': 'application/json' }
             });
-            
+            if (!response.ok) throw new Error('inventory API returned ' + response.status);
+            const payload = await response.json();
+            const products = (payload.data || [])
+                .filter(item => item.dealId !== product.dealId)
+                .slice(0, 4)
+                .map(mapInventoryDetail);
+
             if (products.length === 0) {
                 grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem 1rem;color:var(--text-light);font-size:0.9rem;">No similar products currently available.</div>';
                 return;
             }
-            
-            grid.innerHTML = products.map(p => `
-                <div class="related-card" onclick="window.location.href='/product/${p.slug || generateSlug(p.title)}'">
+
+            grid.innerHTML = products.map(p => {
+                const safeTitle = escapeHtml(p.title || 'Product');
+                const price = p.rfqOnly ? 'Quote required' : '$' + Number(p.price).toFixed(2);
+                return `<div class="related-card" onclick="window.location.href='/product/${encodeURIComponent(p.slug)}'">
                     <div class="related-image">
-                        ${p.image_url ? 
-                            `<img src="${p.image_url}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'" />` :
+                        ${p.image_url ?
+                            `<img src="${p.image_url}" alt="${safeTitle}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'" />` :
                             `<i class="fa-solid fa-box"></i>`
                         }
                     </div>
-                    <div class="related-title">${p.title || 'Product'}</div>
-                    <div class="related-price">$${(p.price || 0).toFixed(2)}</div>
-                </div>
-            `).join('');
+                    <div class="related-title">${safeTitle}</div>
+                    <div class="related-price">${price}</div>
+                </div>`;
+            }).join('');
         } catch (error) {
-            console.error('Error loading related products:', error);
-            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem 1rem;color:var(--text-light);font-size:0.9rem;">No similar products currently available.</div>';
+            console.error('Error loading related inventory:', error);
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem 1rem;color:var(--text-light);font-size:0.9rem;">Similar inventory unavailable.</div>';
         }
     }
 
@@ -2253,11 +1925,9 @@
                 const countEl = document.getElementById('ratingReviews');
                 if (starsEl) starsEl.textContent = starsHtml + ' ' + rounded;
                 if (countEl) countEl.textContent = `(${all.length} real customer review${all.length === 1 ? '' : 's'})`;
-                try {
-                    await db.collection('products').doc(String(currentProductId)).set({
-                        rating: rounded, reviews: all.length
-                    }, { merge: true });
-                } catch (e) { /* ignore if product doc update fails */ }
+                // Reviews remain a separate buyer-feedback collection. They do
+                // not mutate the inventory source or public snapshot from the
+                // browser; an approved aggregate can be published separately.
             } else {
                 const countEl = document.getElementById('ratingReviews');
                 if (countEl) countEl.textContent = '(no customer reviews yet — be the first)';
@@ -2446,25 +2116,28 @@
             const script = document.createElement('script');
             script.type = 'application/ld+json';
             script.id = 'productJsonLd';
-            const avg = (product.rating_avg || product.rating || 0);
-            script.textContent = JSON.stringify({
+            const item = {
                 '@context': 'https://schema.org',
                 '@type': 'Product',
                 name: product.title || '',
                 description: (product.description || '').substring(0, 300),
                 sku: product.sku || currentProductId || '',
                 brand: { '@type': 'Brand', name: product.brand || 'Pilot Distribution' },
-                image: window.getProductImage ? [window.getProductImage(product, '')] : undefined,
-                aggregateRating: avg > 0 ? { '@type': 'AggregateRating', ratingValue: Number(avg).toFixed(1), reviewCount: Number(product.rating_count || product.reviews_count || 1) } : undefined,
-                offers: {
+                image: product.image_url ? [product.image_url] : undefined
+            };
+            // RFQ/login offers must not expose a fabricated price. Only the
+            // public pricing mode receives an Offer price in JSON-LD.
+            if (!product.rfqOnly) {
+                item.offers = {
                     '@type': 'Offer',
-                    url: location.origin + '/product/' + (currentProductId || ''),
+                    url: location.origin + '/product/' + encodeURIComponent(product.slug || currentProductId || ''),
                     priceCurrency: 'USD',
-                    price: Number(product.price || 0).toFixed(2),
+                    price: Number(product.price).toFixed(2),
                     availability: (product.stock || 0) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
                     businessFunction: 'http://purl.org/goodrelations/v1#Sell'
-                }
-            });
+                };
+            }
+            script.textContent = JSON.stringify(item);
             document.head.appendChild(script);
         } catch (e) { /* SEO optional */ }
     }

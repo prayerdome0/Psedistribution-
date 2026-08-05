@@ -17,12 +17,19 @@ class AppSettings:
     allowed_origins: tuple[str, ...] = ("https://pilotsalesdistribution.com",)
     max_last_good_age_seconds: int = 300
     rate_limit_per_minute: int = 120
+    runtime_mode: str = "single"
+    database_url: str | None = None
+    valkey_url: str | None = None
 
     def __post_init__(self) -> None:
         if len(self.cursor_secret.encode("utf-8")) < 32:
             raise ValueError("cursor_secret must be at least 32 bytes")
         if not self.hmac_keys or any(len(value.encode("utf-8")) < 16 for value in self.hmac_keys.values()):
             raise ValueError("each HMAC key must be at least 16 bytes")
+        if self.runtime_mode not in {"single", "production"}:
+            raise ValueError("runtime_mode must be 'single' or 'production'")
+        if self.runtime_mode == "production" and (not self.database_url or not self.valkey_url):
+            raise ValueError("production mode requires database_url and valkey_url")
 
 
 def default_packet_root() -> Path:

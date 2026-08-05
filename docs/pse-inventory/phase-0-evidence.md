@@ -24,21 +24,21 @@ marked `PENDING_OWNER_PROVISIONING` — they are NOT fabricated.
 
 ## Current website implementation
 
-- **Product storage/model:** Firestore collection `products`, queried **from the browser** — violates the packet's non-negotiable boundary for any private data; acceptable only for a buyer-safe public collection. Rewired in this change to the public inventory API.
+- **Product storage/model:** Buyer-facing catalog, homepage, search and detail pages now consume only the public inventory API. Firestore remains for authentication, cart, reviews and administrative workflows; buyer-facing product discovery does not query the Firestore `products` collection.
 - **Product list route/component:** `/products` → `products.html` (grid `#productGrid`, `loadProducts()`).
 - **Product detail route/component:** `/product/{slug}` → `product-detail.html` (`loadProductDetail()`, `loadProductBySlug()`).
 - **RFQ persistence and notification path:** `rfq.html` form `#rfqForm`; submission handler stores to Firestore/email per existing code. Identity fields (dealId, sourceVersion, snapshotVersion, slug, quantity) added by this change.
 - **Authentication model:** Firebase Auth (CDN) used by account/seller/admin pages; not required for RFQ.
 - **Cart/order behavior:** Firestore `cart` collection; checkout pages exist. Per packet decision D-002, Phase 1 is RFQ-first: no inventory decrement or checkout commitment from public inventory items.
-- **Server-only runtime boundary:** None exists on static hosting; therefore the buyer-safe boundary is enforced by a separate server-side inventory API that publishes only allowlisted fields. The browser calls only `GET /api/inventory*`.
-- **Existing cache/revalidation mechanism:** None; added by this change (ETag, Cache-Control, signed revalidation route).
-- **Existing monitoring/logging:** None observed. Prometheus/Alertmanager assets added under `services/pse-inventory/deploy/`.
+- **Server-only runtime boundary:** Buyer-safe data is enforced by the allowlist publisher and the API. Production runs the API against PostgreSQL's public snapshot view and Valkey shared state; the browser calls only `GET /api/inventory*`.
+- **Existing cache/revalidation mechanism:** ETag, Cache-Control, signed revalidation route and shared production nonce/rate-limit adapters are implemented.
+- **Existing monitoring/logging:** Prometheus/Alertmanager assets and API metrics are under `services/pse-inventory/deploy/`; live alert delivery remains an operational provisioning step.
 
 ## SalesMax/PSE inventory source
 
 - **Authoritative runtime/database or sheet:** NOT connected in this session (packet blocker B-002 OPEN). Until inspected, the Private Canonical Master is the controlled operational authority per the packet Source of Truth policy.
 - **Source owner:** Caden / owner delegate.
-- **Existing connector:** None in repository (no Sheets connector code committed).
+- **Existing connector:** A bounded server-side JSON/CSV/HTTPS export loader exists at `services/pse-inventory/pse_inventory/authority_export.py`; the actual SalesMax endpoint/credentials are still owner-provisioned.
 - **Current primary key:** `dealId` (immutable), per canonical schema v4.0.0.
 - **Quantity/on-hand source:** `inventory.onHandUnits` on canonical records; ATS = onHand − reserved.
 - **Reservation/hold source:** `inventory.reservedUnits`; Phase 1 holds are manual/controlled.
@@ -55,7 +55,7 @@ marked `PENDING_OWNER_PROVISIONING` — they are NOT fabricated.
 - **Key rotation mechanism:** current + previous key IDs supported per `05_INTEGRATION/05_HMAC_REVALIDATION_SPEC.md`.
 - **Network/CORS restrictions:** API CORS allowlist defaults to `https://pilotsalesdistribution.com`; preview origin added only by the local preview harness.
 - **Audit log destination:** publish reports + structured logs; centralized sink `PENDING_OWNER_PROVISIONING`.
-- **Nonce/replay store:** in-process nonce store for the single-replica reference; Valkey adapter implemented in `pse_inventory/shared_state.py` and required before any multi-replica production deployment.
+- **Nonce/replay store:** production mode wires the Valkey adapter in `pse_inventory/shared_state.py`; the in-process nonce store remains available only for the single-process local preview. Live two-replica evidence still requires staging.
 
 ## Observed defects requiring correction (packet P0 items)
 
@@ -68,7 +68,7 @@ Evidence captured by direct grep on 2026-08-04:
 ## Verification environment limitations (honest gaps)
 
 - Python in this sandbox is 3.11.2; the packet's production pin is 3.13. Service code is written to run on both; production deployment must use the pinned 3.13 image and locks.
-- Docker/PostgreSQL/Valkey/libreoffice/poppler are unavailable in this sandbox. PostgreSQL store and shared-state adapters are implemented with injectable clients and integration tests skip unless `PSE_TEST_DATABASE_URL` / `PSE_TEST_VALKEY_URL` are provided; the packet gauntlet's visual-PDF gate cannot run here (environmental, recorded as such).
+- Docker/PostgreSQL/Valkey/libreoffice/poppler are unavailable in this sandbox. PostgreSQL store/repository and Valkey adapters are production-wired with injectable/fake coverage; live database/role and two-replica integration evidence still requires `PSE_TEST_DATABASE_URL` / `PSE_TEST_VALKEY_URL`. The packet gauntlet's visual-PDF gate cannot run here (environmental, recorded as such).
 - Packet gauntlet bootstrap run in this environment: 258 checks, all 103 legacy + node tests pass; sole failures are the missing visual tooling listed above and the packet's own declared `productionBlocker`.
 
 ## Discovery exit evidence status

@@ -45,9 +45,10 @@ def test_ingest_preserves_rows_and_hashes():
     assert evidence[0].authority == "auth"
 
 
-def test_ingest_deduplicates_byte_identical_rows():
+def test_ingest_preserves_byte_identical_source_rows():
     evidence = ingest([row(), row()], authority="auth")
-    assert len(evidence) == 1
+    assert len(evidence) == 2
+    assert evidence[0].source_hash == evidence[1].source_hash
 
 
 def test_mismatched_row_authority_rejected():

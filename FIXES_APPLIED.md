@@ -100,7 +100,7 @@ This document summarizes the full audit and fixes applied to make the marketplac
 
 ## 📦 Backend / Inventory
 
-- Verified `services/pse-inventory` tests pass (104 tests, 1 skipped) + catalog RFQ tests (4 pass)
+- Verified the inventory/website Python suite passes (136 tests, 1 live-PostgreSQL test skipped) plus catalog RFQ tests (4 pass)
 - `preview` server confirmed working on `:8080` serving `/api/inventory` + static site in one process
 - Snapshot `current.json` is demo-only 2 records — documented as staging demo, API returns ETag, cursor binding, 503 last-known-good correctly
 - `requirements.runtime.lock` pinned, works with Python 3.11+
@@ -113,8 +113,8 @@ This document summarizes the full audit and fixes applied to make the marketplac
 
 ## ✅ Validation
 
-- `python -m pytest -q` → 104 passed
-- `node --test catalog.test.mjs` → 4 passed
+- `python -m pytest -o addopts='' services/pse-inventory/tests tests/pse_inventory` → 136 passed, 1 skipped (live PostgreSQL)
+- `node --test apps/pse-inventory-catalog/catalog.test.mjs` → 4 passed
 - No hardcoded secrets grep `re_` → clean
 - No `12,000+` fake stats remain (except historic docs)
 - `vercel.json` headers allow preview iframe

@@ -22,17 +22,14 @@ def test_products_page_reads_public_api_not_private_master():
     html = (ROOT / "products.html").read_text(encoding="utf-8")
     assert "/api/inventory" in html
     assert "fetchInventoryFeed" in html
-    # The storefront shows BOTH the live inventory API feed AND the current
-    # products uploaded to Firestore (never only the inventory feed). The
-    # merge must be unconditional — not a length-0 fallback — and dedupe
-    # against dealId/slug/title so items never render twice.
+    # Public product discovery is API-only. Firebase remains available for
+    # account/cart features, but no buyer-facing loader may read the private
+    # product collection or static fallback catalog.
     load_block = html.split("async function loadProducts()")[1].split("allProducts = products;")[0]
-    assert "db.collection('products')" in load_block
-    assert "ALWAYS merge" in load_block
-    assert "if (products.length === 0) {" not in load_block.split("// 3)")[0]
-    inventory_pos = load_block.index("fetchInventoryFeed")
-    firestore_pos = load_block.index("db.collection('products')")
-    assert inventory_pos < firestore_pos, "inventory feed stays the primary source; Firestore merges after"
+    assert "db.collection('products')" not in load_block
+    assert "PSE_CATALOG_DATA" not in load_block
+    assert "fetchInventoryFeed" in load_block
+    assert "mapInventoryItem" in load_block
 
 
 def test_product_detail_page_prefers_public_api():
@@ -40,6 +37,14 @@ def test_product_detail_page_prefers_public_api():
     assert "/api/inventory/" in html
     assert "mapInventoryDetail" in html
     assert "rfqOnly" in html, "RFQ/login pricing must never render a fabricated price"
+    assert "db.collection('products')" not in html
+
+
+def test_public_discovery_pages_have_no_private_or_static_product_fallbacks():
+    for page in ("index.html", "products.html", "product-detail.html", "search-pro.js"):
+        html = (ROOT / page).read_text(encoding="utf-8")
+        assert "db.collection('products')" not in html
+        assert "PSE_CATALOG_DATA" not in html
 
 
 def test_rfq_page_preserves_inventory_identity():

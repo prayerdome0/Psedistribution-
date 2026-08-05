@@ -17,6 +17,8 @@
   "catalogRoute": "/products -> products.html",
   "productDetailRoute": "/product/{slug} -> product-detail.html",
   "rfqRoute": "/rfq -> rfq.html",
-  "inventoryApiBase": "/api/inventory served by services/pse-inventory (single API replica until the shared-state adapters are approved)",
+  "inventoryApiBase": "/api/inventory served same-origin by services/pse-inventory in production mode (PostgreSQL active public snapshot + Valkey shared replay/rate-limit state)",
+  "sourceConnector": "services/pse-inventory/pse_inventory/authority_export.py (bounded JSON/CSV/HTTPS SalesMax or reviewed Sheets export; server-side bearer token only)",
+  "productionCompose": "services/pse-inventory/deploy/compose.production.yaml",
   "productionStatus": "NOT_DEPLOYED"
 }

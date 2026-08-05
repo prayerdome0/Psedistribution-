@@ -32,7 +32,6 @@ def ingest(rows: Sequence[Mapping[str, Any]], *, authority: str) -> list[RawEvid
     if not authority or not str(authority).strip():
         raise IntakeError("authority is required")
     evidence: list[RawEvidenceRecord] = []
-    seen_hashes: set[str] = set()
     for row in rows:
         try:
             require_provenance(row, authority=authority)
@@ -40,9 +39,9 @@ def ingest(rows: Sequence[Mapping[str, Any]], *, authority: str) -> list[RawEvid
             raise IntakeError(f"intake row rejected: {exc}") from exc
         payload = dict(row)
         digest = source_sha256(payload)
-        if digest in seen_hashes:
-            continue
-        seen_hashes.add(digest)
+        # Preserve every source row, including byte-identical repeats. The
+        # reconciliation layer may link evidence to one canonical candidate,
+        # but it must never erase source history before review.
         evidence.append(RawEvidenceRecord(
             source_record_id=str(row.get("sourceRecordId") or row.get("messageId") or row.get("dealId")),
             authority=authority,

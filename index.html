@@ -35,6 +35,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="main.js"></script>
+    <script src="/inventory-client.js"></script>
 
     <!-- Premium Design System (shared) -->
     <link rel="stylesheet" href="/style.css" />
@@ -59,13 +60,13 @@
                 <span><i class="fa-solid fa-truck-fast"></i> Freight quoted per product</span>
                 <span><i class="fa-solid fa-file-lines"></i> RFQ-first purchasing — no commitment until confirmed</span>
                 <span><i class="fa-solid fa-box"></i> Availability subject to prior sale and final confirmation</span>
-                <span><i class="fa-solid fa-shield-halved"></i> Verified suppliers for serious bulk buyers</span>
+                <span><i class="fa-solid fa-shield-halved"></i> Buyer-safe offers for serious bulk buyers</span>
                 <span><i class="fa-solid fa-bolt"></i> Wholesale Inventory. Verified Before You Buy.</span>
                 <span><i class="fa-solid fa-circle-check"></i> Availability confirmed per offer</span>
                 <span><i class="fa-solid fa-truck-fast"></i> Freight quoted per product</span>
                 <span><i class="fa-solid fa-file-lines"></i> RFQ-first purchasing — no commitment until confirmed</span>
                 <span><i class="fa-solid fa-box"></i> Availability subject to prior sale and final confirmation</span>
-                <span><i class="fa-solid fa-shield-halved"></i> Verified suppliers for serious bulk buyers</span>
+                <span><i class="fa-solid fa-shield-halved"></i> Buyer-safe offers for serious bulk buyers</span>
             </div>
         </div>
         <div class="top-links">
@@ -140,16 +141,15 @@
                 <div class="hm"><i class="fa-solid fa-circle-check"></i> Availability confirmed per offer</div>
                 <div class="hm"><i class="fa-solid fa-truck-fast"></i> Freight quoted per product</div>
                 <div class="hm"><i class="fa-solid fa-file-lines"></i> RFQ-first purchasing</div>
-                <div class="hm"><i class="fa-solid fa-shield-halved"></i> Verified suppliers</div>
+                <div class="hm"><i class="fa-solid fa-shield-halved"></i> Buyer-safe offer records</div>
             </div>
         </div>
         <div class="pse-hero-panel" aria-label="Live market status">
             <div class="php-title">Live status <span class="big"><span class="live-dot" aria-hidden="true"></span> LIVE</span></div>
-            <div class="php-row"><span class="k">Deal records</span><span class="v" id="statDeals">296</span></div>
-            <div class="php-row"><span class="k">PSE accounts</span><span class="v" id="statAccounts">50</span></div>
-            <div class="php-row"><span class="k">SalesMax accounts</span><span class="v" id="statSalesmax">3</span></div>
-            <div class="php-row"><span class="k">Working areas</span><span class="v" id="statAreas">3</span></div>
-            <div class="php-row"><span class="k">Current offers</span><span class="v red" id="liveOfferCountHero">—</span></div>
+            <div class="php-row"><span class="k">Published deals</span><span class="v red" id="statDeals">—</span></div>
+            <div class="php-row"><span class="k">Units currently available</span><span class="v" id="statUnits">—</span></div>
+            <div class="php-row"><span class="k">Categories represented</span><span class="v" id="statCategories">—</span></div>
+            <div class="php-row"><span class="k">Last inventory verification</span><span class="v" id="statVerified">—</span></div>
             <div class="php-row"><span class="k">Availability model</span><span class="v green">Confirmed per offer</span></div>
         </div>
     </div>
@@ -158,11 +158,11 @@
 <div class="container">
 
     <!-- 2. TRUST METRICS -->
-    <div class="pse-trust" aria-label="Marketplace trust metrics">
-        <div class="pt"><div class="pt-num">296</div><div class="pt-label">Deal Records</div><div class="pt-desc">Wholesale inventory offers catalogued</div></div>
-        <div class="pt"><div class="pt-num">50</div><div class="pt-label">PSE Accounts</div><div class="pt-desc">Verified buyer &amp; seller accounts</div></div>
-        <div class="pt"><div class="pt-num">3</div><div class="pt-label">SalesMax Accounts</div><div class="pt-desc">Connected inventory channels</div></div>
-        <div class="pt"><div class="pt-num">3</div><div class="pt-label">Working Areas</div><div class="pt-desc">Active wholesale markets</div></div>
+    <div class="pse-trust" aria-label="Published inventory metrics">
+        <div class="pt"><div class="pt-num" id="trustDeals">—</div><div class="pt-label">Published Deals</div><div class="pt-desc">Offers currently passing the publication gate</div></div>
+        <div class="pt"><div class="pt-num" id="trustUnits">—</div><div class="pt-label">Available Units</div><div class="pt-desc">Buyer-safe available-to-sell quantity</div></div>
+        <div class="pt"><div class="pt-num" id="trustCategories">—</div><div class="pt-label">Categories</div><div class="pt-desc">Categories represented in the public snapshot</div></div>
+        <div class="pt"><div class="pt-num" id="trustFreshness">—</div><div class="pt-label">Feed Status</div><div class="pt-desc">Validated API snapshot freshness</div></div>
     </div>
 
     <!-- 3. FEATURED LIVE INVENTORY -->
@@ -217,14 +217,14 @@
         <div>
             <span class="eyebrow"><i class="fa-solid fa-gauge-high"></i> Operational snapshot</span>
             <h2 id="opsTitle">Built for <span class="red">serious buyers</span></h2>
-            <p>A dependable wholesale pipeline — from verified supplier to confirmed delivery terms.</p>
+            <p>A dependable wholesale pipeline — from public offer record to confirmed delivery terms.</p>
         </div>
     </section>
     <div class="pse-ops">
         <article class="op">
-            <div class="op-head"><i class="fa-solid fa-shield-halved"></i><strong>Verified Suppliers</strong></div>
-            <span class="op-status">Operational</span>
-            <p>Every supplier is verified and quality-checked for reliable wholesale partnerships.</p>
+            <div class="op-head"><i class="fa-solid fa-shield-halved"></i><strong>Buyer-safe publication</strong></div>
+            <span class="op-status">Allowlist enforced</span>
+            <p>Only approved public fields cross the inventory boundary; supplier and internal source data stays private.</p>
         </article>
         <article class="op">
             <div class="op-head"><i class="fa-solid fa-truck-fast"></i><strong>Clear Freight Terms</strong></div>
@@ -341,14 +341,17 @@
     let slideInterval = null;
 
     function initFirebase() {
-        if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
+        if (typeof firebase === 'undefined') {
+            // Public inventory must still render when Firebase/auth is blocked.
+            loadFeaturedInventory();
+            return;
+        }
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         window.db = firebase.firestore();
         window.auth = firebase.auth();
         setupAuthListener();
         loadCartCount();
         loadWishlistCount();
-        loadLiveOfferCount();
         loadFeaturedInventory();
     }
 
@@ -432,12 +435,12 @@
     }
 
     // ── FEATURED LIVE INVENTORY ──────────────────────────────
-    // Reads the public allow-listed inventory API first, then merges the
-    // Firestore `products` collection, then falls back to catalog-data.js.
-    // Renders 6-8 featured cards with loading and error states.
+    // The homepage reads only the validated buyer-safe inventory API. Auth and
+    // Firestore remain available for account/cart features, never for public
+    // product discovery.
     let featuredProducts = [];
 
-    function mapInv(item) {
+    function mapInv(item, meta) {
         const isPublicPrice = item.pricingMode === 'public' && Number.isFinite(Number(item.publicUnitPrice));
         const availability = item.status === 'confirm-availability' || item.quantityMode === 'confirm'
             ? 'confirm'
@@ -445,8 +448,8 @@
         return {
             id: item.dealId,
             dealId: item.dealId,
-            sourceVersion: item.sourceVersion || '',
-            snapshotVersion: item.snapshotVersion || '',
+            sourceVersion: item.sourceVersion || (meta && meta.sourceVersion) || '',
+            snapshotVersion: item.snapshotVersion || (meta && meta.snapshotVersion) || '',
             slug: item.slug || generateSlug(item.title || 'product'),
             title: item.title || 'Product',
             brand: item.brand || 'Pilot Distribution',
@@ -460,87 +463,44 @@
             image_url: (item.imageUrls && item.imageUrls[0]) || '',
             availability: availability,
             stock: availability === 'in-stock' ? item.availableToSell : 0,
-            lastAvailabilityConfirmedAt: item.lastAvailabilityConfirmedAt || ''
+            lastAvailabilityConfirmedAt: item.lastAvailabilityConfirmedAt || '',
+            rfqEnabled: item.rfqEnabled !== false
         };
     }
 
     async function fetchInventoryFeed() {
         const items = [];
+        let meta = null;
         let cursor = null;
-        for (let page = 0; page < 4; page++) {
-            const url = new URL('/api/inventory', window.location.origin);
-            url.searchParams.set('limit', '50');
+        for (let page = 0; page < 10; page++) {
+            const url = new URL('/api/inventory', window.PSEInventory ? window.PSEInventory.apiOrigin() : (window.PSE_INVENTORY_API_ORIGIN || window.location.origin));
+            url.searchParams.set('limit', '100');
             if (cursor) url.searchParams.set('cursor', cursor);
             const response = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
             if (!response.ok) throw new Error('inventory feed unavailable: ' + response.status);
             const payload = await response.json();
+            meta = payload.meta || meta;
             items.push(...(payload.data || []));
             cursor = payload.meta && payload.meta.nextCursor;
             if (!cursor) break;
         }
-        return items;
+        return { items, meta };
     }
 
+    let featuredInventoryStarted = false;
     async function loadFeaturedInventory() {
         const grid = document.getElementById('featuredInventoryContainer');
-        if (!grid) return;
+        if (!grid || featuredInventoryStarted) return;
+        featuredInventoryStarted = true;
         let products = [];
 
-        // 1) Public inventory API
         try {
-            products = (await fetchInventoryFeed()).map(mapInv);
+            const feed = await fetchInventoryFeed();
+            updateInventoryMetrics(feed.meta, feed.items);
+            products = feed.items.map(item => mapInv(item, feed.meta));
         } catch (feedError) {
-            console.log('Inventory API unavailable, loading current products for homepage...');
-        }
-
-        // 2) Merge Firestore products collection
-        try {
-            const snapshot = await db.collection('products')
-                .where('status', 'in', ['active', 'approved'])
-                .orderBy('created_at', 'desc')
-                .limit(50)
-                .get();
-            if (!snapshot.empty) {
-                const seen = new Set();
-                products.forEach(p => {
-                    if (p.slug) seen.add('slug:' + p.slug);
-                    if (p.id) seen.add('id:' + p.id);
-                    seen.add('title:' + (p.title || '').toLowerCase());
-                });
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const slug = data.slug || generateSlug(data.title || 'product');
-                    if (seen.has('id:' + doc.id) || seen.has('slug:' + slug) || seen.has('title:' + (data.title || '').toLowerCase())) return;
-                    seen.add('id:' + doc.id);
-                    seen.add('slug:' + slug);
-                    products.push({
-                        id: doc.id, dealId: doc.id, slug: slug,
-                        title: data.title || 'Product', brand: data.brand || 'Pilot Distribution',
-                        moq: data.moq || 1, category: data.category || 'other',
-                        pricingMode: 'public', price: data.price || 0, old_price: data.old_price || 0,
-                        image_url: (window.getProductImage ? window.getProductImage(data, '') : (data.image_url || '')),
-                        availability: (data.stock || 0) > 0 ? 'in-stock' : 'unavailable', stock: data.stock || 0,
-                        rfqEnabled: true, condition: data.condition || '', fob: data.fob || '',
-                        freightTerms: data.freightTerms || 'Freight quoted separately',
-                        lastAvailabilityConfirmedAt: data.lastAvailabilityConfirmedAt || ''
-                    });
-                });
-            }
-        } catch (dbError) {
-            console.error('Firestore product load error (homepage):', dbError);
-        }
-
-        // 3) Last resort: catalog-data.js
-        if (products.length === 0 && window.PSE_CATALOG_DATA && window.PSE_CATALOG_DATA.products) {
-            products = window.PSE_CATALOG_DATA.products.slice(0, 8).map((p, i) => ({
-                id: 'catalog-' + i, dealId: 'catalog-' + i, slug: generateSlug(p.title),
-                title: p.title, brand: p.brand || 'Pilot Distribution', moq: p.moq || 1,
-                category: p.category || 'other', pricingMode: 'public',
-                price: p.price || 0, old_price: p.old_price || 0, image_url: p.image_url || '',
-                availability: 'in-stock', stock: 100, rfqEnabled: true,
-                condition: '', fob: '', freightTerms: 'Freight quoted separately',
-                lastAvailabilityConfirmedAt: ''
-            }));
+            console.error('Inventory API unavailable:', feedError);
+            updateInventoryMetrics(null, []);
         }
 
         featuredProducts = products;
@@ -678,22 +638,46 @@
         }
     }
 
+    function setMetric(id, value) {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    }
+
+    function updateInventoryMetrics(meta, items) {
+        const total = Number(meta && meta.totalCount);
+        const units = (items || []).reduce((sum, item) => sum + (Number(item.availableToSell) || 0), 0);
+        const categories = new Set((items || []).map(item => item.category).filter(Boolean)).size;
+        const verified = (items || [])
+            .map(item => item.lastAvailabilityConfirmedAt)
+            .filter(Boolean)
+            .sort()
+            .pop();
+        const dealsText = Number.isFinite(total) ? total.toLocaleString() : '—';
+        const unitsText = units.toLocaleString();
+        const categoriesText = categories.toLocaleString();
+        const verifiedText = verified ? new Date(verified).toLocaleString() : 'Not published';
+        setMetric('statDeals', dealsText);
+        setMetric('trustDeals', dealsText);
+        setMetric('statUnits', unitsText);
+        setMetric('trustUnits', unitsText);
+        setMetric('statCategories', categoriesText);
+        setMetric('trustCategories', categoriesText);
+        setMetric('statVerified', verifiedText);
+        setMetric('trustFreshness', meta && meta.freshness ? meta.freshness : 'Unavailable');
+    }
+
     async function loadLiveOfferCount() {
-        const countEl = document.getElementById('liveOfferCountHero');
-        if (!countEl) return;
+        // Kept as a public API-only metric hook for pages or integrations that
+        // call it directly. The featured loader supplies the complete metrics.
         try {
-            const response = await fetch('/api/inventory?limit=1', { headers: { 'Accept': 'application/json' } });
-            if (response.ok) {
-                const payload = await response.json();
-                const count = Number(payload.total ?? payload.count ?? (Array.isArray(payload.items) ? payload.items.length : NaN));
-                if (Number.isFinite(count) && count >= 0) { countEl.textContent = count.toLocaleString(); return; }
-            }
-        } catch (e) { /* API optional in static preview */ }
-        try {
-            const snapshot = await db.collection('products').where('status', '==', 'active').get();
-            countEl.textContent = snapshot.size.toLocaleString();
+            const response = await fetch(new URL('/api/inventory?limit=100', window.PSEInventory ? window.PSEInventory.apiOrigin() : (window.PSE_INVENTORY_API_ORIGIN || window.location.origin)), { headers: { 'Accept': 'application/json' } });
+            if (!response.ok) throw new Error('inventory API returned ' + response.status);
+            const payload = await response.json();
+            updateInventoryMetrics(payload.meta, payload.data || []);
         } catch (e) {
-            countEl.textContent = '296';
+            updateInventoryMetrics(null, []);
+            setMetric('statVerified', 'Unavailable');
+            setMetric('trustFreshness', 'Unavailable');
         }
     }
 
