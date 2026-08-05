@@ -33,7 +33,7 @@
             id: 'products_browse',
             keywords: ['products', 'catalog', 'browse', 'shop', 'items', 'list', 'what do you sell', 'categories', 'find products'],
             reply: function () {
-                return 'We\'re a B2B wholesale marketplace with 12,000+ products across Electronics, Fashion, Home, Sports, Beauty and Automotive. 🛒 Browse the full catalog here: <a href="/products" class="pse-link">View all products</a> — or ask me for something specific (e.g. "show me headphones").';
+                return 'We\'re a B2B wholesale marketplace with verified wholesale products across Electronics, Fashion, Home, Sports, Beauty and Automotive. 🛒 Browse the full catalog here: <a href="/products" class="pse-link">View all products</a> — or ask me for something specific (e.g. "show me headphones").';
             },
             quick: ['Electronics', 'Fashion', 'Home & Living']
         },
@@ -132,7 +132,7 @@
         {
             id: 'become_seller',
             keywords: ['sell', 'seller', 'vendor', 'supplier', 'become a seller', 'list products', 'wholesale supplier'],
-            reply: 'We\'d love to have you on board! 🏪 Create your seller account at <a href="/become-seller" class="pse-link">Become a Seller</a>, complete <a href="/supplier-verification" class="pse-link">Supplier Verification</a>, and start listing products in minutes. 580+ verified suppliers already sell with us!',
+            reply: 'We\'d love to have you on board! 🏪 Create your seller account at <a href="/become-seller" class="pse-link">Become a Seller</a>, complete <a href="/supplier-verification" class="pse-link">Supplier Verification</a>, and start listing products in minutes. verified suppliers already sell with us!',
             quick: ['Become a seller']
         },
         {
@@ -172,7 +172,7 @@
         {
             id: 'about',
             keywords: ['about', 'company', 'who are you', 'what is pse', 'pilot sales', 'about the company', 'trust', 'legit', 'verified'],
-            reply: 'Pilot Sales Distribution (PSE) is a premium B2B wholesale marketplace connecting verified suppliers with buyers worldwide. 🌍 580+ verified suppliers, 12,000+ products, 99.7% satisfaction. Learn more at <a href="/about" class="pse-link">About us</a>.'
+            reply: 'Pilot Sales Distribution (PSE) is a premium B2B wholesale marketplace connecting verified suppliers with buyers worldwide. 🌍 verified suppliers, growing catalog, high satisfaction. Learn more at <a href="/about" class="pse-link">About us</a>.'
         },
         {
             id: 'help',

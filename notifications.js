@@ -103,7 +103,7 @@
                 if (window.Notification.permission === 'granted') {
                     var n = new window.Notification(title || 'PSE Distribution', {
                         body: message || '',
-                        icon: opts.iconUrl || '/logo.jpg',
+                        icon: opts.iconUrl || '/logo.webp',
                         tag: notif.tag,
                         silent: true  // we already played our own sound
                     });
@@ -152,7 +152,7 @@
                 if (perm === 'granted' && window.__psePendingSystem) {
                     var p = window.__psePendingSystem;
                     window.__psePendingSystem = null;
-                    push(p.title, p.message, { url: p.url, iconUrl: '/logo.jpg', tag: p.tag });
+                    push(p.title, p.message, { url: p.url, iconUrl: '/logo.webp', tag: p.tag });
                 }
             }).catch(function () {});
         } catch (e) {

@@ -115,7 +115,7 @@
     // do not all use the same image field (and some store a Cloudinary result
     // object instead of a string), so keep image selection in one place.
     function productImage(product, fallback) {
-        fallback = fallback || '/logo.jpg';
+        fallback = fallback || '/logo.webp';
         var seen = [];
         function find(value) {
             if (!value || seen.indexOf(value) !== -1) return '';
@@ -153,7 +153,7 @@
     function useImageFallback(img, fallback) {
         if (!img || img.dataset.imageFallbackApplied) return;
         img.dataset.imageFallbackApplied = 'true';
-        img.src = fallback || '/logo.jpg';
+        img.src = fallback || '/logo.webp';
     }
 
     window.getProductImage = productImage;
@@ -270,22 +270,35 @@
     };
 
     document.addEventListener('DOMContentLoaded', function () {
-        var topBarLinks = document.querySelector('.top-bar .top-links') || document.querySelector('.top-bar .container');
-        if (topBarLinks && !document.getElementById('pseGlobalCurrencySelector')) {
-            var curr = getCurrency();
-            var select = document.createElement('select');
-            select.id = 'pseGlobalCurrencySelector';
-            select.style.cssText = 'background:rgba(255,255,255,0.14);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;outline:none;margin-left:8px;';
-            select.innerHTML = '<option value="USD" style="color:#222;">USD $</option>' +
-                               '<option value="EUR" style="color:#222;">EUR €</option>' +
-                               '<option value="GBP" style="color:#222;">GBP £</option>' +
-                               '<option value="CAD" style="color:#222;">CAD $</option>';
-            select.value = curr;
-            select.addEventListener('change', function (e) {
-                setCurrency(e.target.value);
-            });
-            topBarLinks.appendChild(select);
-        }
+        try {
+            if (document.getElementById('pseGlobalCurrencySelector')) return;
+            var topBarLinks = document.querySelector('.top-bar .top-links');
+            if (!topBarLinks) {
+                topBarLinks = document.querySelector('.top-bar .container');
+                if (topBarLinks) {
+                    // avoid injecting into moving-words container
+                    var tl = topBarLinks.querySelector('.top-links');
+                    if (tl) topBarLinks = tl;
+                }
+            }
+            if (topBarLinks && !document.getElementById('pseGlobalCurrencySelector')) {
+                var curr = getCurrency();
+                var select = document.createElement('select');
+                select.id = 'pseGlobalCurrencySelector';
+                select.setAttribute('aria-label','Currency');
+                select.style.cssText = 'background:rgba(255,255,255,0.14);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;outline:none;margin-left:8px;';
+                select.innerHTML = '<option value="USD" style="color:#222;">USD $</option>' +
+                                   '<option value="EUR" style="color:#222;">EUR €</option>' +
+                                   '<option value="GBP" style="color:#222;">GBP £</option>' +
+                                   '<option value="CAD" style="color:#222;">CAD $</option>' +
+                                   '<option value="ZMW" style="color:#222;">ZMW K</option>';
+                select.value = CURRENCY_RATES[curr] ? curr : 'USD';
+                select.addEventListener('change', function (e) {
+                    setCurrency(e.target.value);
+                });
+                topBarLinks.appendChild(select);
+            }
+        } catch(e){}
     });
 
     // ─── AUTO-INIT (only when the page relies on main.js, e.g. chat.html) ───

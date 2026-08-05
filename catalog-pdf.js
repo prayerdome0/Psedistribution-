@@ -265,7 +265,7 @@
 
     doc.setTextColor(210, 225, 232);
     doc.setFont('helvetica', 'normal');
-    doc.text('3. Browse all 12,000+ SKUs:', MARGIN, yy);
+    doc.text('3. Browse our full catalog:', MARGIN, yy);
     doc.setTextColor(ACCENT[0], ACCENT[1], ACCENT[2]);
     doc.setFont('helvetica', 'bold');
     doc.text(safe(site.url) + '/products', MARGIN, yy + 18);

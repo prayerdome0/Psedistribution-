@@ -1870,7 +1870,7 @@
                     stock: parseInt(values[headers.indexOf('stock')]) || 100,
                     sku: values[headers.indexOf('sku')] || '',
                     description: values[headers.indexOf('description')] || 'Wholesale product listed by verified supplier.',
-                    image_url: values[headers.indexOf('image_url')] || 'logo.jpg',
+                    image_url: values[headers.indexOf('image_url')] || '/logo.webp',
                     slug: generateSlug(values[headers.indexOf('title')] || values[0]),
                     supplier_id: user.uid,
                     seller_id: user.uid,

@@ -1,11 +1,18 @@
 /* ==========================================================================
    PSE Recently Viewed Products — tracks and displays recently viewed items
+   Fixed: XSS-safe escaping, logo.webp fallback, robust IDs
    ========================================================================== */
 (function () {
     'use strict';
 
     const STORAGE_KEY = 'pse_recently_viewed';
     const MAX_RECENT = 8;
+
+    function esc(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
 
     function getRecentlyViewed() {
         try {
@@ -18,23 +25,16 @@
         if (!product || !product.id) return;
 
         let recent = getRecentlyViewed();
-
-        // Remove duplicates
         recent = recent.filter(p => p.id !== product.id);
-
-        // Add to front
         recent.unshift({
-            id: product.id,
-            title: product.title,
-            price: product.price,
-            image_url: product.image_url,
-            slug: product.slug,
-            brand: product.brand || 'Pilot Distribution'
+            id: String(product.id),
+            title: String(product.title || 'Product'),
+            price: parseFloat(product.price) || 0,
+            image_url: String(product.image_url || product.image || '/logo.webp'),
+            slug: String(product.slug || product.id),
+            brand: String(product.brand || 'Pilot Distribution')
         });
-
-        // Limit size
         if (recent.length > MAX_RECENT) recent.length = MAX_RECENT;
-
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(recent));
         } catch (e) {}
@@ -59,14 +59,14 @@
             <div class="product-grid" style="margin-top:1rem;">
                 ${recent.map(p => `
                     <div class="product-card">
-                        <div class="product-image" onclick="window.location.href='/product/${p.slug || p.id}'">
-                            <img src="${p.image_url || 'logo.jpg'}" alt="${p.title}" loading="lazy">
+                        <div class="product-image" onclick="window.location.href='/product/${esc(p.slug || p.id)}'">
+                            <img src="${esc(p.image_url || '/logo.webp')}" alt="${esc(p.title)}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'">
                         </div>
-                        <div class="product-title">${p.title}</div>
-                        <div class="product-brand">${p.brand}</div>
-                        <div class="product-price">$${(p.price || 0).toFixed(2)}</div>
+                        <div class="product-title">${esc(p.title)}</div>
+                        <div class="product-brand">${esc(p.brand)}</div>
+                        <div class="product-price">$${(parseFloat(p.price) || 0).toFixed(2)}</div>
                         <div class="product-actions">
-                            <button class="btn-add" onclick="addToCartFromRecent('${p.id}')">
+                            <button class="btn-add" onclick="addToCartFromRecent('${esc(p.id)}')">
                                 <i class="fa-solid fa-cart-plus"></i> Add
                             </button>
                         </div>
@@ -76,38 +76,37 @@
         `;
     }
 
-    // Helper for recent product add to cart
     window.addToCartFromRecent = function (productId) {
         if (typeof window.addToCart === 'function') {
             window.addToCart(productId);
         } else {
-            // Fallback
             const recent = getRecentlyViewed();
             const prod = recent.find(p => p.id === productId);
             if (prod) {
-                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
-                const existing = cart.findIndex(i => i.product_id === productId);
-                if (existing > -1) {
-                    cart[existing].quantity = (cart[existing].quantity || 1) + 1;
-                } else {
-                    cart.push({ ...prod, product_id: productId, quantity: 1 });
-                }
-                localStorage.setItem('pilot_cart', JSON.stringify(cart));
-                if (window.showToast) window.showToast('✅ Added to cart!', 'success');
+                try {
+                    const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+                    const existing = cart.findIndex(i => i.product_id === productId);
+                    if (existing > -1) {
+                        cart[existing].quantity = (cart[existing].quantity || 1) + 1;
+                    } else {
+                        cart.push({ ...prod, product_id: productId, quantity: 1 });
+                    }
+                    localStorage.setItem('pilot_cart', JSON.stringify(cart));
+                    if (window.showToast) window.showToast('✅ Added to cart!', 'success');
+                    if (window.loadCartCount) window.loadCartCount();
+                } catch(e){}
             }
         }
     };
 
-    // Expose public API
     window.PSE = window.PSE || {};
     window.PSE.recentlyViewed = {
         add: addRecentlyViewed,
         render: renderRecentlyViewed,
         get: getRecentlyViewed,
-        clear: () => localStorage.removeItem(STORAGE_KEY)
+        clear: () => { try{ localStorage.removeItem(STORAGE_KEY);}catch(e){} }
     };
 
-    // Auto-render on pages that have the container
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => renderRecentlyViewed(), 1200);
