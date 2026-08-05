@@ -288,7 +288,8 @@ def gate_2_security() -> None:
         vercel = json.load(f)
     headers = {h["key"]: h["value"] for e in vercel.get("headers", []) for h in e.get("headers", [])}
     required = ["X-Content-Type-Options", "X-Frame-Options", "Referrer-Policy",
-                "Permissions-Policy", "Content-Security-Policy"]
+                "Permissions-Policy", "Content-Security-Policy",
+                "Cross-Origin-Opener-Policy", "Cross-Origin-Resource-Policy"]
     for r in required:
         if r in headers:
             ok(f"vercel.json sets {r}")
@@ -300,6 +301,24 @@ def gate_2_security() -> None:
             ok(f"CSP allows {host}")
         else:
             fail(f"CSP does not allow {host} (preview iframe may break)")
+    for directive in ["default-src", "script-src", "style-src", "img-src", "connect-src",
+                      "base-uri", "form-action", "frame-ancestors", "upgrade-insecure-requests"]:
+        if directive in csp:
+            ok(f"CSP declares {directive}")
+        else:
+            warn(f"CSP missing {directive} directive")
+    # HSTS — Vercel doesn't allow setting this in vercel.json (must be
+    # enabled at the domain level). Just warn if not present (operator action).
+    hsts_present = any("Strict-Transport-Security" in e.get("headers", [{}])[0].get("key", "") for e in vercel.get("headers", []))
+    if not hsts_present:
+        warn("Strict-Transport-Security not in vercel.json — enable HSTS at the Vercel domain level (Settings → Domains → HSTS)")
+    # Permissions-Policy should be present and disable at least camera/mic
+    pp = headers.get("Permissions-Policy", "")
+    for blocked in ["camera=()", "microphone=()", "geolocation=()"]:
+        if blocked in pp:
+            ok(f"Permissions-Policy blocks {blocked}")
+        else:
+            warn(f"Permissions-Policy should block {blocked}")
     # robots.txt
     rt = (REPO / "robots.txt").read_text()
     for must in ["/admin-dashboard", "/admin", "/seller-dashboard", "/account", "/api/"]:

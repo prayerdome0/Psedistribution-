@@ -259,9 +259,21 @@ ignore a backup failure.**
 
 ---
 
-## 7. Incident response
+## 7. TLS / HSTS
 
-### Severity ladder
+| Cert | Where | Notes |
+|---|---|---|
+| Frontend (Vercel) | Auto-provisioned by Vercel for `pilotsalesdistribution.com` and `www.pilotsalesdistribution.com`. Renewal is automatic. | Enable HSTS at the domain level: Settings → Domains → select domain → HSTS → enable. Max-age 1 year, include subdomains, preload. |
+| Inventory API (self-hosted) | Caddy auto-provisions via Let's Encrypt (DNS-01 challenge). Renewal is automatic. | Caddyfile already sets HSTS preload — confirm the edge is reachable on :80 for the challenge. |
+
+### HSTS preload
+
+Once the site has been running on HTTPS with HSTS for at least 60 days
+without a security incident, submit the domain to the HSTS preload
+list: <https://hstspreload.org>. This bakes the policy into browsers
+so even a first visit to the domain is forced over HTTPS.
+
+## 8. Incident response
 
 | Sev | Definition | Response time | Who |
 |---|---|---|---|
@@ -325,7 +337,7 @@ The actual reason it broke, with evidence (logs, commit, runbook step).
 
 ---
 
-## 8. Common failure modes
+## 9. Common failure modes
 
 ### Symptom: "503 — snapshot unavailable"
 
@@ -412,7 +424,7 @@ curl -fsS -X POST https://formsubmit.co/ajax/admin@pilotsalesdistribution.com \
 
 ---
 
-## 9. Security incident
+## 10. Security incident
 
 If you suspect a breach (unauthorised access, data leak, etc.):
 

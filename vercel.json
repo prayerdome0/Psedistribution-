@@ -331,12 +331,24 @@
           "value": "strict-origin-when-cross-origin"
         },
         {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin-allow-popups"
+        },
+        {
+          "key": "Cross-Origin-Embedder-Policy",
+          "value": "unsafe-none"
+        },
+        {
+          "key": "Cross-Origin-Resource-Policy",
+          "value": "same-site"
+        },
+        {
           "key": "Permissions-Policy",
-          "value": "geolocation=(), microphone=(), camera=()"
+          "value": "accelerometer=(), autoplay=(self), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(self \"https://pilotsalesdistribution.com\"), usb=(), interest-cohort=()"
         },
         {
           "key": "Content-Security-Policy",
-          "value": "frame-ancestors 'self' https://*.e2b.app https://*.arena.ai https://pilotsalesdistribution.com;"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com https://*.firebaseio.com https://*.firebaseapp.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://api.resend.com https://formsubmit.co; frame-src 'self' https://*.firebaseapp.com https://accounts.google.com; worker-src 'self' blob:; manifest-src 'self'; base-uri 'none'; form-action 'self' https://formsubmit.co https://accounts.google.com; frame-ancestors 'self' https://*.e2b.app https://*.arena.ai https://pilotsalesdistribution.com; upgrade-insecure-requests"
         }
       ]
     },
