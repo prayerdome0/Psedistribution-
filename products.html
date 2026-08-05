@@ -1248,6 +1248,9 @@
                         ${p.rfqEnabled ? `<a class="btn-add" href="${rfqHref}" style="background:var(--primary);text-align:center;text-decoration:none;">
                             <i class="fa-regular fa-file-lines"></i> RFQ
                         </a>` : ''}
+                        <button onclick="addToRfqCart('${p.dealId || p.id}', '${safeTitle}', ${p.price || 0}, '${imageUrl}')" class="btn-add" style="background:#0b2138;color:#fff;">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
                     </div>
                 </div>
             `;
@@ -1673,5 +1676,9 @@
     <script src="dark-mode.js"></script>
     <script src="recently-viewed.js"></script>
     <script src="quickview.js"></script>
+    <script src="advanced-search.js"></script>
+    <script src="compare-enhanced.js"></script>
+    <script src="mobile-nav-enhanced.js"></script>
+    <script src="rfq-cart.js"></script>
 </body>
 </html>
