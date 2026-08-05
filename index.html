@@ -49,6 +49,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="main.js"></script>
+    <script src="catalog-data.js"></script>
     <script src="/inventory-client.js"></script>
 
     <!-- Premium Design System (shared) -->
@@ -717,6 +718,20 @@
         } catch (feedError) {
             console.error('Inventory API unavailable:', feedError);
             updateInventoryMetrics(null, []);
+            // Fallback to static catalog data when API is unreachable
+            if (window.PSE_CATALOG_DATA && window.PSE_CATALOG_DATA.products) {
+                products = window.PSE_CATALOG_DATA.products.map(p => ({
+                    id: p.sku || '', dealId: p.sku || '',
+                    slug: generateSlug(p.title || 'product'),
+                    title: p.title || 'Product', brand: p.brand || 'Pilot Distribution',
+                    moq: p.moq || 0, category: p.category || 'other',
+                    price: p.price || null, image_url: p.image_url || 'logo.webp',
+                    availability: 'in-stock', stock: 1,
+                    freightTerms: 'Freight quoted separately', fob: '', condition: '',
+                    rfqEnabled: true, lastAvailabilityConfirmedAt: new Date().toISOString()
+                }));
+                updateInventoryMetrics({ totalCount: products.length, freshness: 'static' }, window.PSE_CATALOG_DATA.products);
+            }
         }
 
         featuredProducts = products;
