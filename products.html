@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap&family=Montserrat:wght@300;400;500;600;700;800;900" rel="stylesheet" />
     
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -631,6 +631,36 @@
         </button>
     </div>
 
+    <!-- BANNER SLIDER / PROMOTIONAL BANNER -->
+    <div class="banner-slider animate-on-scroll" style="margin: 1.5rem 0 2rem; height: 340px;">
+        <div class="banner-track" id="productsBannerTrack">
+            <div class="slide">
+                <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1920&q=80" alt="Global Wholesale Freight" />
+                <div class="slide-caption">
+                    <span class="badge"><i class="fa-solid fa-bolt"></i> Global Logistics &amp; Bulk Shipping</span>
+                    <h2>Verified Wholesale <span>Inventory at Scale</span></h2>
+                    <p>Confirmed availability per offer. Freight quoted per product with 100% Escrow Trade Assurance.</p>
+                    <a href="/rfq" class="btn btn-white"><i class="fa-regular fa-file-lines"></i> Submit RFQ</a>
+                </div>
+            </div>
+            <div class="slide">
+                <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1920&q=80" alt="Warehouse Distribution" />
+                <div class="slide-caption">
+                    <span class="badge"><i class="fa-solid fa-shield-halved"></i> Verified Suppliers</span>
+                    <h2>Tiered VIP Supplier <span>Memberships &amp; Sponsoring</span></h2>
+                    <p>Gold &amp; Platinum Enterprise suppliers with direct manufacturer inspection and on-time guarantees.</p>
+                    <a href="/become-seller" class="btn btn-white"><i class="fa-solid fa-store"></i> Become a Seller</a>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="banner-nav prev" onclick="moveProductsSlide(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+        <button type="button" class="banner-nav next" onclick="moveProductsSlide(1)"><i class="fa-solid fa-chevron-right"></i></button>
+        <div class="dots" id="productsBannerDots">
+            <button type="button" class="dot active" onclick="setProductsSlide(0)"></button>
+            <button type="button" class="dot" onclick="setProductsSlide(1)"></button>
+        </div>
+    </div>
+
     <!-- Trust strip -->
     <div class="animate-on-scroll" style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;background:#fff;border:1px solid var(--border);border-radius:12px;padding:0.7rem 1rem;margin-bottom:1.2rem;font-size:0.78rem;color:var(--text);">
         <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-circle-check" style="color:var(--primary);"></i> <strong>Per-offer availability</strong> — confirmed and time-stamped</span>
@@ -781,6 +811,21 @@
 
 <!-- JAVASCRIPT -->
 <script>
+    // ─── BANNER SLIDER FUNCTIONS ───
+    let currentProdSlide = 0;
+    function setProductsSlide(n) {
+        const track = document.getElementById('productsBannerTrack');
+        const dots = document.querySelectorAll('#productsBannerDots .dot');
+        if (!track) return;
+        currentProdSlide = (n + 2) % 2;
+        track.style.transform = `translateX(-${currentProdSlide * 100}%)`;
+        dots.forEach((d, idx) => d.classList.toggle('active', idx === currentProdSlide));
+    }
+    function moveProductsSlide(dir) {
+        setProductsSlide(currentProdSlide + dir);
+    }
+    setInterval(() => moveProductsSlide(1), 6000);
+
     // ─── FIREBASE CONFIG ───
     const firebaseConfig = {
         apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",

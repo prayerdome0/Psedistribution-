@@ -435,4 +435,21 @@
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pseCookieConsent);
     else pseCookieConsent();
+
+    // ─── 5. AUTOMATIC SCROLL REVEAL ANIMATIONS (all pages) ───
+    document.addEventListener('DOMContentLoaded', function () {
+        var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll, .product-card, .why-card, .category-item, .stat-item, .testimonial-card, .card, .section-title').forEach(function (el) {
+            if (!el.classList.contains('animate-on-scroll')) el.classList.add('animate-on-scroll');
+            observer.observe(el);
+        });
+    });
 })();

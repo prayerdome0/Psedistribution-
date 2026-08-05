@@ -60,71 +60,33 @@
     --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
     /* Type */
-    --font-heading: 'Sora', 'Inter', 'Segoe UI', system-ui, sans-serif;
-    --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-heading: 'Montserrat', 'Sora', 'Inter', 'Segoe UI', system-ui, sans-serif;
+    --font-body: 'Inter', 'Montserrat', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* ─── ENHANCED ANIMATIONS & KEYFRAMES ─── */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-html {
-    scroll-behavior: smooth;
-    -webkit-text-size-adjust: 100%;
+@keyframes floatAnim {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
 }
 
-body {
-    background: var(--light);
-    color: var(--dark);
-    font-family: var(--font-body);
-    line-height: 1.65;
-    overflow-x: hidden;
-    font-size: 15.5px;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(14, 124, 104, 0.4); }
+    50% { box-shadow: 0 0 0 14px rgba(14, 124, 104, 0); }
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
-    line-height: 1.22;
-    letter-spacing: -0.015em;
-    color: var(--secondary);
-}
+.float-effect { animation: floatAnim 4s ease-in-out infinite; }
+.pulse-glow-effect { animation: pulseGlow 2.5s infinite; }
 
-a { text-decoration: none; color: inherit; }
-ul { list-style: none; }
-img { max-width: 100%; display: block; }
-button { font-family: var(--font-body); }
-input, select, textarea { font-family: var(--font-body); }
-
-::selection {
-    background: var(--primary);
-    color: var(--white);
-}
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: var(--light); }
-::-webkit-scrollbar-thumb {
-    background: #c9d6e0;
-    border-radius: 10px;
-    border: 2px solid var(--light);
-}
-::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-
-.container {
-    max-width: 1320px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-}
-
-/* ─── SCROLL REVEAL ─── */
 .animate-on-scroll {
     opacity: 0;
-    transform: translateY(28px);
-    transition: opacity 0.7s var(--transition-slow), transform 0.7s var(--transition-slow);
+    transform: translateY(32px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .animate-on-scroll.visible {
     opacity: 1;
