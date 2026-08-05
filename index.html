@@ -154,7 +154,7 @@
                     <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1600&q=80" alt="Trusted supplier partnerships" loading="lazy" />
                     <div class="slide-caption">
                         <span class="badge"><i class="fa-solid fa-handshake"></i> For suppliers</span>
-                        <h2>Partner with <span>580+ verified sellers</span></h2>
+                        <h2>Build your <span>verified supply network</span></h2>
                         <p>List your inventory on a marketplace built for verified B2B distribution.</p>
                         <span class="btn btn-white"><i class="fa-solid fa-store"></i> Become a Seller</span>
                     </div>
@@ -166,29 +166,29 @@
         <div class="dots" id="bannerDots"></div>
     </div>
 
-    <!-- 2. STATS -->
-    <div class="stats-section animate-on-scroll">
+    <!-- 2. LIVE MARKETPLACE STATUS -->
+    <section class="stats-section animate-on-scroll" aria-label="Marketplace status">
         <div class="stat-item">
             <div class="icon"><i class="fa-solid fa-boxes-stacked"></i></div>
-            <div class="number">12,000<span class="suffix">+</span></div>
-            <div class="label">Products Available</div>
+            <div class="number" id="liveOfferCount">—</div>
+            <div class="label">Current offers</div>
         </div>
         <div class="stat-item">
-            <div class="icon"><i class="fa-solid fa-handshake"></i></div>
-            <div class="number">580<span class="suffix">+</span></div>
-            <div class="label">Verified Suppliers</div>
+            <div class="icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="number">Per offer</div>
+            <div class="label">Availability confirmation</div>
         </div>
         <div class="stat-item">
-            <div class="icon"><i class="fa-solid fa-percent"></i></div>
-            <div class="number">40<span class="suffix">%</span></div>
-            <div class="label">Average Savings</div>
+            <div class="icon"><i class="fa-solid fa-truck"></i></div>
+            <div class="number">Clear</div>
+            <div class="label">Freight terms</div>
         </div>
         <div class="stat-item">
-            <div class="icon"><i class="fa-solid fa-star"></i></div>
-            <div class="number">99.7<span class="suffix">%</span></div>
-            <div class="label">Customer Satisfaction</div>
+            <div class="icon"><i class="fa-regular fa-file-lines"></i></div>
+            <div class="number">RFQ</div>
+            <div class="label">Before commitment</div>
         </div>
-    </div>
+    </section>
 
     <!-- 3. SHOP BY CATEGORY -->
     <div class="section-title animate-on-scroll" style="margin-top: 2.5rem;">
@@ -197,56 +197,46 @@
         <p>Find the products you need at wholesale prices</p>
     </div>
     <div class="category-grid animate-on-scroll">
-        <div class="category-item" onclick="window.location.href='/products?category=electronics'">
+        <a class="category-item" href='/products?category=electronics'">
             <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=200&h=200&q=80" alt="Electronics" loading="lazy" />
             <span>Electronics</span>
-        </div>
-        <div class="category-item" onclick="window.location.href='/products?category=fashion'">
+        </a>
+        <a class="category-item" href='/products?category=fashion'">
             <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=200&h=200&q=80" alt="Fashion" loading="lazy" />
             <span>Fashion</span>
-        </div>
-        <div class="category-item" onclick="window.location.href='/products?category=home'">
+        </a>
+        <a class="category-item" href='/products?category=home'">
             <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=200&h=200&q=80" alt="Home" loading="lazy" />
             <span>Home</span>
-        </div>
-        <div class="category-item" onclick="window.location.href='/products?category=beauty'">
+        </a>
+        <a class="category-item" href='/products?category=beauty'">
             <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=200&h=200&q=80" alt="Beauty" loading="lazy" />
             <span>Beauty</span>
-        </div>
-        <div class="category-item" onclick="window.location.href='/products?category=sports'">
+        </a>
+        <a class="category-item" href='/products?category=sports'">
             <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=200&h=200&q=80" alt="Sports" loading="lazy" />
             <span>Sports</span>
-        </div>
-        <div class="category-item" onclick="window.location.href='/products?category=automotive'">
+        </a>
+        <a class="category-item" href="/products?category=automotive">
             <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=200&h=200&q=80" alt="Automotive" loading="lazy" />
             <span>Automotive</span>
-        </div>
+        </a>
     </div>
 
-    <!-- 4. TRUSTED COMPANIES -->
-    <div class="trusted-section animate-on-scroll">
+    <!-- 4. HOW BUYING WORKS -->
+    <section class="trusted-section animate-on-scroll" aria-labelledby="how-it-works-title">
         <div class="section-title">
-            <span class="eyebrow"><i class="fa-solid fa-building-shield"></i> Our network</span>
-            <h2>Trusted by <span>Leading Companies</span></h2>
-            <p>Join thousands of businesses that trust Pilot Sales Distribution</p>
+            <span class="eyebrow"><i class="fa-solid fa-compass"></i> Procurement, made clear</span>
+            <h2 id="how-it-works-title">How <span>buying works</span></h2>
+            <p>Every offer is handled on its own commercial terms—so you know what happens before you commit.</p>
         </div>
-        <div class="logo-carousel">
-            <div class="logo-track" id="logoTrack">
-                <!-- Logos populated by JavaScript -->
-            </div>
+        <div class="why-grid">
+            <article class="why-card"><h3><i class="fa-solid fa-magnifying-glass"></i> 1. Find an offer</h3><p>Browse current inventory and review MOQ, lead time and offer-specific terms.</p></article>
+            <article class="why-card"><h3><i class="fa-regular fa-file-lines"></i> 2. Request a quote</h3><p>Send your required quantity. Our team confirms current availability, freight and final commercial terms.</p></article>
+            <article class="why-card"><h3><i class="fa-solid fa-handshake"></i> 3. Approve with confidence</h3><p>Proceed only after you have reviewed the confirmed quote and the applicable payment, inspection and delivery terms.</p></article>
         </div>
-    </div>
-
-    <!-- 5. FLASH DEALS -->
-    <div class="flash-deals animate-on-scroll" style="margin-top: 1rem;">
-        <div class="left">
-            <h3><i class="fa-solid fa-bolt"></i> Flash Deals</h3>
-            <div class="flash-timer" id="flashTimer">
-                <span id="flashHours">02</span><span class="sep">:</span><span id="flashMinutes">45</span><span class="sep">:</span><span id="flashSeconds">30</span>
-            </div>
-        </div>
-        <p style="font-weight:600;font-size:1.05rem;margin:0;">Up to <strong style="color:var(--accent);font-size:1.25rem;">40% OFF</strong> selected wholesale items — ends soon!</p>
-    </div>
+        <p style="text-align:center;margin:1.5rem 0 0;"><a href="/help-center" class="btn-outline">Read the buyer guide <i class="fa-solid fa-arrow-right"></i></a></p>
+    </section>
 
     <!-- 6. WHY CHOOSE US -->
     <div class="section-title animate-on-scroll" style="margin-top: 2.5rem;">
@@ -295,34 +285,19 @@
         <p style="opacity:0.7;font-size:0.75rem;margin-top:0.8rem;"><i class="fa-solid fa-lock"></i> No spam — unsubscribe any time. New subscribers instantly get a confirmation email.</p>
     </div>
 
-    <!-- 9. TESTIMONIALS -->
-    <div class="testimonials-section animate-on-scroll">
+    <!-- 9. BUYER FEEDBACK -->
+    <section class="testimonials-section animate-on-scroll" aria-labelledby="feedback-title">
         <div class="section-title">
-            <span class="eyebrow" style="background:rgba(224,166,46,0.14);border-color:rgba(224,166,46,0.35);color:#ffd98a;"><i class="fa-solid fa-quote-left"></i> Reviews</span>
-            <h2>What Our <span>Buyers Say</span></h2>
-            <p>Real reviews from verified wholesale buyers</p>
+            <span class="eyebrow" style="background:rgba(224,166,46,0.14);border-color:rgba(224,166,46,0.35);color:#ffd98a;"><i class="fa-regular fa-star"></i> Feedback</span>
+            <h2 id="feedback-title">Buyer feedback, <span>shown honestly</span></h2>
+            <p>We publish customer feedback only after it is submitted by a verified buyer.</p>
         </div>
-        <div class="testimonial-grid">
-            <div class="testimonial-card">
-                <div class="stars">★★★★★</div>
-                <p class="text">"The wholesale prices saved our business thousands. Delivery was faster than expected and the products exceeded quality expectations."</p>
-                <div class="author">Marcus Chen</div>
-                <div class="company">Retail Chain Owner</div>
-            </div>
-            <div class="testimonial-card">
-                <div class="stars">★★★★☆</div>
-                <p class="text">"Verified suppliers made all the difference. We found exactly what we needed at competitive bulk rates with no quality issues."</p>
-                <div class="author">Sarah Okonkwo</div>
-                <div class="company">Distribution Manager</div>
-            </div>
-            <div class="testimonial-card">
-                <div class="stars">★★★★★</div>
-                <p class="text">"The quick sign-up and easy login made onboarding smooth. We've been ordering for 6 months with zero issues."</p>
-                <div class="author">David Nakamura</div>
-                <div class="company">E-commerce Director</div>
-            </div>
+        <div class="quote-section" style="margin-top:1.5rem;">
+            <h2>Be among our first <span>verified reviewers</span></h2>
+            <p>After your order is complete, you can share an experience that helps other procurement teams buy with confidence.</p>
+            <a href="/products" class="btn-white"><i class="fa-solid fa-box-open"></i> View current offers</a>
         </div>
-    </div>
+    </section>
 
     <!-- 10. MORE DEALS -->
     <div class="section-title animate-on-scroll" style="margin-top: 2.5rem;">
@@ -460,7 +435,7 @@
         setupAuthListener();
         loadCartCount();
         loadWishlistCount();
-        renderLogos();
+        loadLiveOfferCount();
     }
 
     function setupAuthListener() {
@@ -767,6 +742,25 @@
         }, 1000);
     }
 
+    async function loadLiveOfferCount() {
+        const countEl = document.getElementById('liveOfferCount');
+        if (!countEl) return;
+        try {
+            const response = await fetch('/api/inventory?limit=1', { headers: { 'Accept': 'application/json' } });
+            if (response.ok) {
+                const payload = await response.json();
+                const count = Number(payload.total ?? payload.count ?? (Array.isArray(payload.items) ? payload.items.length : NaN));
+                if (Number.isFinite(count) && count >= 0) { countEl.textContent = count.toLocaleString(); return; }
+            }
+        } catch (e) { /* The public API is optional in static previews. */ }
+        try {
+            const snapshot = await db.collection('products').where('status', '==', 'active').get();
+            countEl.textContent = snapshot.size.toLocaleString();
+        } catch (e) {
+            countEl.textContent = 'Current';
+        }
+    }
+
     window.toggleWishlist = toggleWishlist;
     window.goToSlide = goToSlide;
     window.nextSlide = nextSlide;
@@ -834,9 +828,9 @@
                 <button type="submit"><i class="fa-solid fa-paper-plane"></i> Join</button>
             </form>
             <div id="psePopupTrust">
-                <span><i class="fa-solid fa-shield-halved"></i> Scam-free</span>
-                <span><i class="fa-solid fa-circle-check"></i> Verified sellers</span>
-                <span><i class="fa-solid fa-rotate-left"></i> 30-day returns</span>
+                <span><i class="fa-solid fa-circle-check"></i> Offer-specific terms</span>
+                <span><i class="fa-regular fa-file-lines"></i> RFQ-first purchasing</span>
+                <span><i class="fa-solid fa-truck"></i> Freight confirmed per offer</span>
             </div>
             <button id="psePopupLater" onclick="pseClosePopup(true)">Don't show me this today</button>
         </div>
