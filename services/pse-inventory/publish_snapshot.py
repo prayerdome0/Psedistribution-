@@ -45,6 +45,7 @@ sys.path.insert(0, str(SERVICE))
 from pse_inventory import publish_gate  # noqa: E402
 from pse_inventory._packet import load_atomic_store_module  # noqa: E402
 from pse_inventory.snapshot_builder import PublishBlocked, build_snapshot  # noqa: E402
+from pse_inventory.postgres_store import PostgresSnapshotStore  # noqa: E402
 
 DEFAULT_MEDIA_HOSTS = {
     "pilotsalesdistribution.com",
@@ -127,6 +128,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--release-id", required=True)
     parser.add_argument("--data-dir", type=Path, default=SERVICE / "data",
                         help="snapshot store directory (default: services/pse-inventory/data)")
+    parser.add_argument("--database-url", default=None,
+                        help="production PostgreSQL URL; when set, promote through public_inventory.active_snapshot")
     parser.add_argument("--allow-media-host", action="append", default=[],
                         help="additional approved HTTPS media host (repeatable)")
     parser.add_argument("--dry-run", action="store_true",
@@ -215,9 +218,23 @@ def main(argv: list[str] | None = None) -> int:
         print(f"dry run: gate passed, recordCount={snapshot.get('recordCount')}, nothing promoted")
         return EXIT_OK
 
+    storage_target = "filesystem"
     try:
-        atomic_store = load_atomic_store_module()
-        atomic_store.promote_snapshot(data_dir, snapshot)
+        if args.database_url:
+            try:
+                import psycopg  # type: ignore
+            except ImportError as exc:
+                raise RuntimeError("psycopg is required for --database-url promotion") from exc
+            store = PostgresSnapshotStore(
+                lambda: psycopg.connect(args.database_url, connect_timeout=5)
+            )
+            staged = store.stage_snapshot(snapshot, run_id=args.run_id)
+            receipt = store.promote_snapshot(staged, operator=args.operator, release_id=args.release_id)
+            payload["previousSnapshotVersion"] = receipt.previous_snapshot_version
+            storage_target = "postgresql"
+        else:
+            atomic_store = load_atomic_store_module()
+            atomic_store.promote_snapshot(data_dir, snapshot)
     except Exception as exc:  # StoreError, OSError, integrity failures
         payload["promoted"] = False
         payload["promotionError"] = str(exc)
@@ -225,10 +242,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: snapshot passed the gates but promotion failed: {exc}", file=sys.stderr)
         return EXIT_IO
 
+    payload["storageTarget"] = storage_target
     payload["promoted"] = True
     report_file = write_report(report_dir, payload)
     print(json.dumps(payload, indent=2, ensure_ascii=False))
-    print(f"promoted snapshotVersion={snapshot['snapshotVersion']} recordCount={snapshot.get('recordCount')} -> {current_file}")
+    target = "PostgreSQL public_inventory.active_snapshot" if storage_target == "postgresql" else str(current_file)
+    print(f"promoted snapshotVersion={snapshot['snapshotVersion']} recordCount={snapshot.get('recordCount')} -> {target}")
     if ignored_ids:
         print(f"note: {len(ignored_ids)} record(s) not publish-approved and were ignored: {', '.join(ignored_ids)}")
     if report_file:

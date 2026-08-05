@@ -7,6 +7,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import yaml
+
 ROOT = Path(__file__).resolve().parents[3]
 SERVICE = ROOT / "services" / "pse-inventory"
 
@@ -59,3 +61,31 @@ def test_server_exits_fail_closed_without_secrets():
     )
     assert completed.returncode != 0
     assert "PSE_REVALIDATION_KEYS_JSON" in completed.stderr
+
+
+def test_production_compose_wires_database_and_shared_state():
+    path = SERVICE / "deploy" / "compose.production.yaml"
+    compose = yaml.safe_load(path.read_text(encoding="utf-8"))
+    services = compose["services"]
+    api = services["api"]
+    environment = api["environment"]
+    assert environment["PSE_RUNTIME_MODE"] == "production"
+    assert "PSE_DATABASE_URL" in environment
+    assert "PSE_VALKEY_URL" in environment
+    assert {"postgres", "valkey"} <= set(api["depends_on"])
+    assert "ports" not in api
+    assert api["read_only"] is True
+    assert api["cap_drop"] == ["ALL"]
+    assert "./postgres-init:/docker-entrypoint-initdb.d:ro" in services["postgres"]["volumes"]
+    assert "../migrations:/migrations:ro" in services["postgres"]["volumes"]
+    assert "PSE_STOREFRONT_PASSWORD" in services["postgres"]["environment"]
+    assert "PSE_PUBLISHER_PASSWORD" in services["postgres"]["environment"]
+
+
+def test_caddy_does_not_serve_repository_control_plane_paths():
+    text = (SERVICE / "deploy" / "Caddyfile").read_text(encoding="utf-8")
+    assert "handle @blocked" in text
+    for path in ("/services/*", "/vendor/*", "/.env*", "/firestore.rules"):
+        assert path in text
+    assert "@apiInternal path /api/internal/*" in text
+    assert "handle @apiInternal" in text

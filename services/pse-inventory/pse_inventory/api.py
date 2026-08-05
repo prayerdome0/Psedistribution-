@@ -27,13 +27,19 @@ from ._packet import load_revalidation_module
 from .cursor import CursorError, CursorSigner
 from .rate_limit import FixedWindowRateLimiter
 from .settings import AppSettings
+from .shared_state import ReplayDetected, SharedStateUnavailable
 from .snapshot_repository import SnapshotRepository, SnapshotUnavailable
 
 CONTRACT_VERSION = "4.0.0"
 REQUESTS = Counter("pse_inventory_http_requests_total", "Inventory API requests", ["path", "status"])
 LATENCY = Histogram("pse_inventory_http_request_seconds", "Inventory API request latency", ["path"])
 SNAPSHOT_RECORDS = Gauge("pse_inventory_snapshot_records", "Records in current validated public snapshot")
+SNAPSHOT_GENERATED = Gauge("pse_inventory_snapshot_generated_timestamp_seconds", "Unix timestamp of the active snapshot")
+SHARED_STATE_UP = Gauge("pse_inventory_shared_state_up", "Whether shared Valkey state is available")
 REVALIDATIONS = Counter("pse_inventory_revalidations_total", "Signed revalidation attempts", ["result"])
+PRIVACY_VIOLATIONS = Counter("pse_inventory_privacy_violations_total", "Rejected private-field publication attempts")
+PARITY_MISMATCHES = Counter("pse_inventory_parity_mismatch_total", "Feed/API parity mismatches")
+PUBLISH_ROLLBACKS = Counter("pse_inventory_publish_rollbacks_total", "Snapshot rollback events")
 
 
 def _canonical(value: Any) -> bytes:
@@ -73,15 +79,23 @@ def create_app(settings: AppSettings) -> FastAPI:
         allow_headers=["If-None-Match", "Content-Type"],
         expose_headers=["ETag", "X-PSE-Snapshot-Version", "X-Request-Id", "Cache-Control"],
     )
-    repository = SnapshotRepository(
-        snapshot_file=settings.snapshot_file,
-        packet_root=settings.packet_root,
-        max_last_good_age_seconds=settings.max_last_good_age_seconds,
-    )
-    signer = CursorSigner(secret=settings.cursor_secret.encode("utf-8"))
-    limiter = FixedWindowRateLimiter(limit=settings.rate_limit_per_minute, window_seconds=60)
     revalidation = load_revalidation_module(settings.packet_root)
-    nonce_store = revalidation.NonceStore()
+    if settings.runtime_mode == "production":
+        from .production import build_production_repository, build_production_shared_state
+
+        repository = build_production_repository(settings)
+        nonce_store, limiter = build_production_shared_state(settings)
+        SHARED_STATE_UP.set(1)
+    else:
+        repository = SnapshotRepository(
+            snapshot_file=settings.snapshot_file,
+            packet_root=settings.packet_root,
+            max_last_good_age_seconds=settings.max_last_good_age_seconds,
+        )
+        limiter = FixedWindowRateLimiter(limit=settings.rate_limit_per_minute, window_seconds=60)
+        nonce_store = revalidation.NonceStore()
+        SHARED_STATE_UP.set(1)
+    signer = CursorSigner(secret=settings.cursor_secret.encode("utf-8"))
     app.state.settings = settings
     app.state.repository = repository
     app.state.cursor_signer = signer
@@ -94,10 +108,21 @@ def create_app(settings: AppSettings) -> FastAPI:
     async def request_controls(request: Request, call_next):
         request.state.request_id = request.headers.get("X-Request-Id") or uuid.uuid4().hex
         started = time.perf_counter()
-        public_path = request.url.path.startswith("/api/inventory")
-        if public_path and request.method != "OPTIONS":
+        protected_path = (
+            request.url.path.startswith("/api/inventory")
+            or request.url.path == "/api/internal/inventory/revalidate"
+        )
+        if protected_path and request.method != "OPTIONS":
             client = request.client.host if request.client else "unknown"
-            if not limiter.allow(client):
+            try:
+                allowed = limiter.allow(client, _now(app)) if settings.runtime_mode == "production" else limiter.allow(client)
+            except SharedStateUnavailable:
+                SHARED_STATE_UP.set(0)
+                response = _error(request, 503, "SHARED_STATE_UNAVAILABLE", "Inventory protection state is temporarily unavailable.")
+                response.headers["X-Request-Id"] = request.state.request_id
+                REQUESTS.labels(request.url.path, "503").inc()
+                return response
+            if not allowed:
                 response = _error(request, 429, "RATE_LIMITED", "Request limit exceeded.", headers={"Retry-After": "60"})
                 response.headers["X-Request-Id"] = request.state.request_id
                 REQUESTS.labels(request.url.path, "429").inc()
@@ -114,6 +139,11 @@ def create_app(settings: AppSettings) -> FastAPI:
     def current_snapshot() -> dict[str, Any]:
         snapshot = repository.refresh_or_last_good()
         SNAPSHOT_RECORDS.set(snapshot["recordCount"])
+        try:
+            generated = datetime.fromisoformat(snapshot["generatedAt"].replace("Z", "+00:00"))
+            SNAPSHOT_GENERATED.set(generated.timestamp())
+        except (KeyError, TypeError, ValueError):
+            SNAPSHOT_GENERATED.set(0)
         return snapshot
 
     def snapshot_headers(snapshot: dict[str, Any], representation: Any) -> dict[str, str]:
@@ -204,6 +234,13 @@ def create_app(settings: AppSettings) -> FastAPI:
                 now=_now(app),
                 nonce_store=nonce_store,
             )
+        except ReplayDetected:
+            REVALIDATIONS.labels("replay").inc()
+            return _error(request, 409, "NONCE_REPLAY", "The signed request nonce has already been used.")
+        except SharedStateUnavailable:
+            SHARED_STATE_UP.set(0)
+            REVALIDATIONS.labels("shared_state_unavailable").inc()
+            return _error(request, 503, "SHARED_STATE_UNAVAILABLE", "Inventory protection state is temporarily unavailable.")
         except revalidation.RevalidationError as exc:
             message = str(exc).lower()
             if "replay" in message:

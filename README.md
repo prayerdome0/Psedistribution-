@@ -89,6 +89,38 @@ After promotion: `scripts/pse-inventory-backup.sh` to take a validated backup,
 restart the API so it serves the new snapshot at `/api/inventory`, and use
 `scripts/pse-inventory-rollback.sh <snapshotVersion>` if anything looks wrong.
 
+### Production topology
+
+`services/pse-inventory/deploy/compose.production.yaml` is the production
+wiring path. It runs the API in fail-closed `production` mode against
+PostgreSQL (`public_inventory.active_snapshot`) and Valkey (shared replay and
+rate-limit state), with Caddy serving the site and same-origin `/api/*` proxy.
+Copy `services/pse-inventory/deploy/.env.example` into the deployment secret
+store, replace every placeholder, apply the migrations, and run:
+
+```bash
+cd services/pse-inventory/deploy
+# Use an external secret manager in production; do not commit .env.
+docker compose -f compose.production.yaml config
+docker compose -f compose.production.yaml up -d --build
+```
+
+The production publisher can promote directly to the transactional public
+snapshot table instead of the local file store:
+
+```bash
+./.venv/bin/python services/pse-inventory/publish_snapshot.py \
+    --records approved-canonical-records.json \
+    --approvals owner-approvals.json \
+    --database-url "$PSE_PUBLISHER_DATABASE_URL" \
+    --operator "<owner or documented delegate>" \
+    --run-id <run-id> --release-id <release-id>
+```
+
+The import command accepts a local JSON/CSV export or a reviewed HTTPS
+SalesMax/Sheets export URL. It uses `PSE_AUTHORITY_BEARER_TOKEN` only in the
+server-side migration process; the token never reaches the website bundle.
+
 ### Run the tests
 
 ```bash
@@ -196,7 +228,7 @@ Key routes (clean URLs on Vercel):
   - **🏆 Top Buyers by Revenue:** the customers tab surfaces the top 5 spenders (medals, order counts, lifetime spend) computed from the orders cache.
   - **📴 Offline page (`offline.html`):** branded offline shell (retry + WhatsApp lifeline) — service worker v2 precaches it and serves it as the navigation fallback.
   - **🗺️ Sitemap** now includes `/verify`.
-- **🔎 Pro Search suggestions** — the header search bar on every page is a professional suggestion engine: instant debounced results as you type (no Enter needed), ranked by prefix/word/substring relevance, rich product previews (thumbnail, brand, ★ rating, price, stock, ✓ Verified badge), category & brand chips, recent searches (clearable) and popular searches, full keyboard navigation (↑/↓/Enter/Esc, ARIA listbox), match highlighting, and a "See all N results" footer. Catalog is cached for 10 minutes (sessionStorage), loaded once from Firestore — 100% real products only, no fake or sample demo catalogs. Powered by the shared `search-pro.js` — no API keys, no server
+- **🔎 Pro Search suggestions** — the header search bar on every page is a professional suggestion engine: instant debounced results as you type (no Enter needed), ranked by prefix/word/substring relevance, buyer-safe public API previews (thumbnail, brand, verified availability, price/RFQ mode), category chips, recent searches (clearable) and popular searches, full keyboard navigation (↑/↓/Enter/Esc, ARIA listbox), match highlighting, and a "See all N results" footer. The validated public inventory feed is cached for 10 minutes in sessionStorage; no Firestore or static product fallback is used. Powered by the shared `search-pro.js` — no API keys, no server
 - **💎 Premium Suite (100% admin-managed)** — a full marketing, loyalty & accountability layer powered by the shared `premium.js` engine, all controlled from the admin dashboard:
   - **🎟️ Coupons & Promo Codes** — admins create percent- or fixed-amount discount codes with minimum spend, usage caps and expiry dates (admin **Coupons** tab). Buyers redeem them live at `checkout.html`; the discount flows into the order totals and is recorded on the saved order.
   - **📣 Site-wide Promo Banners** — admins publish a scheduled announcement bar (message, emoji, link, custom colors, start/end window) that renders at the very top of **every** customer-facing page via `premium.js` (admin **Promo Banners** tab). Auto-hidden on the admin dashboard.
@@ -205,7 +237,7 @@ Key routes (clean URLs on Vercel):
   - **💰 Store-Credit Wallet + Referrals** — admins credit/debit member wallets (refunds, bonuses); members share a referral code that awards points to both referrer and invitee (admin **Loyalty & Wallet** tab).
   - **🛡️ Admin Audit Log** — every premium action (coupon/banner/flash create·toggle·delete, settings save, wallet adjust, coupon redemption, admin login) is recorded with actor, action, detail and timestamp in the admin **Audit Log** tab for full accountability.
   - **⭐ Robust admin-role detection** — the account page now detects the admin role from the live Firestore doc *and* the cached session, so admins instantly see an **👑 Administrator** crown and the **Admin Dashboard** shortcut with no flash of missing controls.
-- **🚫 100% Real Only — No Fake or Demo Content** — all sample, demo, placeholder, and fallback products (`FALLBACK_PRODUCTS`), fake statistics (`12,000+`, `580+`, `1,234+`), and demo toast alerts have been completely removed across the catalog, search bar, AI assistant, product detail pages, and home page. The site displays honest, real-time data from Firestore with clean empty states when inventory or statistics are zero.
+- **🚫 100% Real Only — No Fake or Demo Content** — all sample, demo, placeholder, and fallback products (`FALLBACK_PRODUCTS`), fake statistics (`12,000+`, `580+`, `1,234+`), and demo toast alerts have been removed from buyer-facing discovery. Catalog, search, product detail and homepage inventory metrics come from the validated public inventory API with honest empty states when the publication feed is unavailable or empty.
 - Email/password + Google sign-up and login (no SMS/phone verification)
 - Guest cart (localStorage) that merges on login
 - Wishlist, RFQ, order tracking, WhatsApp quote checkout

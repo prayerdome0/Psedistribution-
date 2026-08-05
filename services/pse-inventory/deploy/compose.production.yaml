@@ -1,0 +1,131 @@
+# Production topology for the PSE inventory path.
+#
+# Unlike compose.yaml (the deliberately single-process reference), this file
+# wires the API to PostgreSQL and Valkey. Use managed equivalents in production
+# when available, or run this stack on a private host with persistent volumes.
+# Real secret values are supplied through an external .env/secret manager.
+name: pse-inventory-production
+
+services:
+  api:
+    build:
+      context: ../../..
+      dockerfile: services/pse-inventory/deploy/Dockerfile
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    env_file: [.env]
+    environment:
+      PSE_RUNTIME_MODE: production
+      PSE_PACKET_ROOT: /app/vendor/pse-inventory-packet
+      PSE_SNAPSHOT_FILE: /data/current.json
+      PSE_DATABASE_URL: ${PSE_DATABASE_URL:?set PSE_DATABASE_URL}
+      PSE_VALKEY_URL: ${PSE_VALKEY_URL:?set PSE_VALKEY_URL}
+      PSE_CURSOR_SECRET: ${PSE_CURSOR_SECRET:?set PSE_CURSOR_SECRET}
+      PSE_REVALIDATION_KEYS_JSON: ${PSE_REVALIDATION_KEYS_JSON:?set PSE_REVALIDATION_KEYS_JSON}
+      PSE_ALLOWED_ORIGINS: ${PSE_ALLOWED_ORIGINS:?set PSE_ALLOWED_ORIGINS}
+      PSE_MAX_LAST_GOOD_AGE_SECONDS: ${PSE_MAX_LAST_GOOD_AGE_SECONDS:-300}
+      PSE_RATE_LIMIT_PER_MINUTE: ${PSE_RATE_LIMIT_PER_MINUTE:-120}
+    volumes:
+      - inventory_runtime_data:/data
+    expose: ["8080"]
+    networks: [edge, private]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/internal/readyz', timeout=2)"]
+      interval: 15s
+      timeout: 3s
+      retries: 4
+      start_period: 20s
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+
+  postgres:
+    image: postgres:18.4-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pse_inventory}
+      POSTGRES_USER: ${POSTGRES_USER:-pse_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      PSE_PUBLISHER_PASSWORD: ${PSE_PUBLISHER_PASSWORD:?set PSE_PUBLISHER_PASSWORD}
+      PSE_STOREFRONT_PASSWORD: ${PSE_STOREFRONT_PASSWORD:?set PSE_STOREFRONT_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../migrations:/migrations:ro
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    networks: [private]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+    security_opt: ["no-new-privileges:true"]
+
+  valkey:
+    image: valkey/valkey:9.1.0-alpine
+    restart: unless-stopped
+    command: ["valkey-server", "--appendonly", "yes", "--requirepass", "${VALKEY_PASSWORD:?set VALKEY_PASSWORD}"]
+    environment:
+      VALKEY_PASSWORD: ${VALKEY_PASSWORD:?set VALKEY_PASSWORD}
+    volumes: [valkey_data:/data]
+    networks: [private]
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli -a $$VALKEY_PASSWORD ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+    security_opt: ["no-new-privileges:true"]
+
+  caddy:
+    image: caddy:2.11.4-alpine
+    restart: unless-stopped
+    environment:
+      PSE_SITE_HOST: ${PSE_SITE_HOST:?set PSE_SITE_HOST}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ../../../:/srv:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    ports: ["80:80", "443:443"]
+    networks: [edge]
+    depends_on:
+      api:
+        condition: service_healthy
+    security_opt: ["no-new-privileges:true"]
+
+  prometheus:
+    image: prom/prometheus:v3.12.0
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alert_rules.yml:/etc/prometheus/alert_rules.yml:ro
+      - prometheus_data:/prometheus
+    networks: [private]
+    depends_on:
+      api:
+        condition: service_healthy
+
+  alertmanager:
+    image: prom/alertmanager:v0.32.1
+    restart: unless-stopped
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    networks: [private]
+
+networks:
+  edge: {}
+  private: {}
+
+volumes:
+  inventory_runtime_data: {}
+  postgres_data: {}
+  valkey_data: {}
+  caddy_data: {}
+  caddy_config: {}
+  prometheus_data: {}
+  alertmanager_data: {}

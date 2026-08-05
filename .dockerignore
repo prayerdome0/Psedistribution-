@@ -1,0 +1,12 @@
+.git
+.venv
+__pycache__
+*.pyc
+*.log
+.arena
+node_modules
+PSE_SalesMax_Inventory_Wiring_MASTERED_OPEN_SOURCE_v4.0.0_2026-08-03.zip
+services/pse-inventory/data/backups
+services/pse-inventory/data/publish_reports
+services/pse-inventory/data/import-*
+**/.env
