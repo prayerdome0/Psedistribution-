@@ -16,6 +16,11 @@ Disallow: /checkout
 Disallow: /cart
 Disallow: /api/
 Disallow: /order-success
+Disallow: /forgot-password
+Disallow: /forgot
+Disallow: /reset-password
+Disallow: /500
+Disallow: /error
 
 # Crawl politely
 Crawl-delay: 1

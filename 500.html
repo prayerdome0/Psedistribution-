@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Something Went Wrong - Pilot Sales Distribution</title>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --primary: #0e7c68;
+            --primary-dark: #0a5a4a;
+            --secondary: #0b2138;
+            --accent: #e0a62e;
+            --text-light: #698093;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+        body { background: #f5f8fa; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
+
+        .error-container { text-align: center; max-width: 560px; width: 100%; }
+        .error-container .code { font-size: 8rem; font-weight: 900; color: #c92335; line-height: 1; }
+        .error-container .logo { width: 80px; height: 80px; margin: 0 auto 1rem; }
+        .error-container .logo img { width: 100%; height: 100%; object-fit: contain; }
+        .error-container h2 { font-size: 1.8rem; color: #0b2138; margin: 0.5rem 0; }
+        .error-container p { color: #698093; margin-bottom: 1.5rem; }
+
+        .btn-row { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 0.5rem; }
+        .btn-home {
+            display: inline-block; background: #0e7c68; color: #fff; padding: 0.7rem 2.5rem; border-radius: 50px;
+            font-weight: 600; text-decoration: none; transition: 0.3s; border: none; cursor: pointer; font-size: 1rem;
+        }
+        .btn-home:hover { background: #0a5a4a; transform: translateY(-2px); }
+        .btn-secondary { background: #0b2138; }
+        .btn-secondary:hover { background: #16334f; }
+
+        .help-links { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin-top: 1.2rem; }
+        .help-links a {
+            display: inline-flex; align-items: center; gap: 0.45rem; background: #fff; color: #33475b;
+            padding: 0.55rem 1.2rem; border-radius: 40px; font-size: 0.83rem; font-weight: 600; text-decoration: none;
+            border: 1px solid #e2e8ef; transition: all 0.25s;
+        }
+        .help-links a:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
+        .help-links a i { color: var(--primary); }
+
+        .reference {
+            margin-top: 1.5rem; padding: 0.8rem 1rem; background: #fff; border-radius: 12px;
+            border: 1px solid #e2e8ef; font-size: 0.78rem; color: #698093;
+        }
+        .reference code { color: #0b2138; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+        .status-dot {
+            display: inline-block; width: 8px; height: 8px; background: #c92335; border-radius: 50%;
+            margin-right: 6px; vertical-align: middle; animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        @media (max-width: 480px) {
+            .error-container .code { font-size: 5rem; }
+            .error-container h2 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="logo">
+            <img src="/logo.webp" alt="Pilot Sales Distribution" />
+        </div>
+        <div class="code">500</div>
+        <h2>Something Went Wrong</h2>
+        <p>We're sorry — an unexpected error occurred on our side. Our team has been notified and is working on it.</p>
+
+        <div class="btn-row">
+            <button class="btn-home" onclick="retry()">
+                <i class="fa-solid fa-rotate-right"></i>&nbsp; Try Again
+            </button>
+            <a href="/" class="btn-home btn-secondary">🏠 Back to Home</a>
+        </div>
+
+        <div class="help-links">
+            <a href="/products"><i class="fa-solid fa-boxes-stacked"></i> Browse Products</a>
+            <a href="/rfq"><i class="fa-regular fa-file-lines"></i> Request Quote</a>
+            <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help Center</a>
+            <a href="/contact"><i class="fa-regular fa-envelope"></i> Contact Us</a>
+            <a href="https://wa.me/19099384682" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+        </div>
+
+        <div class="reference">
+            <span class="status-dot"></span>
+            <strong>Service status:</strong> <span id="statusText">Checking…</span>
+            <br />
+            <strong>Reference ID:</strong> <code id="refId">—</code>
+        </div>
+    </div>
+
+    <script>
+        // Generate a short reference ID for support
+        (function () {
+            try {
+                var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                var id = '';
+                for (var i = 0; i < 8; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
+                var el = document.getElementById('refId');
+                if (el) el.textContent = 'ERR-' + id;
+                // Stash in sessionStorage so support can ask for it
+                try { sessionStorage.setItem('pse_last_error_ref', id); } catch (e) {}
+            } catch (e) {}
+        })();
+
+        // Best-effort liveness check against the inventory API health endpoint
+        (function () {
+            var statusEl = document.getElementById('statusText');
+            if (!statusEl) return;
+            // Try the relative path the static site uses for the inventory API
+            var candidates = ['/internal/healthz', '/api/health', '/healthz'];
+            var i = 0;
+            function tryNext() {
+                if (i >= candidates.length) {
+                    statusEl.textContent = 'Status unknown — please try again shortly.';
+                    return;
+                }
+                var url = candidates[i++];
+                fetch(url, { method: 'GET', cache: 'no-store' })
+                    .then(function (r) {
+                        if (r.ok) { statusEl.textContent = 'Inventory service healthy — this page may be a transient error.'; }
+                        else { tryNext(); }
+                    })
+                    .catch(function () { tryNext(); });
+            }
+            tryNext();
+        })();
+
+        function retry() {
+            // Reload the previously requested page if possible
+            try {
+                var last = document.referrer;
+                if (last && new URL(last).origin === window.location.origin) {
+                    window.location.href = last;
+                    return;
+                }
+            } catch (e) {}
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
