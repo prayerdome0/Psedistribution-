@@ -4,6 +4,9 @@
 # Placeholder-only templates are safe to commit (no real values, enforced by test)
 !.env.example
 !**/.env.example
+# Temporary workspace used to push around the GitHub App's workflows: write
+# restriction. Safe to recreate; never tracked.
+.workflows-stash/
 .DS_Store
 node_modules/
 .idea/
