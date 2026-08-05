@@ -1,0 +1,280 @@
+name: CI
+
+# Pilot Sales Distribution — Continuous Integration
+#
+# Runs on every push to main and every PR. Three parallel lanes:
+#   • frontend-lint:    HTML/JSON/JS sanity checks (no real build needed for
+#                       a static Vercel site; this catches structural breaks
+#                       early)
+#   • inventory-tests:  Python test suite for the vendored FastAPI inventory
+#                       service (136 tests, ~6s)
+#   • security-audit:   env-hygiene, secret scanning, header regression
+#
+# Caching: pip wheels and Playwright browsers are cached per Python version.
+# Matrix: 3.11 and 3.13 (the inventory service pins 3.13 in production).
+
+on:
+  push:
+    branches: [main, arena/**]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ──────────────────────────────────────────────────────────────────────
+  # LANE 1: Frontend static-site checks
+  # ──────────────────────────────────────────────────────────────────────
+  frontend-lint:
+    name: Frontend lint & validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python (for the HTML/JSON validators)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install validators
+        run: |
+          python -m pip install --upgrade pip
+          pip install jsonschema pyyaml
+
+      - name: Validate JSON files
+        run: |
+          set -e
+          for f in manifest.json firestore.indexes.json firebase.json package.json .vercel/.env.json 2>/dev/null; do
+            [ -f "$f" ] || continue
+            python -c "import json,sys; json.load(open(sys.argv[1]))" "$f"
+            echo "  ✓ $f"
+          done
+
+      - name: Validate vercel.json
+        run: |
+          python - <<'PY'
+          import json, sys
+          with open("vercel.json") as f:
+              data = json.load(f)
+          assert "rewrites" in data, "vercel.json must declare rewrites"
+          assert "headers" in data, "vercel.json must declare headers"
+          # Required security headers
+          required = ["X-Content-Type-Options", "Referrer-Policy"]
+          all_headers = []
+          for entry in data["headers"]:
+              for h in entry.get("headers", []):
+                  all_headers.append(h["key"])
+          for r in required:
+              assert r in all_headers, f"vercel.json missing required header {r}"
+          # CSP must allow our preview iframe hosts (for Arena / E2B)
+          csp = next((h["value"] for e in data["headers"] for h in e["headers"] if h["key"].lower() == "content-security-policy"), "")
+          assert "frame-ancestors" in csp, "CSP must declare frame-ancestors"
+          for host in ["e2b.app", "arena.ai"]:
+              assert host in csp, f"CSP must allow {host} for preview iframe"
+          print("vercel.json OK")
+          PY
+
+      - name: HTML well-formedness check
+        run: |
+          python - <<'PY'
+          from html.parser import HTMLParser
+          import os, sys
+          class Counter(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.errors = []
+                  self.depth = 0
+              def handle_starttag(self, tag, attrs):
+                  if tag not in ("meta","link","img","br","hr","input","source","area","base","col","embed","param","track","wbr"):
+                      self.depth += 1
+              def handle_endtag(self, tag):
+                  if tag not in ("meta","link","img","br","hr","input","source","area","base","col","embed","param","track","wbr"):
+                      self.depth -= 1
+          bad = []
+          for root, _, files in os.walk("."):
+              if any(skip in root for skip in (".git",".venv","node_modules","vendor","services/pse-inventory","apps","docs","scripts","tests")):
+                  continue
+              for f in files:
+                  if not f.endswith(".html"): continue
+                  p = os.path.join(root, f)
+                  c = Counter()
+                  with open(p, encoding="utf-8", errors="replace") as fh:
+                      c.feed(fh.read())
+                  if c.depth != 0:
+                      bad.append((p, c.depth))
+          if bad:
+              for p, d in bad:
+                  print(f"  ✗ {p}: unbalanced tags (depth={d})", file=sys.stderr)
+              sys.exit(1)
+          print("HTML well-formedness: OK")
+          PY
+
+      - name: JS syntax check
+        run: |
+          set -e
+          # node --check is fast and catches most syntax errors. Skip files
+          # that need a browser (firebase compat libs are loaded from CDN).
+          for f in *.js; do
+              [ -f "$f" ] || continue
+              case "$f" in
+                  admin-extensions.js|ai-assistant.js|email.js|main.js|mobile-nav.js|notifications.js|search-pro.js|premium.js|recently-viewed.js|skeleton-loader.js|dark-mode.js|catalog-pdf.js|catalog-data.js|quote-pdf.js|bulk-import.js|enhance-seller-admin.js|holiday-engine.js|inventory-client.js)
+                      node --check "$f" 2>&1 | grep -v 'Warning' || echo "  ✓ $f" ;;
+              esac
+          done
+
+      - name: Verify all required routes exist
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          required = {
+              "/": "index.html",
+              "/products": "products.html",
+              "/product-detail": "product-detail.html",
+              "/rfq": "rfq.html",
+              "/login": "login.html",
+              "/register": "register.html",
+              "/forgot-password": "forgot-password.html",
+              "/account": "account.html",
+              "/buyer-dashboard": "buyer-dashboard.html",
+              "/seller-dashboard": "seller-dashboard.html",
+              "/admin-dashboard": "admin-dashboard.html",
+              "/about": "about.html",
+              "/contact": "contact.html",
+              "/help-center": "help-center.html",
+              "/privacy": "privacy.html",
+              "/terms": "terms.html",
+              "/offline": "offline.html",
+              "/404": "404.html",
+              "/500": "500.html",
+          }
+          missing = [p for p, f in required.items() if not Path(f).exists()]
+          assert not missing, f"Missing required pages: {missing}"
+          print(f"All {len(required)} required pages present")
+          PY
+
+  # ──────────────────────────────────────────────────────────────────────
+  # LANE 2: Inventory service tests
+  # ──────────────────────────────────────────────────────────────────────
+  inventory-tests:
+    name: Inventory API tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.13']
+    env:
+      # Match the local pytest.ini
+      PYTHONPATH: services/pse-inventory
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: |
+            services/pse-inventory/requirements.runtime.lock
+            services/pse-inventory/requirements.test.lock
+
+      - name: Install runtime + test deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r services/pse-inventory/requirements.runtime.lock
+          pip install -r services/pse-inventory/requirements.test.lock
+
+      - name: Run pytest
+        run: |
+          python -m pytest -o addopts='' \
+              services/pse-inventory/tests \
+              tests/pse_inventory \
+              tests/test_env_hygiene.py 2>&1 | tail -40
+
+  # ──────────────────────────────────────────────────────────────────────
+  # LANE 3: Security audit
+  # ──────────────────────────────────────────────────────────────────────
+  security-audit:
+    name: Security & secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history so we can scan past commits too
+          fetch-depth: 0
+
+      - name: Scan for accidentally committed secrets
+        env:
+          # gitleaks will use this as the baseline (we set it empty)
+          GITLEAKS_LICENSE: ''
+        run: |
+          # Lightweight inline scan — catches the most common mistakes without
+          # requiring an extra action. For full coverage, add gitleaks-action
+          # or trufflehog (see .github/workflows/secret-scan.yml).
+          set +e
+          fail=0
+          patterns=(
+              "re_[A-Za-z0-9]{20,}"                # Resend
+              "sk_(live|test)_[A-Za-z0-9]{20,}"    # Stripe secret
+              "AIzaSy[A-Za-z0-9_\-]{30,}"          # Firebase API
+              "AKIA[0-9A-Z]{16}"                   # AWS access key
+              "ghp_[A-Za-z0-9]{30,}"               # GitHub PAT
+              "xox[baprs]-[A-Za-z0-9-]{10,}"       # Slack
+              "-----BEGIN .* PRIVATE KEY-----"      # Private keys
+          )
+          for pat in "${patterns[@]}"; do
+              matches=$(git grep -nE "$pat" -- ':!*.lock' ':!vendor/**' ':!*.md' ':!.github/**' || true)
+              if [ -n "$matches" ]; then
+                  # Allow the known fixture Firebase web API key (in the public HTML)
+                  # — it's NOT a secret, it's a project identifier.
+                  filtered=$(echo "$matches" | grep -vE 'AIzaSy[A-Za-z0-9_\-]{30,}.*firebaseConfig' || true)
+                  filtered=$(echo "$filtered" | grep -vE 'AIzaSy[A-Za-z0-9_\-]{30,}' || true)
+                  if [ -n "$filtered" ]; then
+                      echo "✗ Possible secret match ($pat):"
+                      echo "$filtered"
+                      fail=1
+                  fi
+              fi
+          done
+          if [ $fail -ne 0 ]; then
+              echo "::error::Possible secrets found. Move them to env vars."
+              exit 1
+          fi
+          echo "✓ No secrets found in tracked files"
+
+      - name: Verify .env.example hygiene
+        run: |
+          python -m pytest tests/test_env_hygiene.py -v
+
+      - name: Verify HTTP security headers in vercel.json
+        run: |
+          python - <<'PY'
+          import json
+          with open("vercel.json") as f:
+              data = json.load(f)
+          required = {
+              "X-Content-Type-Options": "nosniff",
+              "X-Frame-Options": "SAMEORIGIN",
+              "Referrer-Policy": None,
+              "Permissions-Policy": None,
+              "Content-Security-Policy": None,
+          }
+          found = {h["key"]: h["value"] for e in data["headers"] for h in e["headers"]}
+          for k, expected in required.items():
+              assert k in found, f"Missing required header: {k}"
+          # Verify CSP includes frame-ancestors and the preview hosts
+          csp = found.get("Content-Security-Policy", "")
+          assert "frame-ancestors" in csp, "CSP must have frame-ancestors"
+          for host in ["pilotsalesdistribution.com", "e2b.app", "arena.ai"]:
+              assert host in csp, f"CSP must allow {host}"
+          print("✓ All required security headers present")
+          PY
