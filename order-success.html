@@ -17,16 +17,16 @@
     
     <style>
         :root {
-            --primary: #1a7b6b;
-            --primary-dark: #0f4f43;
-            --primary-light: #e8f5f0;
-            --secondary: #0b2a3b;
-            --secondary-light: #1a4b5e;
-            --accent: #f1c40f;
-            --text-light: #6a889a;
+            --primary: #0e7c68;
+            --primary-dark: #0a5a4a;
+            --primary-light: #e6f4ef;
+            --secondary: #0b2138;
+            --secondary-light: #16334f;
+            --accent: #e0a62e;
+            --text-light: #698093;
             --border: #e9edf2;
-            --border-dark: #dce3e9;
-            --light: #f0f4f8;
+            --border-dark: #d3dce5;
+            --light: #f5f8fa;
             --white: #ffffff;
             --shadow: 0 4px 20px rgba(0,0,0,0.06);
             --shadow-hover: 0 20px 50px -10px rgba(0,20,30,0.12);
@@ -51,7 +51,7 @@
             color: #d4e2ed;
             font-size: 0.75rem;
             padding: 0.4rem 0;
-            border-bottom: 1px solid #1a4055;
+            border-bottom: 1px solid #16334f;
             overflow: hidden;
             position: sticky;
             top: 0;
@@ -64,7 +64,7 @@
         .moving-words .words-track span i { color: var(--accent); margin-right: 0.3rem; }
         @keyframes scrollWords { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
         .top-links { display: flex; gap: 1rem; flex-shrink: 0; }
-        .top-links a { color: #b4d0e0; transition: var(--transition); cursor: pointer; }
+        .top-links a { color: #a9c3d6; transition: var(--transition); cursor: pointer; }
         .top-links a:hover { color: var(--white); }
         .top-links i { color: var(--accent); margin-right: 0.2rem; }
 
@@ -126,7 +126,7 @@
             flex-direction: column;
             align-items: center;
             font-size: 0.6rem;
-            color: #1a3340;
+            color: #33475b;
             cursor: pointer;
             transition: var(--transition);
             padding: 0.2rem 0.3rem;
@@ -164,7 +164,7 @@
         }
         .nav-categories::-webkit-scrollbar { height: 3px; }
         .nav-categories::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #1a3340; }
+        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #33475b; }
         .nav-tab { padding: 0.3rem 0; border-bottom: 3px solid transparent; transition: var(--transition); cursor: pointer; position: relative; flex-shrink: 0; }
         .nav-tab::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 3px; background: var(--primary); transition: width 0.4s ease; }
         .nav-tab:hover::after, .nav-tab.active::after { width: 100%; }
@@ -203,18 +203,18 @@
 
         .footer {
             background: var(--secondary);
-            color: #b4d0e0;
+            color: #a9c3d6;
             padding: 2rem 0 1rem;
             margin-top: 3rem;
         }
         .footer .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
         .footer .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
-        .footer .footer-links a { color: #b4d0e0; font-size: 0.85rem; transition: var(--transition); }
+        .footer .footer-links a { color: #a9c3d6; font-size: 0.85rem; transition: var(--transition); }
         .footer .footer-links a:hover { color: var(--white); }
-        .footer .footer-bottom { border-top: 1px solid #1a4055; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
+        .footer .footer-bottom { border-top: 1px solid #16334f; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
         .footer .footer-bottom strong { color: var(--white); }
         .footer .footer-social { display: flex; gap: 1rem; }
-        .footer .footer-social a { color: #b4d0e0; transition: var(--transition); font-size: 1.1rem; }
+        .footer .footer-social a { color: #a9c3d6; transition: var(--transition); font-size: 1.1rem; }
         .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
 
         .toast {
@@ -258,6 +258,7 @@
             .top-bar .moving-words .words-track span { font-size: 0.65rem; }
         }
     </style>
+    <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
 
@@ -378,8 +379,8 @@
             </div>
 
             <div class="btn-group" style="display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1.2rem;">
-                <button type="button" class="btn-primary-custom" onclick="downloadFormalInvoicePDF()" style="background:#0b2a3b;color:#fff;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-weight:600;">
-                    <i class="fa-solid fa-file-pdf" style="color:#f1c40f;"></i> Download Official Commercial Invoice (PDF)
+                <button type="button" class="btn-primary-custom" onclick="downloadFormalInvoicePDF()" style="background:#0b2138;color:#fff;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-weight:600;">
+                    <i class="fa-solid fa-file-pdf" style="color:#e0a62e;"></i> Download Official Commercial Invoice (PDF)
                 </button>
                 <a href="/home" class="btn-primary-custom"><i class="fa-solid fa-house"></i> Continue Shopping</a>
                 <a href="/track-order" class="btn-outline-custom"><i class="fa-solid fa-truck"></i> Track Order</a>
@@ -599,19 +600,19 @@
                 <title>${invNum} - Commercial Invoice</title>
                 <style>
                     body { font-family: 'Segoe UI', system-ui, sans-serif; color:#222; padding:30px; max-width:850px; margin:0 auto; }
-                    .header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #1a7b6b; padding-bottom:20px; margin-bottom:25px; }
-                    .header h1 { color:#1a7b6b; margin:0; font-size:24px; }
+                    .header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #0e7c68; padding-bottom:20px; margin-bottom:25px; }
+                    .header h1 { color:#0e7c68; margin:0; font-size:24px; }
                     .header .meta { text-align:right; font-size:14px; color:#555; }
                     .parties { display:flex; justify-content:space-between; margin-bottom:30px; font-size:14px; }
                     .party-box { width:47%; background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #e9edf2; }
-                    .party-box h4 { margin:0 0 8px; color:#0b2a3b; text-transform:uppercase; font-size:12px; letter-spacing:0.5px; }
+                    .party-box h4 { margin:0 0 8px; color:#0b2138; text-transform:uppercase; font-size:12px; letter-spacing:0.5px; }
                     table { width:100%; border-collapse:collapse; margin-bottom:30px; font-size:14px; }
-                    th { background:#0b2a3b; color:#fff; padding:12px 10px; text-align:left; font-size:13px; text-transform:uppercase; }
-                    .totals { width:320px; margin-left:auto; border-top:2px solid #0b2a3b; padding-top:10px; }
+                    th { background:#0b2138; color:#fff; padding:12px 10px; text-align:left; font-size:13px; text-transform:uppercase; }
+                    .totals { width:320px; margin-left:auto; border-top:2px solid #0b2138; padding-top:10px; }
                     .total-row { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; }
-                    .total-row.grand { font-weight:800; font-size:18px; color:#1a7b6b; border-top:1px solid #ccc; padding-top:12px; }
+                    .total-row.grand { font-weight:800; font-size:18px; color:#0e7c68; border-top:1px solid #ccc; padding-top:12px; }
                     .footer { margin-top:40px; padding-top:20px; border-top:1px solid #ddd; font-size:12px; color:#666; text-align:center; }
-                    .badge { display:inline-block; background:#e8f5f0; color:#1a7b6b; border:1px solid #1a7b6b; font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; margin-top:6px; }
+                    .badge { display:inline-block; background:#e6f4ef; color:#0e7c68; border:1px solid #0e7c68; font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; margin-top:6px; }
                 </style>
             </head>
             <body>
@@ -622,9 +623,9 @@
                         <div class="badge">✓ OFFICIAL COMMERCIAL INVOICE</div>
                     </div>
                     <div class="meta">
-                        <strong style="font-size:16px;color:#0b2a3b;">INVOICE #: ${invNum}</strong><br />
+                        <strong style="font-size:16px;color:#0b2138;">INVOICE #: ${invNum}</strong><br />
                         Date: ${dateStr}<br />
-                        ${o.purchase_order_number ? `<strong style="color:#1a7b6b;">BUYER PO #: ${esc(o.purchase_order_number)}</strong><br />` : ''}
+                        ${o.purchase_order_number ? `<strong style="color:#0e7c68;">BUYER PO #: ${esc(o.purchase_order_number)}</strong><br />` : ''}
                         Payment Term: 30 Days Net / Escrow Trade Assurance
                     </div>
                 </div>

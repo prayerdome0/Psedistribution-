@@ -6,7 +6,7 @@
 //   • Offline fallback shell
 // Bump CACHE_VERSION on deploys to invalidate old caches.
 // ============================================
-const CACHE_VERSION = 'pse-v2';
+const CACHE_VERSION = 'pse-v3';
 const STATIC_CACHE = CACHE_VERSION + '-static';
 const PAGE_CACHE = CACHE_VERSION + '-pages';
 

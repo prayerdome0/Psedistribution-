@@ -24,19 +24,19 @@
     
     <style>
         :root {
-            --primary: #1a7b6b;
-            --primary-dark: #0f4f43;
-            --primary-light: #e8f5f0;
-            --secondary: #0b2a3b;
-            --secondary-light: #1a4b5e;
-            --accent: #f1c40f;
-            --accent-hover: #e0b50e;
+            --primary: #0e7c68;
+            --primary-dark: #0a5a4a;
+            --primary-light: #e6f4ef;
+            --secondary: #0b2138;
+            --secondary-light: #16334f;
+            --accent: #e0a62e;
+            --accent-hover: #c8901f;
             --dark: #0b1a2a;
-            --text: #2c5a6b;
-            --text-light: #6a889a;
+            --text: #33475b;
+            --text-light: #698093;
             --border: #e9edf2;
-            --border-dark: #dce3e9;
-            --light: #f0f4f8;
+            --border-dark: #d3dce5;
+            --light: #f5f8fa;
             --white: #ffffff;
             --shadow: 0 4px 20px rgba(0,0,0,0.06);
             --shadow-hover: 0 20px 50px -10px rgba(0,20,30,0.12);
@@ -61,7 +61,7 @@
             color: #d4e2ed;
             font-size: 0.75rem;
             padding: 0.4rem 0;
-            border-bottom: 1px solid #1a4055;
+            border-bottom: 1px solid #16334f;
             overflow: hidden;
             position: sticky;
             top: 0;
@@ -74,7 +74,7 @@
         .moving-words .words-track span i { color: var(--accent); margin-right: 0.3rem; }
         @keyframes scrollWords { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
         .top-links { display: flex; gap: 1rem; flex-shrink: 0; }
-        .top-links a { color: #b4d0e0; transition: var(--transition); cursor: pointer; }
+        .top-links a { color: #a9c3d6; transition: var(--transition); cursor: pointer; }
         .top-links a:hover { color: var(--white); }
         .top-links i { color: var(--accent); margin-right: 0.2rem; }
 
@@ -136,7 +136,7 @@
             flex-direction: column;
             align-items: center;
             font-size: 0.6rem;
-            color: #1a3340;
+            color: #33475b;
             cursor: pointer;
             transition: var(--transition);
             padding: 0.2rem 0.3rem;
@@ -174,7 +174,7 @@
         }
         .nav-categories::-webkit-scrollbar { height: 3px; }
         .nav-categories::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #1a3340; }
+        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #33475b; }
         .nav-tab { padding: 0.3rem 0; border-bottom: 3px solid transparent; transition: var(--transition); cursor: pointer; position: relative; flex-shrink: 0; }
         .nav-tab::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 3px; background: var(--primary); transition: width 0.4s ease; }
         .nav-tab:hover::after, .nav-tab.active::after { width: 100%; }
@@ -324,7 +324,7 @@
             z-index: 2;
         }
         .product-badge.wholesale { background: var(--primary); }
-        .product-badge.flash { background: #e67e22; }
+        .product-badge.flash { background: #e0a62e; }
         .verified-badge {
             position: absolute;
             top: 8px;
@@ -480,18 +480,18 @@
 
         .footer {
             background: var(--secondary);
-            color: #b4d0e0;
+            color: #a9c3d6;
             padding: 2rem 0 1rem;
             margin-top: 3rem;
         }
         .footer .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
         .footer .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
-        .footer .footer-links a { color: #b4d0e0; font-size: 0.85rem; transition: var(--transition); }
+        .footer .footer-links a { color: #a9c3d6; font-size: 0.85rem; transition: var(--transition); }
         .footer .footer-links a:hover { color: var(--white); }
-        .footer .footer-bottom { border-top: 1px solid #1a4055; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
+        .footer .footer-bottom { border-top: 1px solid #16334f; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
         .footer .footer-bottom strong { color: var(--white); }
         .footer .footer-social { display: flex; gap: 1rem; }
-        .footer .footer-social a { color: #b4d0e0; transition: var(--transition); font-size: 1.1rem; }
+        .footer .footer-social a { color: #a9c3d6; transition: var(--transition); font-size: 1.1rem; }
         .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
 
         @media (max-width: 992px) {
@@ -530,6 +530,7 @@
             .top-bar .moving-words .words-track span { font-size: 0.65rem; }
         }
     </style>
+    <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
 
@@ -607,7 +608,7 @@
         <h1>All <span>Products</span></h1>
         <p>Browse our extensive wholesale catalog</p>
         <button type="button" onclick="openQuickOrder()" style="margin-top:0.9rem;background:var(--secondary);color:#fff;border:none;padding:0.55rem 1.4rem;border-radius:30px;font-weight:700;font-size:0.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:0.45rem;box-shadow:0 6px 18px rgba(11,42,59,0.25);">
-            <i class="fa-solid fa-bolt" style="color:#f1c40f;"></i> Quick Order by SKU
+            <i class="fa-solid fa-bolt" style="color:#e0a62e;"></i> Quick Order by SKU
         </button>
     </div>
 
@@ -615,7 +616,7 @@
     <div class="animate-on-scroll" style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;background:#fff;border:1px solid var(--border);border-radius:12px;padding:0.7rem 1rem;margin-bottom:1.2rem;font-size:0.78rem;color:var(--text);">
         <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-circle-check" style="color:var(--primary);"></i> <strong>Per-offer availability</strong> — confirmed and time-stamped</span>
         <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-truck" style="color:#0b6bcb;"></i> <strong>Freight terms</strong> — quoted per product</span>
-        <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-file-contract" style="color:#e67e22;"></i> <strong>Inspection &amp; returns</strong> — stated per offer</span>
+        <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-file-contract" style="color:#e0a62e;"></i> <strong>Inspection &amp; returns</strong> — stated per offer</span>
         <span style="display:flex;align-items:center;gap:0.35rem;"><i class="fa-solid fa-file-lines" style="color:#c0392b;"></i> <strong>RFQ-first</strong> — no commitment until confirmed</span>
     </div>
 
@@ -713,10 +714,10 @@
 </div>
 
 <!-- QUICK ORDER MODAL -->
-<div id="quickOrderModal" style="display:none;position:fixed;inset:0;background:rgba(11,26,42,0.55);z-index:9999;align-items:center;justify-content:center;padding:1rem;">
+<div id="quickOrderModal" style="display:none;position:fixed;inset:0;background:rgba(8,16,26,0.55);z-index:9999;align-items:center;justify-content:center;padding:1rem;">
     <div style="background:#fff;border-radius:16px;max-width:540px;width:100%;padding:1.6rem;max-height:90vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,0.3);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-            <h3 style="font-size:1.1rem;color:var(--secondary);"><i class="fa-solid fa-bolt" style="color:#f1c40f;"></i> Quick Order by SKU</h3>
+            <h3 style="font-size:1.1rem;color:var(--secondary);"><i class="fa-solid fa-bolt" style="color:#e0a62e;"></i> Quick Order by SKU</h3>
             <button onclick="closeQuickOrder()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-light);"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <p style="font-size:0.78rem;color:var(--text-light);margin-bottom:0.7rem;">Paste one item per line as <strong>SKU, quantity</strong> (comma, pipe or space separated). SKUs or exact product titles both work.</p>
@@ -1506,8 +1507,8 @@
             <table style="width:100%;border-collapse:collapse;font-size:0.85rem;background:#fff;border:1px solid var(--border-dark);">
                 <thead>
                     <tr style="background:var(--secondary);color:#fff;text-align:left;">
-                        <th style="padding:12px;border:1px solid #1a4055;">Feature / Spec</th>
-                        ${selected.map(p => `<th style="padding:12px;border:1px solid #1a4055;min-width:170px;">${esc(p.title || 'Product')}</th>`).join('')}
+                        <th style="padding:12px;border:1px solid #16334f;">Feature / Spec</th>
+                        ${selected.map(p => `<th style="padding:12px;border:1px solid #16334f;min-width:170px;">${esc(p.title || 'Product')}</th>`).join('')}
                     </tr>
                 </thead>
                 <tbody>
@@ -1533,7 +1534,7 @@
                     </tr>
                     <tr>
                         <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">VIP Supplier Tier</td>
-                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);">${p.supplier_tier === 'platinum' ? '<span style="color:#8e44ad;font-weight:700;">👑 Platinum (0% Fee)</span>' : p.supplier_tier === 'gold' ? '<span style="color:#f39c12;font-weight:700;">👑 Gold (5% Fee)</span>' : 'Basic (10% Fee)'}</td>`).join('')}
+                        ${selected.map(p => `<td style="padding:10px;border:1px solid var(--border-light);">${p.supplier_tier === 'platinum' ? '<span style="color:#8e44ad;font-weight:700;">👑 Platinum (0% Fee)</span>' : p.supplier_tier === 'gold' ? '<span style="color:#e0a62e;font-weight:700;">👑 Gold (5% Fee)</span>' : 'Basic (10% Fee)'}</td>`).join('')}
                     </tr>
                     <tr>
                         <td style="padding:10px;border:1px solid var(--border-light);font-weight:700;background:var(--light);">Incoterms Basis</td>
@@ -1613,7 +1614,7 @@
                 const effQty = Math.max(qty, p.moq || 1);
                 qoParsed.push({ product: p, qty: effQty });
                 rows.push(`<div style="display:flex;justify-content:space-between;gap:0.6rem;padding:0.35rem 0;border-bottom:1px solid var(--border);">
-                    <span style="color:#1a7b6b;">✅ ${(p.title || code).substring(0, 42)}${effQty !== qty ? ` <em style="font-style:normal;color:#e67e22;">(MOQ rounded to ${effQty})</em>` : ''}</span>
+                    <span style="color:#0e7c68;">✅ ${(p.title || code).substring(0, 42)}${effQty !== qty ? ` <em style="font-style:normal;color:#e0a62e;">(MOQ rounded to ${effQty})</em>` : ''}</span>
                     <span style="font-family:monospace;white-space:nowrap;">${effQty} × $${(p.price || 0).toFixed(2)} = <strong>$${((p.price || 0) * effQty).toFixed(2)}</strong></span>
                 </div>`);
             } else {

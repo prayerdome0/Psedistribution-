@@ -18,19 +18,19 @@
     <style>
         /* ─── ALL STYLES INLINE ─── */
         :root {
-            --primary: #1a7b6b;
-            --primary-dark: #0f4f43;
-            --primary-light: #e8f5f0;
-            --secondary: #0b2a3b;
-            --secondary-light: #1a4b5e;
-            --accent: #f1c40f;
-            --accent-hover: #e0b50e;
+            --primary: #0e7c68;
+            --primary-dark: #0a5a4a;
+            --primary-light: #e6f4ef;
+            --secondary: #0b2138;
+            --secondary-light: #16334f;
+            --accent: #e0a62e;
+            --accent-hover: #c8901f;
             --dark: #0b1a2a;
-            --text: #2c5a6b;
-            --text-light: #6a889a;
+            --text: #33475b;
+            --text-light: #698093;
             --border: #e9edf2;
-            --border-dark: #dce3e9;
-            --light: #f0f4f8;
+            --border-dark: #d3dce5;
+            --light: #f5f8fa;
             --white: #ffffff;
             --shadow: 0 4px 20px rgba(0,0,0,0.06);
             --shadow-hover: 0 20px 50px -10px rgba(0,20,30,0.12);
@@ -57,7 +57,7 @@
             color: #d4e2ed;
             font-size: 0.75rem;
             padding: 0.4rem 0;
-            border-bottom: 1px solid #1a4055;
+            border-bottom: 1px solid #16334f;
             overflow: hidden;
             position: sticky;
             top: 0;
@@ -70,7 +70,7 @@
         .moving-words .words-track span i { color: var(--accent); margin-right: 0.3rem; }
         @keyframes scrollWords { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
         .top-links { display: flex; gap: 1rem; flex-shrink: 0; }
-        .top-links a { color: #b4d0e0; transition: var(--transition); cursor: pointer; }
+        .top-links a { color: #a9c3d6; transition: var(--transition); cursor: pointer; }
         .top-links a:hover { color: var(--white); }
         .top-links i { color: var(--accent); margin-right: 0.2rem; }
 
@@ -135,7 +135,7 @@
             flex-direction: column;
             align-items: center;
             font-size: 0.6rem;
-            color: #1a3340;
+            color: #33475b;
             cursor: pointer;
             transition: var(--transition);
             padding: 0.2rem 0.3rem;
@@ -174,7 +174,7 @@
         }
         .nav-categories::-webkit-scrollbar { height: 3px; }
         .nav-categories::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #1a3340; }
+        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #33475b; }
         .nav-tab { padding: 0.3rem 0; border-bottom: 3px solid transparent; transition: var(--transition); cursor: pointer; position: relative; flex-shrink: 0; }
         .nav-tab::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 3px; background: var(--primary); transition: width 0.4s ease; }
         .nav-tab:hover::after, .nav-tab.active::after { width: 100%; }
@@ -386,18 +386,18 @@
         /* ─── FOOTER ─── */
         .footer {
             background: var(--secondary);
-            color: #b4d0e0;
+            color: #a9c3d6;
             padding: 2rem 0 1rem;
             margin-top: 3rem;
         }
         .footer .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
         .footer .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
-        .footer .footer-links a { color: #b4d0e0; font-size: 0.85rem; transition: var(--transition); }
+        .footer .footer-links a { color: #a9c3d6; font-size: 0.85rem; transition: var(--transition); }
         .footer .footer-links a:hover { color: var(--white); }
-        .footer .footer-bottom { border-top: 1px solid #1a4055; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
+        .footer .footer-bottom { border-top: 1px solid #16334f; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
         .footer .footer-bottom strong { color: var(--white); }
         .footer .footer-social { display: flex; gap: 1rem; }
-        .footer .footer-social a { color: #b4d0e0; transition: var(--transition); font-size: 1.1rem; }
+        .footer .footer-social a { color: #a9c3d6; transition: var(--transition); font-size: 1.1rem; }
         .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
 
         /* ─── TOAST ─── */
@@ -455,6 +455,7 @@
             .top-bar .moving-words .words-track span { font-size: 0.65rem; }
         }
     </style>
+    <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
 

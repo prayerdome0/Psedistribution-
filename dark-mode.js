@@ -20,8 +20,8 @@
             root.style.setProperty('--primary', '#0f766e');
             root.style.setProperty('--primary-dark', '#134e4b');
             root.style.setProperty('--secondary', '#0f172a');
-            root.style.setProperty('--light', '#1e293b');
-            root.style.setProperty('--white', '#1e293b');
+            root.style.setProperty('--light', '#0b2138');
+            root.style.setProperty('--white', '#0b2138');
             root.style.setProperty('--text', '#e2e8f0');
             root.style.setProperty('--text-light', '#94a3b8');
             root.style.setProperty('--border', '#334155');
@@ -51,7 +51,7 @@
         toggle.style.cssText = `
             position: fixed; bottom: 90px; right: 20px; z-index: 99999;
             width: 44px; height: 44px; border-radius: 50%; border: none;
-            background: #1a7b6b; color: #fff; font-size: 1.1rem;
+            background: #0e7c68; color: #fff; font-size: 1.1rem;
             cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             display: flex; align-items: center; justify-content: center;
         `;

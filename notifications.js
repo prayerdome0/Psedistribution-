@@ -243,7 +243,7 @@
             .pse-notif-wrap{position:relative;display:inline-flex;}\
             .pse-notif-bell{position:relative;display:flex;flex-direction:column;align-items:center;font-size:0.6rem;color:inherit;cursor:pointer;padding:0.2rem 0.3rem;text-decoration:none;transition:color .3s ease,transform .3s ease;}\
             .pse-notif-bell i{font-size:1.3rem;margin-bottom:2px;transition:transform .3s ease;}\
-            .pse-notif-bell:hover{color:var(--primary, #1a7b6b);transform:translateY(-2px);}\
+            .pse-notif-bell:hover{color:var(--primary, #0e7c68);transform:translateY(-2px);}\
             .pse-notif-bell:hover i{transform:scale(1.15);}\
             .pse-notif-bell.has-new i{animation:pseBellRing .5s ease;}\
             @keyframes pseBellRing{0%,100%{transform:rotate(0);}20%{transform:rotate(12deg);}40%{transform:rotate(-10deg);}60%{transform:rotate(6deg);}80%{transform:rotate(-4deg);}}\
@@ -252,21 +252,21 @@
             .pse-notif-panel{position:absolute;top:calc(100% + 12px);right:0;width:360px;max-width:90vw;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(11,42,59,.18);border:1px solid #e9edf2;z-index:99999;overflow:hidden;display:none;font-family:\'Inter\',\'Segoe UI\',system-ui,sans-serif;}\
             .pse-notif-panel.open{display:block;animation:psePanelIn .25s cubic-bezier(0.22,1,0.36,1);}\
             @keyframes psePanelIn{from{opacity:0;transform:translateY(-12px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}\
-            .pse-notif-head{display:flex;align-items:center;justify-content:space-between;padding:0.9rem 1rem;background:linear-gradient(135deg,#0b2a3b,#1a4b5e);color:#fff;}\
+            .pse-notif-head{display:flex;align-items:center;justify-content:space-between;padding:0.9rem 1rem;background:linear-gradient(135deg,#0b2138,#16334f);color:#fff;}\
             .pse-notif-head strong{font-size:0.95rem;}\
             .pse-notif-head .pse-notif-actions{display:flex;gap:0.4rem;}\
             .pse-notif-head button{background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:30px;font-size:0.7rem;padding:0.3rem 0.7rem;cursor:pointer;transition:background .3s;}\
             .pse-notif-head button:hover{background:rgba(255,255,255,.25);}\
             .pse-notif-list{max-height:400px;overflow-y:auto;}\
-            .pse-notif-empty{padding:2.5rem 1rem;text-align:center;color:#6a889a;font-size:0.85rem;}\
-            .pse-notif-item{display:flex;gap:0.7rem;padding:0.8rem 1rem;border-bottom:1px solid #f0f4f8;cursor:pointer;transition:background .2s,transform .2s;text-align:left;width:100%;border-left:3px solid transparent;animation:pseNotifItemIn .4s ease both;}\
+            .pse-notif-empty{padding:2.5rem 1rem;text-align:center;color:#698093;font-size:0.85rem;}\
+            .pse-notif-item{display:flex;gap:0.7rem;padding:0.8rem 1rem;border-bottom:1px solid #f5f8fa;cursor:pointer;transition:background .2s,transform .2s;text-align:left;width:100%;border-left:3px solid transparent;animation:pseNotifItemIn .4s ease both;}\
             @keyframes pseNotifItemIn{from{opacity:0;transform:translateX(-8px);}to{opacity:1;transform:translateX(0);}}\
             .pse-notif-item:hover{background:#f7fafc;transform:translateX(2px);}\
-            .pse-notif-item.unread{background:#eef7f3;border-left-color:#1a7b6b;}\
-            .pse-notif-item .pse-notif-ico{width:36px;height:36px;border-radius:50%;background:#e8f5f0;color:#1a7b6b;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;}\
+            .pse-notif-item.unread{background:#f0f8f5;border-left-color:#0e7c68;}\
+            .pse-notif-item .pse-notif-ico{width:36px;height:36px;border-radius:50%;background:#e6f4ef;color:#0e7c68;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;}\
             .pse-notif-item .pse-notif-body{flex:1;min-width:0;}\
-            .pse-notif-item .pse-notif-title{font-size:0.83rem;font-weight:700;color:#0b2a3b;}\
-            .pse-notif-item .pse-notif-msg{font-size:0.78rem;color:#6a889a;margin-top:2px;line-height:1.45;}\
+            .pse-notif-item .pse-notif-title{font-size:0.83rem;font-weight:700;color:#0b2138;}\
+            .pse-notif-item .pse-notif-msg{font-size:0.78rem;color:#698093;margin-top:2px;line-height:1.45;}\
             .pse-notif-item .pse-notif-time{font-size:0.68rem;color:#9fb3c2;margin-top:4px;}\
             .pse-notif-floating{position:fixed;right:22px;bottom:96px;z-index:2147483001;}\
         ';

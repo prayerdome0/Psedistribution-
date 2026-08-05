@@ -30,7 +30,7 @@
             var t = document.createElement('div');
             t.textContent = msg;
             t.style.cssText = 'position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);background:' +
-                (type === 'error' ? '#c0392b' : '#0b2a3b') + ';color:#fff;padding:0.7rem 1.2rem;border-radius:50px;' +
+                (type === 'error' ? '#c0392b' : '#0b2138') + ';color:#fff;padding:0.7rem 1.2rem;border-radius:50px;' +
                 'font-size:0.85rem;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.25);font-family:Inter,Segoe UI,sans-serif;';
             document.body.appendChild(t);
             setTimeout(function () { t.remove(); }, 3500);

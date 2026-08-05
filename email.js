@@ -130,14 +130,14 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .header { text-align:center; border-bottom:2px solid #0e7c68; padding-bottom:15px; margin-bottom:20px; }
         .logo { max-width:160px; height:auto; }
-        .title { color:#0b2a3b; font-size:22px; margin:10px 0 0; }
-        .order-number { color:#2c5a6b; font-size:14px; }
+        .title { color:#0b2138; font-size:22px; margin:10px 0 0; }
+        .order-number { color:#33475b; font-size:14px; }
         .details { background:#f8fafb; border-radius:8px; padding:15px; border:1px solid #e9edf2; margin:15px 0; }
-        .btn { background:#1a7b6b; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
+        .btn { background:#0e7c68; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2138; border-radius:0 0 12px 12px; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
         .product-item { padding:5px 0; border-bottom:1px solid #e9edf2; }
         .product-item:last-child { border-bottom:none; }
     </style>
@@ -149,7 +149,7 @@ function buildTemplateHTML(templateName, data) {
                 <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
                 <h2 class="title">✅ Order Confirmed!</h2>
             </div>
-            <h3 style="color:#0b2a3b;margin:0 0 5px;">Thank you for your order!</h3>
+            <h3 style="color:#0b2138;margin:0 0 5px;">Thank you for your order!</h3>
             <p class="order-number">Order #${data.orderNumber || 'N/A'}</p>
             <div class="details">
                 <p><strong>Order Date:</strong> ${data.date || new Date().toLocaleDateString()}</p>
@@ -171,8 +171,8 @@ function buildTemplateHTML(templateName, data) {
             <div style="text-align:center;margin:20px 0;">
                 <a href="https://pilotsalesdistribution.com/track-order?order=${data.orderNumber}" class="btn">📦 Track Your Order</a>
             </div>
-            <p style="color:#2c5a6b;font-size:14px;line-height:1.7;margin:0;">
-                Questions? <a href="https://wa.me/19099384682" style="color:#1a7b6b;text-decoration:none;">Chat with us on WhatsApp</a>
+            <p style="color:#33475b;font-size:14px;line-height:1.7;margin:0;">
+                Questions? <a href="https://wa.me/19099384682" style="color:#0e7c68;text-decoration:none;">Chat with us on WhatsApp</a>
             </p>
             <div class="footer">
                 <p>&copy; 2026 Pilot Sales Distribution &bull; 
@@ -195,11 +195,11 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .header { text-align:center; border-bottom:2px solid #0e7c68; padding-bottom:15px; margin-bottom:20px; }
         .logo { max-width:160px; height:auto; }
-        .btn { background:#f1c40f; color:#0b2a3b; padding:14px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
+        .btn { background:#e0a62e; color:#0b2138; padding:14px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2138; border-radius:0 0 12px 12px; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
     </style>
 </head>
 <body>
@@ -207,21 +207,21 @@ function buildTemplateHTML(templateName, data) {
         <div class="card">
             <div class="header">
                 <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
-                <h2 style="color:#0b2a3b;font-size:22px;">🔑 Reset Your Password</h2>
+                <h2 style="color:#0b2138;font-size:22px;">🔑 Reset Your Password</h2>
             </div>
-            <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'User'},</h3>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+            <h3 style="color:#0b2138;margin:0 0 10px;">Hi ${data.name || 'User'},</h3>
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                 We received a request to reset your password for your Pilot Sales Distribution account.
             </p>
             <div style="text-align:center;margin:20px 0;">
                 <a href="${data.resetLink || '#'}" class="btn">🔑 Reset Password</a>
             </div>
-            <p style="color:#6a889a;font-size:13px;margin:0 0 5px;">This link expires in 1 hour for security reasons.</p>
-            <p style="color:#6a889a;font-size:13px;margin:0;">If you didn't request this, please contact support immediately.</p>
+            <p style="color:#698093;font-size:13px;margin:0 0 5px;">This link expires in 1 hour for security reasons.</p>
+            <p style="color:#698093;font-size:13px;margin:0;">If you didn't request this, please contact support immediately.</p>
             <hr style="border:none;border-top:1px solid #e9edf2;margin:20px 0;">
-            <p style="color:#6a889a;font-size:12px;margin:0;">
+            <p style="color:#698093;font-size:12px;margin:0;">
                 Need help? Contact us at
-                <a href="mailto:support@pilotsalesdistribution.com" style="color:#1a7b6b;text-decoration:none;">support@pilotsalesdistribution.com</a>
+                <a href="mailto:support@pilotsalesdistribution.com" style="color:#0e7c68;text-decoration:none;">support@pilotsalesdistribution.com</a>
             </p>
             <div class="footer">
                 <p>&copy; 2026 Pilot Sales Distribution &bull; 
@@ -244,11 +244,11 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .header { text-align:center; border-bottom:2px solid #0e7c68; padding-bottom:15px; margin-bottom:20px; }
         .logo { max-width:180px; height:auto; }
-        .btn { background:#1a7b6b; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
+        .btn { background:#0e7c68; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2138; border-radius:0 0 12px 12px; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
     </style>
 </head>
 <body>
@@ -256,29 +256,29 @@ function buildTemplateHTML(templateName, data) {
         <div class="card">
             <div class="header">
                 <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
-                <h1 style="color:#0b2a3b;font-size:24px;margin:10px 0 0;">Welcome to <span style="color:#1a7b6b;">Pilot Sales</span></h1>
+                <h1 style="color:#0b2138;font-size:24px;margin:10px 0 0;">Welcome to <span style="color:#0e7c68;">Pilot Sales</span></h1>
             </div>
-            <h2 style="color:#0b2a3b;font-size:20px;margin:0 0 10px;">Hi ${data.name || 'User'},</h2>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+            <h2 style="color:#0b2138;font-size:20px;margin:0 0 10px;">Hi ${data.name || 'User'},</h2>
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                 Welcome to <strong>Pilot Sales Distribution</strong> - your premium wholesale marketplace!
             </p>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                 We're excited to have you on board. Here's what you can do next:
             </p>
             <div style="background:#f8fafb;border-radius:8px;padding:15px;margin:15px 0;border:1px solid #e9edf2;">
                 <ul style="list-style:none;padding:0;margin:0;">
-                    <li style="padding:5px 0;font-size:14px;color:#0b2a3b;">🛒 <a href="https://pilotsalesdistribution.com/products" style="color:#1a7b6b;text-decoration:none;">Browse 12,000+ products</a></li>
-                    <li style="padding:5px 0;font-size:14px;color:#0b2a3b;">📋 <a href="https://pilotsalesdistribution.com/rfq" style="color:#1a7b6b;text-decoration:none;">Request a quote</a></li>
-                    <li style="padding:5px 0;font-size:14px;color:#0b2a3b;">💬 <a href="https://wa.me/19099384682" style="color:#1a7b6b;text-decoration:none;">Chat with us on WhatsApp</a></li>
+                    <li style="padding:5px 0;font-size:14px;color:#0b2138;">🛒 <a href="https://pilotsalesdistribution.com/products" style="color:#0e7c68;text-decoration:none;">Browse 12,000+ products</a></li>
+                    <li style="padding:5px 0;font-size:14px;color:#0b2138;">📋 <a href="https://pilotsalesdistribution.com/rfq" style="color:#0e7c68;text-decoration:none;">Request a quote</a></li>
+                    <li style="padding:5px 0;font-size:14px;color:#0b2138;">💬 <a href="https://wa.me/19099384682" style="color:#0e7c68;text-decoration:none;">Chat with us on WhatsApp</a></li>
                 </ul>
             </div>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:15px 0 0;">Need help? Reply to this email or contact us 24/7.</p>
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:15px 0 0;">Need help? Reply to this email or contact us 24/7.</p>
             <div class="footer">
                 <p>&copy; 2026 Pilot Sales Distribution. All rights reserved.</p>
                 <p style="margin:5px 0 0;">
-                    <a href="https://pilotsalesdistribution.com/privacy" style="color:#b4d0e0;text-decoration:none;">Privacy Policy</a> &bull;
-                    <a href="https://pilotsalesdistribution.com/terms" style="color:#b4d0e0;text-decoration:none;">Terms</a> &bull;
-                    <a href="https://pilotsalesdistribution.com/help-center" style="color:#b4d0e0;text-decoration:none;">Help Center</a>
+                    <a href="https://pilotsalesdistribution.com/privacy" style="color:#a9c3d6;text-decoration:none;">Privacy Policy</a> &bull;
+                    <a href="https://pilotsalesdistribution.com/terms" style="color:#a9c3d6;text-decoration:none;">Terms</a> &bull;
+                    <a href="https://pilotsalesdistribution.com/help-center" style="color:#a9c3d6;text-decoration:none;">Help Center</a>
                 </p>
                 <p style="margin:8px 0 0;">📧 support@pilotsalesdistribution.com &bull; 📞 +1 (909) 938-4682</p>
             </div>
@@ -299,11 +299,11 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .header { text-align:center; border-bottom:2px solid #0e7c68; padding-bottom:15px; margin-bottom:20px; }
         .logo { max-width:160px; height:auto; }
-        .btn { background:#1a7b6b; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
+        .btn { background:#0e7c68; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2138; border-radius:0 0 12px 12px; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
     </style>
 </head>
 <body>
@@ -311,10 +311,10 @@ function buildTemplateHTML(templateName, data) {
         <div class="card">
             <div class="header">
                 <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
-                <h2 style="color:#0b2a3b;font-size:22px;">📄 Quote Response</h2>
+                <h2 style="color:#0b2138;font-size:22px;">📄 Quote Response</h2>
             </div>
-            <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'User'},</h3>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+            <h3 style="color:#0b2138;margin:0 0 10px;">Hi ${data.name || 'User'},</h3>
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                 ${data.supplier || 'A supplier'} has responded to your quote request.
             </p>
             <div style="background:#f8fafb;border-radius:8px;padding:15px;margin:15px 0;border:1px solid #e9edf2;">
@@ -322,7 +322,7 @@ function buildTemplateHTML(templateName, data) {
                 <p><strong>Price:</strong> $${data.price || '0.00'}</p>
                 <p><strong>Supplier:</strong> ${data.supplier || 'Pilot Sales Distribution'}</p>
             </div>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:15px 0;">
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:15px 0;">
                 ${data.message || 'Please contact us for more details.'}
             </p>
             <div style="text-align:center;margin:20px 0;">
@@ -348,11 +348,11 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .header { text-align:center; border-bottom:2px solid #0e7c68; padding-bottom:15px; margin-bottom:20px; }
         .logo { max-width:160px; height:auto; }
-        .btn { background:#1a7b6b; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
+        .btn { background:#0e7c68; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2138; border-radius:0 0 12px 12px; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
     </style>
 </head>
 <body>
@@ -360,10 +360,10 @@ function buildTemplateHTML(templateName, data) {
         <div class="card">
             <div class="header">
                 <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
-                <h2 style="color:#0b2a3b;font-size:22px;">🚚 Your Order Has Shipped!</h2>
+                <h2 style="color:#0b2138;font-size:22px;">🚚 Your Order Has Shipped!</h2>
             </div>
-            <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'User'},</h3>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+            <h3 style="color:#0b2138;margin:0 0 10px;">Hi ${data.name || 'User'},</h3>
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                 Great news! Your order #${data.orderNumber || 'N/A'} has been shipped and is on its way.
             </p>
             <div style="background:#f8fafb;border-radius:8px;padding:15px;margin:15px 0;border:1px solid #e9edf2;">
@@ -374,8 +374,8 @@ function buildTemplateHTML(templateName, data) {
             <div style="text-align:center;margin:20px 0;">
                 <a href="https://pilotsalesdistribution.com/track-order?order=${data.orderNumber}" class="btn">📦 Track Order</a>
             </div>
-            <p style="color:#6a889a;font-size:13px;margin:0;">
-                Questions? <a href="https://wa.me/19099384682" style="color:#1a7b6b;text-decoration:none;">Chat with us on WhatsApp</a>
+            <p style="color:#698093;font-size:13px;margin:0;">
+                Questions? <a href="https://wa.me/19099384682" style="color:#0e7c68;text-decoration:none;">Chat with us on WhatsApp</a>
             </p>
             <div class="footer">
                 <p>&copy; 2026 Pilot Sales Distribution</p>
@@ -397,11 +397,11 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .header { text-align:center; border-bottom:2px solid #0e7c68; padding-bottom:15px; margin-bottom:20px; }
         .logo { max-width:160px; height:auto; }
         .btn { background:#25D366; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
+        .footer { text-align:center; padding:20px; background:#0b2138; border-radius:0 0 12px 12px; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
     </style>
 </head>
 <body>
@@ -409,10 +409,10 @@ function buildTemplateHTML(templateName, data) {
         <div class="card">
             <div class="header">
                 <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
-                <h2 style="color:#0b2a3b;font-size:22px;">📋 RFQ Received!</h2>
+                <h2 style="color:#0b2138;font-size:22px;">📋 RFQ Received!</h2>
             </div>
-            <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'User'},</h3>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+            <h3 style="color:#0b2138;margin:0 0 10px;">Hi ${data.name || 'User'},</h3>
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                 We've received your quote request and will match you with the best suppliers.
             </p>
             <div style="background:#f8fafb;border-radius:8px;padding:15px;margin:15px 0;border:1px solid #e9edf2;">
@@ -423,7 +423,7 @@ function buildTemplateHTML(templateName, data) {
             <div style="text-align:center;margin:20px 0;">
                 <a href="https://wa.me/19099384682" class="btn">💬 Chat on WhatsApp</a>
             </div>
-            <p style="color:#6a889a;font-size:13px;margin:0;">
+            <p style="color:#698093;font-size:13px;margin:0;">
                 Need to add more details? Reply to this email or message us on WhatsApp.
             </p>
             <div class="footer">
@@ -446,12 +446,12 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .header { text-align:center; border-bottom:2px solid #0e7c68; padding-bottom:15px; margin-bottom:20px; }
         .logo { max-width:160px; height:auto; }
-        .title { color:#0b2a3b; font-size:22px; margin:10px 0 0; }
+        .title { color:#0b2138; font-size:22px; margin:10px 0 0; }
         .details { background:#f8fafb; border-radius:8px; padding:15px; border:1px solid #e9edf2; margin:15px 0; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
+        .footer { text-align:center; padding:20px; background:#0b2138; border-radius:0 0 12px 12px; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
     </style>
 </head>
 <body>
@@ -489,11 +489,11 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .header { text-align:center; border-bottom:2px solid #0e7c68; padding-bottom:15px; margin-bottom:20px; }
         .logo { max-width:160px; height:auto; }
-        .btn { background:#1a7b6b; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
+        .btn { background:#0e7c68; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2138; border-radius:0 0 12px 12px; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
     </style>
 </head>
 <body>
@@ -501,19 +501,19 @@ function buildTemplateHTML(templateName, data) {
         <div class="card">
             <div class="header">
                 <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
-                <h2 style="color:#0b2a3b;font-size:22px;">✅ Message Received!</h2>
+                <h2 style="color:#0b2138;font-size:22px;">✅ Message Received!</h2>
             </div>
-            <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+            <h3 style="color:#0b2138;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                 Thank you for contacting <strong>Pilot Sales Distribution</strong>. We have received your message and our support team will get back to you within <strong>24 hours</strong>.
             </p>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                 ${data.message || ''}
             </p>
             <div style="text-align:center;margin:20px 0;">
                 <a href="https://wa.me/19099384682" class="btn" style="background:#25D366;">💬 Chat on WhatsApp</a>
             </div>
-            <p style="color:#6a889a;font-size:13px;margin:0;">
+            <p style="color:#698093;font-size:13px;margin:0;">
                 Need help urgently? Call us at <strong>+1 (909) 938-4682</strong>.
             </p>
             <div class="footer">
@@ -536,11 +536,11 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .header { text-align:center; border-bottom:2px solid #0e7c68; padding-bottom:15px; margin-bottom:20px; }
         .logo { max-width:160px; height:auto; }
-        .btn { background:#1a7b6b; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
+        .btn { background:#0e7c68; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2138; border-radius:0 0 12px 12px; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
     </style>
 </head>
 <body>
@@ -548,17 +548,17 @@ function buildTemplateHTML(templateName, data) {
         <div class="card">
             <div class="header">
                 <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
-                <h2 style="color:#0b2a3b;font-size:22px;">🔔 ${data.title || 'Update'}</h2>
+                <h2 style="color:#0b2138;font-size:22px;">🔔 ${data.title || 'Update'}</h2>
             </div>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                 Hi ${data.name || 'there'},
             </p>
             <div style="background:#f8fafb;border-radius:8px;padding:15px;border:1px solid #e9edf2;margin:15px 0;">
                 ${data.message || 'You have a new update from Pilot Sales Distribution.'}
             </div>
             ${data.buttonText && data.buttonUrl ? '<div style="text-align:center;margin:20px 0;"><a href="' + data.buttonUrl + '" class="btn">' + data.buttonText + '</a></div>' : ''}
-            <p style="color:#6a889a;font-size:13px;margin:0;">
-                Questions? <a href="https://wa.me/19099384682" style="color:#1a7b6b;text-decoration:none;">Chat with us on WhatsApp</a>
+            <p style="color:#698093;font-size:13px;margin:0;">
+                Questions? <a href="https://wa.me/19099384682" style="color:#0e7c68;text-decoration:none;">Chat with us on WhatsApp</a>
             </p>
             <div class="footer">
                 <p>&copy; 2026 Pilot Sales Distribution &bull; <a href="https://pilotsalesdistribution.com">Visit our store</a></p>
@@ -581,10 +581,10 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .banner { background:linear-gradient(135deg,${data.colorA || '#0b2a3b'},${data.colorB || '#1a7b6b'}); color:#ffffff; text-align:center; padding:30px 20px; }
-        .btn { background:#f1c40f; color:#0b2a3b; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:700; display:inline-block; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
+        .banner { background:linear-gradient(135deg,${data.colorA || '#0b2138'},${data.colorB || '#0e7c68'}); color:#ffffff; text-align:center; padding:30px 20px; }
+        .btn { background:#e0a62e; color:#0b2138; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:700; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2138; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
     </style>
 </head>
 <body>
@@ -596,8 +596,8 @@ function buildTemplateHTML(templateName, data) {
                 <p style="margin:8px 0 0;font-size:14px;opacity:0.9;">from Pilot Sales Distribution</p>
             </div>
             <div style="padding:26px 28px;">
-                <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
-                <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+                <h3 style="color:#0b2138;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
+                <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                     ${data.message || 'Happy holidays from the whole Pilot Sales Distribution team!'}
                 </p>
                 ${data.image ? `
@@ -629,11 +629,11 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .header { text-align:center; border-bottom:2px solid #0e7c68; padding-bottom:15px; margin-bottom:20px; }
         .logo { max-width:160px; height:auto; }
-        .btn { background:#1a7b6b; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
+        .btn { background:#0e7c68; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2138; border-radius:0 0 12px 12px; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
     </style>
 </head>
 <body>
@@ -641,15 +641,15 @@ function buildTemplateHTML(templateName, data) {
         <div class="card">
             <div class="header">
                 <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
-                <h2 style="color:#0b2a3b;font-size:20px;margin:8px 0 0;">${data.subject || 'Message from our team'}</h2>
+                <h2 style="color:#0b2138;font-size:20px;margin:8px 0 0;">${data.subject || 'Message from our team'}</h2>
             </div>
-            <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
-            <div style="background:#f8fafb;border-radius:8px;padding:15px;border:1px solid #e9edf2;margin:15px 0;color:#2c5a6b;font-size:15px;line-height:1.7;">
+            <h3 style="color:#0b2138;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
+            <div style="background:#f8fafb;border-radius:8px;padding:15px;border:1px solid #e9edf2;margin:15px 0;color:#33475b;font-size:15px;line-height:1.7;">
                 ${data.message || ''}
             </div>
             ${data.buttonText && data.buttonUrl ? '<div style="text-align:center;margin:20px 0;"><a href="' + data.buttonUrl + '" class="btn">' + data.buttonText + '</a></div>' : ''}
-            <p style="color:#6a889a;font-size:13px;margin:0;">
-                Reply to this email or <a href="https://wa.me/19099384682" style="color:#1a7b6b;text-decoration:none;">chat with us on WhatsApp</a> — we reply within 24 hours.
+            <p style="color:#698093;font-size:13px;margin:0;">
+                Reply to this email or <a href="https://wa.me/19099384682" style="color:#0e7c68;text-decoration:none;">chat with us on WhatsApp</a> — we reply within 24 hours.
             </p>
             <div class="footer">
                 <p>&copy; 2026 Pilot Sales Distribution &bull; <a href="https://pilotsalesdistribution.com">Visit our store</a></p>
@@ -673,10 +673,10 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .header { text-align:center; border-bottom:2px solid #0e7c68; padding-bottom:15px; margin-bottom:20px; }
         .logo { max-width:160px; height:auto; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
+        .footer { text-align:center; padding:20px; background:#0b2138; border-radius:0 0 12px 12px; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
         .steps { background:#f8fafb; border-radius:8px; padding:15px; border:1px solid #e9edf2; margin:15px 0; }
     </style>
 </head>
@@ -685,19 +685,19 @@ function buildTemplateHTML(templateName, data) {
         <div class="card">
             <div class="header">
                 <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
-                <h2 style="color:#0b2a3b;font-size:22px;margin:8px 0 0;">📋 Application Received!</h2>
+                <h2 style="color:#0b2138;font-size:22px;margin:8px 0 0;">📋 Application Received!</h2>
             </div>
-            <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+            <h3 style="color:#0b2138;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                 Thank you for applying to sell on <strong>Pilot Sales Distribution</strong>. We have received your application for <strong>${data.businessName || 'your business'}</strong> and our team is now reviewing it.
             </p>
             <div class="steps">
-                <p style="margin:0 0 8px;font-weight:600;color:#0b2a3b;">What happens next?</p>
-                <p style="margin:0 0 5px;font-size:14px;color:#2c5a6b;">✅ 1. Our Trust &amp; Safety team reviews your details</p>
-                <p style="margin:0 0 5px;font-size:14px;color:#2c5a6b;">🔍 2. We verify your business information (usually within 48 hours)</p>
-                <p style="margin:0;font-size:14px;color:#2c5a6b;">🎉 3. Once approved, you'll get the Verified Seller badge and full dashboard access</p>
+                <p style="margin:0 0 8px;font-weight:600;color:#0b2138;">What happens next?</p>
+                <p style="margin:0 0 5px;font-size:14px;color:#33475b;">✅ 1. Our Trust &amp; Safety team reviews your details</p>
+                <p style="margin:0 0 5px;font-size:14px;color:#33475b;">🔍 2. We verify your business information (usually within 48 hours)</p>
+                <p style="margin:0;font-size:14px;color:#33475b;">🎉 3. Once approved, you'll get the Verified Seller badge and full dashboard access</p>
             </div>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:15px 0 0;">
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:15px 0 0;">
                 We'll email you the moment your application is reviewed. No action needed from you right now.
             </p>
             <div class="footer">
@@ -722,12 +722,12 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .header { text-align:center; border-bottom:2px solid #0e7c68; padding-bottom:15px; margin-bottom:20px; }
         .logo { max-width:160px; height:auto; }
         .details { background:#f8fafb; border-radius:8px; padding:15px; border:1px solid #e9edf2; margin:15px 0; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
-        .btn { background:#1a7b6b; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2138; border-radius:0 0 12px 12px; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
+        .btn { background:#0e7c68; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
     </style>
 </head>
 <body>
@@ -735,9 +735,9 @@ function buildTemplateHTML(templateName, data) {
         <div class="card">
             <div class="header">
                 <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
-                <h2 style="color:#0b2a3b;font-size:22px;margin:8px 0 0;">🏪 New Seller Application</h2>
+                <h2 style="color:#0b2138;font-size:22px;margin:8px 0 0;">🏪 New Seller Application</h2>
             </div>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                 A new seller has applied to join the marketplace. Review and verify it from the admin dashboard.
             </p>
             <div class="details">
@@ -778,11 +778,11 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .header { text-align:center; border-bottom:2px solid #0e7c68; padding-bottom:15px; margin-bottom:20px; }
         .logo { max-width:160px; height:auto; }
-        .btn { background:#1a7b6b; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
+        .btn { background:#0e7c68; color:#ffffff; padding:12px 40px; text-decoration:none; border-radius:50px; font-weight:600; display:inline-block; }
+        .footer { text-align:center; padding:20px; background:#0b2138; border-radius:0 0 12px 12px; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
     </style>
 </head>
 <body>
@@ -790,20 +790,20 @@ function buildTemplateHTML(templateName, data) {
         <div class="card">
             <div class="header">
                 <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
-                <h2 style="color:#0b2a3b;font-size:22px;margin:8px 0 0;">🎉 You're Approved!</h2>
+                <h2 style="color:#0b2138;font-size:22px;margin:8px 0 0;">🎉 You're Approved!</h2>
             </div>
-            <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+            <h3 style="color:#0b2138;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                 Great news! Your application for <strong>${data.businessName || 'your business'}</strong> has been <strong>approved</strong> by our Trust &amp; Safety team.
             </p>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                 Your account now carries the <strong>✓ Verified Seller</strong> badge, so buyers can trust you more and buy with confidence. You can start listing products right away from your seller dashboard.
             </p>
             <div style="text-align:center;margin:20px 0;">
                 <a href="https://pilotsalesdistribution.com/seller-dashboard" class="btn">🚀 Open Seller Dashboard</a>
             </div>
-            <p style="color:#6a889a;font-size:13px;margin:0;">
-                Need help getting started? <a href="https://wa.me/19099384682" style="color:#1a7b6b;text-decoration:none;">Chat with us on WhatsApp</a>
+            <p style="color:#698093;font-size:13px;margin:0;">
+                Need help getting started? <a href="https://wa.me/19099384682" style="color:#0e7c68;text-decoration:none;">Chat with us on WhatsApp</a>
             </p>
             <div class="footer">
                 <p>&copy; 2026 Pilot Sales Distribution &bull; <a href="https://pilotsalesdistribution.com">Visit our store</a></p>
@@ -827,10 +827,10 @@ function buildTemplateHTML(templateName, data) {
         body { margin:0; padding:0; background:#f4f7f9; font-family:'Segoe UI',Arial,sans-serif; }
         .container { max-width:600px; margin:0 auto; padding:20px; }
         .card { background:#ffffff; border-radius:12px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .header { text-align:center; border-bottom:2px solid #1a7b6b; padding-bottom:15px; margin-bottom:20px; }
+        .header { text-align:center; border-bottom:2px solid #0e7c68; padding-bottom:15px; margin-bottom:20px; }
         .logo { max-width:160px; height:auto; }
-        .footer { text-align:center; padding:20px; background:#0b2a3b; border-radius:0 0 12px 12px; color:#b4d0e0; font-size:12px; }
-        .footer a { color:#b4d0e0; text-decoration:none; }
+        .footer { text-align:center; padding:20px; background:#0b2138; border-radius:0 0 12px 12px; color:#a9c3d6; font-size:12px; }
+        .footer a { color:#a9c3d6; text-decoration:none; }
     </style>
 </head>
 <body>
@@ -838,16 +838,16 @@ function buildTemplateHTML(templateName, data) {
         <div class="card">
             <div class="header">
                 <img src="https://pilotsalesdistribution.com/logo.jpg" alt="Pilot Sales Distribution" class="logo" />
-                <h2 style="color:#0b2a3b;font-size:22px;margin:8px 0 0;">Update on Your Application</h2>
+                <h2 style="color:#0b2138;font-size:22px;margin:8px 0 0;">Update on Your Application</h2>
             </div>
-            <h3 style="color:#0b2a3b;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:0 0 15px;">
+            <h3 style="color:#0b2138;margin:0 0 10px;">Hi ${data.name || 'there'},</h3>
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:0 0 15px;">
                 Thank you for your interest in selling on <strong>Pilot Sales Distribution</strong>. After reviewing your application, we're unable to approve it at this time.
             </p>
-            <div style="background:#f8fafb;border-radius:8px;padding:15px;border:1px solid #e9edf2;margin:15px 0;color:#2c5a6b;font-size:14px;line-height:1.7;">
+            <div style="background:#f8fafb;border-radius:8px;padding:15px;border:1px solid #e9edf2;margin:15px 0;color:#33475b;font-size:14px;line-height:1.7;">
                 ${data.reason ? '<strong>Reason:</strong> ' + data.reason : "You're welcome to re-apply in the future once the required information or documentation is available."}
             </div>
-            <p style="color:#2c5a6b;font-size:15px;line-height:1.7;margin:15px 0 0;">
+            <p style="color:#33475b;font-size:15px;line-height:1.7;margin:15px 0 0;">
                 If you believe this is a mistake or have additional details to share, just reply to this email and our team will be happy to take another look.
             </p>
             <div class="footer">
@@ -1168,8 +1168,8 @@ async function sendFestivalGreeting(toEmail, name, holiday, imageDataUrl) {
         message: holiday.message || 'Warm wishes and great deals from Pilot Sales Distribution!',
         cta: holiday.cta || 'Shop Festival Deals',
         url: holiday.url || 'https://pilotsalesdistribution.com/products',
-        colorA: (holiday.colors && holiday.colors[0]) || '#0b2a3b',
-        colorB: (holiday.colors && holiday.colors[1]) || '#1a7b6b',
+        colorA: (holiday.colors && holiday.colors[0]) || '#0b2138',
+        colorB: (holiday.colors && holiday.colors[1]) || '#0e7c68',
         image: imageDataUrl || ''
     };
     return sendEmailResend('festival', data, toEmail);
