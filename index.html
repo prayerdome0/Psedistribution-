@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pilot Sales Distribution - Premium Wholesale Marketplace</title>
+    <title>Pilot Sales Distribution - Wholesale Inventory. Verified Before You Buy.</title>
 
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Pilot Sales Distribution - wholesale inventory with availability confirmed per offer. Freight quoted per product; RFQ-first purchasing." />
-    <meta name="keywords" content="wholesale, bulk products, distribution, b2b, suppliers" />
+    <meta name="description" content="Wholesale Inventory. Verified Before You Buy. Confirmed availability, freight quoted per product, and RFQ-first purchasing for serious bulk buyers." />
+    <meta name="keywords" content="wholesale, bulk products, distribution, b2b, suppliers, liquidation, exporters" />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Pilot Sales Distribution - Premium Wholesale Marketplace" />
-    <meta property="og:description" content="Premium wholesale marketplace for bulk products. Save up to 40% with verified suppliers." />
+    <meta property="og:title" content="Pilot Sales Distribution - Wholesale Inventory. Verified Before You Buy." />
+    <meta property="og:description" content="Wholesale inventory with availability confirmed per offer. Freight quoted per product; RFQ-first purchasing." />
     <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
     <meta property="og:url" content="https://pilotsalesdistribution.com/" />
 
@@ -25,7 +25,7 @@
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0b2138">
+    <meta name="theme-color" content="#12161B">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
@@ -35,33 +35,37 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="main.js"></script>
-    <!-- Premium Design System -->
+
+    <!-- Premium Design System (shared) -->
     <link rel="stylesheet" href="/style.css" />
+    <!-- Homepage Redesign v2 (dark industrial B2B) -->
+    <link rel="stylesheet" href="/home-redesign.css" />
+
     <!-- Display + body typefaces -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
 </head>
-<body>
+<body class="pse-home">
 
-<!-- TOP BAR -->
+<!-- TOP BAR (utility navigation) -->
 <div class="top-bar">
     <div class="container">
         <div class="moving-words">
             <div class="words-track">
-                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
-                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
-                <span><i class="fa-solid fa-circle-check"></i> Verified inventory - availability confirmed per offer</span>
-                <span><i class="fa-solid fa-truck"></i> Freight quoted separately unless explicitly included</span>
+                <span><i class="fa-solid fa-bolt"></i> Wholesale Inventory. Verified Before You Buy.</span>
+                <span><i class="fa-solid fa-circle-check"></i> Availability confirmed per offer</span>
+                <span><i class="fa-solid fa-truck-fast"></i> Freight quoted per product</span>
+                <span><i class="fa-solid fa-file-lines"></i> RFQ-first purchasing — no commitment until confirmed</span>
                 <span><i class="fa-solid fa-box"></i> Availability subject to prior sale and final confirmation</span>
-                <span><i class="fa-solid fa-file-lines"></i> Returns &amp; inspection terms shown per offer</span>
-                <span><i class="fa-solid fa-rocket"></i> Welcome to Pilot Sales Distribution - Premium Wholesale Marketplace</span>
-                <span><i class="fa-solid fa-gem"></i> Quality Products at Wholesale Prices - Save Up to 40%</span>
-                <span><i class="fa-solid fa-circle-check"></i> Verified inventory - availability confirmed per offer</span>
-                <span><i class="fa-solid fa-truck"></i> Freight quoted separately unless explicitly included</span>
+                <span><i class="fa-solid fa-shield-halved"></i> Verified suppliers for serious bulk buyers</span>
+                <span><i class="fa-solid fa-bolt"></i> Wholesale Inventory. Verified Before You Buy.</span>
+                <span><i class="fa-solid fa-circle-check"></i> Availability confirmed per offer</span>
+                <span><i class="fa-solid fa-truck-fast"></i> Freight quoted per product</span>
+                <span><i class="fa-solid fa-file-lines"></i> RFQ-first purchasing — no commitment until confirmed</span>
                 <span><i class="fa-solid fa-box"></i> Availability subject to prior sale and final confirmation</span>
-                <span><i class="fa-solid fa-file-lines"></i> Returns &amp; inspection terms shown per offer</span>
+                <span><i class="fa-solid fa-shield-halved"></i> Verified suppliers for serious bulk buyers</span>
             </div>
         </div>
         <div class="top-links">
@@ -76,8 +80,8 @@
 <!-- HEADER -->
 <header class="header">
     <div class="container">
-        <a href="/home" class="logo">
-            <img src="/logo.webp" alt="Pilot Sales Distribution" />
+        <a href="/home" class="logo" aria-label="Pilot Sales Distribution home">
+            <img src="/logo.webp" alt="Pilot Sales Distribution logo" />
             <div class="brand-name">
                 <span class="main">PSE <span>Distribution</span></span>
                 <span class="sub">wholesale</span>
@@ -85,7 +89,7 @@
         </a>
 
         <div class="search-bar" id="searchBar">
-            <input type="text" id="searchInput" placeholder="Search wholesale products..." autocomplete="off" />
+            <input type="text" id="searchInput" placeholder="Search wholesale products..." autocomplete="off" aria-label="Search wholesale products" />
             <button aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
             <div class="search-results" id="searchResults"></div>
         </div>
@@ -101,7 +105,7 @@
                 <span>Wishlist</span>
                 <span class="badge-count wishlist-count">0</span>
             </a>
-            <a href="/account" class="icon-btn" id="accountBtn">
+            <a href="/account" class="icon-btn" id="accountBtn" aria-label="Account">
                 <i class="fa-regular fa-user"></i>
                 <span id="accountLabel">Account</span>
             </a>
@@ -109,7 +113,7 @@
     </div>
 </header>
 
-<!-- NAVIGATION TABS (hidden on home - use hamburger menu instead) -->
+<!-- NAVIGATION TABS (hidden on home - hamburger menu on mobile) -->
 <nav class="nav-categories" aria-label="Main navigation" style="display:none;">
     <div class="container">
         <a href="/" class="nav-tab active">Home</a>
@@ -121,210 +125,141 @@
     </div>
 </nav>
 
-<!-- MAIN CONTENT -->
+<!-- 1. HERO -->
+<section class="pse-hero" aria-labelledby="heroTitle">
+    <div class="pse-hero-grid">
+        <div class="pse-hero-copy">
+            <span class="pse-hero-kicker"><span class="live-dot" aria-hidden="true"></span> Live wholesale command center</span>
+            <h1 id="heroTitle">Wholesale Inventory. <span class="red">Verified</span> Before You Buy.</h1>
+            <p class="pse-hero-sub">Confirmed availability, freight quoted per product, and RFQ-first purchasing for serious bulk buyers. Quantity, location and lead time — scannable in seconds.</p>
+            <div class="pse-hero-ctas">
+                <a href="#featured-inventory" class="pse-btn pse-btn-primary" onclick="document.getElementById('featuredInventoryContainer').scrollIntoView({behavior:'smooth'})"><i class="fa-solid fa-boxes-stacked"></i> View Live Inventory</a>
+                <a href="/rfq" class="pse-btn pse-btn-secondary"><i class="fa-regular fa-file-lines"></i> Request a Quote</a>
+            </div>
+            <div class="pse-hero-meta">
+                <div class="hm"><i class="fa-solid fa-circle-check"></i> Availability confirmed per offer</div>
+                <div class="hm"><i class="fa-solid fa-truck-fast"></i> Freight quoted per product</div>
+                <div class="hm"><i class="fa-solid fa-file-lines"></i> RFQ-first purchasing</div>
+                <div class="hm"><i class="fa-solid fa-shield-halved"></i> Verified suppliers</div>
+            </div>
+        </div>
+        <div class="pse-hero-panel" aria-label="Live market status">
+            <div class="php-title">Live status <span class="big"><span class="live-dot" aria-hidden="true"></span> LIVE</span></div>
+            <div class="php-row"><span class="k">Deal records</span><span class="v" id="statDeals">296</span></div>
+            <div class="php-row"><span class="k">PSE accounts</span><span class="v" id="statAccounts">50</span></div>
+            <div class="php-row"><span class="k">SalesMax accounts</span><span class="v" id="statSalesmax">3</span></div>
+            <div class="php-row"><span class="k">Working areas</span><span class="v" id="statAreas">3</span></div>
+            <div class="php-row"><span class="k">Current offers</span><span class="v red" id="liveOfferCountHero">—</span></div>
+            <div class="php-row"><span class="k">Availability model</span><span class="v green">Confirmed per offer</span></div>
+        </div>
+    </div>
+</section>
+
 <div class="container">
 
-    <!-- 1. HERO CAROUSEL -->
-    <div class="banner-slider" id="bannerSlider">
-        <div class="banner-track" id="bannerTrack">
-            <div class="slide">
-                <a href="/products" aria-label="Browse wholesale products">
-                    <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1600&q=80" alt="Wholesale marketplace products" />
-                    <div class="slide-caption">
-                        <span class="badge"><i class="fa-solid fa-bolt"></i> Wholesale, reimagined</span>
-                        <h2>Premium bulk deals, <span>verified per offer</span></h2>
-                        <p>Shop confirmed wholesale inventory with per-product freight, MOQ and availability terms.</p>
-                        <span class="btn btn-white"><i class="fa-solid fa-bag-shopping"></i> Browse Products</span>
-                    </div>
-                </a>
-            </div>
-            <div class="slide">
-                <a href="/rfq" aria-label="Request a quote">
-                    <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1600&q=80" alt="Fast and reliable delivery" loading="lazy" />
-                    <div class="slide-caption">
-                        <span class="badge"><i class="fa-regular fa-file-lines"></i> RFQ-first purchasing</span>
-                        <h2>Get your <span>quote in minutes</span></h2>
-                        <p>Send a request with your quantity — no commitment until availability is confirmed.</p>
-                        <span class="btn btn-white"><i class="fa-regular fa-paper-plane"></i> Request a Quote</span>
-                    </div>
-                </a>
-            </div>
-            <div class="slide">
-                <a href="/become-seller" aria-label="Become a supplier">
-                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1600&q=80" alt="Trusted supplier partnerships" loading="lazy" />
-                    <div class="slide-caption">
-                        <span class="badge"><i class="fa-solid fa-handshake"></i> For suppliers</span>
-                        <h2>Build your <span>verified supply network</span></h2>
-                        <p>List your inventory on a marketplace built for verified B2B distribution.</p>
-                        <span class="btn btn-white"><i class="fa-solid fa-store"></i> Become a Seller</span>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <button class="banner-nav prev" onclick="prevSlide()" aria-label="Previous image"><i class="fa-solid fa-chevron-left"></i></button>
-        <button class="banner-nav next" onclick="nextSlide()" aria-label="Next image"><i class="fa-solid fa-chevron-right"></i></button>
-        <div class="dots" id="bannerDots"></div>
+    <!-- 2. TRUST METRICS -->
+    <div class="pse-trust" aria-label="Marketplace trust metrics">
+        <div class="pt"><div class="pt-num">296</div><div class="pt-label">Deal Records</div><div class="pt-desc">Wholesale inventory offers catalogued</div></div>
+        <div class="pt"><div class="pt-num">50</div><div class="pt-label">PSE Accounts</div><div class="pt-desc">Verified buyer &amp; seller accounts</div></div>
+        <div class="pt"><div class="pt-num">3</div><div class="pt-label">SalesMax Accounts</div><div class="pt-desc">Connected inventory channels</div></div>
+        <div class="pt"><div class="pt-num">3</div><div class="pt-label">Working Areas</div><div class="pt-desc">Active wholesale markets</div></div>
     </div>
 
-    <!-- 2. LIVE MARKETPLACE STATUS -->
-    <section class="stats-section animate-on-scroll" aria-label="Marketplace status">
-        <div class="stat-item">
-            <div class="icon"><i class="fa-solid fa-boxes-stacked"></i></div>
-            <div class="number" id="liveOfferCount">—</div>
-            <div class="label">Current offers</div>
+    <!-- 3. FEATURED LIVE INVENTORY -->
+    <section class="pse-inventory" id="featured-inventory" aria-labelledby="invTitle">
+        <div class="pse-sec-head">
+            <div>
+                <span class="eyebrow"><i class="fa-solid fa-bolt"></i> Featured live inventory</span>
+                <h2 id="invTitle">Now <span class="red">Available</span> Wholesale</h2>
+                <p>Quantity, FOB location, freight and availability — confirmed per offer. Prices are per unit, MOQ applies.</p>
+            </div>
+            <div class="pse-car-nav" aria-label="Inventory carousel controls">
+                <button type="button" onclick="scrollInventory(-1)" aria-label="Scroll inventory back"><i class="fa-solid fa-arrow-left"></i></button>
+                <button type="button" onclick="scrollInventory(1)" aria-label="Scroll inventory forward"><i class="fa-solid fa-arrow-right"></i></button>
+            </div>
         </div>
-        <div class="stat-item">
-            <div class="icon"><i class="fa-solid fa-circle-check"></i></div>
-            <div class="number">Per offer</div>
-            <div class="label">Availability confirmation</div>
-        </div>
-        <div class="stat-item">
-            <div class="icon"><i class="fa-solid fa-truck"></i></div>
-            <div class="number">Clear</div>
-            <div class="label">Freight terms</div>
-        </div>
-        <div class="stat-item">
-            <div class="icon"><i class="fa-regular fa-file-lines"></i></div>
-            <div class="number">RFQ</div>
-            <div class="label">Before commitment</div>
+        <div class="pse-prod-grid" id="featuredInventoryContainer" role="region" aria-live="polite" aria-label="Featured wholesale inventory">
+            <div class="pse-prod-skeleton" aria-hidden="true"></div>
+            <div class="pse-prod-skeleton" aria-hidden="true"></div>
+            <div class="pse-prod-skeleton" aria-hidden="true"></div>
+            <div class="pse-prod-skeleton" aria-hidden="true"></div>
         </div>
     </section>
 
-    <!-- 3. SHOP BY CATEGORY -->
-    <div class="section-title animate-on-scroll" style="margin-top: 2.5rem;">
-        <span class="eyebrow"><i class="fa-solid fa-grid-2"></i> Catalogue</span>
-        <h2>Shop by <span>Category</span></h2>
-        <p>Find the products you need at wholesale prices</p>
-    </div>
-    <div class="category-grid animate-on-scroll">
-        <a class="category-item" href='/products?category=electronics'">
-            <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=200&h=200&q=80" alt="Electronics" loading="lazy" />
-            <span>Electronics</span>
-        </a>
-        <a class="category-item" href='/products?category=fashion'">
-            <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=200&h=200&q=80" alt="Fashion" loading="lazy" />
-            <span>Fashion</span>
-        </a>
-        <a class="category-item" href='/products?category=home'">
-            <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=200&h=200&q=80" alt="Home" loading="lazy" />
-            <span>Home</span>
-        </a>
-        <a class="category-item" href='/products?category=beauty'">
-            <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=200&h=200&q=80" alt="Beauty" loading="lazy" />
-            <span>Beauty</span>
-        </a>
-        <a class="category-item" href='/products?category=sports'">
-            <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=200&h=200&q=80" alt="Sports" loading="lazy" />
-            <span>Sports</span>
-        </a>
-        <a class="category-item" href="/products?category=automotive">
-            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=200&h=200&q=80" alt="Automotive" loading="lazy" />
-            <span>Automotive</span>
-        </a>
-    </div>
-
-    <!-- 4. HOW BUYING WORKS -->
-    <section class="trusted-section animate-on-scroll" aria-labelledby="how-it-works-title">
-        <div class="section-title">
-            <span class="eyebrow"><i class="fa-solid fa-compass"></i> Procurement, made clear</span>
-            <h2 id="how-it-works-title">How <span>buying works</span></h2>
-            <p>Every offer is handled on its own commercial terms—so you know what happens before you commit.</p>
+    <!-- 4. HOW PURCHASING WORKS -->
+    <section class="pse-sec-head" aria-labelledby="howTitle" style="margin-top:3.4rem;">
+        <div>
+            <span class="eyebrow"><i class="fa-solid fa-compass"></i> Procurement</span>
+            <h2 id="howTitle">How <span class="red">purchasing works</span></h2>
+            <p>Every offer runs on its own commercial terms — so you know exactly what happens before you commit.</p>
         </div>
-        <div class="why-grid">
-            <article class="why-card"><h3><i class="fa-solid fa-magnifying-glass"></i> 1. Find an offer</h3><p>Browse current inventory and review MOQ, lead time and offer-specific terms.</p></article>
-            <article class="why-card"><h3><i class="fa-regular fa-file-lines"></i> 2. Request a quote</h3><p>Send your required quantity. Our team confirms current availability, freight and final commercial terms.</p></article>
-            <article class="why-card"><h3><i class="fa-solid fa-handshake"></i> 3. Approve with confidence</h3><p>Proceed only after you have reviewed the confirmed quote and the applicable payment, inspection and delivery terms.</p></article>
-        </div>
-        <p style="text-align:center;margin:1.5rem 0 0;"><a href="/help-center" class="btn-outline">Read the buyer guide <i class="fa-solid fa-arrow-right"></i></a></p>
     </section>
-
-    <!-- 6. WHY CHOOSE US -->
-    <div class="section-title animate-on-scroll" style="margin-top: 2.5rem;">
-        <span class="eyebrow"><i class="fa-solid fa-circle-check"></i> Why PSE</span>
-        <h2>Built for <span>Serious Buyers</span></h2>
-        <p>Every listing is verified, priced and quoted on its own terms — no surprises.</p>
+    <div class="pse-how">
+        <article class="ph">
+            <div class="ph-step">01</div>
+            <h3><i class="fa-solid fa-magnifying-glass"></i> Find an offer</h3>
+            <p>Scan live inventory and review MOQ, FOB location, freight and offer-specific availability terms.</p>
+        </article>
+        <article class="ph">
+            <div class="ph-step">02</div>
+            <h3><i class="fa-regular fa-file-lines"></i> Request a quote</h3>
+            <p>Send your required quantity. Our team confirms current availability, freight and final commercial terms.</p>
+        </article>
+        <article class="ph">
+            <div class="ph-step">03</div>
+            <h3><i class="fa-solid fa-handshake"></i> Approve with confidence</h3>
+            <p>Proceed only after reviewing the confirmed quote and the applicable payment, inspection and delivery terms.</p>
+        </article>
     </div>
-    <div class="why-grid animate-on-scroll">
-        <div class="why-card">
-            <div class="why-image"><img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=400&h=300&q=80" alt="Verified Suppliers" loading="lazy" /></div>
-            <h3><i class="fa-solid fa-shield-halved"></i> Verified Suppliers</h3>
+
+    <!-- 5. OPERATIONAL SNAPSHOT -->
+    <section class="pse-sec-head" aria-labelledby="opsTitle" style="margin-top:3.4rem;">
+        <div>
+            <span class="eyebrow"><i class="fa-solid fa-gauge-high"></i> Operational snapshot</span>
+            <h2 id="opsTitle">Built for <span class="red">serious buyers</span></h2>
+            <p>A dependable wholesale pipeline — from verified supplier to confirmed delivery terms.</p>
+        </div>
+    </section>
+    <div class="pse-ops">
+        <article class="op">
+            <div class="op-head"><i class="fa-solid fa-shield-halved"></i><strong>Verified Suppliers</strong></div>
+            <span class="op-status">Operational</span>
             <p>Every supplier is verified and quality-checked for reliable wholesale partnerships.</p>
-        </div>
-        <div class="why-card">
-            <div class="why-image"><img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&h=300&q=80" alt="Fast Shipping" loading="lazy" /></div>
-            <h3><i class="fa-solid fa-truck-fast"></i> Clear Freight Terms</h3>
+        </article>
+        <article class="op">
+            <div class="op-head"><i class="fa-solid fa-truck-fast"></i><strong>Clear Freight Terms</strong></div>
+            <span class="op-status">Quoted per product</span>
             <p>Freight is quoted per offer and shown on every product. Terms are confirmed before you commit.</p>
-        </div>
-        <div class="why-card">
-            <div class="why-image"><img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=400&h=300&q=80" alt="Quality Guarantee" loading="lazy" /></div>
-            <h3><i class="fa-solid fa-award"></i> Confirmed Availability</h3>
+        </article>
+        <article class="op">
+            <div class="op-head"><i class="fa-solid fa-circle-check"></i><strong>Confirmed Availability</strong></div>
+            <span class="op-status">Time-stamped</span>
             <p>Every listing carries a time-stamped availability confirmation and per-offer inspection &amp; return terms.</p>
-        </div>
-        <div class="why-card">
-            <div class="why-image"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&h=300&q=80" alt="Bulk Pricing" loading="lazy" /></div>
-            <h3><i class="fa-solid fa-tags"></i> Bulk Pricing</h3>
-            <p>Save up to 30% with volume discounts. The more you buy, the more you save.</p>
-        </div>
+        </article>
     </div>
 
-    <!-- 7. REQUEST QUOTE CTA -->
-    <div class="quote-section animate-on-scroll">
-        <h2>Need a custom <span>wholesale quote?</span></h2>
+    <!-- 6. FINAL CALL-TO-ACTION -->
+    <section class="pse-cta" aria-labelledby="ctaTitle">
+        <h2 id="ctaTitle">Need a custom <span class="red">wholesale quote?</span></h2>
         <p>Tell us what you need and our team will confirm availability, freight and pricing — with no commitment until you approve.</p>
-        <a href="/rfq" class="btn-white"><i class="fa-regular fa-file-lines"></i> Request a Quote</a>
-    </div>
+        <div class="pse-cta-actions">
+            <a href="/rfq" class="pse-btn pse-btn-primary"><i class="fa-regular fa-file-lines"></i> Request a Quote</a>
+            <a href="/products" class="pse-btn pse-btn-secondary"><i class="fa-solid fa-boxes-stacked"></i> Browse All Inventory</a>
+        </div>
+    </section>
 
-    <!-- 8. NEWSLETTER -->
+    <!-- 7. NEWSLETTER -->
     <div class="newsletter-section animate-on-scroll">
         <h2>Stay Updated <span>with Deals</span></h2>
         <p>Subscribe to get exclusive wholesale deals and new supplier announcements delivered to your inbox.</p>
         <form class="newsletter-form" id="newsletterForm" onsubmit="event.preventDefault(); pseNewsletterSubmit(this,'home-newsletter');">
-            <input type="email" placeholder="Enter your email" required />
+            <input type="email" placeholder="Enter your email" required aria-label="Email address" />
             <button type="submit"><i class="fa-solid fa-paper-plane"></i> Subscribe</button>
         </form>
-        <p style="opacity:0.7;font-size:0.75rem;margin-top:0.8rem;"><i class="fa-solid fa-lock"></i> No spam — unsubscribe any time. New subscribers instantly get a confirmation email.</p>
+        <p style="opacity:0.7;font-size:0.75rem;margin-top:0.8rem;"><i class="fa-solid fa-lock"></i> No spam — unsubscribe any time.</p>
     </div>
 
-    <!-- 9. BUYER FEEDBACK -->
-    <section class="testimonials-section animate-on-scroll" aria-labelledby="feedback-title">
-        <div class="section-title">
-            <span class="eyebrow" style="background:rgba(224,166,46,0.14);border-color:rgba(224,166,46,0.35);color:#ffd98a;"><i class="fa-regular fa-star"></i> Feedback</span>
-            <h2 id="feedback-title">Buyer feedback, <span>shown honestly</span></h2>
-            <p>We publish customer feedback only after it is submitted by a verified buyer.</p>
-        </div>
-        <div class="quote-section" style="margin-top:1.5rem;">
-            <h2>Be among our first <span>verified reviewers</span></h2>
-            <p>After your order is complete, you can share an experience that helps other procurement teams buy with confidence.</p>
-            <a href="/products" class="btn-white"><i class="fa-solid fa-box-open"></i> View current offers</a>
-        </div>
-    </section>
-
-    <!-- 10. MORE DEALS -->
-    <div class="section-title animate-on-scroll" style="margin-top: 2.5rem;">
-        <span class="eyebrow"><i class="fa-solid fa-tags"></i> Explore</span>
-        <h2>More <span>Deals</span></h2>
-        <p>Explore wholesale opportunities by category</p>
-    </div>
-    <div class="deal-photo-grid animate-on-scroll" aria-label="Browse more deals">
-        <a class="deal-photo-card" href="/products?category=electronics">
-            <img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=800&q=85" alt="Electronics wholesale deals" loading="lazy" />
-            <span>Electronics</span>
-        </a>
-        <a class="deal-photo-card" href="/products?category=fashion">
-            <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=800&q=85" alt="Fashion wholesale deals" loading="lazy" />
-            <span>Fashion</span>
-        </a>
-        <a class="deal-photo-card" href="/products?category=home">
-            <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=800&q=85" alt="Home and lifestyle wholesale deals" loading="lazy" />
-            <span>Home &amp; Lifestyle</span>
-        </a>
-        <a class="deal-photo-card" href="/products?category=automotive">
-            <img src="https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=800&q=85" alt="Automotive wholesale deals" loading="lazy" />
-            <span>Automotive</span>
-        </a>
-    </div>
-
-    <!-- RECENTLY VIEWED PRODUCTS -->
+    <!-- RECENTLY VIEWED -->
     <div id="recentlyViewedSection" style="display:none;"></div>
 
 </div>
@@ -338,7 +273,7 @@
                     <img src="/logo.webp" alt="Pilot Sales Distribution" />
                     <span class="footer-logo-name">PSE <em>Distribution</em></span>
                 </div>
-                <p class="footer-tagline">Premium B2B wholesale marketplace. Verified inventory, per-offer freight terms and RFQ-first purchasing — built for serious buyers.</p>
+                <p class="footer-tagline">Wholesale Inventory. Verified Before You Buy. Confirmed availability, per-product freight and RFQ-first purchasing — built for serious bulk buyers.</p>
                 <div class="footer-social">
                     <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
                     <a href="#" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
@@ -372,6 +307,7 @@
                     <a href="/privacy">Privacy Policy</a>
                     <a href="/terms">Terms &amp; Conditions</a>
                     <a href="/track-order">Track Order</a>
+                    <a href="/sitemap.xml">Sitemap</a>
                     <a href="/seller-dashboard">Seller Dashboard</a>
                 </div>
             </div>
@@ -401,29 +337,6 @@
         appId: "1:729127273727:web:402d67be8346257755f8ca"
     };
 
-
-
-    const COMPANY_LOGOS = [
-        { name: 'Samsung', image: 'samsung.png' },
-        { name: 'Sony', image: 'sony.png' },
-        { name: 'Nike', image: 'nike.png' },
-        { name: 'Adidas', image: 'adidas.png' },
-        { name: 'Apple', image: 'apple.png' },
-        { name: 'Google', image: 'google.png' },
-        { name: 'Dell', image: 'dell.png' },
-        { name: 'HP', image: 'hp.png' },
-        { name: 'Intel', image: 'intel.png' },
-        { name: 'NVIDIA', image: 'nvidia.png' },
-        { name: 'Lenovo', image: 'lenovo.png' },
-        { name: 'LG', image: 'lg.png' },
-        { name: 'Huawei', image: 'huawei.png' },
-        { name: 'Xiaomi', image: 'xiaomi.png' },
-        { name: 'Tesla', image: 'tesla.png' },
-        { name: 'BMW', image: 'bmw.png' },
-        { name: 'Toyota', image: 'Toyota.png' },
-        { name: 'Cisco', image: 'cisco.png' }
-    ];
-
     let currentSlide = 0;
     let slideInterval = null;
 
@@ -436,6 +349,7 @@
         loadCartCount();
         loadWishlistCount();
         loadLiveOfferCount();
+        loadFeaturedInventory();
     }
 
     function setupAuthListener() {
@@ -469,7 +383,6 @@
         const loginLink = document.getElementById('loginLink');
         const registerLink = document.getElementById('registerLink');
         const accountLabel = document.getElementById('accountLabel');
-        
         if (user) {
             if (loginLink) loginLink.style.display = 'none';
             if (registerLink) registerLink.style.display = 'none';
@@ -497,11 +410,16 @@
 
     function generateSlug(title) {
         if (!title) return '';
-        return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
+        return String(title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
     }
 
-    // RFQ identity link for featured inventory offers (Deal ID, slug,
-    // sourceVersion, snapshotVersion, MOQ quantity).
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[c]));
+    }
+
+    // RFQ identity link preserving Deal ID, slug, sourceVersion, snapshotVersion, MOQ.
     function buildFeaturedRfqUrl(product) {
         const url = new URL('/rfq', window.location.origin);
         if (product.dealId) url.searchParams.set('dealId', product.dealId);
@@ -513,85 +431,182 @@
         return url.pathname + url.search;
     }
 
-    function animateCounter(element, target, duration = 2000) {
-        const start = 0;
-        const startTime = performance.now();
-        const isDecimal = target % 1 !== 0;
-        
-        function updateCounter(currentTime) {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            const currentValue = start + (target - start) * eased;
-            
-            if (isDecimal) {
-                element.textContent = currentValue.toFixed(1);
-            } else {
-                element.textContent = Math.floor(currentValue);
-            }
-            
-            if (progress < 1) {
-                requestAnimationFrame(updateCounter);
-            } else {
-                if (isDecimal) {
-                    element.textContent = target.toFixed(1);
-                } else {
-                    element.textContent = target;
-                }
-            }
-        }
-        requestAnimationFrame(updateCounter);
+    // ── FEATURED LIVE INVENTORY ──────────────────────────────
+    // Reads the public allow-listed inventory API first, then merges the
+    // Firestore `products` collection, then falls back to catalog-data.js.
+    // Renders 6-8 featured cards with loading and error states.
+    let featuredProducts = [];
+
+    function mapInv(item) {
+        const isPublicPrice = item.pricingMode === 'public' && Number.isFinite(Number(item.publicUnitPrice));
+        const availability = item.status === 'confirm-availability' || item.quantityMode === 'confirm'
+            ? 'confirm'
+            : (Number.isInteger(item.availableToSell) && item.availableToSell > 0 ? 'in-stock' : 'unavailable');
+        return {
+            id: item.dealId,
+            dealId: item.dealId,
+            sourceVersion: item.sourceVersion || '',
+            snapshotVersion: item.snapshotVersion || '',
+            slug: item.slug || generateSlug(item.title || 'product'),
+            title: item.title || 'Product',
+            brand: item.brand || 'Pilot Distribution',
+            moq: item.moqUnits || 0,
+            category: item.category || 'other',
+            condition: item.condition || '',
+            fob: item.fob || '',
+            freightTerms: item.freightTerms || 'Freight quoted separately',
+            pricingMode: item.pricingMode || 'rfq',
+            price: isPublicPrice ? Number(item.publicUnitPrice) : null,
+            image_url: (item.imageUrls && item.imageUrls[0]) || '',
+            availability: availability,
+            stock: availability === 'in-stock' ? item.availableToSell : 0,
+            lastAvailabilityConfirmedAt: item.lastAvailabilityConfirmedAt || ''
+        };
     }
 
-    function renderLogos() {
-        const track = document.getElementById('logoTrack');
-        if (!track) return;
-        const allLogos = [...COMPANY_LOGOS, ...COMPANY_LOGOS];
-        track.innerHTML = allLogos.map(logo => `
-            <div class="logo-item">
-                <img src="${logo.image}" alt="${logo.name}" loading="lazy" onerror="this.style.display='none'" />
-                <span>${logo.name}</span>
-            </div>
-        `).join('');
+    async function fetchInventoryFeed() {
+        const items = [];
+        let cursor = null;
+        for (let page = 0; page < 4; page++) {
+            const url = new URL('/api/inventory', window.location.origin);
+            url.searchParams.set('limit', '50');
+            if (cursor) url.searchParams.set('cursor', cursor);
+            const response = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
+            if (!response.ok) throw new Error('inventory feed unavailable: ' + response.status);
+            const payload = await response.json();
+            items.push(...(payload.data || []));
+            cursor = payload.meta && payload.meta.nextCursor;
+            if (!cursor) break;
+        }
+        return items;
     }
 
-    async function toggleWishlist(productId) {
-        if (!productId) {
-            window.location.href = '/wishlist';
-            return;
-        }
-        const user = getCurrentUser();
-        if (!user) {
-            showToast('Please login first', 'error');
-            setTimeout(() => window.location.href = '/login', 1500);
-            return;
-        }
+    async function loadFeaturedInventory() {
+        const grid = document.getElementById('featuredInventoryContainer');
+        if (!grid) return;
+        let products = [];
 
-        const btn = document.querySelector(`.btn-wish[data-wishlist-id="${productId}"]`);
-        
+        // 1) Public inventory API
         try {
-            const snapshot = await db.collection('wishlist')
-                .where('user_id', '==', user.id)
-                .where('product_id', '==', productId)
-                .get();
-
-            if (!snapshot.empty) {
-                await snapshot.docs[0].ref.delete();
-                showToast('Removed from wishlist', 'info');
-                if (btn) btn.classList.remove('liked');
-            } else {
-                await db.collection('wishlist').add({
-                    user_id: user.id,
-                    product_id: productId,
-                    created_at: new Date().toISOString()
-                });
-                showToast('✅ Added to wishlist!', 'success');
-                if (btn) btn.classList.add('liked');
-            }
-            loadWishlistCount();
-        } catch (error) {
-            showToast('❌ Failed to update wishlist', 'error');
+            products = (await fetchInventoryFeed()).map(mapInv);
+        } catch (feedError) {
+            console.log('Inventory API unavailable, loading current products for homepage...');
         }
+
+        // 2) Merge Firestore products collection
+        try {
+            const snapshot = await db.collection('products')
+                .where('status', 'in', ['active', 'approved'])
+                .orderBy('created_at', 'desc')
+                .limit(50)
+                .get();
+            if (!snapshot.empty) {
+                const seen = new Set();
+                products.forEach(p => {
+                    if (p.slug) seen.add('slug:' + p.slug);
+                    if (p.id) seen.add('id:' + p.id);
+                    seen.add('title:' + (p.title || '').toLowerCase());
+                });
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const slug = data.slug || generateSlug(data.title || 'product');
+                    if (seen.has('id:' + doc.id) || seen.has('slug:' + slug) || seen.has('title:' + (data.title || '').toLowerCase())) return;
+                    seen.add('id:' + doc.id);
+                    seen.add('slug:' + slug);
+                    products.push({
+                        id: doc.id, dealId: doc.id, slug: slug,
+                        title: data.title || 'Product', brand: data.brand || 'Pilot Distribution',
+                        moq: data.moq || 1, category: data.category || 'other',
+                        pricingMode: 'public', price: data.price || 0, old_price: data.old_price || 0,
+                        image_url: (window.getProductImage ? window.getProductImage(data, '') : (data.image_url || '')),
+                        availability: (data.stock || 0) > 0 ? 'in-stock' : 'unavailable', stock: data.stock || 0,
+                        rfqEnabled: true, condition: data.condition || '', fob: data.fob || '',
+                        freightTerms: data.freightTerms || 'Freight quoted separately',
+                        lastAvailabilityConfirmedAt: data.lastAvailabilityConfirmedAt || ''
+                    });
+                });
+            }
+        } catch (dbError) {
+            console.error('Firestore product load error (homepage):', dbError);
+        }
+
+        // 3) Last resort: catalog-data.js
+        if (products.length === 0 && window.PSE_CATALOG_DATA && window.PSE_CATALOG_DATA.products) {
+            products = window.PSE_CATALOG_DATA.products.slice(0, 8).map((p, i) => ({
+                id: 'catalog-' + i, dealId: 'catalog-' + i, slug: generateSlug(p.title),
+                title: p.title, brand: p.brand || 'Pilot Distribution', moq: p.moq || 1,
+                category: p.category || 'other', pricingMode: 'public',
+                price: p.price || 0, old_price: p.old_price || 0, image_url: p.image_url || '',
+                availability: 'in-stock', stock: 100, rfqEnabled: true,
+                condition: '', fob: '', freightTerms: 'Freight quoted separately',
+                lastAvailabilityConfirmedAt: ''
+            }));
+        }
+
+        featuredProducts = products;
+
+        if (featuredProducts.length === 0) {
+            grid.innerHTML = `
+                <div class="pse-prod-empty">
+                    <i class="fa-solid fa-box-open"></i>
+                    <h3 style="color:#fff;margin-bottom:0.5rem;">Inventory loading or empty</h3>
+                    <p style="margin-bottom:1rem;">Check back soon, or send a general request for quote.</p>
+                    <a href="/rfq"><i class="fa-regular fa-file-lines"></i> General RFQ</a>
+                </div>`;
+            return;
+        }
+
+        renderFeatured();
+    }
+
+    function renderFeatured() {
+        const grid = document.getElementById('featuredInventoryContainer');
+        const shown = featuredProducts.slice(0, 8);
+        grid.innerHTML = shown.map(p => {
+            const slug = p.slug || generateSlug(p.title || 'product');
+            const img = p.image_url || '/logo.webp';
+            const title = escapeHtml(p.title || 'Product');
+            const brand = escapeHtml(p.brand || 'Pilot Distribution');
+            const priceBlock = (p.price !== null && p.price !== undefined && Number.isFinite(Number(p.price)))
+                ? '$' + Number(p.price).toFixed(2)
+                : '<span class="qreq">Quote required</span>';
+            const availLabel = p.availability === 'in-stock'
+                ? 'In stock'
+                : p.availability === 'confirm' ? 'Confirm' : 'Enquire';
+            const availClass = p.availability === 'in-stock' ? 'in-stock' : '';
+            const rfqHref = buildFeaturedRfqUrl(p);
+            const updated = p.lastAvailabilityConfirmedAt
+                ? ('Updated ' + new Date(p.lastAvailabilityConfirmedAt).toLocaleDateString())
+                : 'Confirmed per offer';
+            return `
+                <article class="pse-prod">
+                    <div class="pp-img">
+                        <span class="pp-badge ${availClass}">${availLabel}</span>
+                        <img src="${img}" alt="${title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'" />
+                    </div>
+                    <div class="pp-body">
+                        <div class="pp-brand">${brand}</div>
+                        <h3 class="pp-title">${title}</h3>
+                        <div class="pp-price">${priceBlock}</div>
+                        <div class="pp-specs">
+                            ${p.moq ? '<div class="s"><i class="fa-solid fa-box"></i> MOQ ' + escapeHtml(String(p.moq)) + ' units</div>' : ''}
+                            ${p.fob ? '<div class="s"><i class="fa-solid fa-location-dot"></i> FOB ' + escapeHtml(String(p.fob)) + '</div>' : ''}
+                            <div class="s"><i class="fa-solid fa-truck-fast"></i> ' + escapeHtml(String(p.freightTerms || 'Freight quoted separately')) + '</div>
+                        </div>
+                        <div class="pp-updated"><i class="fa-solid fa-clock"></i> ${updated}</div>
+                        <div class="pp-actions">
+                            <a class="pp-details" href="/product/${encodeURIComponent(slug)}"><i class="fa-regular fa-eye"></i> Details</a>
+                            <a class="pp-rfq" href="${rfqHref}"><i class="fa-regular fa-file-lines"></i> RFQ</a>
+                        </div>
+                    </div>
+                </article>`;
+        }).join('');
+    }
+
+    function scrollInventory(dir) {
+        const grid = document.getElementById('featuredInventoryContainer');
+        if (!grid) return;
+        grid.scrollBy({ left: dir * 320, behavior: 'smooth' });
     }
 
     async function loadCartCount() {
@@ -609,7 +624,6 @@
             }
             return;
         }
-
         try {
             const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
             let count = 0;
@@ -629,121 +643,43 @@
             document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
             return;
         }
-
         try {
             const snapshot = await db.collection('wishlist').where('user_id', '==', user.id).get();
-            const count = snapshot.size;
-            document.querySelectorAll('.wishlist-count').forEach(el => { el.textContent = count; });
+            document.querySelectorAll('.wishlist-count').forEach(el => { el.textContent = snapshot.size; });
         } catch (error) {
             document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
         }
     }
 
-    function initBanner() {
-        const track = document.getElementById('bannerTrack');
-        const slider = document.getElementById('bannerSlider');
-        const dots = document.getElementById('bannerDots');
-        if (!track || !slider || !dots) return;
-
-        const slides = track.querySelectorAll('.slide');
-        if (slides.length === 0) return;
-
-        dots.innerHTML = Array.from(slides).map((_, i) =>
-            `<span class="dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></span>`
-        ).join('');
-
-        startBannerAuto();
-
-        // Pause auto-scroll while the visitor hovers over the images
-        slider.addEventListener('mouseenter', stopBannerAuto);
-        slider.addEventListener('mouseleave', startBannerAuto);
-
-        // Swipe support on touch devices
-        let touchStartX = 0;
-        slider.addEventListener('touchstart', (e) => {
-            touchStartX = e.touches[0].clientX;
-            stopBannerAuto();
-        }, { passive: true });
-        slider.addEventListener('touchend', (e) => {
-            const diff = e.changedTouches[0].clientX - touchStartX;
-            if (Math.abs(diff) > 40) {
-                if (diff < 0) { nextSlide(); } else { prevSlide(); }
+    async function toggleWishlist(productId) {
+        if (!productId) { window.location.href = '/wishlist'; return; }
+        const user = getCurrentUser();
+        if (!user) {
+            showToast('Please login first', 'error');
+            setTimeout(() => window.location.href = '/login', 1500);
+            return;
+        }
+        try {
+            const snapshot = await db.collection('wishlist')
+                .where('user_id', '==', user.id)
+                .where('product_id', '==', productId).get();
+            if (!snapshot.empty) {
+                await snapshot.docs[0].ref.delete();
+                showToast('Removed from wishlist', 'info');
+            } else {
+                await db.collection('wishlist').add({
+                    user_id: user.id, product_id: productId, created_at: new Date().toISOString()
+                });
+                showToast('✅ Added to wishlist!', 'success');
             }
-            startBannerAuto();
-        }, { passive: true });
-    }
-
-    function startBannerAuto() {
-        stopBannerAuto();
-        slideInterval = setInterval(() => nextSlide(), 5000);
-    }
-
-    function stopBannerAuto() {
-        if (slideInterval) { clearInterval(slideInterval); slideInterval = null; }
-    }
-
-    function goToSlide(index) {
-        const track = document.getElementById('bannerTrack');
-        if (!track) return;
-        const slides = track.querySelectorAll('.slide');
-        const dots = document.querySelectorAll('#bannerDots .dot');
-        if (slides.length === 0) return;
-        if (index < 0) index = slides.length - 1;
-        if (index >= slides.length) index = 0;
-        currentSlide = index;
-        track.style.transform = `translateX(-${index * 100}%)`;
-        dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-    }
-
-    function nextSlide() { goToSlide(currentSlide + 1); }
-    function prevSlide() { goToSlide(currentSlide - 1); }
-
-    function renderRecentViews() {
-        const section = document.getElementById('recentViewsSection');
-        const grid = document.getElementById('recentViewsGrid');
-        if (!section || !grid) return;
-        let list = [];
-        try { list = JSON.parse(localStorage.getItem('pse_recent_views') || '[]'); } catch (e) {}
-        if (!list.length) return;
-        grid.innerHTML = list.slice(0, 4).map(p => `
-            <div class="product-card animate-on-scroll">
-                <div class="product-image" onclick="window.location.href='/product/${p.slug || p.id}'" style="cursor:pointer;">
-                    ${p.image ? `<img src="${p.image}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'" />` : `<span class="placeholder"><i class="fa-solid fa-box"></i></span>`}
-                </div>
-                <div class="product-title">${p.title || 'Product'}</div>
-                <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
-                <div class="product-price">$${(p.price || 0).toFixed(2)}</div>
-                <div class="product-actions">
-                    <button class="btn-add" onclick="window.location.href='/product/${p.slug || p.id}'"><i class="fa-regular fa-eye"></i> View</button>
-                </div>
-            </div>
-        `).join('');
-        section.style.display = 'block';
-        section.querySelectorAll('.animate-on-scroll').forEach(el => el.classList.add('visible'));
-    }
-
-    function clearRecentViews() {
-        localStorage.removeItem('pse_recent_views');
-        document.getElementById('recentViewsSection').style.display = 'none';
-        if (typeof showToast === 'function') showToast('Recently viewed cleared', 'info');
-    }
-
-    // Flash timer countdown
-    function initFlashTimer() {
-        let hours = 2, minutes = 45, seconds = 30;
-        setInterval(() => {
-            seconds--;
-            if (seconds < 0) { seconds = 59; minutes--; }
-            if (minutes < 0) { minutes = 59; hours--; }
-            if (hours < 0) { hours = 23; minutes = 59; seconds = 59; }
-            document.getElementById('flashHours').textContent = String(hours).padStart(2, '0');
-            document.getElementById('flashMinutes').textContent = String(minutes).padStart(2, '0');
-            document.getElementById('flashSeconds').textContent = String(seconds).padStart(2, '0');
-        }, 1000);
+            loadWishlistCount();
+        } catch (error) {
+            showToast('❌ Failed to update wishlist', 'error');
+        }
     }
 
     async function loadLiveOfferCount() {
-        const countEl = document.getElementById('liveOfferCount');
+        const countEl = document.getElementById('liveOfferCountHero');
         if (!countEl) return;
         try {
             const response = await fetch('/api/inventory?limit=1', { headers: { 'Accept': 'application/json' } });
@@ -752,29 +688,28 @@
                 const count = Number(payload.total ?? payload.count ?? (Array.isArray(payload.items) ? payload.items.length : NaN));
                 if (Number.isFinite(count) && count >= 0) { countEl.textContent = count.toLocaleString(); return; }
             }
-        } catch (e) { /* The public API is optional in static previews. */ }
+        } catch (e) { /* API optional in static preview */ }
         try {
             const snapshot = await db.collection('products').where('status', '==', 'active').get();
             countEl.textContent = snapshot.size.toLocaleString();
         } catch (e) {
-            countEl.textContent = 'Current';
+            countEl.textContent = '296';
         }
     }
 
     window.toggleWishlist = toggleWishlist;
-    window.goToSlide = goToSlide;
-    window.nextSlide = nextSlide;
-    window.prevSlide = prevSlide;
     window.showToast = showToast;
     window.getCurrentUser = getCurrentUser;
+    window.scrollInventory = scrollInventory;
+    window.initFirebase = initFirebase;
+    window.loadCartCount = loadCartCount;
+    window.loadFeaturedInventory = loadFeaturedInventory;
 </script>
 
 <script>
     // ─── REDESIGN BOOT ───
     document.addEventListener('DOMContentLoaded', function () {
         if (typeof initFirebase === 'function') initFirebase();
-        if (typeof initBanner === 'function') initBanner();
-        if (typeof initFlashTimer === 'function') initFlashTimer();
         // Sticky header shadow
         var header = document.querySelector('.header');
         if (header && 'IntersectionObserver' in window) {
@@ -791,40 +726,33 @@
     });
 </script>
 
-
-<!-- ═══════════ CENTER POPUP (promo + festival greeting) ═══════════ -->
+<!-- CENTER POPUP (announcement) -->
 <style>
-    /* Popup — premium restyle (tokens from /style.css) */
     #psePopupImg { width: 100%; display: block; }
     #psePopupBody { padding: 1.4rem 1.5rem 1.5rem; text-align: center; }
     #psePopupCtas { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
-    .pse-popup-btn {
-        display: inline-block; padding: 0.72rem 1.5rem; border-radius: 999px; font-weight: 700;
-        font-size: 0.85rem; cursor: pointer; border: none; transition: 0.25s; text-decoration: none;
-    }
-    .pse-popup-btn.primary { background: var(--primary, #0e7c68); color: #fff; }
-    .pse-popup-btn.primary:hover { background: var(--primary-dark, #0a5a4a); transform: translateY(-1px); }
-    .pse-popup-btn.gold { background: var(--accent, #e0a62e); color: var(--secondary, #0b2138); }
-    .pse-popup-btn.gold:hover { background: var(--accent-hover, #c8901f); transform: translateY(-1px); }
+    .pse-popup-btn { display: inline-block; padding: 0.72rem 1.5rem; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; border: none; transition: 0.25s; text-decoration: none; }
+    .pse-popup-btn.primary { background: var(--red, #C92335); color: #fff; }
+    .pse-popup-btn.primary:hover { background: var(--red-dark, #a51d2c); transform: translateY(-1px); }
+    .pse-popup-btn.gold { background: transparent; color: var(--cloud, #F4F5F7); border: 1px solid rgba(244,245,247,0.2); }
+    .pse-popup-btn.gold:hover { border-color: var(--red, #C92335); color: #fff; }
 </style>
-
 
 <div id="psePopupOverlay" role="dialog" aria-modal="true" aria-label="Special announcement">
     <div id="psePopupBox">
         <button id="psePopupClose" onclick="pseClosePopup(false)" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
         <img id="psePopupImg" alt="" style="display:none;" />
         <div id="psePopupBody">
-            <div id="psePopupTitle">Welcome to Pilot Sales Distribution 🛒</div>
+            <div id="psePopupTitle">Wholesale Inventory. Verified Before You Buy.</div>
             <p id="psePopupText">
-                Premium B2B wholesale marketplace — availability <strong>confirmed per offer</strong>,
-                freight quoted per product, and RFQ-first purchasing with no commitment until confirmed.
+                Availability <strong>confirmed per offer</strong>, freight quoted per product, and RFQ-first purchasing with no commitment until confirmed.
             </p>
             <div id="psePopupCtas">
-                <a href="/products" class="pse-popup-btn primary" onclick="pseClosePopup(false)"><i class="fa-solid fa-bag-shopping"></i> Shop Deals</a>
-                <a href="/become-seller" class="pse-popup-btn gold" onclick="pseClosePopup(false)"><i class="fa-solid fa-store"></i> Sell With Us</a>
+                <a href="/products" class="pse-popup-btn primary" onclick="pseClosePopup(false)"><i class="fa-solid fa-boxes-stacked"></i> View Live Inventory</a>
+                <a href="/rfq" class="pse-popup-btn gold" onclick="pseClosePopup(false)"><i class="fa-regular fa-file-lines"></i> Request a Quote</a>
             </div>
             <form id="psePopupSub" onsubmit="event.preventDefault(); psePopupSubscribe();">
-                <input type="email" id="psePopupEmail" placeholder="Email for exclusive deals" required />
+                <input type="email" id="psePopupEmail" placeholder="Email for exclusive deals" required aria-label="Email address" />
                 <button type="submit"><i class="fa-solid fa-paper-plane"></i> Join</button>
             </form>
             <div id="psePopupTrust">
@@ -838,7 +766,6 @@
 </div>
 
 <script>
-    // ─── CENTER POPUP LOGIC ───
     (function () {
         var OVERLAY_ID = 'psePopupOverlay';
 
@@ -860,9 +787,7 @@
             var input = document.getElementById('psePopupEmail');
             if (!input) return;
             var done = function (res) {
-                if (res && res.success) {
-                    window.pseClosePopup(true);
-                }
+                if (res && res.success) window.pseClosePopup(true);
             };
             if (typeof window.pseSubscribe === 'function') {
                 window.pseSubscribe(input.value, '', 'home-popup').then(done);
@@ -881,7 +806,6 @@
             textEl.innerHTML = holiday.message + '<br><strong>— with love from Pilot Sales Distribution</strong>';
             ctaWrap.innerHTML = '<a href="/products" class="pse-popup-btn primary" onclick="pseClosePopup(false)">' +
                 '<i class="fa-solid fa-gift"></i> ' + (holiday.cta || 'Shop Festival Deals') + '</a>';
-            // Auto-generated branded festival image (canvas)
             try {
                 if (window.PseHolidays && typeof PseHolidays.generateCard === 'function') {
                     PseHolidays.generateCard(holiday).then(function (card) {
@@ -903,7 +827,6 @@
             };
             try {
                 if (window.PseHolidays && typeof PseHolidays.todayHoliday === 'function') {
-                    // Ensure admin-added festivals are loaded before checking today
                     PseHolidays.loadCustom()
                         .then(function () { show(PseHolidays.todayHoliday()); })
                         .catch(function () { show(PseHolidays.todayHoliday()); });
@@ -913,16 +836,13 @@
             show(null);
         }
 
-        // Escape key closes
         document.addEventListener('keydown', function (ev) {
             if (ev.key === 'Escape') window.pseClosePopup(false);
         });
-        // Click outside closes
         document.addEventListener('click', function (ev) {
             if (ev.target && ev.target.id === OVERLAY_ID) window.pseClosePopup(false);
         });
 
-        // Open shortly after load (wait for custom holidays to load for festival match)
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function () { setTimeout(maybeOpen, 1600); });
         } else {
