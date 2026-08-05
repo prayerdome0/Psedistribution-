@@ -39,13 +39,13 @@
 
     <!-- Premium Design System (shared) -->
     <link rel="stylesheet" href="/style.css" />
-    <!-- Homepage Redesign v2 (dark industrial B2B) -->
+    <!-- Homepage v3 — dark industrial "command center" (premium) -->
     <link rel="stylesheet" href="/home-redesign.css" />
 
-    <!-- Display + body typefaces -->
+    <!-- Display + body + data typefaces -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet" />
 
 </head>
 <body class="pse-home">
@@ -158,7 +158,7 @@
 <div class="container">
 
     <!-- 2. TRUST METRICS -->
-    <div class="pse-trust" aria-label="Published inventory metrics">
+    <div class="pse-trust animate-on-scroll" aria-label="Published inventory metrics">
         <div class="pt"><div class="pt-num" id="trustDeals">—</div><div class="pt-label">Published Deals</div><div class="pt-desc">Offers currently passing the publication gate</div></div>
         <div class="pt"><div class="pt-num" id="trustUnits">—</div><div class="pt-label">Available Units</div><div class="pt-desc">Buyer-safe available-to-sell quantity</div></div>
         <div class="pt"><div class="pt-num" id="trustCategories">—</div><div class="pt-label">Categories</div><div class="pt-desc">Categories represented in the public snapshot</div></div>
@@ -166,7 +166,7 @@
     </div>
 
     <!-- 3. FEATURED LIVE INVENTORY -->
-    <section class="pse-inventory" id="featured-inventory" aria-labelledby="invTitle">
+    <section class="pse-inventory animate-on-scroll" id="featured-inventory" aria-labelledby="invTitle">
         <div class="pse-sec-head">
             <div>
                 <span class="eyebrow"><i class="fa-solid fa-bolt"></i> Featured live inventory</span>
@@ -187,14 +187,14 @@
     </section>
 
     <!-- 4. HOW PURCHASING WORKS -->
-    <section class="pse-sec-head" aria-labelledby="howTitle" style="margin-top:3.4rem;">
+    <section class="pse-sec-head animate-on-scroll" aria-labelledby="howTitle" style="margin-top:3.4rem;">
         <div>
             <span class="eyebrow"><i class="fa-solid fa-compass"></i> Procurement</span>
             <h2 id="howTitle">How <span class="red">purchasing works</span></h2>
             <p>Every offer runs on its own commercial terms — so you know exactly what happens before you commit.</p>
         </div>
     </section>
-    <div class="pse-how">
+    <div class="pse-how animate-on-scroll">
         <article class="ph">
             <div class="ph-step">01</div>
             <h3><i class="fa-solid fa-magnifying-glass"></i> Find an offer</h3>
@@ -213,14 +213,14 @@
     </div>
 
     <!-- 5. OPERATIONAL SNAPSHOT -->
-    <section class="pse-sec-head" aria-labelledby="opsTitle" style="margin-top:3.4rem;">
+    <section class="pse-sec-head animate-on-scroll" aria-labelledby="opsTitle" style="margin-top:3.4rem;">
         <div>
             <span class="eyebrow"><i class="fa-solid fa-gauge-high"></i> Operational snapshot</span>
             <h2 id="opsTitle">Built for <span class="red">serious buyers</span></h2>
             <p>A dependable wholesale pipeline — from public offer record to confirmed delivery terms.</p>
         </div>
     </section>
-    <div class="pse-ops">
+    <div class="pse-ops animate-on-scroll">
         <article class="op">
             <div class="op-head"><i class="fa-solid fa-shield-halved"></i><strong>Buyer-safe publication</strong></div>
             <span class="op-status">Allowlist enforced</span>
@@ -239,7 +239,7 @@
     </div>
 
     <!-- 6. FINAL CALL-TO-ACTION -->
-    <section class="pse-cta" aria-labelledby="ctaTitle">
+    <section class="pse-cta animate-on-scroll" aria-labelledby="ctaTitle">
         <h2 id="ctaTitle">Need a custom <span class="red">wholesale quote?</span></h2>
         <p>Tell us what you need and our team will confirm availability, freight and pricing — with no commitment until you approve.</p>
         <div class="pse-cta-actions">
@@ -640,7 +640,25 @@
 
     function setMetric(id, value) {
         const element = document.getElementById(id);
-        if (element) element.textContent = value;
+        if (!element) return;
+        const text = String(value ?? '').trim();
+        // Count-up animation for pure numeric values (commas allowed).
+        if (/^[\d,]+$/.test(text) && text !== element._lastValue) {
+            element._lastValue = text;
+            const target = Number(text.replace(/,/g, ''));
+            const duration = 950;
+            const start = performance.now();
+            function tick(now) {
+                const p = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - p, 3);
+                element.textContent = Math.round(target * eased).toLocaleString();
+                if (p < 1) requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+        } else {
+            element._lastValue = text;
+            element.textContent = value;
+        }
     }
 
     function updateInventoryMetrics(meta, items) {
@@ -706,6 +724,23 @@
             new IntersectionObserver(function (entries) {
                 header.classList.toggle('scrolled', !entries[0].isIntersecting);
             }).observe(sentinel);
+        }
+        // Scroll reveal for .animate-on-scroll sections
+        var revealEls = document.querySelectorAll('.animate-on-scroll');
+        if (revealEls.length) {
+            if (!('IntersectionObserver' in window)) {
+                revealEls.forEach(function (el) { el.classList.add('visible'); });
+            } else {
+                var revealObserver = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            revealObserver.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+                revealEls.forEach(function (el) { revealObserver.observe(el); });
+            }
         }
     });
 </script>
