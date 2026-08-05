@@ -209,6 +209,38 @@
     {
       "source": "/inventory-upload/:path*",
       "destination": "/inventory-upload.html"
+    },
+    {
+      "source": "/verify",
+      "destination": "/verify.html"
+    },
+    {
+      "source": "/verify/:path*",
+      "destination": "/verify.html"
+    },
+    {
+      "source": "/catalogs",
+      "destination": "/catalogs.html"
+    },
+    {
+      "source": "/catalogs/:path*",
+      "destination": "/catalogs.html"
+    },
+    {
+      "source": "/supplier-store",
+      "destination": "/supplier-store.html"
+    },
+    {
+      "source": "/supplier-store/:path*",
+      "destination": "/supplier-store.html"
+    },
+    {
+      "source": "/offline",
+      "destination": "/offline.html"
+    },
+    {
+      "source": "/offline/:path*",
+      "destination": "/offline.html"
     }
   ],
   "redirects": [
@@ -248,7 +280,7 @@
         },
         {
           "key": "X-Frame-Options",
-          "value": "DENY"
+          "value": "SAMEORIGIN"
         },
         {
           "key": "X-XSS-Protection",
@@ -261,6 +293,10 @@
         {
           "key": "Permissions-Policy",
           "value": "geolocation=(), microphone=(), camera=()"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors 'self' https://*.e2b.app https://*.arena.ai https://pilotsalesdistribution.com;"
         }
       ]
     },

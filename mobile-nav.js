@@ -323,11 +323,17 @@
             menu.classList.add('open');
             overlay.classList.add('show');
             hamburger.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+            hamburger.setAttribute('aria-expanded', 'true');
+            hamburger.setAttribute('aria-label', 'Close menu');
+            document.body.style.overflow = 'hidden';
         }
         function closeMenu() {
             menu.classList.remove('open');
             overlay.classList.remove('show');
             hamburger.innerHTML = '<i class="fa-solid fa-bars"></i>';
+            hamburger.setAttribute('aria-expanded', 'false');
+            hamburger.setAttribute('aria-label', 'Open menu');
+            document.body.style.overflow = '';
         }
 
         const hamburger = document.createElement('button');

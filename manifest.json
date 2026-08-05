@@ -2,7 +2,7 @@
   "name": "Pilot Sales Distribution",
   "short_name": "PSE Distribution",
   "description": "Premium wholesale marketplace for bulk products from verified suppliers.",
-  "start_url": "/home",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0b2138",
   "theme_color": "#0b2138",
@@ -36,6 +36,9 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["shopping", "business"],
+  "categories": [
+    "shopping",
+    "business"
+  ],
   "lang": "en"
 }

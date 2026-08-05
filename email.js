@@ -6,8 +6,10 @@
 
 // ─── RESEND EMAIL CONFIGURATION ───
 const EMAIL_CONFIG = {
+    // 🔒 SECURITY FIX: No hardcoded API key. Configure via localStorage PSE_RESEND_KEY, meta tag, or window.PSE_CONFIG.resendKey
+
     // Resend API Key
-    apiKey: 're_JhyJxWw3_ASv9MEAFfcFaDNiusLGna6Ht',
+    apiKey: (function(){ try { return localStorage.getItem('PSE_RESEND_KEY') || ''; } catch(e){ return ''; } })(), // 🔒 No hardcoded key — set via localStorage or server env
     fromEmail: 'Pilot Sales Distribution <support@pilotsalesdistribution.com>',
     replyTo: 'support@pilotsalesdistribution.com',
     fallbackEmail: 'support@pilotsalesdistribution.com'
@@ -267,7 +269,7 @@ function buildTemplateHTML(templateName, data) {
             </p>
             <div style="background:#f8fafb;border-radius:8px;padding:15px;margin:15px 0;border:1px solid #e9edf2;">
                 <ul style="list-style:none;padding:0;margin:0;">
-                    <li style="padding:5px 0;font-size:14px;color:#0b2138;">🛒 <a href="https://pilotsalesdistribution.com/products" style="color:#0e7c68;text-decoration:none;">Browse 12,000+ products</a></li>
+                    <li style="padding:5px 0;font-size:14px;color:#0b2138;">🛒 <a href="https://pilotsalesdistribution.com/products" style="color:#0e7c68;text-decoration:none;">Browse verified products</a></li>
                     <li style="padding:5px 0;font-size:14px;color:#0b2138;">📋 <a href="https://pilotsalesdistribution.com/rfq" style="color:#0e7c68;text-decoration:none;">Request a quote</a></li>
                     <li style="padding:5px 0;font-size:14px;color:#0b2138;">💬 <a href="https://wa.me/19099384682" style="color:#0e7c68;text-decoration:none;">Chat with us on WhatsApp</a></li>
                 </ul>
@@ -912,12 +914,32 @@ async function sendEmailFormSubmit(templateType, data, toEmail) {
     }
 }
 
-// ─── SEND EMAIL USING RESEND API ───
+// ─── SEND EMAIL USING RESEND API (secure, no hardcoded key) ───
 async function sendEmailResend(templateType, data, toEmail) {
     try {
         const template = getTemplate(templateType, data);
         if (!template) {
             throw new Error(`Template "${templateType}" not found`);
+        }
+
+        // 🔒 Security: Only attempt Resend if a key is explicitly configured
+        // via localStorage (admin) or server env. Otherwise skip directly to
+        // free FormSubmit fallback — no hardcoded secret in repo.
+        const configuredKey = (function(){
+            try {
+                // Try multiple sources: localStorage, meta tag, global config
+                return localStorage.getItem('PSE_RESEND_KEY') ||
+                       (document.querySelector('meta[name="resend-key"]')?.content) ||
+                       (window.PSE_CONFIG && window.PSE_CONFIG.resendKey) ||
+                       EMAIL_CONFIG.apiKey || '';
+            } catch(e){ return EMAIL_CONFIG.apiKey || ''; }
+        })();
+
+        if (!configuredKey || configuredKey.length < 10) {
+            // No valid key — use free fallback transport immediately
+            const fsResult = await sendEmailFormSubmit(templateType, data, toEmail);
+            if (fsResult.success) return fsResult;
+            return sendEmailFallback(templateType, data, toEmail);
         }
 
         const emailData = {
@@ -931,23 +953,23 @@ async function sendEmailResend(templateType, data, toEmail) {
         const response = await fetch(RESEND_API_URL, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${EMAIL_CONFIG.apiKey}`,
+                'Authorization': `Bearer ${configuredKey}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(emailData)
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to send email');
+            const errorData = await response.json().catch(()=>({message:'Resend failed'}));
+            throw new Error(errorData.message || 'Failed to send email via Resend');
         }
 
         const result = await response.json();
-        console.log('✅ Email sent via Resend:', result);
+        console.log('✅ Email sent via Resend');
         return { success: true, transport: 'resend', result };
 
     } catch (error) {
-        console.error('❌ Resend email error:', error);
+        console.warn('Resend not available, using fallback transport:', error.message);
         // Fallback 1: FormSubmit (free, no API key)
         const formSubmitResult = await sendEmailFormSubmit(templateType, data, toEmail);
         if (formSubmitResult.success) {
@@ -1272,5 +1294,5 @@ if (typeof module !== 'undefined' && module.exports) {
     };
 }
 
-console.log('📧 Email system loaded successfully with Resend API!');
-console.log('📁 Templates loaded from GitHub: https://github.com/prayerdome0/Psedistribution-/tree/main/Email%20Template');
+console.log('📧 Email system ready (FormSubmit primary, Resend optional)');
+console.log('📧 Email templates ready');

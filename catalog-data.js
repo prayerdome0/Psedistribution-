@@ -25,7 +25,7 @@
         id: 'all',
         name: 'Full Wholesale Catalog',
         cover: 'https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=800&q=80',
-        blurb: 'Every category in one master line sheet — 12,000+ SKUs available.'
+        blurb: 'Every category in one master line sheet — curated from verified suppliers.'
       },
       electronics: {
         id: 'electronics',

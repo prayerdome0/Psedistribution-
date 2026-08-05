@@ -6,16 +6,16 @@
 //   • Offline fallback shell
 // Bump CACHE_VERSION on deploys to invalidate old caches.
 // ============================================
-const CACHE_VERSION = 'pse-v3';
+const CACHE_VERSION = 'pse-v4';
 const STATIC_CACHE = CACHE_VERSION + '-static';
 const PAGE_CACHE = CACHE_VERSION + '-pages';
 
 const PRECACHE = [
-    '/index.html',
+    '/',
+    '/offline.html',
     '/style.css',
     '/main.js',
     '/logo.webp',
-    '/offline.html',
     '/manifest.json',
     '/favicon.ico'
 ];
