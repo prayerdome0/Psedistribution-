@@ -2494,6 +2494,7 @@
             const products = [];
             snapshot.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
             allAdminProducts = products;
+            try { localStorage.setItem('pse_live_products', JSON.stringify(products)); } catch (e) {}
 
             document.getElementById('productBadge').textContent = products.length;
             document.getElementById('productCount').textContent = `${products.length} products`;

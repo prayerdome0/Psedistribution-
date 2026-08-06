@@ -2,828 +2,197 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>Register - Pilot Sales Distribution</title>
-    <meta name="description" content="Create your Pilot Sales Distribution account." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Create Account — PSE Marketplace</title>
     
+    <!-- Favicon & PWA -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0057FF">
+
+    <!-- Font Awesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap&family=Montserrat:wght@300;400;500;600;700;800;900" rel="stylesheet" />
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="main.js"></script>
-    <script src="search-pro.js"></script>
-<style>
-        .auth-page { max-width: 560px; margin: 2rem auto; background: var(--white); border-radius: var(--radius); padding: 2.5rem; border: 1px solid var(--border); }
-        .auth-page .auth-header { text-align: center; margin-bottom: 1.5rem; }
-        .auth-page .auth-header h2 { font-size: 1.8rem; color: var(--secondary); }
-        .auth-page .auth-header h2 span { color: var(--primary); }
-        .auth-page .auth-header p { color: var(--text-light); font-size: 0.9rem; margin-top: 0.3rem; }
-        .auth-page .form-group { margin-bottom: 1.2rem; }
-        .auth-page .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--secondary); margin-bottom: 0.3rem; }
-        .auth-page .form-group label .required { color: #c0392b; }
-        .auth-page .form-group input { width: 100%; padding: 0.7rem 0.8rem; border: 1px solid var(--border-dark); border-radius: var(--radius-sm); font-size: 0.9rem; transition: var(--transition); }
-        .auth-page .form-group input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(26,123,107,0.1); }
-        .auth-page .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .auth-page .btn-register { width: 100%; background: var(--primary); color: var(--white); border: none; padding: 0.8rem; border-radius: 50px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .auth-page .btn-register:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(26,123,107,0.3); }
-        .auth-page .btn-register:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
-        .auth-page .divider { text-align: center; margin: 1.5rem 0; position: relative; }
-        .auth-page .divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border-dark); }
-        .auth-page .divider span { background: var(--white); padding: 0 1rem; position: relative; color: var(--text-light); font-size: 0.8rem; }
-        .auth-page .social-login { display: flex; gap: 1rem; }
-        .auth-page .social-login button { flex: 1; padding: 0.6rem; border: 1px solid var(--border-dark); border-radius: var(--radius-sm); background: var(--white); cursor: pointer; transition: var(--transition); font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .auth-page .social-login button:hover { background: var(--light); }
-        .auth-page .login-link { text-align: center; margin-top: 1.2rem; font-size: 0.9rem; color: var(--text-light); }
-        .auth-page .login-link a { color: var(--primary); font-weight: 600; transition: var(--transition); }
-        .auth-page .login-link a:hover { text-decoration: underline; }
-        .auth-page .terms { font-size: 0.75rem; color: var(--text-light); text-align: center; margin-top: 1rem; }
-        .auth-page .terms a { color: var(--primary); }
-        
-        .role-selector { display: flex; gap: 1rem; margin: 0.5rem 0 1rem; }
-        .role-selector .role { flex: 1; padding: 0.8rem; border: 2px solid var(--border-dark); border-radius: var(--radius-sm); text-align: center; cursor: pointer; transition: var(--transition); }
-        .role-selector .role:hover { border-color: var(--primary-light); }
-        .role-selector .role.active { border-color: var(--primary); background: var(--primary-light); }
-        .role-selector .role i { font-size: 1.2rem; display: block; margin-bottom: 0.2rem; color: var(--primary); }
-        .role-selector .role span { font-size: 0.8rem; font-weight: 600; color: var(--secondary); }
-        .password-strength { height: 4px; background: var(--border-dark); border-radius: 4px; margin-top: 0.3rem; overflow: hidden; }
-        .password-strength .bar { height: 100%; width: 0%; border-radius: 4px; transition: var(--transition); }
-        .password-strength .bar.weak { width: 25%; background: #c0392b; }
-        .password-strength .bar.medium { width: 50%; background: #e0a62e; }
-        .password-strength .bar.strong { width: 75%; background: #e0a62e; }
-        .password-strength .bar.very-strong { width: 100%; background: #27ae60; }
-        .password-hint { font-size: 0.7rem; color: var(--text-light); margin-top: 0.2rem; }
-        #sellerFields { display: none; animation: slideDown 0.3s ease; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 480px) { .auth-page { padding: 1.5rem; margin: 1rem; } .auth-page .form-row { grid-template-columns: 1fr; } .auth-page .social-login { flex-direction: column; } .role-selector { flex-direction: column; } }
-    </style>
-    <link rel="stylesheet" href="/style.css" />
-    <script src="/marketplace.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Unified Master Stylesheet -->
+    <link rel="stylesheet" href="/marketplace-app.css" />
 </head>
+
 <body>
 
-<!-- TOP BAR -->
-<!-- 1. TOP DELIVERY & UTILITY BAR -->
-<div class="mkt-topbar">
-    <div class="container">
-        <div class="mkt-topbar-left">
-            <div class="top-delivery-badge" data-change-location title="Click to change your delivery location">
-                <i class="fa-solid fa-location-dot"></i>
-                <div class="top-delivery-text">
-                    <span>Deliver to</span>
-                    <strong class="pse-delivery-zip">90210 - Los Angeles, CA</strong>
-                </div>
-            </div>
-            <div class="mkt-announcement-ticker">
-                <span class="badge"><i class="fa-solid fa-bolt"></i> MARKETPLACE ROLLBACKS</span>
-                <span>Save up to 50% on verified bulk pallets &amp; overstock inventory</span>
-            </div>
-        </div>
-        <div class="mkt-topbar-right">
-            <a href="tel:+19099384682"><i class="fa-solid fa-phone"></i> <span>24/7 B2B: +1 (909) 938-4682</span></a>
-            <a href="/become-seller"><i class="fa-solid fa-store"></i> <span>Sell on PSE</span></a>
-            <a href="/track-order"><i class="fa-solid fa-truck"></i> <span>Track Order</span></a>
-            <a href="/help-center"><i class="fa-regular fa-circle-question"></i> <span>Help</span></a>
-            <button type="button" class="mkt-currency-btn" onclick="PSEMarketplace.openCurrencyModal()" title="Change Currency (USD, EUR, GBP, CAD, AUD, ZMW, JPY)"><span>🇺🇸 USD ($)</span> <i class="fa-solid fa-chevron-down" style="font-size:0.6rem;"></i></button>
-        </div>
-    </div>
-</div>
+<div class="app-shell">
 
-<!-- 2. MAIN MARKETPLACE HEADER (Amazon & Walmart Style) -->
-<header class="mkt-header">
-    <div class="container">
-        <a href="/" class="mkt-logo" aria-label="Pilot Sales Distribution Marketplace">
-            <img src="/logo.webp" alt="PSE Distribution Marketplace logo" />
-            <div class="mkt-logo-text">
-                <div class="mkt-logo-main">PSE <span>Marketplace</span></div>
-                <div class="mkt-logo-sub">Wholesale <span class="verified-pill"><i class="fa-solid fa-circle-check"></i> Verified</span></div>
-            </div>
-        </a>
-
-        <div class="mkt-search-wrapper" id="searchBar">
-            <form class="mkt-search-form" role="search" onsubmit="event.preventDefault();">
-                <select class="mkt-search-dept" id="searchDeptSelect" aria-label="Select Category">
-                    <option value="all">All Departments</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="computers">Computers &amp; Laptops</option>
-                    <option value="phones">Smartphones &amp; Tablets</option>
-                    <option value="fashion">Fashion &amp; Apparel</option>
-                    <option value="automotive">Automotive &amp; Fleet</option>
-                    <option value="home">Home &amp; Industrial</option>
-                    <option value="overstock">Liquidation Lots</option>
-                </select>
-                <input type="search" id="searchInput" class="mkt-search-input" placeholder="Search 10,000+ wholesale products, brands, ASINs, or verified suppliers..." autocomplete="off" aria-label="Search wholesale products" />
-                <button type="submit" id="searchBtn" class="mkt-search-btn" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </form>
-            <div class="search-results" id="searchResults"></div>
-        </div>
-
-        <div class="mkt-header-actions">
-            <div class="mkt-account-dropdown">
-                <a href="/account" class="mkt-header-link" id="accountBtn" aria-label="Account and Lists">
-                    <span class="sub-line" id="accountGreeting">Hello, Sign in</span>
-                    <span class="main-line"><span id="accountLabel">Account &amp; Lists</span> <i class="fa-solid fa-caret-down" style="font-size:0.65rem;"></i></span>
-                </a>
-                <div class="mkt-account-flyout">
-                    <a href="/login" class="mkt-flyout-signin-btn" id="loginLink">Sign In</a>
-                    <div class="mkt-flyout-register" id="registerLink">New customer? <a href="/register">Start here.</a></div>
-                    <div class="mkt-flyout-menu">
-                        <a href="/account"><i class="fa-regular fa-user"></i> Your Account</a>
-                        <a href="/buyer-dashboard"><i class="fa-solid fa-box"></i> Your Orders &amp; Invoices</a>
-                        <a href="/rfq"><i class="fa-regular fa-file-lines"></i> Your RFQ Quotes</a>
-                        <a href="/wishlist"><i class="fa-regular fa-heart"></i> Your Saved Wishlist</a>
-                        <a href="/seller-dashboard"><i class="fa-solid fa-store"></i> Seller Central Hub</a>
-                        <a href="/help-center"><i class="fa-regular fa-circle-question"></i> Help &amp; Support</a>
-                    </div>
-                </div>
-            </div>
-
-            <a href="/buyer-dashboard" class="mkt-header-link" aria-label="Returns and Orders">
-                <span class="sub-line">Returns</span>
-                <span class="main-line">&amp; Orders</span>
-            </a>
-
-            <a href="/rfq" class="mkt-header-link" aria-label="Bulk Quotes and RFQ">
-                <span class="sub-line">Wholesale</span>
-                <span class="main-line"><i class="fa-solid fa-file-invoice-dollar" style="color:var(--amz-amber);"></i> RFQ <span class="amz-rfq-badge rfq-count" style="background:var(--pse-teal);color:#fff;border-radius:10px;padding:1px 6px;font-size:0.7rem;margin-left:3px;">0</span></span>
-            </a>
-
-            <a href="/cart" class="mkt-cart-btn" id="cartBtn" aria-label="Shopping Cart">
-                <div class="mkt-cart-icon-wrap">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <span class="mkt-cart-badge cart-count" id="cartCount">0</span>
-                </div>
-                <div class="mkt-cart-label">
-                    <span>Cart</span>
-                    <strong>/bin/bash.00</strong>
-                </div>
-            </a>
-        </div>
-    </div>
-</header>
-
-<!-- 3. SUBNAV / DEPARTMENT BAR -->
-<nav class="mkt-subnav" aria-label="Department Navigation">
-    <div class="container">
-        <div class="mkt-subnav-links">
-            <button class="amz-all-menu-btn" data-open-drawer aria-label="Open All Departments Menu">
+    <!-- ═══════════ GLOBAL HEADER ═══════════ -->
+    <header class="app-header">
+        <div class="app-header-top">
+            <button type="button" class="app-menu-btn" id="appMenuBtn" aria-label="Open Navigation Menu">
                 <i class="fa-solid fa-bars"></i>
-                <span>All Departments</span>
             </button>
-            <a href="/products?filter=deals" class="mkt-subnav-link highlight"><i class="fa-solid fa-bolt"></i> Today's Deals</a>
-            <a href="/products?sort=bestsellers" class="mkt-subnav-link"><i class="fa-solid fa-fire"></i> Best Sellers</a>
-            <a href="/products?filter=rollback" class="mkt-subnav-link"><i class="fa-solid fa-tags"></i> Walmart Rollbacks</a>
-            <a href="/products?category=electronics" class="mkt-subnav-link">Electronics</a>
-            <a href="/products?category=computers" class="mkt-subnav-link">Computers &amp; Laptops</a>
-            <a href="/products?category=phones" class="mkt-subnav-link">Smartphones</a>
-            <a href="/products?category=fashion" class="mkt-subnav-link">Fashion &amp; Apparel</a>
-            <a href="/products?category=automotive" class="mkt-subnav-link">Automotive</a>
-            <a href="/supplier-store" class="mkt-subnav-link">Verified Suppliers</a>
-            <a href="/rfq" class="mkt-subnav-link">Bulk RFQ</a>
-            <a href="/help-center" class="mkt-subnav-link">Customer Service</a>
-        </div>
-        <div class="mkt-subnav-right">
-            <span><i class="fa-solid fa-truck-fast"></i> <strong>2-Day Fast Freight</strong> Guaranteed</span>
-        </div>
-    </div>
-</nav>
 
-<!-- MAIN CONTENT -->
-<div class="container">
-    <div class="auth-page">
-        <div class="auth-header">
-            <h2>Create <span>Account</span></h2>
-            <p>Join Pilot Sales Distribution wholesale marketplace</p>
+            <a href="/" class="app-logo" aria-label="PSE Marketplace Home">
+                <img src="/logo.webp" alt="PSE Marketplace Logo" />
+                <span class="app-logo-name">PSE <b>Marketplace</b></span>
+            </a>
+
+            <div class="app-header-actions">
+                <button type="button" class="app-icon-btn" id="appNotifBtn" aria-label="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="app-badge" id="appNotifBadge">3</span>
+                </button>
+                <a href="/cart" class="app-icon-btn" aria-label="Cart">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="app-badge app-badge--cart cart-count" id="cartCount">0</span>
+                </a>
+            </div>
         </div>
 
-        <div id="referralBanner" style="display:none;background:linear-gradient(135deg,#8e44ad,#9b59b6);color:#fff;border-radius:var(--radius-sm);padding:0.7rem 1rem;font-size:0.8rem;margin-bottom:1rem;"></div>
+        <div class="app-search" id="searchBar">
+            <form class="app-search-form" role="search" onsubmit="event.preventDefault(); var q=document.getElementById('searchInput').value.trim(); if(q) window.location.href='/products?search='+encodeURIComponent(q);">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="searchInput" placeholder="Search Products, Brands, Suppliers..." autocomplete="off" aria-label="Search marketplace" />
+                <button type="submit" id="searchBtn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+        </div>
 
-        <form id="registerForm">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>First Name <span class="required">*</span></label>
-                    <input type="text" id="regFirstName" placeholder="caden" required />
-                </div>
-                <div class="form-group">
-                    <label>Last Name <span class="required">*</span></label>
-                    <input type="text" id="regLastName" placeholder="gibson" required />
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Email Address <span class="required">*</span></label>
-                <input type="email" id="regEmail" placeholder="you@example.com" required />
-            </div>
-
-            <div class="form-group">
-                <label>Password <span class="required">*</span></label>
-                <input type="password" id="regPassword" placeholder="Min 6 characters" required minlength="6" />
-                <div class="password-strength"><div class="bar" id="passwordStrengthBar"></div></div>
-                <div class="password-hint" id="passwordHint">Use 6+ characters with a mix of letters and numbers</div>
-            </div>
-
-            <div class="form-group">
-                <label>Confirm Password <span class="required">*</span></label>
-                <input type="password" id="regConfirmPassword" placeholder="Confirm your password" required />
-                <div id="passwordMatchHint" style="font-size:0.7rem; margin-top:0.2rem;"></div>
-            </div>
-
-            <div class="form-group">
-                <label>Promo / Referral Code <span style="color:var(--text-light); font-weight:400; font-size:0.72rem;">(optional)</span></label>
-                <input type="text" id="regPromoCode" placeholder="e.g. WELCOME10" autocomplete="off" style="text-transform:uppercase;" />
-                <div id="promoHint" style="font-size:0.72rem; margin-top:0.3rem; min-height:0.9rem;"></div>
-                <div class="password-hint"><i class="fa-solid fa-ticket" style="color:var(--primary); margin-right:0.2rem;"></i> Have a promo code? Enter it here — it will be applied automatically to your first order.</div>
-            </div>
-
-            <label style="font-size:0.85rem; font-weight:600; color:var(--secondary);">I want to register as:</label>
-            <div class="role-selector">
-                <div class="role active" onclick="selectRole(this)" data-role="buyer">
-                    <i class="fa-regular fa-user"></i>
-                    <span>Customer</span>
-                </div>
-                <div class="role" onclick="selectRole(this)" data-role="seller">
-                    <i class="fa-solid fa-store"></i>
-                    <span>Seller</span>
-                </div>
-            </div>
-
-            <div id="sellerFields">
-                <div class="info-box" style="background:var(--primary-light); border-radius:var(--radius-sm); padding:0.8rem 1rem; border-left:4px solid var(--primary); margin-bottom:1rem;">
-                    <p style="margin:0; font-size:0.8rem; color:var(--text);"><i class="fa-solid fa-circle-info" style="color:var(--primary); margin-right:0.3rem;"></i> Sellers complete a short <strong>application</strong> for review &amp; verification. After creating your account you'll be taken to the seller application form.</p>
-                </div>
-                <div class="form-group">
-                    <label>Company Name <span class="required">*</span></label>
-                    <input type="text" id="regCompany" placeholder="Your business name" />
-                </div>
-                <div class="form-group">
-                    <label>Business Type</label>
-                    <input type="text" id="regBusinessType" placeholder="Retail, Wholesale, Manufacturing, etc." />
-                </div>
-            </div>
-
-            <button type="submit" class="btn-register" id="registerBtn">
-                <i class="fa-solid fa-user-plus"></i> Create Account
+        <div class="app-locbar">
+            <button type="button" class="app-loc" id="appLocBtn" title="Tap to change delivery location">
+                <i class="fa-solid fa-location-dot"></i> Deliver to <strong id="appZip">90210 – Los Angeles, CA</strong>
             </button>
-        </form>
+            <a class="app-greet" href="/account" id="appGreetLink"><i class="fa-regular fa-circle-user"></i> Hi, <span id="accountLabel">Guest</span></a>
+        </div>
+    </header>
 
-        <div class="divider"><span>or continue with</span></div>
-
-        <div class="social-login">
-            <button onclick="signUpWithGoogle()" id="googleSignUpBtn">
-                <img src="https://www.google.com/favicon.ico" style="width:18px; height:18px;" alt="Google" />
-                Sign up with Google
-            </button>
-            <button onclick="showToast('Facebook registration coming soon', 'info')">
-                <i class="fa-brands fa-facebook"></i> Facebook
+    <!-- ═══════════ GLOBAL MENU DRAWER ═══════════ -->
+    <div class="app-drawer-overlay" id="appDrawerOverlay"></div>
+    <aside class="app-drawer" id="appDrawer" aria-label="Navigation drawer" aria-hidden="true">
+        <div class="app-drawer-header">
+            <div class="app-drawer-user">
+                <div class="app-drawer-avatar"><i class="fa-solid fa-user"></i></div>
+                <div class="app-drawer-userinfo">
+                    <span class="app-drawer-greeting">Welcome to PSE</span>
+                    <strong class="app-drawer-username" id="drawerUserLabel">Hello, Guest</strong>
+                    <a href="/login" class="app-drawer-authlink" id="drawerAuthLink">Sign In / Register</a>
+                </div>
+            </div>
+            <button type="button" class="app-drawer-close" id="appDrawerClose" aria-label="Close menu">
+                <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="login-link">
-            Already have an account? <a href="/login">Sign in</a>
+        <div class="app-drawer-body">
+            <div class="app-drawer-group-title">Navigation</div>
+            <ul class="app-drawer-menu">
+                <li><a href="/"><i class="fa-solid fa-house"></i><span>Home</span></a></li>
+                <li><a href="/products"><i class="fa-solid fa-layer-group"></i><span>Categories</span></a></li>
+                <li><a href="/products?category=electronics"><i class="fa-solid fa-tv"></i><span>Electronics</span></a></li>
+                <li><a href="/products?category=computers"><i class="fa-solid fa-laptop"></i><span>Computers</span></a></li>
+                <li><a href="/products?category=phones"><i class="fa-solid fa-mobile-screen-button"></i><span>Smartphones</span></a></li>
+                <li><a href="/products?category=fashion"><i class="fa-solid fa-shirt"></i><span>Fashion</span></a></li>
+                <li><a href="/products?category=automotive"><i class="fa-solid fa-car"></i><span>Automotive</span></a></li>
+                <li><a href="/products?category=home"><i class="fa-solid fa-couch"></i><span>Home &amp; Industrial</span></a></li>
+                <li><a href="/products?category=overstock"><i class="fa-solid fa-boxes-stacked"></i><span>Liquidation Lots</span></a></li>
+                <li><a href="/rfq"><i class="fa-solid fa-file-invoice-dollar"></i><span>RFQ Quotes</span><span class="app-drawer-pill">B2B</span></a></li>
+                <li><a href="/supplier-store"><i class="fa-solid fa-store"></i><span>Supplier Directory</span></a></li>
+                <li><a href="/account#orders"><i class="fa-solid fa-box"></i><span>Orders</span></a></li>
+                <li><a href="/wishlist"><i class="fa-regular fa-heart"></i><span>Wishlist</span></a></li>
+                <li><a href="/cart"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><span class="app-drawer-badge cart-count">0</span></a></li>
+                <li><a href="/account"><i class="fa-regular fa-user"></i><span>Account</span></a></li>
+                <li><a href="/account#settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a></li>
+                <li><a href="/contact"><i class="fa-regular fa-envelope"></i><span>Contact Us</span></a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- ═══════════ REGISTER MAIN CONTENT ═══════════ -->
+    <main class="app-main">
+
+        <h1 style="font-size:18px; font-weight:900; margin:0 0 14px;"><i class="fa-solid fa-user-plus" style="color:var(--app-primary);"></i> Join PSE Marketplace</h1>
+
+        <div style="background:#fff; border:1px solid var(--app-border); border-radius:var(--app-radius-lg); padding:16px; margin-bottom:14px;">
+            <form onsubmit="handleRegisterSubmit(event)">
+                <div style="margin-bottom:10px;">
+                    <label style="display:block; font-size:12px; font-weight:700; color:var(--app-text); margin-bottom:4px;">Full Name</label>
+                    <input type="text" id="regName" placeholder="e.g. John Doe" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <label style="display:block; font-size:12px; font-weight:700; color:var(--app-text); margin-bottom:4px;">Work / Company Email</label>
+                    <input type="email" id="regEmail" placeholder="e.g. buyer@company.com" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
+                </div>
+
+                <div style="margin-bottom:14px;">
+                    <label style="display:block; font-size:12px; font-weight:700; color:var(--app-text); margin-bottom:4px;">Create Password</label>
+                    <input type="password" id="regPassword" placeholder="••••••••" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
+                </div>
+
+                <button type="submit" class="app-checkout-btn">
+                    <i class="fa-solid fa-check"></i> Register as Verified Buyer
+                </button>
+            </form>
         </div>
 
-        <div class="terms">
-            By creating an account, you agree to our <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms of Service</a>
+        <div style="text-align:center; font-size:12.5px; color:var(--app-text-muted);">
+            Already have an account? <a href="/login" style="font-weight:700;">Sign In</a>
         </div>
-    </div>
+
+    </main>
+
+    <!-- ═══════════ COMPACT FOOTER ═══════════ -->
+    <footer class="app-footer">
+        <div class="app-footer-logo">
+            <img src="/logo.webp" alt="PSE Marketplace" />
+            <strong>PSE <b>Marketplace</b></strong>
+        </div>
+        <p>&copy; 2026 Pilot Sales Distribution, Inc. All rights reserved.</p>
+    </footer>
+
+    <!-- ═══════════ BOTTOM NAVIGATION ═══════════ -->
+    <nav class="app-bottom-nav" aria-label="Main navigation">
+        <a href="/" class="app-nav-item" data-nav="home">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/products" class="app-nav-item" data-nav="categories">
+            <i class="fa-solid fa-shapes"></i>
+            <span>Categories</span>
+        </a>
+        <a href="/rfq" class="app-nav-item" data-nav="rfq">
+            <i class="fa-solid fa-file-invoice"></i>
+            <span>RFQ</span>
+        </a>
+        <a href="/cart" class="app-nav-item" data-nav="cart">
+            <div class="app-nav-icon-wrap">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="app-badge app-badge--cart cart-count">0</span>
+            </div>
+            <span>Cart</span>
+        </a>
+        <a href="/account" class="app-nav-item active" data-nav="account">
+            <i class="fa-solid fa-user"></i>
+            <span>Account</span>
+        </a>
+    </nav>
+
 </div>
 
-<!-- FOOTER -->
-<!-- AUTO-SCROLLING LOGO MARQUEE -->
-<section class="marketplace-logo-marquee-section" aria-labelledby="marqueeTitle">
-    <div class="mkt-marquee-header">
-        <div class="mkt-marquee-kicker"><i class="fa-solid fa-certificate"></i> Verified Global Network</div>
-        <h2 class="mkt-marquee-title" id="marqueeTitle">Trusted Marketplace Partners &amp; Direct Wholesale Brands</h2>
-        <p class="mkt-marquee-desc">Verified B2B wholesale distribution network. Sourced from authorized suppliers, enterprise liquidators, and top marketplace leaders.</p>
-    </div>
-    <div class="marketplace-logo-marquee-container" data-auto-scroll-logos>
-        <div class="marketplace-logo-marquee-track"></div>
-    </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="mkt-footer">
-    <a href="#" class="amz-back-to-top" id="backToTopBtn">Back to top</a>
-    <div class="mkt-footer-nav">
-        <div class="container">
-            <div class="mkt-footer-grid">
-                <div class="mkt-footer-col">
-                    <h4>Get to Know Us</h4>
-                    <ul>
-                        <li><a href="/about">About PSE Distribution</a></li>
-                        <li><a href="/about">Leadership &amp; Careers</a></li>
-                        <li><a href="/supplier-verification">Verified Supplier Standards</a></li>
-                        <li><a href="/catalogs">Wholesale Line Sheets</a></li>
-                        <li><a href="/verify">Authenticity Guarantee</a></li>
-                    </ul>
-                </div>
-                <div class="mkt-footer-col">
-                    <h4>Make Money with Us</h4>
-                    <ul>
-                        <li><a href="/become-seller">Sell on PSE Marketplace</a></li>
-                        <li><a href="/inventory-upload">Upload Bulk Inventory</a></li>
-                        <li><a href="/seller-dashboard">Seller Central Hub</a></li>
-                        <li><a href="/become-seller">Fulfillment &amp; Pallet Warehousing</a></li>
-                        <li><a href="/supplier-store">Supplier Storefronts</a></li>
-                    </ul>
-                </div>
-                <div class="mkt-footer-col">
-                    <h4>Payment &amp; Financing</h4>
-                    <ul>
-                        <li><a href="/rfq">PSE Corporate Net-30 Terms</a></li>
-                        <li><a href="/checkout">100% Escrow Buyer Protection</a></li>
-                        <li><a href="/account">Wholesale Credit Lines</a></li>
-                        <li><a href="/checkout">Wire Transfer &amp; Card Payments</a></li>
-                        <li><a href="/help-center">Tax-Exempt Purchasing</a></li>
-                    </ul>
-                </div>
-                <div class="mkt-footer-col">
-                    <h4>Let Us Help You</h4>
-                    <ul>
-                        <li><a href="/account">Your Account</a></li>
-                        <li><a href="/buyer-dashboard">Your Orders &amp; Invoices</a></li>
-                        <li><a href="/track-order">Shipping Rates &amp; LTL Freight</a></li>
-                        <li><a href="/rfq">Request a Custom Quote (RFQ)</a></li>
-                        <li><a href="/help-center">Help Center &amp; Disputes</a></li>
-                        <li><a href="/contact">24/7 B2B Concierge</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="mkt-footer-middle">
-        <div class="container">
-            <a href="/" class="mkt-logo" style="margin:0 auto 0 0;">
-                <img src="/logo.webp" alt="PSE Distribution" style="height:32px;" />
-                <div class="mkt-logo-text">
-                    <div class="mkt-logo-main" style="font-size:1.05rem;">PSE <span>Marketplace</span></div>
-                </div>
-            </a>
-            <div style="display:flex;gap:1.5rem;align-items:center;">
-                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;"><i class="fa-solid fa-globe"></i> English (US)</span>
-                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;">$ USD - U.S. Dollar</span>
-                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;">🇺🇸 United States</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="mkt-footer-bottom">
-        <div class="container">
-            <div class="mkt-footer-links">
-                <a href="/terms">Conditions of Use</a>
-                <a href="/privacy">Privacy Notice</a>
-                <a href="/terms">Consumer Health Data</a>
-                <a href="/terms">Your Ads Privacy Choices</a>
-                <a href="/become-seller">Seller Terms</a>
-            </div>
-            <p>&copy; 2026 Pilot Sales Distribution, Inc. or its affiliates. All rights reserved. Amazon, Walmart, Target, Apple, and other trademarks are the property of their respective owners.</p>
-            
-            <div class="mkt-payment-row">
-                <div class="mkt-payment-badge"><img src="/visa.svg" alt="Visa" /></div>
-                <div class="mkt-payment-badge"><img src="/mastercard.svg" alt="Mastercard" /></div>
-                <div class="mkt-payment-badge"><img src="/paypal.svg" alt="PayPal" /></div>
-                <div class="mkt-payment-badge"><span style="font-weight:900;font-size:0.7rem;color:#0071dc;">ESCROW 100%</span></div>
-                <div class="mkt-payment-badge"><span style="font-weight:900;font-size:0.7rem;color:#0e7c68;"><i class="fa-solid fa-lock"></i> 256-BIT SSL</span></div>
-            </div>
-        </div>
-    </div>
-</footer>
-
-<!-- TOAST -->
-<div id="toast" class="toast"></div>
-
-<!-- JAVASCRIPT -->
+<script src="/marketplace-app.js"></script>
 <script>
-    // ─── FIREBASE CONFIG ───
-    const firebaseConfig = {
-        apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
-        authDomain: "pilot-sales-distribution.firebaseapp.com",
-        projectId: "pilot-sales-distribution",
-        storageBucket: "pilot-sales-distribution.firebasestorage.app",
-        messagingSenderId: "729127273727",
-        appId: "1:729127273727:web:402d67be8346257755f8ca"
-    };
-
-    let auth, db, googleProvider;
-    let selectedRole = 'buyer';
-    let referredByCode = '';
-
-    // ─── REFERRAL / PROMO URL PARAMS (?ref=CODE&promo=CODE) ───
-    // ?ref=CODE   → referral link from account.html (points for both sides)
-    // ?promo=CODE → prefill the promo-code field (coupon validated on blur)
-    (function captureUrlPromos() {
-        try {
-            const params = new URLSearchParams(location.search);
-            const ref = (params.get('ref') || '').trim();
-            const promo = (params.get('promo') || '').trim();
-            const emailPrefill = (params.get('email') || '').trim();
-            document.addEventListener('DOMContentLoaded', function () {
-                if (emailPrefill) {
-                    const emailInput = document.getElementById('regEmail');
-                    if (emailInput && !emailInput.value) emailInput.value = emailPrefill;
-                }
-                if (ref) {
-                    referredByCode = ref.toUpperCase();
-                    const banner = document.getElementById('referralBanner');
-                    if (banner) {
-                        banner.innerHTML = `🎁 You were invited with referral code <strong>${referredByCode}</strong> — you'll both earn bonus reward points!`;
-                        banner.style.display = 'block';
-                    }
-                }
-                if (promo) {
-                    const input = document.getElementById('regPromoCode');
-                    if (input && !input.value) {
-                        input.value = promo.toUpperCase();
-                        setTimeout(validatePromoField, 1500); // wait for PSE_PREMIUM + Firestore
-                    }
-                }
-            });
-        } catch (e) {}
-    })();
-
-    // ─── INITIALIZE ───
-    function initFirebase() {
-        if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-            console.log('✅ Firebase initialized');
-        }
-        auth = firebase.auth();
-        db = firebase.firestore(); window.db = db;
-        googleProvider = new firebase.auth.GoogleAuthProvider();
-        setupAuthListener();
-        loadCartCount();
-    }
-
-    // ─── AUTH LISTENER ───
-    function setupAuthListener() {
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                try {
-                    const doc = await db.collection('users').doc(user.uid).get();
-                    const data = doc.exists ? doc.data() : {};
-                    localStorage.setItem('pilot_user', JSON.stringify({
-                        id: user.uid,
-                        email: user.email,
-                        full_name: data.full_name || user.displayName || '',
-                        role: data.role || 'buyer'
-                    }));
-                } catch (e) {}
-            } else {
-                localStorage.removeItem('pilot_user');
-            }
-            updateAuthUI();
-        });
-    }
-
-    // ─── GET USER ───
-    function getCurrentUser() {
-        try {
-            const user = localStorage.getItem('pilot_user');
-            return user ? JSON.parse(user) : null;
-        } catch (e) { return null; }
-    }
-
-    // ─── UPDATE UI ───
-    function updateAuthUI() {
-        const user = getCurrentUser();
-        const loginLink = document.getElementById('loginLink');
-        const registerLink = document.getElementById('registerLink');
-        const accountLabel = document.getElementById('accountLabel');
-        if (user) {
-            if (loginLink) loginLink.style.display = 'none';
-            if (registerLink) registerLink.style.display = 'none';
-            if (accountLabel) accountLabel.textContent = user.full_name || 'Account';
-        } else {
-            if (loginLink) loginLink.style.display = 'inline';
-            if (registerLink) registerLink.style.display = 'inline';
-            if (accountLabel) accountLabel.textContent = 'Account';
-        }
-    }
-
-    // ─── TOAST ───
-    function showToast(message, type = 'info') {
-        let toast = document.getElementById('toast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'toast';
-            toast.className = 'toast';
-            document.body.appendChild(toast);
-        }
-        toast.textContent = message;
-        toast.className = 'toast ' + type + ' show';
-        clearTimeout(toast._timeout);
-        toast._timeout = setTimeout(() => {
-            toast.classList.remove('show');
-        }, 4000);
-    }
-
-    // ─── ROLE SELECTOR ───
-    window.selectRole = function(el) {
-        document.querySelectorAll('.role-selector .role').forEach(r => r.classList.remove('active'));
-        el.classList.add('active');
-        selectedRole = el.dataset.role;
-        const sellerFields = document.getElementById('sellerFields');
-        sellerFields.style.display = selectedRole === 'seller' ? 'block' : 'none';
-    };
-
-    // ─── PASSWORD STRENGTH ───
-    document.getElementById('regPassword').addEventListener('input', function() {
-        const password = this.value;
-        const bar = document.getElementById('passwordStrengthBar');
-        const hint = document.getElementById('passwordHint');
-        let strength = 0;
-        let level = '';
-        if (password.length >= 6) strength++;
-        if (password.length >= 10) strength++;
-        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-        if (/\d/.test(password)) strength++;
-        if (/[^a-zA-Z0-9]/.test(password)) strength++;
-        if (strength <= 1) { level = 'weak'; hint.textContent = 'Weak - Add more characters, numbers, and symbols'; hint.style.color = '#c0392b'; }
-        else if (strength === 2) { level = 'medium'; hint.textContent = 'Medium - Add uppercase letters and symbols'; hint.style.color = '#e0a62e'; }
-        else if (strength === 3) { level = 'strong'; hint.textContent = 'Strong - Good password!'; hint.style.color = '#e0a62e'; }
-        else if (strength >= 4) { level = 'very-strong'; hint.textContent = 'Very Strong - Excellent password!'; hint.style.color = '#27ae60'; }
-        bar.className = 'bar ' + level;
-    });
-
-    // ─── PASSWORD MATCH ───
-    document.getElementById('regConfirmPassword').addEventListener('input', function() {
-        const password = document.getElementById('regPassword').value;
-        const confirm = this.value;
-        const hint = document.getElementById('passwordMatchHint');
-        if (confirm.length === 0) { hint.textContent = ''; }
-        else if (password === confirm) { hint.textContent = '✅ Passwords match!'; hint.style.color = '#27ae60'; }
-        else { hint.textContent = '❌ Passwords do not match'; hint.style.color = '#c0392b'; }
-    });
-
-    // ─── PROMO / REFERRAL CODE ───
-    // Codes are managed by admin in the Coupons tab (premium.js) and redeemed
-    // at checkout. Registration stores a validated code so the buyer's first
-    // order picks it up automatically.
-    let promoDebounce = null;
-    const promoInput = document.getElementById('regPromoCode');
-    const promoHint = document.getElementById('promoHint');
-
-    promoInput.addEventListener('input', function() {
-        this.value = this.value.toUpperCase();
-        clearTimeout(promoDebounce);
-        const code = this.value.trim();
-        if (!code) { promoHint.textContent = ''; return; }
-        promoHint.textContent = '⏳ Checking promo code…';
-        promoHint.style.color = '#7f8c8d';
-        promoDebounce = setTimeout(validatePromoField, 500);
-    });
-    promoInput.addEventListener('blur', function() { if (this.value.trim()) validatePromoField(); });
-
-    // Returns a sanitized promo object { code, type, value, min_spend } or null.
-    // Never throws — promo codes must never block account creation.
-    async function validatePromoCode(code) {
-        code = String(code || '').trim().toUpperCase();
-        if (!code) return null;
-        try {
-            if (!window.PSE_PREMIUM || typeof window.PSE_PREMIUM.lookupCoupon !== 'function') return null;
-            const res = await window.PSE_PREMIUM.lookupCoupon(code);
-            if (!res.valid || !res.coupon) return null;
-            return {
-                code: code,
-                type: res.coupon.type === 'percent' ? 'percent' : 'fixed',
-                value: Number(res.coupon.value) || 0,
-                min_spend: Number(res.coupon.min_spend) || 0,
-                label: res.message,
-                claimed_at: new Date().toISOString()
-            };
-        } catch (e) { return null; }
-    }
-
-    async function validatePromoField() {
-        const code = promoInput.value.trim();
-        if (!code) { promoHint.textContent = ''; return; }
-        try {
-            if (!window.PSE_PREMIUM || typeof window.PSE_PREMIUM.lookupCoupon !== 'function') {
-                promoHint.textContent = 'Promo validation unavailable right now — you can still enter it at checkout.';
-                promoHint.style.color = '#7f8c8d';
-                return;
-            }
-            const res = await window.PSE_PREMIUM.lookupCoupon(code);
-            if (res.valid) {
-                promoHint.innerHTML = `🎉 <strong>${code.toUpperCase()}</strong> is valid — ${res.message}! Applied automatically to your first order.`;
-                promoHint.style.color = '#27ae60';
-            } else {
-                promoHint.textContent = '❌ ' + res.message;
-                promoHint.style.color = '#c0392b';
-            }
-        } catch (e) {
-            promoHint.textContent = 'Could not verify the code right now — you can also apply it at checkout.';
-            promoHint.style.color = '#7f8c8d';
-        }
-    }
-
-    // Persist a validated signup promo so checkout can auto-apply it.
-    function storeSignupPromo(promo) {
-        try {
-            if (promo && promo.code) localStorage.setItem('pse_signup_promo', promo.code);
-            else localStorage.removeItem('pse_signup_promo');
-        } catch (e) {}
-    }
-
-    // ─── REGISTER ───
-    document.getElementById('registerForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const firstName = document.getElementById('regFirstName').value.trim();
-        const lastName = document.getElementById('regLastName').value.trim();
-        const email = document.getElementById('regEmail').value.trim();
-        const password = document.getElementById('regPassword').value;
-        const confirm = document.getElementById('regConfirmPassword').value;
-        const company = document.getElementById('regCompany').value.trim();
-        const businessType = document.getElementById('regBusinessType').value.trim();
-
-        if (!firstName || !lastName || !email || !password) {
-            showToast('Please fill in all required fields', 'error');
-            return;
-        }
-        if (password !== confirm) {
-            showToast('Passwords do not match', 'error');
-            return;
-        }
-        if (password.length < 6) {
-            showToast('Password must be at least 6 characters', 'error');
-            return;
-        }
-        if (selectedRole === 'seller' && !company) {
-            showToast('Please enter your company name', 'error');
-            return;
-        }
-
-        const btn = document.getElementById('registerBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account...';
-
-        try {
-            // Validate the optional promo code (never blocks registration)
-            let signupPromo = null;
-            const promoRaw = document.getElementById('regPromoCode').value.trim();
-            if (promoRaw) {
-                signupPromo = await validatePromoCode(promoRaw);
-                if (!signupPromo) {
-                    showToast(`⚠️ Promo code "${promoRaw.toUpperCase()}" wasn't recognized — you can try again at checkout.`, 'info');
-                }
-            }
-
-            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-            const user = userCredential.user;
-            // Email verification is best-effort — never blocks registration
-            try { await user.sendEmailVerification(); } catch (verifyErr) { console.log('Verification email skipped', verifyErr); }
-            await db.collection('users').doc(user.uid).set({
-                email: email,
-                full_name: `${firstName} ${lastName}`,
-                first_name: firstName,
-                last_name: lastName,
-                role: selectedRole === 'seller' ? 'buyer' : selectedRole,
-                company: company || '',
-                business_type: businessType || '',
-                created_at: new Date().toISOString(),
-                status: 'active',
-                verification_status: 'pending',
-                seller_application: selectedRole === 'seller' ? 'pending' : 'none',
-                signup_promo: signupPromo || null
-            });
-            storeSignupPromo(signupPromo);
-            // Referral attribution — one-time, guarded in premium.js
-            try {
-                if (referredByCode && window.PSE_PREMIUM && typeof window.PSE_PREMIUM.maybeApplyReferral === 'function') {
-                    await window.PSE_PREMIUM.maybeApplyReferral(user.uid, referredByCode);
-                    showToast('🎁 Referral applied — bonus points are on their way!', 'success');
-                }
-            } catch (e) {}
-            try {
-                if (signupPromo && window.PSE_PREMIUM && typeof window.PSE_PREMIUM.logAudit === 'function') {
-                    window.PSE_PREMIUM.logAudit('promo.signup_claim', signupPromo.code + ' claimed by ' + email).catch(() => {});
-                }
-            } catch (e) {}
-            localStorage.setItem('pilot_user', JSON.stringify({
-                id: user.uid,
-                email: email,
-                full_name: `${firstName} ${lastName}`,
-                role: selectedRole === 'seller' ? 'buyer' : selectedRole
-            }));
-            updateAuthUI();
-            try {
-                if (typeof sendWelcomeEmail === 'function') {
-                    sendWelcomeEmail(email, firstName).catch(() => {});
-                }
-            } catch (e) {}
-            // Sellers are redirected to the seller application form for review & verification
-            if (selectedRole === 'seller') {
-                showToast("✅ Account created! Now let's complete your seller application…", 'success');
-                sessionStorage.setItem('pse_seller_prefill', JSON.stringify({
-                    firstName, lastName, email, company, businessType
-                }));
-                setTimeout(() => { window.location.href = '/become-seller'; }, 1500);
-                return;
-            }
-            showToast(signupPromo
-                ? `✅ Welcome ${firstName}! Promo ${signupPromo.code} locked in — verification email sent!`
-                : `✅ Welcome ${firstName}! Account created — verification email sent!`, 'success');
-            setTimeout(() => { window.location.href = '/home'; }, 1500);
-        } catch (error) {
-            let msg = error.message;
-            if (error.code === 'auth/email-already-in-use') msg = 'This email is already registered.';
-            if (error.code === 'auth/weak-password') msg = 'Password is too weak. Use 6+ characters.';
-            if (error.code === 'auth/invalid-email') msg = 'Please enter a valid email address.';
-            showToast('❌ ' + msg, 'error');
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Account';
-        }
-    });
-
-    // ─── GOOGLE SIGN UP ───
-    window.signUpWithGoogle = async function() {
-        const btn = document.getElementById('googleSignUpBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
-        try {
-            // Honor a promo code typed before using Google sign-up
-            let signupPromo = null;
-            const promoRaw = document.getElementById('regPromoCode').value.trim();
-
-            const result = await auth.signInWithPopup(googleProvider);
-            const user = result.user;
-            const doc = await db.collection('users').doc(user.uid).get();
-            if (!doc.exists) {
-                if (promoRaw) signupPromo = await validatePromoCode(promoRaw);
-                await db.collection('users').doc(user.uid).set({
-                    email: user.email,
-                    full_name: user.displayName || '',
-                    role: 'buyer',
-                    created_at: new Date().toISOString(),
-                    status: 'active',
-                    signup_promo: signupPromo || null
-                });
-                storeSignupPromo(signupPromo);
-                if (referredByCode && window.PSE_PREMIUM && typeof window.PSE_PREMIUM.maybeApplyReferral === 'function') {
-                    await window.PSE_PREMIUM.maybeApplyReferral(user.uid, referredByCode).catch(() => {});
-                }
-                if (signupPromo) showToast(`🎉 Promo ${signupPromo.code} will be applied to your first order!`, 'success');
-            }
-            const data = doc.exists ? doc.data() : {};
-            localStorage.setItem('pilot_user', JSON.stringify({
-                id: user.uid,
-                email: user.email,
-                full_name: data.full_name || user.displayName || '',
-                role: data.role || 'buyer'
-            }));
-            updateAuthUI();
-            showToast('✅ Google sign up successful!', 'success');
-            setTimeout(() => window.location.href = '/home', 1500);
-        } catch (error) {
-            showToast('❌ Failed to sign up with Google', 'error');
-            btn.disabled = false;
-            btn.innerHTML = '<img src="https://www.google.com/favicon.ico" style="width:18px; height:18px;" alt="Google" /> Sign up with Google';
-        }
-    };
-
-    // ─── LOAD CART COUNT ───
-    async function loadCartCount() {
-        try {
-            const user = getCurrentUser();
-            if (!user) {
-                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
-                const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-                document.querySelectorAll('.cart-count').forEach(el => {
-                    el.textContent = count;
-                    el.style.display = count > 0 ? 'inline' : 'none';
-                });
-                return;
-            }
-            const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
-            let count = 0;
-            snapshot.forEach(doc => { count += doc.data().quantity || 1; });
-            document.querySelectorAll('.cart-count').forEach(el => {
-                el.textContent = count;
-                el.style.display = count > 0 ? 'inline' : 'none';
-            });
-        } catch (error) {
-            document.querySelectorAll('.cart-count').forEach(el => el.textContent = '0');
-        }
-    }
-
-    // ─── INIT ───
-    document.addEventListener('DOMContentLoaded', function() {
-        initFirebase();
-        document.getElementById('year').textContent = new Date().getFullYear();
-    });
-
-    // ─── EXPOSE ───
-    window.showToast = showToast;
-    window.getCurrentUser = getCurrentUser;
+function handleRegisterSubmit(e) {
+    e.preventDefault();
+    var name = document.getElementById('regName').value;
+    var email = document.getElementById('regEmail').value;
+    localStorage.setItem('pilot_user', JSON.stringify({
+        full_name: name,
+        email: email,
+        role: 'buyer'
+    }));
+    window.PSEMarketplace.updateAuthUI();
+    window.pseToast('Account created successfully!', 'success');
+    setTimeout(function() { window.location.href = '/account'; }, 600);
+}
 </script>
-    <script src="email.js"></script>
-    <script src="ai-assistant.js"></script>
-    <script src="notifications.js"></script>
-    <script src="premium.js"></script>
 </body>
 </html>

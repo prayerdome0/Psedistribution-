@@ -2,1045 +2,172 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Become a Seller - Pilot Sales Distribution</title>
-    <meta name="description" content="Join Pilot Sales Distribution as a seller." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Become a Verified Seller — PSE Marketplace</title>
     
+    <!-- Favicon & PWA -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0057FF">
+
+    <!-- Font Awesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap&family=Montserrat:wght@300;400;500;600;700;800;900" rel="stylesheet" />
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="main.js"></script>
-    
-    <style>
-        :root {
-            --primary: #0e7c68;
-            --primary-dark: #0a5a4a;
-            --primary-light: #e6f4ef;
-            --secondary: #0b2138;
-            --secondary-light: #16334f;
-            --accent: #e0a62e;
-            --accent-hover: #c8901f;
-            --dark: #0b1a2a;
-            --text: #33475b;
-            --text-light: #698093;
-            --border: #e9edf2;
-            --border-dark: #d3dce5;
-            --light: #f5f8fa;
-            --white: #ffffff;
-            --shadow: 0 4px 20px rgba(0,0,0,0.06);
-            --shadow-hover: 0 20px 50px -10px rgba(0,20,30,0.12);
-            --radius: 1.5rem;
-            --radius-sm: 0.8rem;
-            --transition: 0.3s ease;
-        }
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
-        body { background: var(--light); color: var(--dark); line-height: 1.6; overflow-x: hidden; }
-        a { text-decoration: none; color: inherit; }
-        ul { list-style: none; }
-        img { max-width: 100%; display: block; }
-
-        .container { max-width: 1300px; margin: 0 auto; padding: 0 1.5rem; }
-
-        .animate-on-scroll { opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease, transform 0.6s ease; }
-        .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
-
-        .top-bar {
-            background: var(--secondary);
-            color: #d4e2ed;
-            font-size: 0.75rem;
-            padding: 0.4rem 0;
-            border-bottom: 1px solid #16334f;
-            overflow: hidden;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .top-bar .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
-        .moving-words { flex: 1; overflow: hidden; white-space: nowrap; position: relative; }
-        .moving-words .words-track { display: inline-block; animation: scrollWords 30s linear infinite; }
-        .moving-words .words-track span { margin: 0 2rem; font-weight: 500; }
-        .moving-words .words-track span i { color: var(--accent); margin-right: 0.3rem; }
-        @keyframes scrollWords { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
-        .top-links { display: flex; gap: 1rem; flex-shrink: 0; }
-        .top-links a { color: #a9c3d6; transition: var(--transition); cursor: pointer; }
-        .top-links a:hover { color: var(--white); }
-        .top-links i { color: var(--accent); margin-right: 0.2rem; }
-
-        .header {
-            background: var(--white);
-            padding: 0.8rem 0;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 35px;
-            z-index: 100;
-        }
-        .header .container { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
-        .logo { display: flex; align-items: center; gap: 0.8rem; text-decoration: none; flex-shrink: 0; }
-        .logo img { height: 45px; width: auto; border-radius: 8px; }
-        .logo .brand-name .main { font-size: 1.3rem; font-weight: 800; color: var(--secondary); }
-        .logo .brand-name .main span { color: var(--primary); }
-        .logo .brand-name .sub { font-size: 0.5rem; color: var(--text-light); font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
-
-        .search-bar {
-            flex: 1;
-            min-width: 200px;
-            display: flex;
-            background: var(--light);
-            border-radius: 50px;
-            border: 2px solid transparent;
-            transition: var(--transition);
-            overflow: hidden;
-            position: relative;
-        }
-        .search-bar:focus-within { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 4px rgba(26,123,107,0.08); }
-        .search-bar input { flex: 1; border: none; padding: 0.6rem 1rem; font-size: 0.9rem; background: transparent; outline: none; }
-        .search-bar button { background: var(--primary); border: none; color: var(--white); padding: 0 1.8rem; cursor: pointer; font-size: 1rem; transition: var(--transition); }
-        .search-bar button:hover { background: var(--primary-dark); }
-        .search-results {
-            position: absolute;
-            top: 110%;
-            left: 0;
-            right: 0;
-            background: var(--white);
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-hover);
-            border: 1px solid var(--border);
-            max-height: 300px;
-            overflow-y: auto;
-            display: none;
-            z-index: 200;
-        }
-        .search-results.show { display: block; }
-        .search-results .result-item { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 1rem; }
-        .search-results .result-item:hover { background: var(--primary-light); }
-        .search-results .result-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
-        .search-results .result-item .info .title { font-weight: 600; font-size: 0.85rem; }
-        .search-results .result-item .info .price { color: var(--primary); font-weight: 700; font-size: 0.8rem; }
-
-        .header-actions { display: flex; align-items: center; gap: 1.2rem; font-size: 0.9rem; flex-wrap: wrap; }
-        .header-actions .icon-btn {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 0.6rem;
-            color: #33475b;
-            cursor: pointer;
-            transition: var(--transition);
-            padding: 0.2rem 0.3rem;
-        }
-        .header-actions .icon-btn i { font-size: 1.3rem; margin-bottom: 2px; transition: var(--transition); }
-        .header-actions .icon-btn:hover { color: var(--primary); transform: translateY(-2px); }
-        .header-actions .icon-btn:hover i { transform: scale(1.1); }
-        .badge-count {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            background: #c0392b;
-            color: var(--white);
-            font-size: 0.55rem;
-            font-weight: 700;
-            border-radius: 50%;
-            padding: 0.1rem 0.45rem;
-            min-width: 18px;
-            text-align: center;
-            animation: badgePop 0.3s ease;
-        }
-        @keyframes badgePop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
-
-        .nav-categories {
-            background: var(--white);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            padding: 0.4rem 0;
-            overflow-x: auto;
-            white-space: nowrap;
-            scrollbar-width: thin;
-            position: sticky;
-            top: 75px;
-            z-index: 99;
-        }
-        .nav-categories::-webkit-scrollbar { height: 3px; }
-        .nav-categories::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #33475b; }
-        .nav-tab { padding: 0.3rem 0; border-bottom: 3px solid transparent; transition: var(--transition); cursor: pointer; position: relative; flex-shrink: 0; }
-        .nav-tab::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 3px; background: var(--primary); transition: width 0.4s ease; }
-        .nav-tab:hover::after, .nav-tab.active::after { width: 100%; }
-        .nav-tab:hover { color: var(--secondary); }
-        .nav-tab.active { color: var(--primary); font-weight: 700; }
-        .wholesale-nav { color: var(--primary); font-weight: 700; }
-
-        .seller-page { max-width: 1000px; margin: 2rem auto; }
-        .seller-hero { text-align: center; padding: 3rem 2rem; background: linear-gradient(135deg, var(--secondary), var(--secondary-light)); border-radius: var(--radius); color: var(--white); margin-bottom: 2rem; }
-        .seller-hero h1 { font-size: 2.8rem; font-weight: 900; }
-        .seller-hero h1 span { color: var(--accent); }
-        .seller-hero p { font-size: 1.1rem; opacity: 0.85; margin-top: 0.5rem; max-width: 600px; margin-left: auto; margin-right: auto; }
-
-        .benefits-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
-        .benefit-card { background: var(--white); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border); text-align: center; transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
-        .benefit-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); border-color: var(--primary-light); }
-        .benefit-card i { font-size: 2.5rem; color: var(--primary); margin-bottom: 0.5rem; }
-        .benefit-card h3 { font-size: 1rem; color: var(--secondary); margin-bottom: 0.3rem; }
-        .benefit-card p { font-size: 0.85rem; color: var(--text-light); }
-
-        .application-form { background: var(--white); border-radius: var(--radius); padding: 2.5rem; border: 1px solid var(--border); margin-top: 2rem; }
-        .application-form h2 { font-size: 1.4rem; color: var(--secondary); margin-bottom: 0.5rem; }
-        .application-form .subtitle { color: var(--text-light); font-size: 0.95rem; margin-bottom: 1.5rem; }
-        .application-form .form-group { margin-bottom: 1.2rem; }
-        .application-form .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--secondary); margin-bottom: 0.3rem; }
-        .application-form .form-group label .required { color: #c0392b; }
-        .application-form .form-group input, .application-form .form-group select, .application-form .form-group textarea { width: 100%; padding: 0.7rem 0.8rem; border: 1px solid var(--border-dark); border-radius: var(--radius-sm); font-size: 0.9rem; transition: var(--transition); font-family: inherit; }
-        .application-form .form-group input:focus, .application-form .form-group select:focus, .application-form .form-group textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(26,123,107,0.1); }
-        .application-form .form-group textarea { resize: vertical; min-height: 100px; }
-        .application-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .application-form .btn-submit { background: var(--primary); color: var(--white); border: none; padding: 0.8rem 2.5rem; border-radius: 50px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; width: 100%; justify-content: center; }
-        .application-form .btn-submit:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(26,123,107,0.3); }
-        .application-form .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
-        .application-form .info-box { background: var(--primary-light); border-radius: var(--radius-sm); padding: 1rem 1.5rem; border-left: 4px solid var(--primary); margin: 1.5rem 0; }
-        .application-form .info-box p { color: var(--text); font-size: 0.9rem; margin: 0; }
-        .application-form .info-box i { color: var(--primary); margin-right: 0.5rem; }
-
-        /* Profile picture upload */
-        .profile-upload { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; margin-bottom: 1.2rem; padding: 1.2rem; background: var(--light); border-radius: var(--radius-sm); border: 1px dashed var(--border-dark); }
-        .profile-upload .avatar-preview { width: 96px; height: 96px; border-radius: 50%; background: var(--white); border: 3px solid var(--primary); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--primary); font-size: 2.2rem; }
-        .profile-upload .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-upload .upload-label { font-size: 0.85rem; font-weight: 600; color: var(--secondary); }
-        .profile-upload .upload-hint { font-size: 0.72rem; color: var(--text-light); text-align: center; }
-        .profile-upload .btn-upload { background: var(--primary); color: var(--white); border: none; padding: 0.5rem 1.2rem; border-radius: 50px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: var(--transition); }
-        .profile-upload .btn-upload:hover { background: var(--primary-dark); }
-        .profile-upload .btn-upload:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        /* Contact info note */
-        .contact-info-box { background: #fff8e1; border-radius: var(--radius-sm); padding: 0.8rem 1rem; border-left: 4px solid var(--accent); margin: 0 0 1.2rem; }
-        .contact-info-box p { margin: 0; font-size: 0.82rem; color: var(--text); }
-        .contact-info-box i { color: #b8860b; margin-right: 0.3rem; }
-
-        .footer {
-            background: var(--secondary);
-            color: #a9c3d6;
-            padding: 2rem 0 1rem;
-            margin-top: 3rem;
-        }
-        .footer .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
-        .footer .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
-        .footer .footer-links a { color: #a9c3d6; font-size: 0.85rem; transition: var(--transition); }
-        .footer .footer-links a:hover { color: var(--white); }
-        .footer .footer-bottom { border-top: 1px solid #16334f; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
-        .footer .footer-bottom strong { color: var(--white); }
-        .footer .footer-social { display: flex; gap: 1rem; }
-        .footer .footer-social a { color: #a9c3d6; transition: var(--transition); font-size: 1.1rem; }
-        .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
-
-        .toast {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--secondary);
-            color: var(--white);
-            padding: 0.8rem 2rem;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            z-index: 9999;
-            display: none;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            max-width: 90%;
-            text-align: center;
-        }
-        .toast.show { display: block; }
-        .toast.success { background: var(--primary); }
-        .toast.error { background: #c0392b; }
-        .toast.info { background: #2980b9; }
-
-        @media (max-width: 768px) {
-            .seller-hero h1 { font-size: 2rem; }
-            .application-form { padding: 1.5rem; }
-            .application-form .form-row { grid-template-columns: 1fr; }
-            .benefits-grid { grid-template-columns: 1fr 1fr; }
-            .top-bar .container { flex-direction: column; gap: 0.3rem; align-items: stretch; text-align: center; }
-            .top-links { justify-content: center; }
-            .header .container { gap: 0.8rem; }
-            .search-bar { min-width: 100%; order: 10; }
-            .header-actions .icon-btn span { display: none; }
-            .footer .footer-content { flex-direction: column; text-align: center; }
-            .footer .footer-links { justify-content: center; gap: 1rem; }
-        }
-        @media (max-width: 480px) {
-            .seller-hero h1 { font-size: 1.6rem; }
-            .benefits-grid { grid-template-columns: 1fr; }
-            .application-form { padding: 1rem; }
-            .top-bar .moving-words .words-track span { font-size: 0.65rem; }
-        }
-    </style>
-    <link rel="stylesheet" href="/style.css" />
-    <script src="/marketplace.js"></script>
+    <!-- Unified Master Stylesheet -->
+    <link rel="stylesheet" href="/marketplace-app.css" />
 </head>
+
 <body>
 
-<!-- TOP BAR -->
-<!-- 1. TOP DELIVERY & UTILITY BAR -->
-<div class="mkt-topbar">
-    <div class="container">
-        <div class="mkt-topbar-left">
-            <div class="top-delivery-badge" data-change-location title="Click to change your delivery location">
-                <i class="fa-solid fa-location-dot"></i>
-                <div class="top-delivery-text">
-                    <span>Deliver to</span>
-                    <strong class="pse-delivery-zip">90210 - Los Angeles, CA</strong>
-                </div>
-            </div>
-            <div class="mkt-announcement-ticker">
-                <span class="badge"><i class="fa-solid fa-bolt"></i> MARKETPLACE ROLLBACKS</span>
-                <span>Save up to 50% on verified bulk pallets &amp; overstock inventory</span>
-            </div>
-        </div>
-        <div class="mkt-topbar-right">
-            <a href="tel:+19099384682"><i class="fa-solid fa-phone"></i> <span>24/7 B2B: +1 (909) 938-4682</span></a>
-            <a href="/become-seller"><i class="fa-solid fa-store"></i> <span>Sell on PSE</span></a>
-            <a href="/track-order"><i class="fa-solid fa-truck"></i> <span>Track Order</span></a>
-            <a href="/help-center"><i class="fa-regular fa-circle-question"></i> <span>Help</span></a>
-            <button type="button" class="mkt-currency-btn" onclick="PSEMarketplace.openCurrencyModal()" title="Change Currency (USD, EUR, GBP, CAD, AUD, ZMW, JPY)"><span>🇺🇸 USD ($)</span> <i class="fa-solid fa-chevron-down" style="font-size:0.6rem;"></i></button>
-        </div>
-    </div>
-</div>
+<div class="app-shell">
 
-<!-- 2. MAIN MARKETPLACE HEADER (Amazon & Walmart Style) -->
-<header class="mkt-header">
-    <div class="container">
-        <a href="/" class="mkt-logo" aria-label="Pilot Sales Distribution Marketplace">
-            <img src="/logo.webp" alt="PSE Distribution Marketplace logo" />
-            <div class="mkt-logo-text">
-                <div class="mkt-logo-main">PSE <span>Marketplace</span></div>
-                <div class="mkt-logo-sub">Wholesale <span class="verified-pill"><i class="fa-solid fa-circle-check"></i> Verified</span></div>
-            </div>
-        </a>
-
-        <div class="mkt-search-wrapper" id="searchBar">
-            <form class="mkt-search-form" role="search" onsubmit="event.preventDefault();">
-                <select class="mkt-search-dept" id="searchDeptSelect" aria-label="Select Category">
-                    <option value="all">All Departments</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="computers">Computers &amp; Laptops</option>
-                    <option value="phones">Smartphones &amp; Tablets</option>
-                    <option value="fashion">Fashion &amp; Apparel</option>
-                    <option value="automotive">Automotive &amp; Fleet</option>
-                    <option value="home">Home &amp; Industrial</option>
-                    <option value="overstock">Liquidation Lots</option>
-                </select>
-                <input type="search" id="searchInput" class="mkt-search-input" placeholder="Search 10,000+ wholesale products, brands, ASINs, or verified suppliers..." autocomplete="off" aria-label="Search wholesale products" />
-                <button type="submit" id="searchBtn" class="mkt-search-btn" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </form>
-            <div class="search-results" id="searchResults"></div>
-        </div>
-
-        <div class="mkt-header-actions">
-            <div class="mkt-account-dropdown">
-                <a href="/account" class="mkt-header-link" id="accountBtn" aria-label="Account and Lists">
-                    <span class="sub-line" id="accountGreeting">Hello, Sign in</span>
-                    <span class="main-line"><span id="accountLabel">Account &amp; Lists</span> <i class="fa-solid fa-caret-down" style="font-size:0.65rem;"></i></span>
-                </a>
-                <div class="mkt-account-flyout">
-                    <a href="/login" class="mkt-flyout-signin-btn" id="loginLink">Sign In</a>
-                    <div class="mkt-flyout-register" id="registerLink">New customer? <a href="/register">Start here.</a></div>
-                    <div class="mkt-flyout-menu">
-                        <a href="/account"><i class="fa-regular fa-user"></i> Your Account</a>
-                        <a href="/buyer-dashboard"><i class="fa-solid fa-box"></i> Your Orders &amp; Invoices</a>
-                        <a href="/rfq"><i class="fa-regular fa-file-lines"></i> Your RFQ Quotes</a>
-                        <a href="/wishlist"><i class="fa-regular fa-heart"></i> Your Saved Wishlist</a>
-                        <a href="/seller-dashboard"><i class="fa-solid fa-store"></i> Seller Central Hub</a>
-                        <a href="/help-center"><i class="fa-regular fa-circle-question"></i> Help &amp; Support</a>
-                    </div>
-                </div>
-            </div>
-
-            <a href="/buyer-dashboard" class="mkt-header-link" aria-label="Returns and Orders">
-                <span class="sub-line">Returns</span>
-                <span class="main-line">&amp; Orders</span>
-            </a>
-
-            <a href="/rfq" class="mkt-header-link" aria-label="Bulk Quotes and RFQ">
-                <span class="sub-line">Wholesale</span>
-                <span class="main-line"><i class="fa-solid fa-file-invoice-dollar" style="color:var(--amz-amber);"></i> RFQ <span class="amz-rfq-badge rfq-count" style="background:var(--pse-teal);color:#fff;border-radius:10px;padding:1px 6px;font-size:0.7rem;margin-left:3px;">0</span></span>
-            </a>
-
-            <a href="/cart" class="mkt-cart-btn" id="cartBtn" aria-label="Shopping Cart">
-                <div class="mkt-cart-icon-wrap">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <span class="mkt-cart-badge cart-count" id="cartCount">0</span>
-                </div>
-                <div class="mkt-cart-label">
-                    <span>Cart</span>
-                    <strong>/bin/bash.00</strong>
-                </div>
-            </a>
-        </div>
-    </div>
-</header>
-
-<!-- 3. SUBNAV / DEPARTMENT BAR -->
-<nav class="mkt-subnav" aria-label="Department Navigation">
-    <div class="container">
-        <div class="mkt-subnav-links">
-            <button class="amz-all-menu-btn" data-open-drawer aria-label="Open All Departments Menu">
+    <!-- ═══════════ GLOBAL HEADER ═══════════ -->
+    <header class="app-header">
+        <div class="app-header-top">
+            <button type="button" class="app-menu-btn" id="appMenuBtn" aria-label="Open Navigation Menu">
                 <i class="fa-solid fa-bars"></i>
-                <span>All Departments</span>
             </button>
-            <a href="/products?filter=deals" class="mkt-subnav-link highlight"><i class="fa-solid fa-bolt"></i> Today's Deals</a>
-            <a href="/products?sort=bestsellers" class="mkt-subnav-link"><i class="fa-solid fa-fire"></i> Best Sellers</a>
-            <a href="/products?filter=rollback" class="mkt-subnav-link"><i class="fa-solid fa-tags"></i> Walmart Rollbacks</a>
-            <a href="/products?category=electronics" class="mkt-subnav-link">Electronics</a>
-            <a href="/products?category=computers" class="mkt-subnav-link">Computers &amp; Laptops</a>
-            <a href="/products?category=phones" class="mkt-subnav-link">Smartphones</a>
-            <a href="/products?category=fashion" class="mkt-subnav-link">Fashion &amp; Apparel</a>
-            <a href="/products?category=automotive" class="mkt-subnav-link">Automotive</a>
-            <a href="/supplier-store" class="mkt-subnav-link">Verified Suppliers</a>
-            <a href="/rfq" class="mkt-subnav-link">Bulk RFQ</a>
-            <a href="/help-center" class="mkt-subnav-link">Customer Service</a>
-        </div>
-        <div class="mkt-subnav-right">
-            <span><i class="fa-solid fa-truck-fast"></i> <strong>2-Day Fast Freight</strong> Guaranteed</span>
-        </div>
-    </div>
-</nav>
 
-<!-- MAIN CONTENT -->
-<div class="container">
-    <div class="seller-page">
-        <div class="seller-hero animate-on-scroll">
-            <h1>Become a <span>Seller</span></h1>
-            <p>Join thousands of businesses selling on Pilot Sales Distribution. Reach millions of buyers worldwide.</p>
-        </div>
+            <a href="/" class="app-logo" aria-label="PSE Marketplace Home">
+                <img src="/logo.webp" alt="PSE Marketplace Logo" />
+                <span class="app-logo-name">PSE <b>Marketplace</b></span>
+            </a>
 
-        <div class="benefits-grid animate-on-scroll">
-            <div class="benefit-card">
-                <i class="fa-solid fa-users"></i>
-                <h3>Reach More Buyers</h3>
-                <p>Connect with thousands of businesses looking for wholesale products</p>
-            </div>
-            <div class="benefit-card">
-                <i class="fa-solid fa-chart-line"></i>
-                <h3>Grow Your Business</h3>
-                <p>Scale your sales with our powerful marketplace tools</p>
-            </div>
-            <div class="benefit-card">
-                <i class="fa-solid fa-shield"></i>
-                <h3>Secure & Trusted</h3>
-                <p>Verified platform with secure transactions and buyer protection</p>
-            </div>
-            <div class="benefit-card">
-                <i class="fa-regular fa-clock"></i>
-                <h3>24/7 Support</h3>
-                <p>Dedicated support team to help you succeed</p>
+            <div class="app-header-actions">
+                <button type="button" class="app-icon-btn" id="appNotifBtn" aria-label="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="app-badge" id="appNotifBadge">3</span>
+                </button>
+                <a href="/cart" class="app-icon-btn" aria-label="Cart">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="app-badge app-badge--cart cart-count" id="cartCount">0</span>
+                </a>
             </div>
         </div>
 
-        <div class="application-form animate-on-scroll">
-            <h2><i class="fa-solid fa-store" style="color:var(--primary);"></i> Seller Application</h2>
-            <p class="subtitle">Fill out the form below and our team will review your application within 48 hours.</p>
+        <div class="app-search" id="searchBar">
+            <form class="app-search-form" role="search" onsubmit="event.preventDefault(); var q=document.getElementById('searchInput').value.trim(); if(q) window.location.href='/products?search='+encodeURIComponent(q);">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="searchInput" placeholder="Search Products, Brands, Suppliers..." autocomplete="off" aria-label="Search marketplace" />
+                <button type="submit" id="searchBtn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+        </div>
 
-            <div class="info-box">
-                <p><i class="fa-solid fa-circle-info"></i> All fields marked with <strong style="color:#c0392b;">*</strong> are required. Your application will be reviewed by our team.</p>
+        <div class="app-locbar">
+            <button type="button" class="app-loc" id="appLocBtn" title="Tap to change delivery location">
+                <i class="fa-solid fa-location-dot"></i> Deliver to <strong id="appZip">90210 – Los Angeles, CA</strong>
+            </button>
+            <a class="app-greet" href="/account" id="appGreetLink"><i class="fa-regular fa-circle-user"></i> Hi, <span id="accountLabel">Guest</span></a>
+        </div>
+    </header>
+
+    <!-- ═══════════ GLOBAL MENU DRAWER ═══════════ -->
+    <div class="app-drawer-overlay" id="appDrawerOverlay"></div>
+    <aside class="app-drawer" id="appDrawer" aria-label="Navigation drawer" aria-hidden="true">
+        <div class="app-drawer-header">
+            <div class="app-drawer-user">
+                <div class="app-drawer-avatar"><i class="fa-solid fa-user"></i></div>
+                <div class="app-drawer-userinfo">
+                    <span class="app-drawer-greeting">Welcome to PSE</span>
+                    <strong class="app-drawer-username" id="drawerUserLabel">Hello, Guest</strong>
+                    <a href="/login" class="app-drawer-authlink" id="drawerAuthLink">Sign In / Register</a>
+                </div>
             </div>
+            <button type="button" class="app-drawer-close" id="appDrawerClose" aria-label="Close menu">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
 
-            <form id="sellerApplicationForm">
-                <!-- Profile picture -->
-                <div class="profile-upload">
-                    <div class="avatar-preview" id="sellerAvatarPreview"><i class="fa-regular fa-user"></i></div>
-                    <span class="upload-label">Profile / Logo Picture</span>
-                    <span class="upload-hint">A clear photo or business logo helps buyers trust you. JPG/PNG/WebP (max 2MB).</span>
-                    <input type="file" id="sellerProfileInput" accept="image/*" style="display:none;" />
-                    <button type="button" class="btn-upload" id="sellerUploadBtn" onclick="document.getElementById('sellerProfileInput').click()">
-                        <i class="fa-regular fa-image"></i> Upload Picture
-                    </button>
-                </div>
+        <div class="app-drawer-body">
+            <div class="app-drawer-group-title">Navigation</div>
+            <ul class="app-drawer-menu">
+                <li><a href="/"><i class="fa-solid fa-house"></i><span>Home</span></a></li>
+                <li><a href="/products"><i class="fa-solid fa-layer-group"></i><span>Categories</span></a></li>
+                <li><a href="/products?category=electronics"><i class="fa-solid fa-tv"></i><span>Electronics</span></a></li>
+                <li><a href="/products?category=computers"><i class="fa-solid fa-laptop"></i><span>Computers</span></a></li>
+                <li><a href="/products?category=phones"><i class="fa-solid fa-mobile-screen-button"></i><span>Smartphones</span></a></li>
+                <li><a href="/products?category=fashion"><i class="fa-solid fa-shirt"></i><span>Fashion</span></a></li>
+                <li><a href="/products?category=automotive"><i class="fa-solid fa-car"></i><span>Automotive</span></a></li>
+                <li><a href="/products?category=home"><i class="fa-solid fa-couch"></i><span>Home &amp; Industrial</span></a></li>
+                <li><a href="/products?category=overstock"><i class="fa-solid fa-boxes-stacked"></i><span>Liquidation Lots</span></a></li>
+                <li><a href="/rfq"><i class="fa-solid fa-file-invoice-dollar"></i><span>RFQ Quotes</span><span class="app-drawer-pill">B2B</span></a></li>
+                <li><a href="/supplier-store"><i class="fa-solid fa-store"></i><span>Supplier Directory</span></a></li>
+                <li><a href="/account#orders"><i class="fa-solid fa-box"></i><span>Orders</span></a></li>
+                <li><a href="/wishlist"><i class="fa-regular fa-heart"></i><span>Wishlist</span></a></li>
+                <li><a href="/cart"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><span class="app-drawer-badge cart-count">0</span></a></li>
+                <li><a href="/account"><i class="fa-regular fa-user"></i><span>Account</span></a></li>
+                <li><a href="/account#settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a></li>
+                <li><a href="/contact"><i class="fa-regular fa-envelope"></i><span>Contact Us</span></a></li>
+            </ul>
+        </div>
+    </aside>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>First Name <span class="required">*</span></label>
-                        <input type="text" id="sellerFirstName" placeholder="Caden" required />
-                    </div>
-                    <div class="form-group">
-                        <label>Last Name <span class="required">*</span></label>
-                        <input type="text" id="sellerLastName" placeholder="Gibson" required />
-                    </div>
-                </div>
+    <!-- ═══════════ BECOME SELLER CONTENT ═══════════ -->
+    <main class="app-main">
 
-                <div class="form-group">
-                    <label>Business Email <span class="required">*</span></label>
-                    <input type="email" id="sellerEmail" placeholder="business@example.com" required />
-                </div>
+        <div class="app-hero-banner" style="background:linear-gradient(135deg, #0F172A 0%, #1E293B 100%);">
+            <span class="app-hero-tag" style="background:var(--app-accent);"><i class="fa-solid fa-store"></i> Supplier Onboarding</span>
+            <h1>Sell on PSE Marketplace</h1>
+            <p>Access 15,000+ verified enterprise wholesale buyers worldwide with guaranteed escrow payouts.</p>
+        </div>
 
-                <div class="form-group">
-                    <label>Phone Number <span class="required">*</span></label>
-                    <input type="tel" id="sellerPhone" placeholder="+1 (555) 123-4567" required />
-                </div>
-
-                <!-- Buyer contact details -->
-                <div class="contact-info-box">
-                    <p><i class="fa-solid fa-comments"></i> <strong>Buyer Contact Details</strong> - Add how you want buyers to reach you. When a buyer clicks Contact Seller on your products, they will be redirected straight to the contact you provide here.</p>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>WhatsApp Number <span class="required">*</span></label>
-                        <input type="tel" id="sellerWhatsApp" placeholder="+1 (555) 123-4567" required />
-                    </div>
-                    <div class="form-group">
-                        <label>Contact Email for Buyers <span class="required">*</span></label>
-                        <input type="email" id="sellerContactEmail" placeholder="sales@yourbusiness.com" required />
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Business Name <span class="required">*</span></label>
-                    <input type="text" id="sellerBusinessName" placeholder="Your business name" required />
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Business Type <span class="required">*</span></label>
-                        <select id="sellerBusinessType" required>
-                            <option value="">Select type</option>
-                            <option value="retail">Retail</option>
-                            <option value="wholesale">Wholesale</option>
-                            <option value="manufacturer">Manufacturer</option>
-                            <option value="distributor">Distributor</option>
-                            <option value="importer">Importer</option>
-                            <option value="dropshipper">Dropshipper</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Years in Business</label>
-                        <select id="sellerYears">
-                            <option value="less-than-1">Less than 1 year</option>
-                            <option value="1-3">1-3 years</option>
-                            <option value="3-5">3-5 years</option>
-                            <option value="5-10">5-10 years</option>
-                            <option value="10+">10+ years</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Business Address / Location</label>
-                    <input type="text" id="sellerLocation" placeholder="City, Country" />
-                </div>
-
-                <div class="form-group">
-                    <label>Website (Optional)</label>
-                    <input type="url" id="sellerWebsite" placeholder="https://yourstore.com" />
-                </div>
-
-                <div class="form-group">
-                    <label>Product Categories <span class="required">*</span></label>
-                    <select id="sellerCategories" multiple style="height:80px;" required>
-                        <option value="electronics">Electronics</option>
-                        <option value="fashion">Fashion</option>
-                        <option value="home">Home & Kitchen</option>
-                        <option value="grocery">Grocery</option>
-                        <option value="beauty">Beauty</option>
-                        <option value="sports">Sports</option>
-                        <option value="office">Office</option>
-                        <option value="industrial">Industrial</option>
-                        <option value="books">Books</option>
-                        <option value="pets">Pets</option>
-                        <option value="baby">Baby</option>
-                        <option value="automotive">Automotive</option>
-                        <option value="health">Health</option>
-                    </select>
-                    <small style="color:var(--text-light); font-size:0.75rem;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple</small>
-                </div>
-
-                <div class="form-group">
-                    <label>Why do you want to sell on Pilot Sales Distribution?</label>
-                    <textarea id="sellerReason" placeholder="Tell us about your business and why you'd like to join our marketplace..." rows="4"></textarea>
-                </div>
-
-                <!-- Supplier Membership Tier Selector -->
-                <div class="form-group" style="margin-top:1.8rem;margin-bottom:1.8rem;">
-                    <label style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:0.8rem;display:block;">Select Your Supplier Membership Tier <span class="required">*</span></label>
-                    <div class="membership-tiers" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;">
-                        <label class="tier-card" style="border:2px solid var(--border-light);border-radius:12px;padding:1.2rem;cursor:pointer;background:var(--bg-card);transition:all 0.2s ease;display:flex;flex-direction:column;position:relative;">
-                            <input type="radio" name="membershipTier" value="basic" checked style="position:absolute;top:15px;right:15px;cursor:pointer;" />
-                            <div style="font-weight:700;font-size:1.1rem;color:var(--text-dark);">Basic Supplier</div>
-                            <div style="font-size:1.4rem;font-weight:800;color:var(--primary);margin:0.4rem 0 0.8rem;">$0 <span style="font-size:0.8rem;font-weight:500;color:var(--text-light);">/ month</span></div>
-                            <ul style="list-style:none;padding:0;margin:0;font-size:0.82rem;color:var(--text-light);display:flex;flex-direction:column;gap:0.4rem;">
-                                <li><i class="fa-solid fa-check" style="color:var(--primary);margin-right:6px;"></i> Up to 10 products</li>
-                                <li><i class="fa-solid fa-check" style="color:var(--primary);margin-right:6px;"></i> Standard catalog search</li>
-                                <li><i class="fa-solid fa-check" style="color:var(--primary);margin-right:6px;"></i> 10% order commission</li>
-                            </ul>
-                        </label>
-                        <label class="tier-card" style="border:2px solid #e0a62e;border-radius:12px;padding:1.2rem;cursor:pointer;background:linear-gradient(135deg,rgba(241,196,15,0.06),rgba(243,156,18,0.08));transition:all 0.2s ease;display:flex;flex-direction:column;position:relative;">
-                            <div style="position:absolute;top:-10px;right:15px;background:#e0a62e;color:#fff;font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;">Popular</div>
-                            <input type="radio" name="membershipTier" value="gold" style="position:absolute;top:15px;right:15px;cursor:pointer;" />
-                            <div style="font-weight:700;font-size:1.1rem;color:#d35400;">👑 Gold Supplier</div>
-                            <div style="font-size:1.4rem;font-weight:800;color:#d35400;margin:0.4rem 0 0.8rem;">$299 <span style="font-size:0.8rem;font-weight:500;color:var(--text-light);">/ month</span></div>
-                            <ul style="list-style:none;padding:0;margin:0;font-size:0.82rem;color:var(--text-light);display:flex;flex-direction:column;gap:0.4rem;">
-                                <li><i class="fa-solid fa-check" style="color:#e0a62e;margin-right:6px;"></i> <strong>Unlimited</strong> products</li>
-                                <li><i class="fa-solid fa-check" style="color:#e0a62e;margin-right:6px;"></i> <strong>"👑 Gold Supplier"</strong> badge</li>
-                                <li><i class="fa-solid fa-check" style="color:#e0a62e;margin-right:6px;"></i> Priority search ranking</li>
-                                <li><i class="fa-solid fa-check" style="color:#e0a62e;margin-right:6px;"></i> Reduced 5% commission</li>
-                            </ul>
-                        </label>
-                        <label class="tier-card" style="border:2px solid #8e44ad;border-radius:12px;padding:1.2rem;cursor:pointer;background:linear-gradient(135deg,rgba(142,68,173,0.06),rgba(155,89,182,0.08));transition:all 0.2s ease;display:flex;flex-direction:column;position:relative;">
-                            <div style="position:absolute;top:-10px;right:15px;background:#8e44ad;color:#fff;font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;">Enterprise</div>
-                            <input type="radio" name="membershipTier" value="platinum" style="position:absolute;top:15px;right:15px;cursor:pointer;" />
-                            <div style="font-weight:700;font-size:1.1rem;color:#8e44ad;">👑 Platinum Supplier</div>
-                            <div style="font-size:1.4rem;font-weight:800;color:#8e44ad;margin:0.4rem 0 0.8rem;">$799 <span style="font-size:0.8rem;font-weight:500;color:var(--text-light);">/ month</span></div>
-                            <ul style="list-style:none;padding:0;margin:0;font-size:0.82rem;color:var(--text-light);display:flex;flex-direction:column;gap:0.4rem;">
-                                <li><i class="fa-solid fa-check" style="color:#8e44ad;margin-right:6px;"></i> <strong>0% Commission</strong> (Zero take-rate)</li>
-                                <li><i class="fa-solid fa-check" style="color:#8e44ad;margin-right:6px;"></i> <strong>"👑 Platinum Supplier"</strong> badge</li>
-                                <li><i class="fa-solid fa-check" style="color:#8e44ad;margin-right:6px;"></i> Featured home page banners</li>
-                                <li><i class="fa-solid fa-check" style="color:#8e44ad;margin-right:6px;"></i> Dedicated account manager</li>
-                            </ul>
-                        </label>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-submit" id="submitBtn">
-                    <i class="fa-regular fa-paper-plane"></i> Submit Application
+        <div style="background:#fff; border:1px solid var(--app-border); border-radius:var(--app-radius-lg); padding:16px; margin-bottom:16px;">
+            <h3 style="font-size:14px; font-weight:800; margin:0 0 12px;">Supplier Registration</h3>
+            <form onsubmit="event.preventDefault(); window.pseToast('Application submitted! Our supplier verification team will contact you within 24h.', 'success'); this.reset();">
+                <input type="text" placeholder="Company / Business Name" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; margin-bottom:10px; background:#FAFBFC;" />
+                <input type="email" placeholder="Business Email" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; margin-bottom:10px; background:#FAFBFC;" />
+                <input type="text" placeholder="Product Categories (e.g. Electronics, Overstock)" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; margin-bottom:10px; background:#FAFBFC;" />
+                <input type="text" placeholder="Country / Warehouse Location" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; margin-bottom:14px; background:#FAFBFC;" />
+                <button type="submit" class="app-checkout-btn">
+                    <i class="fa-solid fa-check"></i> Apply for Verified Supplier Status
                 </button>
             </form>
         </div>
-    </div>
+
+    </main>
+
+    <!-- ═══════════ COMPACT FOOTER ═══════════ -->
+    <footer class="app-footer">
+        <div class="app-footer-logo">
+            <img src="/logo.webp" alt="PSE Marketplace" />
+            <strong>PSE <b>Marketplace</b></strong>
+        </div>
+        <p>&copy; 2026 Pilot Sales Distribution, Inc. All rights reserved.</p>
+    </footer>
+
+    <!-- ═══════════ BOTTOM NAVIGATION ═══════════ -->
+    <nav class="app-bottom-nav" aria-label="Main navigation">
+        <a href="/" class="app-nav-item" data-nav="home">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/products" class="app-nav-item" data-nav="categories">
+            <i class="fa-solid fa-shapes"></i>
+            <span>Categories</span>
+        </a>
+        <a href="/rfq" class="app-nav-item" data-nav="rfq">
+            <i class="fa-solid fa-file-invoice"></i>
+            <span>RFQ</span>
+        </a>
+        <a href="/cart" class="app-nav-item" data-nav="cart">
+            <div class="app-nav-icon-wrap">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="app-badge app-badge--cart cart-count">0</span>
+            </div>
+            <span>Cart</span>
+        </a>
+        <a href="/account" class="app-nav-item" data-nav="account">
+            <i class="fa-solid fa-user"></i>
+            <span>Account</span>
+        </a>
+    </nav>
+
 </div>
 
-<!-- FOOTER -->
-<!-- AUTO-SCROLLING LOGO MARQUEE -->
-<section class="marketplace-logo-marquee-section" aria-labelledby="marqueeTitle">
-    <div class="mkt-marquee-header">
-        <div class="mkt-marquee-kicker"><i class="fa-solid fa-certificate"></i> Verified Global Network</div>
-        <h2 class="mkt-marquee-title" id="marqueeTitle">Trusted Marketplace Partners &amp; Direct Wholesale Brands</h2>
-        <p class="mkt-marquee-desc">Verified B2B wholesale distribution network. Sourced from authorized suppliers, enterprise liquidators, and top marketplace leaders.</p>
-    </div>
-    <div class="marketplace-logo-marquee-container" data-auto-scroll-logos>
-        <div class="marketplace-logo-marquee-track"></div>
-    </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="mkt-footer">
-    <a href="#" class="amz-back-to-top" id="backToTopBtn">Back to top</a>
-    <div class="mkt-footer-nav">
-        <div class="container">
-            <div class="mkt-footer-grid">
-                <div class="mkt-footer-col">
-                    <h4>Get to Know Us</h4>
-                    <ul>
-                        <li><a href="/about">About PSE Distribution</a></li>
-                        <li><a href="/about">Leadership &amp; Careers</a></li>
-                        <li><a href="/supplier-verification">Verified Supplier Standards</a></li>
-                        <li><a href="/catalogs">Wholesale Line Sheets</a></li>
-                        <li><a href="/verify">Authenticity Guarantee</a></li>
-                    </ul>
-                </div>
-                <div class="mkt-footer-col">
-                    <h4>Make Money with Us</h4>
-                    <ul>
-                        <li><a href="/become-seller">Sell on PSE Marketplace</a></li>
-                        <li><a href="/inventory-upload">Upload Bulk Inventory</a></li>
-                        <li><a href="/seller-dashboard">Seller Central Hub</a></li>
-                        <li><a href="/become-seller">Fulfillment &amp; Pallet Warehousing</a></li>
-                        <li><a href="/supplier-store">Supplier Storefronts</a></li>
-                    </ul>
-                </div>
-                <div class="mkt-footer-col">
-                    <h4>Payment &amp; Financing</h4>
-                    <ul>
-                        <li><a href="/rfq">PSE Corporate Net-30 Terms</a></li>
-                        <li><a href="/checkout">100% Escrow Buyer Protection</a></li>
-                        <li><a href="/account">Wholesale Credit Lines</a></li>
-                        <li><a href="/checkout">Wire Transfer &amp; Card Payments</a></li>
-                        <li><a href="/help-center">Tax-Exempt Purchasing</a></li>
-                    </ul>
-                </div>
-                <div class="mkt-footer-col">
-                    <h4>Let Us Help You</h4>
-                    <ul>
-                        <li><a href="/account">Your Account</a></li>
-                        <li><a href="/buyer-dashboard">Your Orders &amp; Invoices</a></li>
-                        <li><a href="/track-order">Shipping Rates &amp; LTL Freight</a></li>
-                        <li><a href="/rfq">Request a Custom Quote (RFQ)</a></li>
-                        <li><a href="/help-center">Help Center &amp; Disputes</a></li>
-                        <li><a href="/contact">24/7 B2B Concierge</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="mkt-footer-middle">
-        <div class="container">
-            <a href="/" class="mkt-logo" style="margin:0 auto 0 0;">
-                <img src="/logo.webp" alt="PSE Distribution" style="height:32px;" />
-                <div class="mkt-logo-text">
-                    <div class="mkt-logo-main" style="font-size:1.05rem;">PSE <span>Marketplace</span></div>
-                </div>
-            </a>
-            <div style="display:flex;gap:1.5rem;align-items:center;">
-                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;"><i class="fa-solid fa-globe"></i> English (US)</span>
-                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;">$ USD - U.S. Dollar</span>
-                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;">🇺🇸 United States</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="mkt-footer-bottom">
-        <div class="container">
-            <div class="mkt-footer-links">
-                <a href="/terms">Conditions of Use</a>
-                <a href="/privacy">Privacy Notice</a>
-                <a href="/terms">Consumer Health Data</a>
-                <a href="/terms">Your Ads Privacy Choices</a>
-                <a href="/become-seller">Seller Terms</a>
-            </div>
-            <p>&copy; 2026 Pilot Sales Distribution, Inc. or its affiliates. All rights reserved. Amazon, Walmart, Target, Apple, and other trademarks are the property of their respective owners.</p>
-            
-            <div class="mkt-payment-row">
-                <div class="mkt-payment-badge"><img src="/visa.svg" alt="Visa" /></div>
-                <div class="mkt-payment-badge"><img src="/mastercard.svg" alt="Mastercard" /></div>
-                <div class="mkt-payment-badge"><img src="/paypal.svg" alt="PayPal" /></div>
-                <div class="mkt-payment-badge"><span style="font-weight:900;font-size:0.7rem;color:#0071dc;">ESCROW 100%</span></div>
-                <div class="mkt-payment-badge"><span style="font-weight:900;font-size:0.7rem;color:#0e7c68;"><i class="fa-solid fa-lock"></i> 256-BIT SSL</span></div>
-            </div>
-        </div>
-    </div>
-</footer>
-
-<!-- TOAST -->
-<div id="toast" class="toast"></div>
-
-<!-- JAVASCRIPT -->
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
-        authDomain: "pilot-sales-distribution.firebaseapp.com",
-        projectId: "pilot-sales-distribution",
-        storageBucket: "pilot-sales-distribution.firebasestorage.app",
-        messagingSenderId: "729127273727",
-        appId: "1:729127273727:web:402d67be8346257755f8ca"
-    };
-
-    let auth, db;
-
-    function initFirebase() {
-        if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        auth = firebase.auth();
-        db = firebase.firestore(); window.db = db;
-        setupAuthListener();
-        loadCartCount();
-        loadWishlistCount();
-    }
-
-    function setupAuthListener() {
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                try {
-                    const doc = await db.collection('users').doc(user.uid).get();
-                    const data = doc.exists ? doc.data() : {};
-                    localStorage.setItem('pilot_user', JSON.stringify({
-                        id: user.uid, email: user.email,
-                        full_name: data.full_name || user.displayName || '',
-                        role: data.role || 'buyer'
-                    }));
-                } catch (e) {}
-            } else { localStorage.removeItem('pilot_user'); }
-            updateAuthUI();
-        });
-    }
-
-    function getCurrentUser() {
-        try { return JSON.parse(localStorage.getItem('pilot_user')); } catch (e) { return null; }
-    }
-
-    function updateAuthUI() {
-        const user = getCurrentUser();
-        const login = document.getElementById('loginLink');
-        const register = document.getElementById('registerLink');
-        const account = document.getElementById('accountLabel');
-        if (user) {
-            if (login) login.style.display = 'none';
-            if (register) register.style.display = 'none';
-            if (account) account.textContent = user.full_name || 'Account';
-        } else {
-            if (login) login.style.display = 'inline';
-            if (register) register.style.display = 'inline';
-            if (account) account.textContent = 'Account';
-        }
-    }
-
-    function showToast(message, type = 'info') {
-        let toast = document.getElementById('toast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'toast';
-            toast.className = 'toast';
-            document.body.appendChild(toast);
-        }
-        toast.textContent = message;
-        toast.className = 'toast ' + type + ' show';
-        clearTimeout(toast._timeout);
-        toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
-    }
-
-    function generateSlug(title) {
-        if (!title) return '';
-        return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
-    }
-
-    // --- CLOUDINARY CONFIG (profile picture upload) ---
-    const CLOUDINARY = { cloudName: 'nqyylkmd', uploadPreset: 'pse_products' };
-    let sellerProfileImageURL = '';
-
-    // --- PROFILE IMAGE UPLOAD ---
-    async function uploadSellerProfileImage(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-        if (!validTypes.includes(file.type)) {
-            showToast('Please upload a valid image (JPG, PNG, WebP, GIF)', 'error');
-            event.target.value = '';
-            return;
-        }
-        if (file.size > 2 * 1024 * 1024) {
-            showToast('Image must be less than 2MB', 'error');
-            event.target.value = '';
-            return;
-        }
-        const uploadBtn = document.getElementById('sellerUploadBtn');
-        uploadBtn.disabled = true;
-        uploadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('sellerAvatarPreview').innerHTML = '<img src="' + e.target.result + '" alt="Profile preview" />';
-        };
-        reader.readAsDataURL(file);
-        showToast('Uploading profile picture...', 'info');
-        try {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', CLOUDINARY.uploadPreset);
-            formData.append('folder', 'products'); // all uploads use the shared Cloudinary "products" folder
-            const response = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY.cloudName + '/image/upload', {
-                method: 'POST', body: formData
-            });
-            if (!response.ok) throw new Error('Upload failed');
-            const data = await response.json();
-            sellerProfileImageURL = data.secure_url;
-            document.getElementById('sellerAvatarPreview').innerHTML = '<img src="' + sellerProfileImageURL + '" alt="Profile" />';
-            showToast('Profile picture uploaded!', 'success');
-        } catch (error) {
-            console.error('Upload error:', error);
-            showToast('Failed to upload picture. You can still submit without it.', 'error');
-            sellerProfileImageURL = '';
-            document.getElementById('sellerAvatarPreview').innerHTML = '<i class="fa-regular fa-user"></i>';
-        } finally {
-            uploadBtn.disabled = false;
-            uploadBtn.innerHTML = '<i class="fa-regular fa-image"></i> Change Picture';
-        }
-    }
-
-    document.getElementById('sellerApplicationForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-
-        const firstName = document.getElementById('sellerFirstName').value.trim();
-        const lastName = document.getElementById('sellerLastName').value.trim();
-        const email = document.getElementById('sellerEmail').value.trim();
-        const phone = document.getElementById('sellerPhone').value.trim();
-        const whatsapp = document.getElementById('sellerWhatsApp').value.trim();
-        const contactEmail = document.getElementById('sellerContactEmail').value.trim();
-        const businessName = document.getElementById('sellerBusinessName').value.trim();
-        const businessType = document.getElementById('sellerBusinessType').value;
-        const years = document.getElementById('sellerYears').value;
-        const location = document.getElementById('sellerLocation').value.trim();
-        const website = document.getElementById('sellerWebsite').value.trim();
-        const categories = document.getElementById('sellerCategories');
-        const selectedCategories = Array.from(categories.selectedOptions).map(o => o.value);
-        const reason = document.getElementById('sellerReason').value.trim();
-
-        if (!firstName || !lastName || !email || !phone || !whatsapp || !contactEmail || !businessName || !businessType || selectedCategories.length === 0) {
-            showToast('Please fill in all required fields', 'error');
-            return;
-        }
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email) || !emailRegex.test(contactEmail)) {
-            showToast('Please enter valid email addresses', 'error');
-            return;
-        }
-
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
-
-        const user = getCurrentUser();
-        const fullName = firstName + ' ' + lastName;
-        const selectedTier = document.querySelector('input[name="membershipTier"]:checked')?.value || 'basic';
-
-        const applicationData = {
-            firstName: firstName, lastName: lastName, full_name: fullName,
-            email: email, phone: phone || '', whatsapp: whatsapp || '',
-            contactEmail: contactEmail, businessName: businessName, businessType: businessType,
-            yearsInBusiness: years || '', location: location || '',
-            website: website || '', categories: selectedCategories,
-            reason: reason || '', profileImage: sellerProfileImageURL || '',
-            membership_tier: selectedTier,
-            userId: (user && user.id) || 'guest',
-            userEmail: (user && user.email) || email,
-            status: 'pending', created_at: new Date().toISOString()
-        };
-
-        try {
-            await db.collection('seller_applications').add(applicationData);
-
-            // Mark the registered account as having submitted an application
-            if (user && user.id) {
-                try {
-                    await db.collection('users').doc(user.id).set({
-                        seller_application: 'submitted',
-                        company: businessName,
-                        membership_tier: selectedTier,
-                        updated_at: new Date().toISOString()
-                    }, { merge: true });
-                } catch (err) { /* non-fatal */ }
-            }
-
-            // --- AUTOMATIC EMAILS (no manual step needed) ---
-            // 1. Confirmation to the applicant
-            try {
-                if (typeof sendSellerApplicationReceived === 'function') {
-                    sendSellerApplicationReceived(email, fullName, businessName).catch(function(){});
-                }
-            } catch (err) {}
-            // 2. Notification to the admin team
-            try {
-                if (typeof sendSellerApplicationAdmin === 'function') {
-                    sendSellerApplicationAdmin(applicationData).catch(function(){});
-                }
-            } catch (err) {}
-
-            showToast('Application submitted! We will review it within 48 hours and email you.', 'success');
-            document.getElementById('sellerApplicationForm').reset();
-            document.getElementById('sellerAvatarPreview').innerHTML = '<i class="fa-regular fa-user"></i>';
-            sellerProfileImageURL = '';
-            try { sessionStorage.removeItem('pse_seller_prefill'); } catch (e) {}
-            setTimeout(function() { window.location.href = '/account'; }, 3500);
-        } catch (error) {
-            console.error('Error submitting application:', error);
-            showToast('Failed to submit application. Please try again.', 'error');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Submit Application';
-        }
-    });
-
-    async function loadCartCount() {
-        const user = getCurrentUser();
-        if (!user) {
-            try {
-                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
-                const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-                document.querySelectorAll('.cart-count').forEach(el => {
-                    el.textContent = count;
-                    el.style.display = count > 0 ? 'inline' : 'none';
-                });
-            } catch (e) {
-                document.querySelectorAll('.cart-count').forEach(el => {
-                    el.textContent = '0';
-                    el.style.display = 'none';
-                });
-            }
-            return;
-        }
-        try {
-            const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
-            let count = 0;
-            snapshot.forEach(doc => { count += doc.data().quantity || 1; });
-            document.querySelectorAll('.cart-count').forEach(el => { el.textContent = count; el.style.display = count > 0 ? 'inline' : 'none'; });
-        } catch (error) {
-            document.querySelectorAll('.cart-count').forEach(el => { el.textContent = '0'; el.style.display = 'none'; });
-        }
-    }
-
-    async function loadWishlistCount() {
-        const user = getCurrentUser();
-        if (!user) {
-            document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
-            return;
-        }
-        try {
-            const snapshot = await db.collection('wishlist').where('user_id', '==', user.id).get();
-            const count = snapshot.size;
-            document.querySelectorAll('.wishlist-count').forEach(el => { el.textContent = count; });
-        } catch (error) {
-            document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
-        }
-    }
-
-    function toggleWishlist() {
-        const user = getCurrentUser();
-        if (!user) { showToast('Please login to view wishlist', 'error'); setTimeout(() => window.location.href = '/login', 1500); return; }
-        window.location.href = '/wishlist';
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        initFirebase();
-        document.getElementById('year').textContent = new Date().getFullYear();
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
-
-        // Profile picture file input
-        const profileInput = document.getElementById('sellerProfileInput');
-        if (profileInput) {
-            profileInput.addEventListener('change', uploadSellerProfileImage);
-        }
-
-        // Prefill from registration redirect (seller role chosen on register page)
-        try {
-            const prefill = JSON.parse(sessionStorage.getItem('pse_seller_prefill') || 'null');
-            if (prefill) {
-                if (prefill.firstName) document.getElementById('sellerFirstName').value = prefill.firstName;
-                if (prefill.lastName) document.getElementById('sellerLastName').value = prefill.lastName;
-                if (prefill.email) document.getElementById('sellerEmail').value = prefill.email;
-                if (prefill.company) {
-                    document.getElementById('sellerBusinessName').value = prefill.company;
-                    document.getElementById('sellerContactEmail').value = prefill.email;
-                }
-                if (prefill.businessType) {
-                    const sel = document.getElementById('sellerBusinessType');
-                    for (let i = 0; i < sel.options.length; i++) {
-                        if (sel.options[i].value === prefill.businessType.toLowerCase()) { sel.selectedIndex = i; break; }
-                    }
-                }
-                showToast('Complete your seller application to get verified', 'info');
-                sessionStorage.removeItem('pse_seller_prefill');
-            }
-        } catch (e) {}
-
-        // Prefill logged-in user details if available
-        const u = getCurrentUser();
-        if (u && u.email && !document.getElementById('sellerEmail').value) {
-            document.getElementById('sellerEmail').value = u.email;
-        }
-    });
-
-    window.toggleWishlist = toggleWishlist;
-    window.showToast = showToast;
-    window.uploadSellerProfileImage = uploadSellerProfileImage;
-</script>
-    <script src="email.js"></script>
-    <script src="ai-assistant.js"></script>
-    <script src="notifications.js"></script>
-    <script src="premium.js"></script>
-    <script src="/search-pro.js"></script>
+<script src="/marketplace-app.js"></script>
 </body>
 </html>
