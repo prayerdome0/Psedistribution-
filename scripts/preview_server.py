@@ -44,6 +44,69 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.handle_inventory_api()
             return
         super().do_GET()
+
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.end_headers()
+
+    def do_POST(self):
+        url_path = self.path.split('?')[0].rstrip('/')
+        if url_path == '/api/send-email':
+            self.handle_send_email_api()
+            return
+        
+        self.send_response(404)
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+        self.wfile.write(b'{"error": "Not Found"}')
+
+    def handle_send_email_api(self):
+        try:
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode('utf-8'))
+            
+            to_email = data.get('to')
+            subject = data.get('subject')
+            html_content = data.get('html')
+            api_key = data.get('apiKey') or os.environ.get('PSE_RESEND_KEY') or ''
+            
+            # Make request to Resend API
+            import urllib.request
+            headers = {
+                'Authorization': f'Bearer {api_key}',
+                'Content-Type': 'application/json'
+            }
+            resend_payload = {
+                'from': 'Pilot Sales Distribution <support@pilotsalesdistribution.com>',
+                'to': to_email,
+                'subject': subject,
+                'html': html_content
+            }
+            
+            req = urllib.request.Request(
+                'https://api.resend.com/emails',
+                data=json.dumps(resend_payload).encode('utf-8'),
+                headers=headers,
+                method='POST'
+            )
+            with urllib.request.urlopen(req) as response:
+                res_body = response.read().decode('utf-8')
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(res_body.encode('utf-8'))
+                return
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
     def handle_inventory_api(self):
         import urllib.parse
         parsed = urllib.parse.urlparse(self.path)

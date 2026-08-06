@@ -1366,6 +1366,16 @@
             const total = (bid.unit_price || 0) * (rfq.quantity || 1);
             const orderNumber = 'ORD-' + Date.now().toString().slice(-8);
 
+            // 📍 Track location to prevent scams
+            let locationInfo = {};
+            try {
+                if (window.PSEMarketplace && window.PSEMarketplace.trackLocation) {
+                    locationInfo = await window.PSEMarketplace.trackLocation();
+                }
+            } catch (le) {
+                console.warn('Location track failed:', le);
+            }
+
             const newOrder = {
                 orderNumber: orderNumber,
                 quoteNumber: 'RFQ-' + rfq.id.slice(0, 8).toUpperCase(),
@@ -1378,6 +1388,7 @@
                 milestone_step: 0,
                 incoterm: 'DDP (Delivered Duty Paid)',
                 paymentMethod: 'Escrow Trade Assurance',
+                location_tracking: locationInfo, // 📍 SAVE TRACKED LOCATION
                 items: [{
                     id: rfq.id,
                     title: `[RFQ ACCEPTED] ${rfq.title}`,
@@ -1406,6 +1417,15 @@
                 accepted_bid: bid,
                 updated_at: new Date().toISOString()
             });
+
+            // 📧 Send email confirmation to the buyer!
+            try {
+                if (window.sendOrderConfirmation) {
+                    await window.sendOrderConfirmation(newOrder);
+                }
+            } catch (ee) {
+                console.error('Order email confirmation failed:', ee);
+            }
 
             closeBuyerQuotesModal();
             showToast('🎉 Quote accepted! Order created at negotiated wholesale rate.', 'success');

@@ -1344,7 +1344,13 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Waiting for Firebase...');
         setTimeout(function() {
             if (typeof db !== 'undefined') {
-                loadChatList();
+                loadChatList().then(() => {
+                    const params = new URLSearchParams(window.location.search);
+                    const sellerId = params.get('sellerId');
+                    if (sellerId) {
+                        startChatWithSeller(sellerId);
+                    }
+                });
                 loadCartCount();
             } else {
                 console.error('Firebase not available after retry');
@@ -1360,7 +1366,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 1500);
     } else {
-        loadChatList();
+        loadChatList().then(() => {
+            const params = new URLSearchParams(window.location.search);
+            const sellerId = params.get('sellerId');
+            if (sellerId) {
+                startChatWithSeller(sellerId);
+            }
+        });
         loadCartCount();
     }
     

@@ -169,7 +169,12 @@
                 <div style="font-size:13.5px; font-weight:800; color:var(--app-text);" id="detailSupplierName">Verified Supplier Store</div>
                 <div style="font-size:11px; color:var(--app-primary); font-weight:700;"><i class="fa-solid fa-circle-check"></i> Verified Enterprise Seller</div>
             </div>
-            <a href="#" id="detailStoreLink" class="app-link-btn">Store</a>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                <a href="#" id="detailStoreLink" class="app-link-btn" style="text-align:center;">Store</a>
+                <button type="button" id="btnContactSeller" class="app-btn-hero-secondary" style="border:1px solid var(--app-primary); background:#fff; color:var(--app-primary); padding:6px 12px; border-radius:12px; font-size:11.5px; font-weight:600; cursor:pointer;" onclick="contactSellerCurrent()">
+                    <i class="fa-solid fa-comment-dots"></i> Chat
+                </button>
+            </div>
         </div>
 
         <!-- 4. DESCRIPTION & SPECIFICATIONS TABS -->
@@ -343,6 +348,23 @@ function addToCartCurrent() {
 function buyNowCurrent(e) {
     if (!currentItem) return;
     addToCartCurrent();
+}
+
+async function contactSellerCurrent() {
+    if (!currentItem) return;
+    const sellerId = currentItem.supplier_id || 'admin';
+    if (!window.auth || !window.auth.currentUser) {
+        window.pseToast('Please sign in to message the seller.', 'info');
+        window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+        return;
+    }
+    const user = window.auth.currentUser;
+    if (user.uid === sellerId) {
+        window.pseToast('You cannot chat with yourself.', 'info');
+        return;
+    }
+    // Redirect to chat.html with sellerId as a query parameter
+    window.location.href = '/chat?sellerId=' + encodeURIComponent(sellerId);
 }
 
 document.addEventListener('DOMContentLoaded', loadProductDetail);
