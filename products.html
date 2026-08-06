@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Products &amp; Categories — PSE Marketplace</title>
+    <meta name="description" content="Browse buyer-safe published wholesale offers. Availability is subject to prior sale and final confirmation." />
+    <link rel="canonical" href="https://pilotsalesdistribution.com/products" />
+    <meta property="og:title" content="Verified Wholesale Inventory | Pilot Sales Distribution" />
+    <meta property="og:description" content="Browse buyer-safe published wholesale offers. Availability is subject to prior sale and final confirmation." />
+    <meta property="og:url" content="https://pilotsalesdistribution.com/products" />
+    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://pilotsalesdistribution.com/"},{"@type":"ListItem","position":2,"name":"Verified Wholesale Inventory","item":"https://pilotsalesdistribution.com/products"}]}</script>
     
     <!-- SEO Meta Tags -->
     <link rel="canonical" href="https://pilotsalesdistribution.com/products" />
@@ -193,11 +200,37 @@
 
 </div>
 
+<script src="/inventory-client.js"></script>
 <script src="/marketplace-app.js"></script>
 <script>
 (function () {
     var allItems = [];
     var filteredItems = [];
+
+    // GET /api/inventory is the only public product-discovery source.
+    // The public API is the only source for buyer discovery.  It contains an
+    // allowlisted snapshot and never exposes the SalesMax/private master.
+    async function fetchInventoryFeed(options) {
+        var response = await window.PSEInventory.list(options || {});
+        return response.items;
+    }
+
+    function mapInventoryItem(item) {
+        return {
+            id: item.dealId, slug: item.slug, title: item.title, brand: item.brand,
+            category: item.category, description: item.shortDescription,
+            image: item.image_url, images: item.imageUrls, moq: item.moq,
+            stock: item.stock, price: item.price, pricingMode: item.pricingMode,
+            dealId: item.dealId, sourceVersion: item.sourceVersion,
+            snapshotVersion: item.snapshotVersion, freightTerms: item.freightTerms
+        };
+    }
+
+    async function loadProducts() {
+        var products = (await fetchInventoryFeed({ limit: 100 })).map(mapInventoryItem);
+        var allProducts = products;
+        return allProducts;
+    }
 
     async function initCatalog() {
         var params = new URLSearchParams(window.location.search);
@@ -221,8 +254,7 @@
             descEl.textContent = 'Results matching your search terms.';
         }
 
-        // Fetch real admin & seller products from Firestore / database
-        allItems = await window.PSEMarketplace.fetchLiveProducts();
+        allItems = await loadProducts();
 
         filteredItems = allItems.filter(function (p) {
             var matchCat = (cat === 'all' || p.category === cat);
@@ -247,7 +279,8 @@
 
         grid.innerHTML = items.map(function (p) {
             var wish = window.isWishlisted ? window.isWishlisted(p.id) : false;
-            var price = Number(p.price || 0).toFixed(2);
+            var publicPrice = Number.isFinite(Number(p.price));
+            var price = publicPrice ? Number(p.price).toFixed(2) : 'RFQ';
             var oldPrice = p.oldPrice ? '$' + Number(p.oldPrice).toFixed(2) : '';
             var slug = p.slug || (p.title || 'product').toLowerCase().replace(/[^a-z0-9]+/g, '-');
             var detailUrl = '/product-detail?slug=' + encodeURIComponent(slug);
@@ -265,10 +298,10 @@
                         '<div class="app-card-brand">' + (p.brand || p.supplier_name || 'Verified Supplier') + '</div>' +
                         '<a href="' + detailUrl + '" class="app-card-title">' + p.title + '</a>' +
                         '<div class="app-card-price-row">' +
-                            '<span class="app-card-price">$' + price + '</span>' +
+                            '<span class="app-card-price">' + (publicPrice ? '$' + price : 'Request a quote') + '</span>' +
                             (oldPrice ? '<span class="app-card-oldprice">' + oldPrice + '</span>' : '') +
                         '</div>' +
-                        '<div class="app-card-moq"><i class="fa-solid fa-box"></i> MOQ: ' + (p.moq || 1) + ' units</div>' +
+                        '<div class="app-card-moq"><i class="fa-solid fa-box"></i> MOQ: ' + (p.moq || 1) + ' units · Freight quoted separately unless explicitly included. Availability subject to prior sale and final confirmation.</div>' +
                         '<button type="button" class="app-card-btn" onclick="window.handleAddToCart(\'' + p.id + '\', \'' + p.title + '\', ' + p.price + ', \'' + p.image + '\')">' +
                             '<i class="fa-solid fa-cart-shopping"></i> Add to Cart' +
                         '</button>' +
