@@ -84,6 +84,7 @@
 
     <!-- Premium Design System (shared) -->
     <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/home-redesign.css" />
     <!-- Professional clean light homepage design -->
 
     <!-- Display + body + data typefaces -->
@@ -438,9 +439,13 @@
             margin: 3.1rem 0 1.45rem;
         }
 
-        /* Professional refinements */
+        /* Featured inventory is deliberately two-up for faster comparison. */
         body.pse-home .pse-prod-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 1.35rem;
+        }
+        @media (max-width: 600px) {
+            body.pse-home .pse-prod-grid { grid-template-columns: 1fr; }
         }
         body.pse-home .pse-trust {
             gap: 1.35rem;
@@ -1012,12 +1017,27 @@
                         <div class="pp-updated"><i class="fa-solid fa-clock"></i> ${updated}</div>
                         <div class="pp-actions">
                             <a class="pp-details" href="/product/${encodeURIComponent(slug)}"><i class="fa-regular fa-eye"></i> Details</a>
-                            <a class="pp-rfq" href="${rfqHref}"><i class="fa-regular fa-file-lines"></i> RFQ</a>
+                            ${p.price !== null && p.availability === 'in-stock'
+                                ? `<button class="pp-rfq" type="button" onclick="handleFeaturedAddToCart('${encodeURIComponent(String(p.id))}')"><i class="fa-solid fa-cart-plus"></i> Add to cart</button>`
+                                : `<a class="pp-rfq" href="${rfqHref}"><i class="fa-regular fa-file-lines"></i> RFQ</a>`}
                         </div>
                     </div>
                 </article>`;
         }).join('');
     }
+
+    // The inventory feed is the source of product details here, so pass its
+    // snapshot into the shared cart helper rather than relying on a Firestore
+    // product document that may not exist for API-backed inventory.
+    window.handleFeaturedAddToCart = async function(encodedId) {
+        const productId = decodeURIComponent(encodedId || '');
+        const product = featuredProducts.find(item => String(item.id) === productId);
+        if (!product || typeof window.addToCart !== 'function') {
+            if (window.showToast) window.showToast('This product is no longer available.', 'error');
+            return;
+        }
+        await window.addToCart(productId, 1, product);
+    };
 
     function scrollInventory(dir) {
         const grid = document.getElementById('featuredInventoryContainer');

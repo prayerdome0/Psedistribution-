@@ -159,6 +159,95 @@
     window.getProductImage = productImage;
     window.useImageFallback = useImageFallback;
 
+    // ─── CART ───
+    // Keep guest carts useful even when Firebase is unavailable. Product details are
+    // stored with the line item so the cart can render without another network call.
+    function readLocalCart() {
+        try {
+            var cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+            return Array.isArray(cart) ? cart.filter(function (item) { return item && item.product_id; }) : [];
+        } catch (e) { return []; }
+    }
+
+    function writeLocalCart(cart) {
+        try {
+            localStorage.setItem('pilot_cart', JSON.stringify(cart));
+            if (cart.length) localStorage.setItem('pilot_cart_ts', String(Date.now()));
+            else localStorage.removeItem('pilot_cart_ts');
+        } catch (e) {}
+    }
+
+    function cartProduct(data, productId) {
+        data = data || {};
+        return {
+            product_id: String(productId),
+            title: data.title || data.name || 'Product',
+            price: Number(data.price || data.publicUnitPrice || 0),
+            old_price: Number(data.old_price || 0),
+            image_url: productImage(data),
+            brand: data.brand || 'Pilot Distribution',
+            moq: Math.max(1, Number(data.moq || data.moqUnits || 1) || 1)
+        };
+    }
+
+    async function fetchProductForCart(productId) {
+        if (!window.db) return cartProduct({}, productId);
+        try {
+            var doc = await window.db.collection('products').doc(String(productId)).get();
+            return doc.exists ? cartProduct(doc.data(), productId) : cartProduct({}, productId);
+        } catch (e) { return cartProduct({}, productId); }
+    }
+
+    async function addToCart(productId, quantity, productData) {
+        if (!productId) return false;
+        quantity = Math.max(1, parseInt(quantity, 10) || 1);
+        var user = getUser();
+        var product = cartProduct(productData, productId);
+        if (!productData) product = await fetchProductForCart(productId);
+
+        // A signed-in user's authoritative cart is Firestore. If it cannot be
+        // reached, retain the item locally and cart.html will merge it on retry.
+        if (user && window.db) {
+            try {
+                var existing = await window.db.collection('cart')
+                    .where('user_id', '==', user.id).where('product_id', '==', String(productId)).get();
+                if (existing.empty) {
+                    await window.db.collection('cart').add(Object.assign({}, product, {
+                        user_id: user.id, quantity: quantity,
+                        created_at: new Date().toISOString(), updated_at: new Date().toISOString()
+                    }));
+                } else {
+                    var current = existing.docs[0].data();
+                    await existing.docs[0].ref.update({ quantity: (Number(current.quantity) || 1) + quantity, updated_at: new Date().toISOString() });
+                }
+                showToast('Added to cart!', 'success');
+                loadCartCount();
+                return true;
+            } catch (error) {
+                console.warn('Could not save cart to Firestore; saving locally instead.', error);
+            }
+        }
+
+        var cart = readLocalCart();
+        var found = cart.filter(function (item) { return String(item.product_id) === String(productId); })[0];
+        if (found) found.quantity = (Number(found.quantity) || 1) + quantity;
+        else { product.quantity = quantity; cart.push(product); }
+        writeLocalCart(cart);
+        showToast('Added to cart!', 'success');
+        updateCartUI();
+        return true;
+    }
+
+    function updateCartUI() {
+        var cart = readLocalCart();
+        var count = cart.reduce(function (sum, item) { return sum + (Number(item.quantity) || 1); }, 0);
+        document.querySelectorAll('.cart-count').forEach(function (el) {
+            el.textContent = count;
+            el.style.display = count ? 'inline' : 'none';
+        });
+        window.dispatchEvent(new CustomEvent('pse_cart_updated', { detail: { count: count } }));
+    }
+
     // ─── CART COUNT ───
     function loadCartCount() {
         var user = getUser();
@@ -175,7 +264,9 @@
             } catch (e) { applyCount(0); }
             return;
         }
-        if (!window.db) return;
+        // Firebase may still be initializing; show any offline/guest cart in the
+        // meantime instead of leaving a stale badge.
+        if (!window.db) { applyCount(readLocalCart().reduce(function (sum, item) { return sum + (item.quantity || 1); }, 0)); return; }
         window.db.collection('cart').where('user_id', '==', user.id).get()
             .then(function (snap) {
                 var count = 0;
@@ -225,6 +316,11 @@
     expose('getCurrentUser', getUser);
     expose('updateAuthUI', updateAuthUI);
     expose('loadCartCount', loadCartCount);
+    expose('updateCartUI', updateCartUI);
+    expose('addToCart', addToCart);
+    expose('fetchProductForCart', fetchProductForCart);
+    // Explicit alias for dynamically rendered product cards.
+    expose('handleAddToCart', function (productId, productData) { return addToCart(productId, 1, productData); });
     expose('loadWishlistCount', loadWishlistCount);
     expose('generateSlug', generateSlug);
     expose('initFirebase', initFirebase);
