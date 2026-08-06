@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Request for Quote (RFQ) — PSE Marketplace</title>
+    <meta name="description" content="Submit a wholesale request for quote with the deal identity and availability context preserved." />
+    <link rel="canonical" href="https://pilotsalesdistribution.com/rfq" />
+    <meta property="og:title" content="Request a Wholesale Quote | Pilot Sales Distribution" />
+    <meta property="og:description" content="Submit a wholesale request for quote with the deal identity and availability context preserved." />
+    <meta property="og:url" content="https://pilotsalesdistribution.com/rfq" />
+    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://pilotsalesdistribution.com/"},{"@type":"ListItem","position":2,"name":"Request a Wholesale Quote","item":"https://pilotsalesdistribution.com/rfq"}]}</script>
     
     <!-- SEO Meta Tags -->
     <link rel="canonical" href="https://pilotsalesdistribution.com/rfq" />
@@ -143,6 +150,10 @@
 
                 <div style="margin-bottom:12px;">
                     <label style="display:block; font-size:12px; font-weight:700; color:var(--app-text); margin-bottom:4px;">Product Name / SKU</label>
+                    <input type="hidden" id="rfqDealId" />
+                    <input type="hidden" id="rfqSlug" />
+                    <input type="hidden" id="rfqSourceVersion" />
+                    <input type="hidden" id="rfqSnapshotVersion" />
                     <input type="text" id="rfqProduct" placeholder="e.g. Sony WH-1000XM5 Wholesale Pallet" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
                 </div>
 
@@ -223,6 +234,7 @@
 
 </div>
 
+<script src="/inventory-client.js"></script>
 <script src="/marketplace-app.js"></script>
 <script>
 function rfqStatusLabel(status) { return String(status || 'pending').replace(/_/g, ' '); }
@@ -271,8 +283,11 @@ async function handleRFQSubmit(e) {
         var quantity = Number(document.getElementById('rfqQty').value);
         var unitTarget = Number(document.getElementById('rfqTargetPrice').value || 0);
         var reference = 'PSE-RFQ-' + Date.now().toString(36).toUpperCase();
+        var dealId = document.getElementById('rfqDealId').value;
+        var sourceVersion = document.getElementById('rfqSourceVersion').value;
+        var snapshotVersion = document.getElementById('rfqSnapshotVersion').value;
         await window.db.collection('rfqs').add({
-            reference: reference, title: document.getElementById('rfqProduct').value.trim(),
+            deal_id: dealId || null, source_version: sourceVersion || null, snapshot_version: snapshotVersion || null, reference: reference, title: document.getElementById('rfqProduct').value.trim(),
             category: document.getElementById('rfqCategory').value, quantity: quantity,
             budget: unitTarget > 0 ? unitTarget * quantity : null, currency: 'USD',
             destination: document.getElementById('rfqDestination').value.trim(),
@@ -284,7 +299,15 @@ async function handleRFQSubmit(e) {
     } catch (error) { console.error('Unable to submit RFQ:', error); window.pseToast('Unable to submit RFQ. Please try again.', 'error'); }
     finally { button.disabled = false; }
 }
+function prefillFromInventoryLink() {
+    var q = new URLSearchParams(window.location.search);
+    var mapping = { dealId: 'rfqDealId', slug: 'rfqSlug', sourceVersion: 'rfqSourceVersion', snapshotVersion: 'rfqSnapshotVersion' };
+    Object.keys(mapping).forEach(function (key) { var el = document.getElementById(mapping[key]); if (el) el.value = q.get(key) || ''; });
+    if (q.get('product')) document.getElementById('rfqProduct').value = q.get('product');
+    if (q.get('quantity')) document.getElementById('rfqQty').value = q.get('quantity');
+}
 document.addEventListener('DOMContentLoaded', function() {
+    prefillFromInventoryLink();
     var wait = setInterval(function() { if (window.auth && window.db) { clearInterval(wait); window.auth.onAuthStateChanged(loadRFQs); } }, 50);
     setTimeout(function() { clearInterval(wait); }, 5000);
 });

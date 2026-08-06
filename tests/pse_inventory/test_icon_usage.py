@@ -106,7 +106,7 @@ def site_files() -> list[Path]:
     paths = list(ROOT.glob("*.html")) + list(ROOT.glob("*.js"))
     paths += list((ROOT / "apps").rglob("*.js"))
     paths += list((ROOT / "apps").rglob("*.html"))
-    paths += [p for p in (ROOT / "Email Template").rglob("*.html") if p.is_file()]
+    paths += [p for p in (ROOT / "email-template").rglob("*.html") if p.is_file()]
     return paths
 
 

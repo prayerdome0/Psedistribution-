@@ -341,7 +341,7 @@ def gate_2_security() -> None:
     ]
     leaks: list[str] = []
     for root, dirs, files in os.walk(REPO):
-        dirs[:] = [d for d in dirs if d not in (".git", "node_modules", "vendor", ".venv", "services/pse-inventory", "apps", "docs", "scripts", "tests", ".github", "Email Template")]
+        dirs[:] = [d for d in dirs if d not in (".git", "node_modules", "vendor", ".venv", "services/pse-inventory", "apps", "docs", "scripts", "tests", ".github", "email-template")]
         for fn in files:
             if not fn.endswith((".html", ".js", ".py", ".json", ".yml", ".yaml", ".toml", ".md")):
                 continue

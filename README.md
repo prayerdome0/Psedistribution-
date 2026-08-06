@@ -8,7 +8,7 @@ Premium B2B wholesale marketplace — static frontend deployed on Vercel with Fi
 - **Inventory API:** `services/pse-inventory/` — deterministic, self-hostable FastAPI service implementing packet contract **v4.0.0** (vendored at `vendor/pse-inventory-packet/`)
 - **Auth / DB:** Firebase Authentication + Cloud Firestore
 - **Hosting:** Vercel (`vercel.json` clean URLs + security headers)
-- **Email:** Resend API via `email.js` + HTML templates in `Email Template/` (auto-falls back to free keyless FormSubmit → mailto)
+- **Email:** Resend API via `email.js` + HTML templates in `email-template/` (auto-falls back to free keyless FormSubmit → mailto)
 - **AI Assistant + Live Support:** `ai-assistant.js` — 100% client-side rule/knowledge-base engine, **no API key, no cost**
 - **Notifications:** `notifications.js` — in-app notification center + browser notifications, no server required
 
@@ -288,7 +288,7 @@ Email sending uses Resend — set a valid key in `email.js` for production; othe
 ├── holiday-engine.js       # Festival calendar + branded card generator + auto emails
 ├── admin-extensions.js     # Admin: subscribers, support, email center, reviews, trust, festivals
 ├── premium.js              # Premium suite engine + admin (coupons, banners, flash sales, loyalty, wallet, audit)
-├── Email Template/         # Transactional HTML emails
+├── email-template/         # Transactional HTML emails
 ├── manifest.json           # PWA
 ├── sitemap.xml / robots.txt
 └── vercel.json             # Routes & headers
