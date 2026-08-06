@@ -2,881 +2,282 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Supplier Storefront - Pilot Sales Distribution</title>
-    <meta name="description" content="Official B2B Verified Supplier Storefront on Pilot Sales Distribution." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Supplier Storefront — PSE Marketplace</title>
     
+    <!-- SEO Meta Tags -->
+    <link rel="canonical" href="https://pilotsalesdistribution.com/supplier-store" />
+    <meta name="robots" content="index, follow" />
+    <meta name="description" content="Verified supplier storefront with authenticated wholesale inventory lots, verified reviews and escrow protection." />
+
+    <!-- Favicon & PWA -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0057FF">
+
+    <!-- Font Awesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap&family=Montserrat:wght@300;400;500;600;700;800;900" rel="stylesheet" />
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="main.js"></script>
-    
-    <style>
-        .store-hero {
-            background: linear-gradient(135deg, var(--secondary), #0d384c);
-            color: #fff;
-            border-radius: var(--radius);
-            padding: 2.5rem 2rem;
-            margin: 2rem 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 2rem;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-        .store-hero-info {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            max-width: 750px;
-        }
-        .store-logo-box {
-            width: 85px;
-            height: 85px;
-            border-radius: 16px;
-            background: #fff;
-            padding: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            overflow: hidden;
-            border: 3px solid var(--primary);
-        }
-        .store-logo-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        .store-title h1 {
-            font-size: 1.9rem;
-            font-weight: 800;
-            margin: 0 0 0.4rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .store-title .badges {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 0.6rem;
-        }
-        .badge-chip {
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .badge-verified { background: #e8f8f0; color: #27ae60; border: 1px solid #27ae60; }
-        .badge-gold { background: linear-gradient(135deg,#e0a62e,#d35400); color: #fff; }
-        .badge-platinum { background: linear-gradient(135deg,#8e44ad,#9b59b6); color: #fff; }
-        .badge-escrow { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
 
-        .store-meta {
-            font-size: 0.88rem;
-            color: #a9c3d6;
-            display: flex;
-            gap: 1.2rem;
-            flex-wrap: wrap;
-        }
-        .store-meta i { color: var(--accent); margin-right: 5px; }
-
-        .store-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 0.7rem;
-            min-width: 200px;
-        }
-        .store-actions .btn-action-custom {
-            padding: 0.75rem 1.4rem;
-            border-radius: 50px;
-            font-size: 0.88rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            border: none;
-            text-decoration: none;
-        }
-        .btn-wa-store { background: #25D366; color: #fff; }
-        .btn-wa-store:hover { background: #1da851; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37,211,102,0.35); }
-        .btn-email-store { background: var(--primary); color: #fff; }
-        .btn-email-store:hover { background: var(--primary-dark); transform: translateY(-2px); }
-        .btn-rfq-store { background: transparent; color: #fff; border: 2px solid var(--accent); }
-        .btn-rfq-store:hover { background: var(--accent); color: var(--secondary); }
-
-        .store-trust-band {
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            margin-bottom: 2.5rem;
-            box-shadow: var(--shadow);
-        }
-        .trust-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 1rem;
-        }
-        .trust-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0.8rem 1rem;
-            background: var(--light);
-            border-radius: 10px;
-            border: 1px solid var(--border-light);
-        }
-        .trust-item i {
-            font-size: 1.4rem;
-            color: var(--primary);
-        }
-        .trust-item strong {
-            display: block;
-            font-size: 0.9rem;
-            color: var(--secondary);
-        }
-        .trust-item span {
-            font-size: 0.78rem;
-            color: var(--text-light);
-        }
-
-        .catalog-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .catalog-header h2 {
-            font-size: 1.5rem;
-            color: var(--secondary);
-            font-weight: 800;
-        }
-        .catalog-header span { color: var(--primary); }
-
-        @media (max-width: 768px) {
-            .store-hero { padding: 1.8rem 1.2rem; flex-direction: column; text-align: center; }
-            .store-hero-info { flex-direction: column; text-align: center; justify-content: center; }
-            .store-title .badges { justify-content: center; }
-            .store-meta { justify-content: center; }
-            .store-actions { width: 100%; }
-        }
-    </style>
-    <link rel="stylesheet" href="/style.css" />
-    <script src="/marketplace.js"></script>
+    <!-- Unified Master Stylesheet -->
+    <link rel="stylesheet" href="/marketplace-app.css" />
 </head>
+
 <body>
 
-<!-- HEADER -->
-<!-- 1. TOP DELIVERY & UTILITY BAR -->
-<div class="mkt-topbar">
-    <div class="container">
-        <div class="mkt-topbar-left">
-            <div class="top-delivery-badge" data-change-location title="Click to change your delivery location">
-                <i class="fa-solid fa-location-dot"></i>
-                <div class="top-delivery-text">
-                    <span>Deliver to</span>
-                    <strong class="pse-delivery-zip">90210 - Los Angeles, CA</strong>
-                </div>
-            </div>
-            <div class="mkt-announcement-ticker">
-                <span class="badge"><i class="fa-solid fa-bolt"></i> MARKETPLACE ROLLBACKS</span>
-                <span>Save up to 50% on verified bulk pallets &amp; overstock inventory</span>
-            </div>
-        </div>
-        <div class="mkt-topbar-right">
-            <a href="tel:+19099384682"><i class="fa-solid fa-phone"></i> <span>24/7 B2B: +1 (909) 938-4682</span></a>
-            <a href="/become-seller"><i class="fa-solid fa-store"></i> <span>Sell on PSE</span></a>
-            <a href="/track-order"><i class="fa-solid fa-truck"></i> <span>Track Order</span></a>
-            <a href="/help-center"><i class="fa-regular fa-circle-question"></i> <span>Help</span></a>
-            <button type="button" class="mkt-currency-btn" onclick="PSEMarketplace.openCurrencyModal()" title="Change Currency (USD, EUR, GBP, CAD, AUD, ZMW, JPY)"><span>🇺🇸 USD ($)</span> <i class="fa-solid fa-chevron-down" style="font-size:0.6rem;"></i></button>
-        </div>
-    </div>
-</div>
+<div class="app-shell">
 
-<!-- 2. MAIN MARKETPLACE HEADER (Amazon & Walmart Style) -->
-<header class="mkt-header">
-    <div class="container">
-        <a href="/" class="mkt-logo" aria-label="Pilot Sales Distribution Marketplace">
-            <img src="/logo.webp" alt="PSE Distribution Marketplace logo" />
-            <div class="mkt-logo-text">
-                <div class="mkt-logo-main">PSE <span>Marketplace</span></div>
-                <div class="mkt-logo-sub">Wholesale <span class="verified-pill"><i class="fa-solid fa-circle-check"></i> Verified</span></div>
-            </div>
-        </a>
-
-        <div class="mkt-search-wrapper" id="searchBar">
-            <form class="mkt-search-form" role="search" onsubmit="event.preventDefault();">
-                <select class="mkt-search-dept" id="searchDeptSelect" aria-label="Select Category">
-                    <option value="all">All Departments</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="computers">Computers &amp; Laptops</option>
-                    <option value="phones">Smartphones &amp; Tablets</option>
-                    <option value="fashion">Fashion &amp; Apparel</option>
-                    <option value="automotive">Automotive &amp; Fleet</option>
-                    <option value="home">Home &amp; Industrial</option>
-                    <option value="overstock">Liquidation Lots</option>
-                </select>
-                <input type="search" id="searchInput" class="mkt-search-input" placeholder="Search 10,000+ wholesale products, brands, ASINs, or verified suppliers..." autocomplete="off" aria-label="Search wholesale products" />
-                <button type="submit" id="searchBtn" class="mkt-search-btn" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </form>
-            <div class="search-results" id="searchResults"></div>
-        </div>
-
-        <div class="mkt-header-actions">
-            <div class="mkt-account-dropdown">
-                <a href="/account" class="mkt-header-link" id="accountBtn" aria-label="Account and Lists">
-                    <span class="sub-line" id="accountGreeting">Hello, Sign in</span>
-                    <span class="main-line"><span id="accountLabel">Account &amp; Lists</span> <i class="fa-solid fa-caret-down" style="font-size:0.65rem;"></i></span>
-                </a>
-                <div class="mkt-account-flyout">
-                    <a href="/login" class="mkt-flyout-signin-btn" id="loginLink">Sign In</a>
-                    <div class="mkt-flyout-register" id="registerLink">New customer? <a href="/register">Start here.</a></div>
-                    <div class="mkt-flyout-menu">
-                        <a href="/account"><i class="fa-regular fa-user"></i> Your Account</a>
-                        <a href="/buyer-dashboard"><i class="fa-solid fa-box"></i> Your Orders &amp; Invoices</a>
-                        <a href="/rfq"><i class="fa-regular fa-file-lines"></i> Your RFQ Quotes</a>
-                        <a href="/wishlist"><i class="fa-regular fa-heart"></i> Your Saved Wishlist</a>
-                        <a href="/seller-dashboard"><i class="fa-solid fa-store"></i> Seller Central Hub</a>
-                        <a href="/help-center"><i class="fa-regular fa-circle-question"></i> Help &amp; Support</a>
-                    </div>
-                </div>
-            </div>
-
-            <a href="/buyer-dashboard" class="mkt-header-link" aria-label="Returns and Orders">
-                <span class="sub-line">Returns</span>
-                <span class="main-line">&amp; Orders</span>
-            </a>
-
-            <a href="/rfq" class="mkt-header-link" aria-label="Bulk Quotes and RFQ">
-                <span class="sub-line">Wholesale</span>
-                <span class="main-line"><i class="fa-solid fa-file-invoice-dollar" style="color:var(--amz-amber);"></i> RFQ <span class="amz-rfq-badge rfq-count" style="background:var(--pse-teal);color:#fff;border-radius:10px;padding:1px 6px;font-size:0.7rem;margin-left:3px;">0</span></span>
-            </a>
-
-            <a href="/cart" class="mkt-cart-btn" id="cartBtn" aria-label="Shopping Cart">
-                <div class="mkt-cart-icon-wrap">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <span class="mkt-cart-badge cart-count" id="cartCount">0</span>
-                </div>
-                <div class="mkt-cart-label">
-                    <span>Cart</span>
-                    <strong>/bin/bash.00</strong>
-                </div>
-            </a>
-        </div>
-    </div>
-</header>
-
-<!-- 3. SUBNAV / DEPARTMENT BAR -->
-<nav class="mkt-subnav" aria-label="Department Navigation">
-    <div class="container">
-        <div class="mkt-subnav-links">
-            <button class="amz-all-menu-btn" data-open-drawer aria-label="Open All Departments Menu">
+    <!-- ═══════════ GLOBAL HEADER ═══════════ -->
+    <header class="app-header">
+        <div class="app-header-top">
+            <button type="button" class="app-menu-btn" id="appMenuBtn" aria-label="Open Navigation Menu">
                 <i class="fa-solid fa-bars"></i>
-                <span>All Departments</span>
             </button>
-            <a href="/products?filter=deals" class="mkt-subnav-link highlight"><i class="fa-solid fa-bolt"></i> Today's Deals</a>
-            <a href="/products?sort=bestsellers" class="mkt-subnav-link"><i class="fa-solid fa-fire"></i> Best Sellers</a>
-            <a href="/products?filter=rollback" class="mkt-subnav-link"><i class="fa-solid fa-tags"></i> Walmart Rollbacks</a>
-            <a href="/products?category=electronics" class="mkt-subnav-link">Electronics</a>
-            <a href="/products?category=computers" class="mkt-subnav-link">Computers &amp; Laptops</a>
-            <a href="/products?category=phones" class="mkt-subnav-link">Smartphones</a>
-            <a href="/products?category=fashion" class="mkt-subnav-link">Fashion &amp; Apparel</a>
-            <a href="/products?category=automotive" class="mkt-subnav-link">Automotive</a>
-            <a href="/supplier-store" class="mkt-subnav-link">Verified Suppliers</a>
-            <a href="/rfq" class="mkt-subnav-link">Bulk RFQ</a>
-            <a href="/help-center" class="mkt-subnav-link">Customer Service</a>
-        </div>
-        <div class="mkt-subnav-right">
-            <span><i class="fa-solid fa-truck-fast"></i> <strong>2-Day Fast Freight</strong> Guaranteed</span>
-        </div>
-    </div>
-</nav>
 
-<!-- MAIN CONTENT -->
-<div class="container">
-    <!-- STORE HERO -->
-    <div class="store-hero animate-on-scroll" id="storeHero">
-        <div class="store-hero-info">
-            <div class="store-logo-box" id="storeLogoBox">
-                <img src="logo.webp" alt="Supplier Logo" id="storeLogoImg" />
-            </div>
-            <div class="store-title">
-                <div class="badges" id="storeBadges">
-                    <span class="badge-chip badge-verified"><i class="fa-solid fa-circle-check"></i> Verified Supplier</span>
-                    <span class="badge-chip badge-escrow"><i class="fa-solid fa-shield-halved"></i> 100% Escrow Assurance</span>
-                </div>
-                <h1 id="storeName">Loading Supplier Storefront...</h1>
-                <div class="store-meta" id="storeMeta">
-                    <span><i class="fa-solid fa-location-dot"></i> <span id="storeLocation">Global Wholesale</span></span>
-                    <span><i class="fa-solid fa-calendar-check"></i> <span id="storeYears">Verified Partner</span></span>
-                    <span><i class="fa-solid fa-boxes-stacked"></i> <span id="storeCatalogCount">0</span> Products Listed</span>
-                </div>
-                <p style="margin-top:0.6rem;font-size:0.9rem;color:#d4e8f5;max-width:550px;" id="storeBio">
-                    Official B2B wholesale manufacturer and distributor on Pilot Sales Distribution.
-                </p>
-            </div>
-        </div>
-        <div class="store-actions">
-            <button class="btn-action-custom btn-wa-store" onclick="contactStoreWhatsApp()">
-                <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
-            </button>
-            <button class="btn-action-custom btn-email-store" onclick="contactStoreEmail()">
-                <i class="fa-regular fa-envelope"></i> Email Supplier
-            </button>
-            <a href="/rfq" class="btn-action-custom btn-rfq-store">
-                <i class="fa-solid fa-file-lines"></i> Submit Custom RFQ
+            <a href="/" class="app-logo" aria-label="PSE Marketplace Home">
+                <img src="/logo.webp" alt="PSE Marketplace Logo" />
+                <span class="app-logo-name">PSE <b>Marketplace</b></span>
             </a>
-        </div>
-    </div>
 
-    <!-- SUPPLIER TRUST KYC SHOWCASE -->
-    <div class="store-trust-band animate-on-scroll">
-        <div style="font-weight:800;font-size:0.95rem;color:var(--secondary);margin-bottom:0.8rem;text-transform:uppercase;letter-spacing:0.5px;">
-            <i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> Verified Supplier Credentials &amp; Trade Assurance
-        </div>
-        <div class="trust-grid">
-            <div class="trust-item">
-                <i class="fa-solid fa-certificate" style="color:#27ae60;"></i>
-                <div>
-                    <strong>ISO 9001 Certified</strong>
-                    <span>Quality management &amp; factory standard audit passed.</span>
-                </div>
-            </div>
-            <div class="trust-item">
-                <i class="fa-solid fa-industry" style="color:#2980b9;"></i>
-                <div>
-                    <strong>Verified Manufacturer</strong>
-                    <span>Direct factory wholesale pricing without intermediaries.</span>
-                </div>
-            </div>
-            <div class="trust-item">
-                <i class="fa-solid fa-building-circle-check" style="color:#8e44ad;"></i>
-                <div>
-                    <strong>On-Site Facility Inspected</strong>
-                    <span>Physical production check and capacity audit verified.</span>
-                </div>
-            </div>
-            <div class="trust-item">
-                <i class="fa-solid fa-shield-check" style="color:var(--primary);"></i>
-                <div>
-                    <strong>100% Escrow Trade Assurance</strong>
-                    <span>Buyer payments held securely in escrow until delivery.</span>
-                </div>
+            <div class="app-header-actions">
+                <button type="button" class="app-icon-btn" id="appNotifBtn" aria-label="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="app-badge" id="appNotifBadge">3</span>
+                </button>
+                <a href="/cart" class="app-icon-btn" aria-label="Cart">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="app-badge app-badge--cart cart-count" id="cartCount">0</span>
+                </a>
             </div>
         </div>
-    </div>
 
-    <!-- CATALOG HEADER -->
-    <div class="catalog-header animate-on-scroll">
-        <h2>Supplier <span>Catalog</span> (<span id="productCountHeader">0</span>)</h2>
-        <div style="display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap;">
-            <input type="text" id="storeSearchInput" placeholder="Search this store..." oninput="filterStoreProducts()" style="padding:0.55rem 1rem;border:1px solid var(--border-dark);border-radius:30px;font-size:0.88rem;outline:none;min-width:220px;" />
+        <div class="app-search" id="searchBar">
+            <form class="app-search-form" role="search" onsubmit="event.preventDefault(); var q=document.getElementById('searchInput').value.trim(); if(q) window.location.href='/products?search='+encodeURIComponent(q);">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="searchInput" placeholder="Search Products, Brands, Suppliers..." autocomplete="off" aria-label="Search marketplace" />
+                <button type="submit" id="searchBtn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+            </form>
         </div>
-    </div>
 
-    <!-- PRODUCTS GRID -->
-    <div class="product-grid" id="productGrid" style="min-height:300px;margin-bottom:4rem;">
-        <div style="grid-column:1/-1;text-align:center;padding:4rem 1rem;color:var(--text-light);">
-            <i class="fa-solid fa-spinner fa-spin" style="font-size:2.5rem;color:var(--primary);margin-bottom:1rem;"></i>
-            <p>Loading supplier catalog...</p>
+        <div class="app-locbar">
+            <button type="button" class="app-loc" id="appLocBtn" title="Tap to change delivery location">
+                <i class="fa-solid fa-location-dot"></i> Deliver to <strong id="appZip">90210 – Los Angeles, CA</strong>
+            </button>
+            <a class="app-greet" href="/account" id="appGreetLink"><i class="fa-regular fa-circle-user"></i> Hi, <span id="accountLabel">Guest</span></a>
         </div>
-    </div>
+    </header>
+
+    <!-- ═══════════ GLOBAL MENU DRAWER ═══════════ -->
+    <div class="app-drawer-overlay" id="appDrawerOverlay"></div>
+    <aside class="app-drawer" id="appDrawer" aria-label="Navigation drawer" aria-hidden="true">
+        <div class="app-drawer-header">
+            <div class="app-drawer-user">
+                <div class="app-drawer-avatar"><i class="fa-solid fa-user"></i></div>
+                <div class="app-drawer-userinfo">
+                    <span class="app-drawer-greeting">Welcome to PSE</span>
+                    <strong class="app-drawer-username" id="drawerUserLabel">Hello, Guest</strong>
+                    <a href="/login" class="app-drawer-authlink" id="drawerAuthLink">Sign In / Register</a>
+                </div>
+            </div>
+            <button type="button" class="app-drawer-close" id="appDrawerClose" aria-label="Close menu">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="app-drawer-body">
+            <div class="app-drawer-group-title">Navigation</div>
+            <ul class="app-drawer-menu">
+                <li><a href="/"><i class="fa-solid fa-house"></i><span>Home</span></a></li>
+                <li><a href="/products"><i class="fa-solid fa-layer-group"></i><span>Categories</span></a></li>
+                <li><a href="/products?category=electronics"><i class="fa-solid fa-tv"></i><span>Electronics</span></a></li>
+                <li><a href="/products?category=computers"><i class="fa-solid fa-laptop"></i><span>Computers</span></a></li>
+                <li><a href="/products?category=phones"><i class="fa-solid fa-mobile-screen-button"></i><span>Smartphones</span></a></li>
+                <li><a href="/products?category=fashion"><i class="fa-solid fa-shirt"></i><span>Fashion</span></a></li>
+                <li><a href="/products?category=automotive"><i class="fa-solid fa-car"></i><span>Automotive</span></a></li>
+                <li><a href="/products?category=home"><i class="fa-solid fa-couch"></i><span>Home &amp; Industrial</span></a></li>
+                <li><a href="/products?category=overstock"><i class="fa-solid fa-boxes-stacked"></i><span>Liquidation Lots</span></a></li>
+                <li><a href="/rfq"><i class="fa-solid fa-file-invoice-dollar"></i><span>RFQ Quotes</span><span class="app-drawer-pill">B2B</span></a></li>
+                <li><a href="/supplier-store"><i class="fa-solid fa-store"></i><span>Supplier Directory</span></a></li>
+                <li><a href="/account#orders"><i class="fa-solid fa-box"></i><span>Orders</span></a></li>
+                <li><a href="/wishlist"><i class="fa-regular fa-heart"></i><span>Wishlist</span></a></li>
+                <li><a href="/cart"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><span class="app-drawer-badge cart-count">0</span></a></li>
+                <li><a href="/account"><i class="fa-regular fa-user"></i><span>Account</span></a></li>
+                <li><a href="/account#settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a></li>
+                <li><a href="/contact"><i class="fa-regular fa-envelope"></i><span>Contact Us</span></a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- ═══════════ SUPPLIER STORE MAIN CONTENT ═══════════ -->
+    <main class="app-main">
+
+        <!-- 1. SUPPLIER BANNER & LOGO -->
+        <div style="background:linear-gradient(135deg, #0F172A 0%, #1E293B 100%); border-radius:var(--app-radius-lg); padding:20px 16px; color:#FFFFFF; margin-bottom:14px; text-align:center; position:relative;">
+            <div style="width:64px; height:64px; border-radius:14px; background:#FFFFFF; padding:6px; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+                <img id="supplierLogo" src="/logo.webp" alt="Supplier Logo" style="max-height:100%; max-width:100%; object-fit:contain;" onerror="this.src='/logo.webp'" />
+            </div>
+            
+            <h1 style="font-size:18px; font-weight:900; margin:0 0 4px;" id="supplierName">Verified Supplier Storefront</h1>
+
+            <!-- Verified Badge -->
+            <div style="display:inline-flex; align-items:center; gap:5px; background:var(--app-primary-soft); color:var(--app-primary); font-size:11px; font-weight:800; padding:3px 10px; border-radius:var(--app-radius-pill); margin-bottom:10px;">
+                <i class="fa-solid fa-circle-check"></i> PSE Verified Supplier
+            </div>
+
+            <div style="display:flex; justify-content:center; gap:16px; font-size:11.5px; opacity:0.85; margin-bottom:14px;">
+                <span><i class="fa-solid fa-star" style="color:var(--app-accent);"></i> 4.9 Rating</span>
+                <span><i class="fa-solid fa-box"></i> Verified Listings</span>
+                <span><i class="fa-solid fa-bolt"></i> Fast Freight</span>
+            </div>
+
+            <!-- Contact Supplier Action -->
+            <div style="display:flex; gap:8px; justify-content:center;">
+                <a href="/rfq" class="app-btn-hero-primary" style="font-size:12px; padding:7px 16px;">
+                    <i class="fa-regular fa-envelope"></i> Contact Supplier
+                </a>
+                <a href="/rfq" class="app-btn-hero-secondary" style="font-size:12px; padding:7px 14px;">
+                    <i class="fa-solid fa-file-invoice"></i> Request Quote
+                </a>
+            </div>
+        </div>
+
+        <!-- 2. SUPPLIER PRODUCTS (Vertical Grid) -->
+        <section class="app-section">
+            <div class="app-section-head">
+                <h2><i class="fa-solid fa-boxes-stacked" style="color:var(--app-primary);"></i> Supplier Products</h2>
+            </div>
+            <div class="grid-cols-2" id="supplierProductsGrid">
+                <!-- Rendered by JS from real seller products -->
+            </div>
+        </section>
+
+        <!-- 3. SUPPLIER REVIEWS -->
+        <section class="app-section">
+            <div class="app-section-head">
+                <h2><i class="fa-solid fa-star" style="color:var(--app-accent);"></i> Verified Reviews</h2>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <div style="background:#fff; border:1px solid var(--app-border); border-radius:var(--app-radius-md); padding:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <strong style="font-size:12.5px;">Verified Wholesale Buyer</strong>
+                        <span style="color:var(--app-accent); font-size:11px;"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
+                    </div>
+                    <p style="font-size:12px; color:var(--app-text-muted); margin:0 0 4px;">"Pallets arrived sealed with intact factory barcodes. Escrow payment was smooth and fast freight delivery."</p>
+                    <span style="font-size:10px; color:var(--app-text-light);">Verified Buyer • Escrow Completed</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ═══════════ COMPACT FOOTER ═══════════ -->
+    <footer class="app-footer">
+        <div class="app-footer-logo">
+            <img src="/logo.webp" alt="PSE Marketplace" />
+            <strong>PSE <b>Marketplace</b></strong>
+        </div>
+        <p>&copy; 2026 Pilot Sales Distribution, Inc. All rights reserved.</p>
+    </footer>
+
+    <!-- ═══════════ BOTTOM NAVIGATION ═══════════ -->
+    <nav class="app-bottom-nav" aria-label="Main navigation">
+        <a href="/" class="app-nav-item" data-nav="home">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/products" class="app-nav-item" data-nav="categories">
+            <i class="fa-solid fa-shapes"></i>
+            <span>Categories</span>
+        </a>
+        <a href="/rfq" class="app-nav-item" data-nav="rfq">
+            <i class="fa-solid fa-file-invoice"></i>
+            <span>RFQ</span>
+        </a>
+        <a href="/cart" class="app-nav-item" data-nav="cart">
+            <div class="app-nav-icon-wrap">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="app-badge app-badge--cart cart-count">0</span>
+            </div>
+            <span>Cart</span>
+        </a>
+        <a href="/account" class="app-nav-item" data-nav="account">
+            <i class="fa-solid fa-user"></i>
+            <span>Account</span>
+        </a>
+    </nav>
+
 </div>
 
-<!-- FOOTER -->
-<!-- AUTO-SCROLLING LOGO MARQUEE -->
-<section class="marketplace-logo-marquee-section" aria-labelledby="marqueeTitle">
-    <div class="mkt-marquee-header">
-        <div class="mkt-marquee-kicker"><i class="fa-solid fa-certificate"></i> Verified Global Network</div>
-        <h2 class="mkt-marquee-title" id="marqueeTitle">Trusted Marketplace Partners &amp; Direct Wholesale Brands</h2>
-        <p class="mkt-marquee-desc">Verified B2B wholesale distribution network. Sourced from authorized suppliers, enterprise liquidators, and top marketplace leaders.</p>
-    </div>
-    <div class="marketplace-logo-marquee-container" data-auto-scroll-logos>
-        <div class="marketplace-logo-marquee-track"></div>
-    </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="mkt-footer">
-    <a href="#" class="amz-back-to-top" id="backToTopBtn">Back to top</a>
-    <div class="mkt-footer-nav">
-        <div class="container">
-            <div class="mkt-footer-grid">
-                <div class="mkt-footer-col">
-                    <h4>Get to Know Us</h4>
-                    <ul>
-                        <li><a href="/about">About PSE Distribution</a></li>
-                        <li><a href="/about">Leadership &amp; Careers</a></li>
-                        <li><a href="/supplier-verification">Verified Supplier Standards</a></li>
-                        <li><a href="/catalogs">Wholesale Line Sheets</a></li>
-                        <li><a href="/verify">Authenticity Guarantee</a></li>
-                    </ul>
-                </div>
-                <div class="mkt-footer-col">
-                    <h4>Make Money with Us</h4>
-                    <ul>
-                        <li><a href="/become-seller">Sell on PSE Marketplace</a></li>
-                        <li><a href="/inventory-upload">Upload Bulk Inventory</a></li>
-                        <li><a href="/seller-dashboard">Seller Central Hub</a></li>
-                        <li><a href="/become-seller">Fulfillment &amp; Pallet Warehousing</a></li>
-                        <li><a href="/supplier-store">Supplier Storefronts</a></li>
-                    </ul>
-                </div>
-                <div class="mkt-footer-col">
-                    <h4>Payment &amp; Financing</h4>
-                    <ul>
-                        <li><a href="/rfq">PSE Corporate Net-30 Terms</a></li>
-                        <li><a href="/checkout">100% Escrow Buyer Protection</a></li>
-                        <li><a href="/account">Wholesale Credit Lines</a></li>
-                        <li><a href="/checkout">Wire Transfer &amp; Card Payments</a></li>
-                        <li><a href="/help-center">Tax-Exempt Purchasing</a></li>
-                    </ul>
-                </div>
-                <div class="mkt-footer-col">
-                    <h4>Let Us Help You</h4>
-                    <ul>
-                        <li><a href="/account">Your Account</a></li>
-                        <li><a href="/buyer-dashboard">Your Orders &amp; Invoices</a></li>
-                        <li><a href="/track-order">Shipping Rates &amp; LTL Freight</a></li>
-                        <li><a href="/rfq">Request a Custom Quote (RFQ)</a></li>
-                        <li><a href="/help-center">Help Center &amp; Disputes</a></li>
-                        <li><a href="/contact">24/7 B2B Concierge</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="mkt-footer-middle">
-        <div class="container">
-            <a href="/" class="mkt-logo" style="margin:0 auto 0 0;">
-                <img src="/logo.webp" alt="PSE Distribution" style="height:32px;" />
-                <div class="mkt-logo-text">
-                    <div class="mkt-logo-main" style="font-size:1.05rem;">PSE <span>Marketplace</span></div>
-                </div>
-            </a>
-            <div style="display:flex;gap:1.5rem;align-items:center;">
-                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;"><i class="fa-solid fa-globe"></i> English (US)</span>
-                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;">$ USD - U.S. Dollar</span>
-                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;">🇺🇸 United States</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="mkt-footer-bottom">
-        <div class="container">
-            <div class="mkt-footer-links">
-                <a href="/terms">Conditions of Use</a>
-                <a href="/privacy">Privacy Notice</a>
-                <a href="/terms">Consumer Health Data</a>
-                <a href="/terms">Your Ads Privacy Choices</a>
-                <a href="/become-seller">Seller Terms</a>
-            </div>
-            <p>&copy; 2026 Pilot Sales Distribution, Inc. or its affiliates. All rights reserved. Amazon, Walmart, Target, Apple, and other trademarks are the property of their respective owners.</p>
-            
-            <div class="mkt-payment-row">
-                <div class="mkt-payment-badge"><img src="/visa.svg" alt="Visa" /></div>
-                <div class="mkt-payment-badge"><img src="/mastercard.svg" alt="Mastercard" /></div>
-                <div class="mkt-payment-badge"><img src="/paypal.svg" alt="PayPal" /></div>
-                <div class="mkt-payment-badge"><span style="font-weight:900;font-size:0.7rem;color:#0071dc;">ESCROW 100%</span></div>
-                <div class="mkt-payment-badge"><span style="font-weight:900;font-size:0.7rem;color:#0e7c68;"><i class="fa-solid fa-lock"></i> 256-BIT SSL</span></div>
-            </div>
-        </div>
-    </div>
-</footer>
-
-<!-- TOAST -->
-<div id="toast" class="toast"></div>
-
-<!-- JAVASCRIPT -->
+<script src="/marketplace-app.js"></script>
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
-        authDomain: "pilot-sales-distribution.firebaseapp.com",
-        projectId: "pilot-sales-distribution",
-        storageBucket: "pilot-sales-distribution.firebasestorage.app",
-        messagingSenderId: "729127273727",
-        appId: "1:729127273727:web:402d67be8346257755f8ca"
+(async function() {
+    var params = new URLSearchParams(window.location.search);
+    var brand = params.get('brand') || '';
+    
+    var products = await window.PSEMarketplace.fetchLiveProducts();
+    var brandProducts = [];
+
+    if (brand) {
+        document.getElementById('supplierName').textContent = brand + ' Authorized Wholesale Store';
+        brandProducts = products.filter(function(p) {
+            var b = (p.brand || p.supplier_name || '').toLowerCase();
+            return b.indexOf(brand.toLowerCase()) !== -1;
+        });
+    } else {
+        brandProducts = products;
+    }
+
+    var brandLogos = {
+        'sony': '/sony.svg',
+        'apple': '/apple.svg',
+        'samsung': '/samsung.svg',
+        'dell': '/dell.svg',
+        'nike': '/nike.svg',
+        'adidas': '/adidas.svg',
+        'amazon': '/amazon.svg',
+        'walmart': '/walmart.svg'
     };
 
-    let db, auth;
-    let currentStoreId = '';
-    let currentStoreBrand = '';
-    let storeProducts = [];
-    let currentSupplierInfo = { whatsapp: '', phone: '', email: '' };
-
-    function initFirebase() {
-        if (typeof firebase === 'undefined') { setTimeout(initFirebase, 500); return; }
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        db = firebase.firestore(); window.db = db;
-        auth = firebase.auth();
-        setupAuthListener();
-        loadStorefront();
-        loadCartCount();
-        loadWishlistCount();
+    if (brand && brandLogos[brand.toLowerCase()]) {
+        document.getElementById('supplierLogo').src = brandLogos[brand.toLowerCase()];
     }
 
-    function setupAuthListener() {
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                try {
-                    const doc = await db.collection('users').doc(user.uid).get();
-                    const data = doc.exists ? doc.data() : {};
-                    localStorage.setItem('pilot_user', JSON.stringify({
-                        id: user.uid, email: user.email,
-                        full_name: data.full_name || user.displayName || '',
-                        role: data.role || 'buyer'
-                    }));
-                } catch (e) {}
-            } else { localStorage.removeItem('pilot_user'); }
-            updateAuthUI();
-        });
-    }
-
-    function getCurrentUser() {
-        try { return JSON.parse(localStorage.getItem('pilot_user')); } catch (e) { return null; }
-    }
-
-    function updateAuthUI() {
-        const user = getCurrentUser();
-        const account = document.getElementById('accountLabel');
-        if (account) account.textContent = user ? (user.full_name || 'Account') : 'Account';
-    }
-
-    function showToast(message, type = 'info') {
-        let toast = document.getElementById('toast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'toast';
-            toast.className = 'toast';
-            document.body.appendChild(toast);
-        }
-        toast.textContent = message;
-        toast.className = 'toast ' + type + ' show';
-        clearTimeout(toast._timeout);
-        toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
-    }
-
-    function generateSlug(title) {
-        if (!title) return '';
-        return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
-    }
-
-    function esc(s) {
-        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-        });
-    }
-
-    async function loadStorefront() {
-        const params = new URLSearchParams(window.location.search);
-        currentStoreId = params.get('id') || params.get('seller') || '';
-        currentStoreBrand = params.get('brand') || '';
-
-        let storeName = currentStoreBrand || 'Verified Supplier Store';
-        let storeBio = 'Official B2B wholesale manufacturer and distributor on Pilot Sales Distribution.';
-        let tier = 'gold';
-        let location = 'Global Wholesale';
-        let years = 'Verified Partner';
-        let profileImage = 'logo.webp';
-
-        if (currentStoreId && db) {
-            try {
-                const doc = await db.collection('users').doc(currentStoreId).get();
-                if (doc.exists) {
-                    const data = doc.data();
-                    storeName = data.company || data.full_name || data.display_name || storeName;
-                    storeBio = data.bio || data.description || storeBio;
-                    tier = data.membership_tier || data.supplier_tier || 'gold';
-                    location = data.location || data.address || location;
-                    years = data.years_in_business ? data.years_in_business + ' yrs in business' : 'Verified Partner';
-                    profileImage = data.profileImage || data.avatar || 'logo.webp';
-                    currentSupplierInfo.whatsapp = data.whatsapp || data.phone || '';
-                    currentSupplierInfo.phone = data.phone || '';
-                    currentSupplierInfo.email = data.contactEmail || data.email || '';
-                }
-            } catch (e) {
-                console.error('Error fetching seller info:', e);
-            }
-        }
-
-        document.getElementById('storeName').textContent = storeName;
-        document.getElementById('storeBio').textContent = storeBio;
-        document.getElementById('storeLocation').textContent = location;
-        document.getElementById('storeYears').textContent = years;
-        document.getElementById('storeLogoImg').src = profileImage;
-
-        // Render Badges
-        const badgesEl = document.getElementById('storeBadges');
-        let badgesHtml = `<span class="badge-chip badge-verified"><i class="fa-solid fa-circle-check"></i> Verified Supplier</span>
-                          <span class="badge-chip badge-escrow"><i class="fa-solid fa-shield-halved"></i> 100% Escrow Assurance</span>`;
-        if (tier === 'platinum') {
-            badgesHtml += ` <span class="badge-chip badge-platinum"><i class="fa-solid fa-crown"></i> Platinum Supplier (0% Commission)</span>`;
-        } else if (tier === 'gold') {
-            badgesHtml += ` <span class="badge-chip badge-gold"><i class="fa-solid fa-crown"></i> Gold Supplier (5% Commission)</span>`;
-        }
-        badgesEl.innerHTML = badgesHtml;
-
-        loadStoreCatalog();
-    }
-
-    async function loadStoreCatalog() {
-        const grid = document.getElementById('productGrid');
-        try {
-            let products = [];
-            const snapshot = await db.collection('products').get();
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                if (data.status === 'inactive' || data.status === 'deleted') return;
-                
-                // Match by supplier ID or brand
-                const matchId = currentStoreId && (data.supplier_id === currentStoreId || data.seller_id === currentStoreId);
-                const matchBrand = currentStoreBrand && data.brand && data.brand.toLowerCase() === currentStoreBrand.toLowerCase();
-                
-                if (matchId || matchBrand || (!currentStoreId && !currentStoreBrand)) {
-                    products.push({
-                        id: doc.id,
-                        ...data,
-                        image_url: data.image_url || data.images?.[0] || 'logo.webp',
-                        slug: data.slug || generateSlug(data.title || 'product'),
-                        title: data.title || 'Product',
-                        price: data.price || 0,
-                        brand: data.brand || 'Pilot Distribution',
-                        moq: data.moq || 1,
-                        category: data.category || 'other',
-                        supplier_verified: true,
-                        supplier_tier: data.supplier_tier || 'gold',
-                        sponsored: !!data.sponsored,
-                        rating: data.rating || 5.0,
-                        stock: data.stock || 0
-                    });
-                }
-            });
-
-            // Sort sponsored to top
-            products.sort((a, b) => (b.sponsored ? 1 : 0) - (a.sponsored ? 1 : 0));
-            storeProducts = products;
-
-            document.getElementById('storeCatalogCount').textContent = products.length;
-            document.getElementById('productCountHeader').textContent = products.length;
-            renderStoreGrid(products);
-        } catch (error) {
-            console.error('Error loading catalog:', error);
-            grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:var(--text-light);">
-                <i class="fa-solid fa-box-open" style="font-size:3rem;color:var(--primary);margin-bottom:1rem;"></i>
-                <h3>No products listed</h3>
-                <p>This verified supplier is currently updating their wholesale catalog.</p>
-            </div>`;
-        }
-    }
-
-    function renderStoreGrid(products) {
-        const grid = document.getElementById('productGrid');
-        if (!products || products.length === 0) {
-            grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3.5rem 1rem;background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border-light);">
-                <i class="fa-solid fa-box-open" style="font-size:3rem;color:var(--text-light);margin-bottom:1rem;display:block;"></i>
-                <h3 style="margin-bottom:0.5rem;color:var(--text-dark);">No Products Found</h3>
-                <p style="color:var(--text-light);font-size:0.95rem;max-width:420px;margin:0 auto;">This supplier has no active listings matching your current search.</p>
-            </div>`;
+    var grid = document.getElementById('supplierProductsGrid');
+    if (grid) {
+        if (!brandProducts.length) {
+            grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:32px 12px; background:#fff; border-radius:14px; border:1px solid var(--app-border);"><i class="fa-solid fa-box-open" style="font-size:28px; color:var(--app-text-light); margin-bottom:6px;"></i><p style="font-size:12px; color:var(--app-text-muted); margin:0;">No active listings for this supplier storefront yet.</p></div>';
             return;
         }
 
-        grid.innerHTML = products.map(p => {
-            const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
-            const slug = p.slug || generateSlug(p.title || 'product');
-            const imageUrl = window.getProductImage ? window.getProductImage(p) : (p.image_url || 'logo.webp');
-            const sponsoredBadge = p.sponsored ? `<span class="product-badge" style="background:#d35400;color:#fff;top:10px;right:10px;z-index:10;font-weight:700;"><i class="fa-solid fa-rocket"></i> SPONSORED</span>` : '';
-            const vipTierBadge = p.supplier_tier === 'platinum' ?
-                `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#8e44ad;margin-top:2px;"><i class="fa-solid fa-crown"></i> Platinum Supplier</div>` :
-                `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#d35400;margin-top:2px;"><i class="fa-solid fa-crown"></i> Gold Supplier</div>`;
-            
-            return `<div class="product-card animate-on-scroll visible">
-                ${sponsoredBadge}
-                ${p.moq ? `<span class="product-badge wholesale" style="${p.sponsored ? 'top:38px;' : ''}">MOQ ${p.moq}</span>` : ''}
-                ${discount > 0 ? `<span class="product-badge flash" style="${p.sponsored ? 'top:66px;' : ''}">-${discount}%</span>` : ''}
-                <span class="verified-badge"><i class="fa-solid fa-circle-check"></i></span>
-                <div class="product-image" onclick="window.location.href='/product/${slug}'">
-                    <img src="${imageUrl}" alt="${esc(p.title)}" loading="lazy" />
-                </div>
-                <div class="product-title">${esc(p.title)}</div>
-                <div class="product-brand">${esc(p.brand)}</div>
-                ${vipTierBadge}
-                <div class="product-price">$${(p.price || 0).toFixed(2)}${p.old_price ? ` <span class="old">$${p.old_price.toFixed(2)}</span>` : ''}</div>
-                <div class="product-actions">
-                    <button class="btn-add" onclick="addToCart('${p.id}')"><i class="fa-solid fa-cart-plus"></i> Add</button>
-                    <button class="btn-wish" onclick="toggleWishlist('${p.id}')"><i class="fa-regular fa-heart"></i></button>
-                </div>
-            </div>`;
+        grid.innerHTML = brandProducts.map(function(p) {
+            var slug = p.slug || (p.title || 'product').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            return '' +
+                '<div class="app-card">' +
+                    '<div class="app-card-img" onclick="window.location.href=\'/product-detail?slug=' + encodeURIComponent(slug) + '\'">' +
+                        '<span class="app-card-badge">VERIFIED</span>' +
+                        '<img src="' + (p.image || '/logo.webp') + '" alt="' + p.title + '" loading="lazy" onerror="this.src=\'/logo.webp\'" />' +
+                    '</div>' +
+                    '<div class="app-card-body">' +
+                        '<div class="app-card-brand">' + (p.brand || p.supplier_name || 'Verified Supplier') + '</div>' +
+                        '<a href="/product-detail?slug=' + encodeURIComponent(slug) + '" class="app-card-title">' + p.title + '</a>' +
+                        '<div class="app-card-price-row"><span class="app-card-price">$' + Number(p.price || 0).toFixed(2) + '</span></div>' +
+                        '<div class="app-card-moq"><i class="fa-solid fa-box"></i> MOQ: ' + (p.moq || 1) + ' units</div>' +
+                        '<button type="button" class="app-card-btn" onclick="window.handleAddToCart(\'' + p.id + '\', \'' + p.title + '\', ' + p.price + ', \'' + p.image + '\')">' +
+                            '<i class="fa-solid fa-cart-shopping"></i> Add to Cart' +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
         }).join('');
     }
-
-    function filterStoreProducts() {
-        const query = (document.getElementById('storeSearchInput').value || '').toLowerCase().trim();
-        if (!query) {
-            renderStoreGrid(storeProducts);
-            return;
-        }
-        const filtered = storeProducts.filter(p =>
-            p.title.toLowerCase().includes(query) ||
-            (p.brand && p.brand.toLowerCase().includes(query)) ||
-            (p.category && p.category.toLowerCase().includes(query))
-        );
-        renderStoreGrid(filtered);
-    }
-
-    function contactStoreWhatsApp() {
-        const wa = (currentSupplierInfo.whatsapp || currentSupplierInfo.phone || '19099384682').replace(/[^0-9]/g, '');
-        const name = document.getElementById('storeName').textContent;
-        const msg = `Hi ${name}, I am visiting your official storefront on Pilot Sales Distribution and would like to inquire about bulk wholesale orders.`;
-        window.open('https://wa.me/' + wa + '?text=' + encodeURIComponent(msg), '_blank');
-    }
-
-    function contactStoreEmail() {
-        const email = currentSupplierInfo.email || 'support@pilotsalesdistribution.com';
-        const name = document.getElementById('storeName').textContent;
-        const subject = encodeURIComponent(`B2B Wholesale Inquiry: ${name} Storefront`);
-        const body = encodeURIComponent(`Hi ${name},\n\nI am viewing your verified storefront on Pilot Sales Distribution and would like to discuss bulk order terms and catalogs.\n\nThank you.`);
-        window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-    }
-
-    async function addToCart(productId) {
-        const user = getCurrentUser();
-        const product = storeProducts.find(p => p.id === productId);
-        if (!product) return;
-        const qty = product.moq || 1;
-        
-        if (!user) {
-            const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
-            const idx = cart.findIndex(i => i.product_id === productId && !i.is_sample);
-            if (idx > -1) {
-                cart[idx].quantity = (cart[idx].quantity || 1) + qty;
-            } else {
-                cart.push({
-                    product_id: productId,
-                    title: product.title,
-                    price: product.price,
-                    old_price: product.old_price || 0,
-                    image_url: window.getProductImage ? window.getProductImage(product, '') : (product.image_url || ''),
-                    brand: product.brand || 'Pilot Distribution',
-                    moq: product.moq || 1,
-                    quantity: qty
-                });
-            }
-            localStorage.setItem('pilot_cart', JSON.stringify(cart));
-            showToast('✅ Added to cart!', 'success');
-            loadCartCount();
-        } else {
-            try {
-                const snapshot = await db.collection('cart')
-                    .where('user_id', '==', user.id)
-                    .where('product_id', '==', productId)
-                    .get();
-                if (!snapshot.empty) {
-                    const docRef = snapshot.docs[0].ref;
-                    const currQty = snapshot.docs[0].data().quantity || 1;
-                    await docRef.update({ quantity: currQty + qty });
-                } else {
-                    await db.collection('cart').add({
-                        user_id: user.id,
-                        product_id: productId,
-                        title: product.title,
-                        price: product.price,
-                        old_price: product.old_price || 0,
-                        image_url: window.getProductImage ? window.getProductImage(product, '') : (product.image_url || ''),
-                        brand: product.brand || 'Pilot Distribution',
-                        moq: product.moq || 1,
-                        quantity: qty,
-                        created_at: new Date().toISOString()
-                    });
-                }
-                showToast('✅ Added to cart!', 'success');
-                loadCartCount();
-            } catch (e) {
-                showToast('Failed to add to cart', 'error');
-            }
-        }
-    }
-
-    function toggleWishlist(productId) {
-        const user = getCurrentUser();
-        if (!user) {
-            showToast('Please login to save wishlist items', 'info');
-            return;
-        }
-        window.location.href = '/wishlist';
-    }
-
-    async function loadCartCount() {
-        const user = getCurrentUser();
-        if (!user) {
-            try {
-                const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
-                const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-                document.querySelectorAll('.cart-count').forEach(el => {
-                    el.textContent = count;
-                    el.style.display = count > 0 ? 'inline' : 'none';
-                });
-            } catch (e) {}
-            return;
-        }
-        try {
-            const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
-            let count = 0;
-            snapshot.forEach(doc => { count += doc.data().quantity || 1; });
-            document.querySelectorAll('.cart-count').forEach(el => {
-                el.textContent = count;
-                el.style.display = count > 0 ? 'inline' : 'none';
-            });
-        } catch (e) {}
-    }
-
-    async function loadWishlistCount() {
-        const user = getCurrentUser();
-        if (!user) return;
-        try {
-            const snapshot = await db.collection('wishlist').where('user_id', '==', user.id).get();
-            document.querySelectorAll('.wishlist-count').forEach(el => {
-                el.textContent = snapshot.size;
-                el.style.display = snapshot.size > 0 ? 'inline' : 'none';
-            });
-        } catch (e) {}
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        initFirebase();
-        document.getElementById('year').textContent = new Date().getFullYear();
-    });
-
-    window.contactStoreWhatsApp = contactStoreWhatsApp;
-    window.contactStoreEmail = contactStoreEmail;
-    window.addToCart = addToCart;
-    window.toggleWishlist = toggleWishlist;
-    window.filterStoreProducts = filterStoreProducts;
+})();
 </script>
-    <script src="email.js"></script>
-    <script src="ai-assistant.js"></script>
-    <script src="notifications.js"></script>
-    <script src="premium.js"></script>
-    <script src="/search-pro.js"></script>
 </body>
 </html>

@@ -2,433 +2,268 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Shopping Cart - Pilot Sales Distribution</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Shopping Cart — PSE Marketplace</title>
     
+    <!-- Favicon & PWA -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0057FF">
+
+    <!-- Font Awesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap&family=Montserrat:wght@400;600;700;800;900" rel="stylesheet" />
-    
-    <link rel="stylesheet" href="/style.css" />
-    
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="/main.js"></script>
-    <script src="/marketplace.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-    <style>
-        .mkt-cart-layout {
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            gap: 2rem;
-            margin: 2rem 0 3rem;
-            align-items: start;
-        }
-
-        /* Cart Main Card */
-        .mkt-cart-card {
-            background: #ffffff;
-            border: 1px solid #d5d9d9;
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-        }
-        .mkt-cart-header {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            padding-bottom: 0.85rem;
-            border-bottom: 1px solid #e2e8f0;
-            margin-bottom: 1rem;
-        }
-        .mkt-cart-header h1 {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: #0f1111;
-            margin: 0;
-        }
-        .mkt-cart-header .price-header {
-            font-size: 0.84rem;
-            color: #565959;
-            font-weight: 600;
-        }
-
-        .mkt-cart-item {
-            display: flex;
-            gap: 1.25rem;
-            padding: 1.25rem 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .mkt-cart-item:last-child {
-            border-bottom: none;
-        }
-        .mkt-cart-item-img {
-            width: 110px;
-            height: 110px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .mkt-cart-item-img img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-        .mkt-cart-item-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 0.35rem;
-        }
-        .mkt-cart-item-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #0f1111;
-            line-height: 1.35;
-            text-decoration: none;
-        }
-        .mkt-cart-item-title:hover {
-            color: var(--amz-link-hover);
-            text-decoration: underline;
-        }
-        .mkt-cart-item-stock {
-            font-size: 0.76rem;
-            color: #0e7c68;
-            font-weight: 700;
-        }
-        .mkt-cart-item-price {
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: #0f1111;
-            text-align: right;
-            flex-shrink: 0;
-        }
-
-        .mkt-cart-item-controls {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            margin-top: 0.6rem;
-            flex-wrap: wrap;
-        }
-        .mkt-qty-select {
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            padding: 0.3rem 0.6rem;
-            font-weight: 700;
-            font-size: 0.84rem;
-            color: #0f1111;
-            outline: none;
-            cursor: pointer;
-        }
-        .mkt-cart-action-btn {
-            background: transparent;
-            border: none;
-            color: var(--amz-link);
-            font-size: 0.8rem;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .mkt-cart-action-btn:hover {
-            text-decoration: underline;
-            color: var(--amz-link-hover);
-        }
-
-        /* Order Summary Card */
-        .mkt-summary-card {
-            background: #ffffff;
-            border: 1px solid #d5d9d9;
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            position: sticky;
-            top: 80px;
-        }
-        .mkt-free-shipping-bar {
-            background: #e6f4ef;
-            border: 1px solid #c3e6cb;
-            border-radius: 6px;
-            padding: 0.65rem 0.85rem;
-            font-size: 0.78rem;
-            color: #0a5a4a;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .mkt-summary-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.88rem;
-            color: #565959;
-        }
-        .mkt-summary-row.total {
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: #0f1111;
-            padding-top: 0.75rem;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        @media (max-width: 900px) {
-            .mkt-cart-layout {
-                grid-template-columns: 1fr;
-            }
-            .mkt-summary-card {
-                position: static;
-            }
-        }
-    </style>
+    <!-- Unified Master Stylesheet -->
+    <link rel="stylesheet" href="/marketplace-app.css" />
 </head>
-<body style="background:#eaeded;">
 
-<!-- 1. TOP BAR -->
-<div class="mkt-topbar">
-    <div class="container">
-        <div class="mkt-topbar-left">
-            <div class="top-delivery-badge" data-change-location title="Click to change delivery location">
-                <i class="fa-solid fa-location-dot"></i>
-                <div class="top-delivery-text">
-                    <span>Deliver to</span>
-                    <strong class="pse-delivery-zip">90210 - Los Angeles, CA</strong>
+<body>
+
+<div class="app-shell">
+
+    <!-- ═══════════ GLOBAL HEADER ═══════════ -->
+    <header class="app-header">
+        <div class="app-header-top">
+            <button type="button" class="app-menu-btn" id="appMenuBtn" aria-label="Open Navigation Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <a href="/" class="app-logo" aria-label="PSE Marketplace Home">
+                <img src="/logo.webp" alt="PSE Marketplace Logo" />
+                <span class="app-logo-name">PSE <b>Marketplace</b></span>
+            </a>
+
+            <div class="app-header-actions">
+                <button type="button" class="app-icon-btn" id="appNotifBtn" aria-label="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="app-badge" id="appNotifBadge">3</span>
+                </button>
+                <a href="/cart" class="app-icon-btn" aria-label="Cart">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="app-badge app-badge--cart cart-count" id="cartCount">0</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="app-search" id="searchBar">
+            <form class="app-search-form" role="search" onsubmit="event.preventDefault(); var q=document.getElementById('searchInput').value.trim(); if(q) window.location.href='/products?search='+encodeURIComponent(q);">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="searchInput" placeholder="Search Products, Brands, Suppliers..." autocomplete="off" aria-label="Search marketplace" />
+                <button type="submit" id="searchBtn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+        </div>
+
+        <div class="app-locbar">
+            <button type="button" class="app-loc" id="appLocBtn" title="Tap to change delivery location">
+                <i class="fa-solid fa-location-dot"></i> Deliver to <strong id="appZip">90210 – Los Angeles, CA</strong>
+            </button>
+            <a class="app-greet" href="/account" id="appGreetLink"><i class="fa-regular fa-circle-user"></i> Hi, <span id="accountLabel">Guest</span></a>
+        </div>
+    </header>
+
+    <!-- ═══════════ GLOBAL MENU DRAWER ═══════════ -->
+    <div class="app-drawer-overlay" id="appDrawerOverlay"></div>
+    <aside class="app-drawer" id="appDrawer" aria-label="Navigation drawer" aria-hidden="true">
+        <div class="app-drawer-header">
+            <div class="app-drawer-user">
+                <div class="app-drawer-avatar"><i class="fa-solid fa-user"></i></div>
+                <div class="app-drawer-userinfo">
+                    <span class="app-drawer-greeting">Welcome to PSE</span>
+                    <strong class="app-drawer-username" id="drawerUserLabel">Hello, Guest</strong>
+                    <a href="/login" class="app-drawer-authlink" id="drawerAuthLink">Sign In / Register</a>
                 </div>
             </div>
-            <div class="mkt-announcement-ticker">
-                <span class="badge"><i class="fa-solid fa-shield-check"></i> ESCROW PROTECTED</span>
-                <span>Your wholesale payment is held in 100% secure escrow until inspection</span>
+            <button type="button" class="app-drawer-close" id="appDrawerClose" aria-label="Close menu">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="app-drawer-body">
+            <div class="app-drawer-group-title">Navigation</div>
+            <ul class="app-drawer-menu">
+                <li><a href="/"><i class="fa-solid fa-house"></i><span>Home</span></a></li>
+                <li><a href="/products"><i class="fa-solid fa-layer-group"></i><span>Categories</span></a></li>
+                <li><a href="/products?category=electronics"><i class="fa-solid fa-tv"></i><span>Electronics</span></a></li>
+                <li><a href="/products?category=computers"><i class="fa-solid fa-laptop"></i><span>Computers</span></a></li>
+                <li><a href="/products?category=phones"><i class="fa-solid fa-mobile-screen-button"></i><span>Smartphones</span></a></li>
+                <li><a href="/products?category=fashion"><i class="fa-solid fa-shirt"></i><span>Fashion</span></a></li>
+                <li><a href="/products?category=automotive"><i class="fa-solid fa-car"></i><span>Automotive</span></a></li>
+                <li><a href="/products?category=home"><i class="fa-solid fa-couch"></i><span>Home &amp; Industrial</span></a></li>
+                <li><a href="/products?category=overstock"><i class="fa-solid fa-boxes-stacked"></i><span>Liquidation Lots</span></a></li>
+                <li><a href="/rfq"><i class="fa-solid fa-file-invoice-dollar"></i><span>RFQ Quotes</span><span class="app-drawer-pill">B2B</span></a></li>
+                <li><a href="/supplier-store"><i class="fa-solid fa-store"></i><span>Supplier Directory</span></a></li>
+                <li><a href="/account#orders"><i class="fa-solid fa-box"></i><span>Orders</span></a></li>
+                <li><a href="/wishlist"><i class="fa-regular fa-heart"></i><span>Wishlist</span></a></li>
+                <li><a href="/cart"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><span class="app-drawer-badge cart-count">0</span></a></li>
+                <li><a href="/account"><i class="fa-regular fa-user"></i><span>Account</span></a></li>
+                <li><a href="/account#settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a></li>
+                <li><a href="/contact"><i class="fa-regular fa-envelope"></i><span>Contact Us</span></a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- ═══════════ CART MAIN CONTENT ═══════════ -->
+    <main class="app-main">
+
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <h1 style="font-size:18px; font-weight:900; margin:0;"><i class="fa-solid fa-cart-shopping" style="color:var(--app-primary);"></i> Shopping Cart</h1>
+            <button type="button" onclick="clearCart()" style="background:transparent; border:none; color:var(--app-danger); font-size:12px; font-weight:700;">Clear All</button>
+        </div>
+
+        <!-- 1. CART ITEMS LIST -->
+        <div class="app-cart-list" id="cartItemsList">
+            <!-- Rendered by JS -->
+        </div>
+
+        <!-- 2. ORDER SUMMARY & CHECKOUT BUTTON -->
+        <div class="app-summary-card" id="cartSummaryBox">
+            <div style="font-size:14px; font-weight:800; margin-bottom:10px; color:var(--app-text);">Order Summary</div>
+            <div class="app-summary-row">
+                <span>Items Subtotal</span>
+                <strong id="subtotalVal">$0.00</strong>
             </div>
-        </div>
-        <div class="mkt-topbar-right">
-            <a href="tel:+19099384682"><i class="fa-solid fa-phone"></i> <span>24/7 B2B: +1 (909) 938-4682</span></a>
-            <a href="/become-seller"><i class="fa-solid fa-store"></i> <span>Sell on PSE</span></a>
-            <a href="/track-order"><i class="fa-solid fa-truck"></i> <span>Track Order</span></a>
-            <a href="/help-center"><i class="fa-regular fa-circle-question"></i> <span>Help</span></a>
-        </div>
-    </div>
-</div>
-
-<!-- 2. HEADER -->
-<header class="mkt-header">
-    <div class="container">
-        <a href="/" class="mkt-logo" aria-label="Pilot Sales Distribution">
-            <img src="/logo.webp" alt="PSE Distribution" />
-            <div class="mkt-logo-text">
-                <div class="mkt-logo-main">PSE <span>Marketplace</span></div>
-                <div class="mkt-logo-sub">Wholesale <span class="verified-pill"><i class="fa-solid fa-circle-check"></i> Verified</span></div>
+            <div class="app-summary-row">
+                <span>Insured Freight</span>
+                <span style="color:var(--app-success); font-weight:700;">FREE (Promo)</span>
             </div>
-        </a>
+            <div class="app-summary-row">
+                <span>PSE Escrow Protection</span>
+                <span style="color:var(--app-success); font-weight:700;">Included (0%)</span>
+            </div>
+            <div class="app-summary-row total">
+                <span>Total Amount</span>
+                <span id="totalVal">$0.00</span>
+            </div>
 
-        <div class="mkt-search-wrapper" id="searchBar">
-            <form class="mkt-search-form" role="search" onsubmit="event.preventDefault();">
-                <input type="search" id="searchInput" class="mkt-search-input" placeholder="Search products..." autocomplete="off" />
-                <button type="submit" id="searchBtn" class="mkt-search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </form>
-            <div class="search-results" id="searchResults"></div>
-        </div>
-
-        <div class="mkt-header-actions">
-            <a href="/account" class="mkt-header-link"><span class="sub-line">Your</span><span class="main-line">Account</span></a>
-            <a href="/buyer-dashboard" class="mkt-header-link"><span class="sub-line">Returns</span><span class="main-line">&amp; Orders</span></a>
-            <a href="/cart" class="mkt-cart-btn">
-                <div class="mkt-cart-icon-wrap"><i class="fa-solid fa-cart-shopping"></i><span class="mkt-cart-badge cart-count">0</span></div>
-                <div class="mkt-cart-label"><span>Cart</span><strong>Active</strong></div>
+            <!-- Checkout Button -->
+            <a href="/checkout" class="app-checkout-btn" style="margin-top:14px;">
+                <i class="fa-solid fa-lock"></i> Proceed to Checkout
             </a>
         </div>
-    </div>
-</header>
 
-<!-- 3. SUBNAV -->
-<nav class="mkt-subnav">
-    <div class="container">
-        <div class="mkt-subnav-links">
-            <button class="amz-all-menu-btn" data-open-drawer><i class="fa-solid fa-bars"></i> <span>All Departments</span></button>
-            <a href="/products?filter=deals" class="mkt-subnav-link highlight"><i class="fa-solid fa-bolt"></i> Today's Deals</a>
-            <a href="/products" class="mkt-subnav-link">All Products</a>
-            <a href="/rfq" class="mkt-subnav-link">Bulk RFQ</a>
-            <a href="/help-center" class="mkt-subnav-link">Customer Service</a>
+    </main>
+
+    <!-- ═══════════ COMPACT FOOTER ═══════════ -->
+    <footer class="app-footer">
+        <div class="app-footer-logo">
+            <img src="/logo.webp" alt="PSE Marketplace" />
+            <strong>PSE <b>Marketplace</b></strong>
         </div>
-    </div>
-</nav>
+        <p>&copy; 2026 Pilot Sales Distribution, Inc. All rights reserved.</p>
+    </footer>
 
-<!-- 4. CART CONTENT -->
-<main class="container">
-    <div class="mkt-cart-layout">
-        <!-- Cart Items List -->
-        <div class="mkt-cart-card">
-            <div class="mkt-cart-header">
-                <div>
-                    <h1>Shopping Cart</h1>
-                    <div style="font-size:0.78rem;color:#565959;cursor:pointer;margin-top:0.2rem;" onclick="clearEntireCart()">Deselect all items</div>
-                </div>
-                <div class="price-header">Price</div>
+    <!-- ═══════════ BOTTOM NAVIGATION ═══════════ -->
+    <nav class="app-bottom-nav" aria-label="Main navigation">
+        <a href="/" class="app-nav-item" data-nav="home">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/products" class="app-nav-item" data-nav="categories">
+            <i class="fa-solid fa-shapes"></i>
+            <span>Categories</span>
+        </a>
+        <a href="/rfq" class="app-nav-item" data-nav="rfq">
+            <i class="fa-solid fa-file-invoice"></i>
+            <span>RFQ</span>
+        </a>
+        <a href="/cart" class="app-nav-item active" data-nav="cart">
+            <div class="app-nav-icon-wrap">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="app-badge app-badge--cart cart-count">0</span>
             </div>
+            <span>Cart</span>
+        </a>
+        <a href="/account" class="app-nav-item" data-nav="account">
+            <i class="fa-solid fa-user"></i>
+            <span>Account</span>
+        </a>
+    </nav>
 
-            <div id="cartItemsList">
-                <!-- Cart items rendered by JS -->
-            </div>
+</div>
 
-            <div style="text-align:right;padding-top:1.2rem;border-top:1px solid #e2e8f0;font-size:1.15rem;color:#0f1111;">
-                Subtotal (<span id="cartSubtotalCount">0</span> items): <strong id="cartBottomSubtotal" style="font-size:1.35rem;color:#b12704;">$0.00</strong>
-            </div>
-        </div>
-
-        <!-- Right Summary Card -->
-        <div class="mkt-summary-card">
-            <div class="mkt-free-shipping-bar">
-                <i class="fa-solid fa-circle-check" style="font-size:1.2rem;color:#0e7c68;"></i>
-                <span>Your order qualifies for <strong>FREE LTL Pallet Shipping</strong>!</span>
-            </div>
-
-            <div style="font-size:1.15rem;font-weight:700;color:#0f1111;">
-                Subtotal (<span id="summaryItemCount">0</span> items):<br />
-                <span id="summarySubtotal" style="font-size:1.6rem;font-weight:900;color:#b12704;">$0.00</span>
-            </div>
-
-            <button class="buybox-btn-buy" type="button" style="background:#f8fafc;border:1.5px solid #cbd5e1;color:#334155;margin-bottom:0.6rem;" onclick="PSEMarketplace.generateProFormaPdf()"><i class="fa-solid fa-file-pdf"></i> Download Formal Pro-Forma Invoice</button>
-            <button class="buybox-btn-cart" id="checkoutBtn" type="button" onclick="window.location.href='/checkout'" style="font-size:1rem;padding:0.85rem;"><i class="fa-solid fa-lock"></i> Proceed to Checkout</button>
-
-            <div class="mkt-summary-row"><span>Estimated Freight:</span><span style="color:#0e7c68;font-weight:700;">FREE</span></div>
-            <div class="mkt-summary-row"><span>Estimated Tax:</span><span>Calculated at checkout</span></div>
-            <div class="mkt-summary-row total"><span>Order Total:</span><span id="summaryTotal">$0.00</span></div>
-
-            <div style="border-top:1px solid #e2e8f0;padding-top:0.8rem;text-align:center;">
-                <div style="font-size:0.72rem;color:#565959;margin-bottom:0.5rem;"><i class="fa-solid fa-shield-halved"></i> 256-Bit Escrow Buyer Protection Guaranteed</div>
-                <div class="mkt-payment-row" style="margin-top:0.3rem;">
-                    <div class="mkt-payment-badge"><img src="/visa.svg" alt="Visa" /></div>
-                    <div class="mkt-payment-badge"><img src="/mastercard.svg" alt="Mastercard" /></div>
-                    <div class="mkt-payment-badge"><img src="/paypal.svg" alt="PayPal" /></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</main>
-
-<!-- 5. AUTO-SCROLLING LOGO MARQUEE -->
-<section class="marketplace-logo-marquee-section">
-    <div class="mkt-marquee-header">
-        <div class="mkt-marquee-kicker"><i class="fa-solid fa-truck-fast"></i> Direct Wholesale Supply</div>
-        <h2 class="mkt-marquee-title">Trusted Global Marketplace &amp; Brand Suppliers</h2>
-        <p class="mkt-marquee-desc">Verified supply chains for authentic wholesale lots with fast freight logistics.</p>
-    </div>
-    <div class="marketplace-logo-marquee-container" data-auto-scroll-logos>
-        <div class="marketplace-logo-marquee-track"></div>
-    </div>
-</section>
-
-<!-- 6. FOOTER -->
-<footer class="mkt-footer">
-    <a href="#" class="amz-back-to-top" id="backToTopBtn">Back to top</a>
-    <div class="mkt-footer-bottom">
-        <div class="container">
-            <p>&copy; 2026 Pilot Sales Distribution, Inc. All rights reserved.</p>
-        </div>
-    </div>
-</footer>
-
-<!-- 7. CART JAVASCRIPT -->
+<script src="/marketplace-app.js"></script>
 <script>
-    function renderCart() {
-        let cart = [];
-        try { cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]'); } catch (e) {}
-        
-        const list = document.getElementById('cartItemsList');
-        const count = cart.reduce((sum, i) => sum + (i.quantity || 1), 0);
-        const subtotal = cart.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+function renderCart() {
+    var cart = [];
+    try { cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]'); } catch (e) {}
 
-        document.getElementById('cartSubtotalCount').textContent = count;
-        document.getElementById('summaryItemCount').textContent = count;
-        document.getElementById('cartBottomSubtotal').textContent = '$' + subtotal.toFixed(2);
-        document.getElementById('summarySubtotal').textContent = '$' + subtotal.toFixed(2);
-        document.getElementById('summaryTotal').textContent = '$' + subtotal.toFixed(2);
+    var container = document.getElementById('cartItemsList');
+    var summary = document.getElementById('cartSummaryBox');
 
-        if (!cart.length) {
-            list.innerHTML = `
-                <div style="text-align:center;padding:3rem 1rem;">
-                    <i class="fa-solid fa-cart-shopping" style="font-size:3rem;color:#cbd5e1;margin-bottom:1rem;"></i>
-                    <h2 style="font-size:1.3rem;font-weight:800;color:#0f1111;">Your Amazon / Walmart Marketplace Cart is empty</h2>
-                    <p style="color:#64748b;margin-bottom:1.5rem;">Explore today's verified wholesale deals and bulk inventory lots.</p>
-                    <a href="/products" class="hero-btn-primary" style="display:inline-flex;">Shop Wholesale Deals</a>
-                </div>
-            `;
-            document.getElementById('checkoutBtn').disabled = true;
-            document.getElementById('checkoutBtn').style.opacity = '0.5';
-            return;
-        }
-
-        document.getElementById('checkoutBtn').disabled = false;
-        document.getElementById('checkoutBtn').style.opacity = '1';
-
-        list.innerHTML = cart.map((item, idx) => `
-            <div class="mkt-cart-item">
-                <div class="mkt-cart-item-img">
-                    <img src="${item.image || '/logo.webp'}" alt="${item.title || 'Product'}" onerror="this.src='/logo.webp'" />
-                </div>
-                <div class="mkt-cart-item-info">
-                    <a href="/product-detail" class="mkt-cart-item-title">${item.title || 'Wholesale Product Item'}</a>
-                    <span class="mkt-cart-item-stock"><i class="fa-solid fa-circle-check"></i> In Stock • Ships in 24h</span>
-                    <div style="font-size:0.76rem;color:#565959;">Eligible for FREE Freight Shipping</div>
-                    <div class="mkt-cart-item-controls">
-                        <label style="font-size:0.8rem;color:#0f1111;font-weight:700;">Qty:
-                            <select class="mkt-qty-select" onchange="updateCartQty(${idx}, this.value)">
-                                ${[1,2,3,4,5,10,25,50,100].map(q => `<option value="${q}" ${item.quantity == q ? 'selected' : ''}>${q}</option>`).join('')}
-                            </select>
-                        </label>
-                        <span style="color:#cbd5e1;">|</span>
-                        <button class="mkt-cart-action-btn" type="button" onclick="deleteCartItem(${idx})">Delete</button>
-                        <span style="color:#cbd5e1;">|</span>
-                        <button class="mkt-cart-action-btn" type="button" onclick="saveForLater(${idx})">Save for later</button>
-                    </div>
-                </div>
-                <div class="mkt-cart-item-price">$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</div>
-            </div>
-        `).join('');
-
-        if (window.PSEMarketplace) window.PSEMarketplace.syncCounters();
+    if (!cart.length) {
+        container.innerHTML = '<div style="text-align:center; padding:40px 16px; background:#fff; border-radius:16px; border:1px solid var(--app-border);"><i class="fa-solid fa-cart-arrow-down" style="font-size:36px; color:var(--app-text-light); margin-bottom:10px;"></i><h3 style="font-size:16px; margin:0 0 6px;">Your cart is empty</h3><p style="font-size:12px; color:var(--app-text-muted); margin:0 0 16px;">Explore wholesale deals and add items to your cart.</p><a href="/products" class="app-link-btn" style="padding:8px 18px; font-size:13px;">Start Shopping</a></div>';
+        if (summary) summary.style.display = 'none';
+        return;
     }
 
-    function updateCartQty(idx, qty) {
-        let cart = [];
-        try { cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]'); } catch (e) {}
-        if (cart[idx]) {
-            cart[idx].quantity = parseInt(qty, 10) || 1;
-            localStorage.setItem('pilot_cart', JSON.stringify(cart));
-            renderCart();
-        }
-    }
+    if (summary) summary.style.display = 'block';
 
-    function deleteCartItem(idx) {
-        let cart = [];
-        try { cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]'); } catch (e) {}
-        cart.splice(idx, 1);
+    var subtotal = 0;
+
+    container.innerHTML = cart.map(function(item, idx) {
+        var price = Number(item.price || 0);
+        var qty = Number(item.quantity || 1);
+        var itemTotal = price * qty;
+        subtotal += itemTotal;
+
+        return '' +
+            '<div class="app-cart-card">' +
+                '<div class="app-cart-card-img">' +
+                    '<img src="' + (item.image || '/logo.webp') + '" alt="' + item.title + '" onerror="this.src=\'/logo.webp\'" />' +
+                '</div>' +
+                '<div class="app-cart-card-body">' +
+                    '<div class="app-cart-card-title">' + item.title + '</div>' +
+                    '<div class="app-cart-card-price">$' + price.toFixed(2) + ' <span style="font-size:11px; font-weight:500; color:var(--app-text-muted);">/ unit</span></div>' +
+                    '<div class="app-qty-control">' +
+                        '<button type="button" onclick="updateQty(' + idx + ', -1)">-</button>' +
+                        '<span>' + qty + '</span>' +
+                        '<button type="button" onclick="updateQty(' + idx + ', 1)">+</button>' +
+                    '</div>' +
+                '</div>' +
+                '<button type="button" class="app-cart-card-del" onclick="deleteItem(' + idx + ')" aria-label="Remove item">' +
+                    '<i class="fa-regular fa-trash-can"></i>' +
+                '</button>' +
+            '</div>';
+    }).join('');
+
+    document.getElementById('subtotalVal').textContent = '$' + subtotal.toFixed(2);
+    document.getElementById('totalVal').textContent = '$' + subtotal.toFixed(2);
+}
+
+function updateQty(idx, delta) {
+    var cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+    if (cart[idx]) {
+        cart[idx].quantity = (cart[idx].quantity || 1) + delta;
+        if (cart[idx].quantity <= 0) {
+            cart.splice(idx, 1);
+        }
         localStorage.setItem('pilot_cart', JSON.stringify(cart));
-        renderCart();
-        if (window.pseToast) window.pseToast('Item removed from cart', 'info');
-    }
-
-    function clearEntireCart() {
-        localStorage.setItem('pilot_cart', '[]');
+        window.syncCartCount();
         renderCart();
     }
+}
 
-    function saveForLater(idx) {
-        deleteCartItem(idx);
-        if (window.pseToast) window.pseToast('Saved item for later!', 'success');
-    }
+function deleteItem(idx) {
+    var cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+    cart.splice(idx, 1);
+    localStorage.setItem('pilot_cart', JSON.stringify(cart));
+    window.syncCartCount();
+    renderCart();
+    window.pseToast('Item removed from cart', 'info');
+}
 
-    document.addEventListener('DOMContentLoaded', () => {
-        renderCart();
-    });
+function clearCart() {
+    localStorage.removeItem('pilot_cart');
+    window.syncCartCount();
+    renderCart();
+    window.pseToast('Cart cleared', 'info');
+}
+
+document.addEventListener('DOMContentLoaded', renderCart);
 </script>
-<script src="/search-pro.js"></script>
 </body>
 </html>

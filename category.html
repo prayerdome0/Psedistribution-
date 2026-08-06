@@ -1,226 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Category — Pilot Sales Distribution</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="/style.css">
-    <script src="main.js"></script>
-    <script src="/inventory-client.js"></script>
-    <style>
-        .category-hero {
-            background: linear-gradient(135deg, var(--secondary), #0d384c);
-            color: white;
-            padding: 3rem 0;
-            margin-bottom: 2rem;
-        }
-        .category-hero h1 {
-            font-size: 2.8rem;
-            font-weight: 800;
-        }
-        .category-hero p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            max-width: 600px;
-        }
-        .category-stats {
-            display: flex;
-            gap: 2rem;
-            margin-top: 1.5rem;
-        }
-        .category-stats .stat {
-            background: rgba(255,255,255,0.1);
-            padding: 0.6rem 1.2rem;
-            border-radius: 30px;
-            font-size: 0.9rem;
-        }
-    </style>
-    <script src="/marketplace.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Category — PSE Marketplace</title>
+    
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0057FF">
+
+    <!-- Font Awesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Unified Master Stylesheet -->
+    <link rel="stylesheet" href="/marketplace-app.css" />
 </head>
+
 <body>
 
-<!-- TOP BAR + HEADER (same as other pages) -->
-<div class="top-bar">
-    <div class="container">
-        <div class="moving-words">
-            <div class="words-track">
-                <span><i class="fa-solid fa-bolt"></i> Wholesale Inventory. Verified Before You Buy.</span>
-            </div>
-        </div>
-        <div class="top-links">
-            <a href="/products">All Products</a>
-            <a href="/rfq">RFQ</a>
-            <a href="/login">Login</a>
-        </div>
-    </div>
-</div>
+<div class="app-shell">
 
-<header class="header">
-    <div class="container">
-        <a href="/" class="logo">
-            <img src="/logo.webp" alt="PSE Distribution">
-            <div class="brand-name">
-                <span class="main">PSE <span>Distribution</span></span>
-            </div>
-        </a>
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Search this category...">
-            <button><i class="fa-solid fa-search"></i></button>
-        </div>
-        <div class="header-actions">
-            <a href="/cart" class="icon-btn"><i class="fa-solid fa-cart-shopping"></i></a>
-            <a href="/wishlist" class="icon-btn"><i class="fa-regular fa-heart"></i></a>
-        </div>
-    </div>
-</header>
+    <!-- ═══════════ GLOBAL HEADER ═══════════ -->
+    <header class="app-header">
+        <div class="app-header-top">
+            <button type="button" class="app-menu-btn" id="appMenuBtn" aria-label="Open Navigation Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
 
-<!-- CATEGORY HERO -->
-<div class="category-hero">
-    <div class="container">
-        <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
-            <div>
-                <span class="eyebrow" style="background:rgba(255,255,255,0.15);color:#fff;">Category</span>
-                <h1 id="categoryTitle">Category</h1>
-                <p id="categoryDescription">Browse verified wholesale products in this category.</p>
-            </div>
-            <div class="category-stats">
-                <div class="stat"><strong id="categoryCount">0</strong> Products</div>
-                <div class="stat"><strong id="categorySuppliers">—</strong> Suppliers</div>
-            </div>
-        </div>
-    </div>
-</div>
+            <a href="/" class="app-logo" aria-label="PSE Marketplace Home">
+                <img src="/logo.webp" alt="PSE Marketplace Logo" />
+                <span class="app-logo-name">PSE <b>Marketplace</b></span>
+            </a>
 
-<div class="container">
-    <!-- Filters -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
-        <div>
-            <select id="sortSelect" onchange="applyCategoryFilters()" style="padding:0.5rem 1rem; border-radius:8px; border:1px solid var(--border);">
-                <option value="default">Sort: Best Match</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="newest">Recently Updated</option>
-            </select>
+            <div class="app-header-actions">
+                <button type="button" class="app-icon-btn" id="appNotifBtn" aria-label="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="app-badge" id="appNotifBadge">3</span>
+                </button>
+                <a href="/cart" class="app-icon-btn" aria-label="Cart">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="app-badge app-badge--cart cart-count" id="cartCount">0</span>
+                </a>
+            </div>
         </div>
-        <div>
-            <button onclick="clearCategoryFilters()" style="background:#fff; border:1px solid var(--border); padding:0.5rem 1.2rem; border-radius:30px; cursor:pointer;">
-                Clear Filters
+
+        <div class="app-search" id="searchBar">
+            <form class="app-search-form" role="search" onsubmit="event.preventDefault(); var q=document.getElementById('searchInput').value.trim(); if(q) window.location.href='/products?search='+encodeURIComponent(q);">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="searchInput" placeholder="Search Products, Brands, Suppliers..." autocomplete="off" aria-label="Search marketplace" />
+                <button type="submit" id="searchBtn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+        </div>
+
+        <div class="app-locbar">
+            <button type="button" class="app-loc" id="appLocBtn" title="Tap to change delivery location">
+                <i class="fa-solid fa-location-dot"></i> Deliver to <strong id="appZip">90210 – Los Angeles, CA</strong>
+            </button>
+            <a class="app-greet" href="/account" id="appGreetLink"><i class="fa-regular fa-circle-user"></i> Hi, <span id="accountLabel">Guest</span></a>
+        </div>
+    </header>
+
+    <!-- ═══════════ GLOBAL MENU DRAWER ═══════════ -->
+    <div class="app-drawer-overlay" id="appDrawerOverlay"></div>
+    <aside class="app-drawer" id="appDrawer" aria-label="Navigation drawer" aria-hidden="true">
+        <div class="app-drawer-header">
+            <div class="app-drawer-user">
+                <div class="app-drawer-avatar"><i class="fa-solid fa-user"></i></div>
+                <div class="app-drawer-userinfo">
+                    <span class="app-drawer-greeting">Welcome to PSE</span>
+                    <strong class="app-drawer-username" id="drawerUserLabel">Hello, Guest</strong>
+                    <a href="/login" class="app-drawer-authlink" id="drawerAuthLink">Sign In / Register</a>
+                </div>
+            </div>
+            <button type="button" class="app-drawer-close" id="appDrawerClose" aria-label="Close menu">
+                <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-    </div>
 
-    <!-- Products Grid -->
-    <div class="product-grid product-grid-2col professional-2" id="categoryProductGrid">
-        <div class="loading-spinner">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            <p>Loading products...</p>
+        <div class="app-drawer-body">
+            <div class="app-drawer-group-title">Navigation</div>
+            <ul class="app-drawer-menu">
+                <li><a href="/"><i class="fa-solid fa-house"></i><span>Home</span></a></li>
+                <li><a href="/products"><i class="fa-solid fa-layer-group"></i><span>Categories</span></a></li>
+                <li><a href="/products?category=electronics"><i class="fa-solid fa-tv"></i><span>Electronics</span></a></li>
+                <li><a href="/products?category=computers"><i class="fa-solid fa-laptop"></i><span>Computers</span></a></li>
+                <li><a href="/products?category=phones"><i class="fa-solid fa-mobile-screen-button"></i><span>Smartphones</span></a></li>
+                <li><a href="/products?category=fashion"><i class="fa-solid fa-shirt"></i><span>Fashion</span></a></li>
+                <li><a href="/products?category=automotive"><i class="fa-solid fa-car"></i><span>Automotive</span></a></li>
+                <li><a href="/products?category=home"><i class="fa-solid fa-couch"></i><span>Home &amp; Industrial</span></a></li>
+                <li><a href="/products?category=overstock"><i class="fa-solid fa-boxes-stacked"></i><span>Liquidation Lots</span></a></li>
+                <li><a href="/rfq"><i class="fa-solid fa-file-invoice-dollar"></i><span>RFQ Quotes</span><span class="app-drawer-pill">B2B</span></a></li>
+                <li><a href="/supplier-store"><i class="fa-solid fa-store"></i><span>Supplier Directory</span></a></li>
+                <li><a href="/account#orders"><i class="fa-solid fa-box"></i><span>Orders</span></a></li>
+                <li><a href="/wishlist"><i class="fa-regular fa-heart"></i><span>Wishlist</span></a></li>
+                <li><a href="/cart"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><span class="app-drawer-badge cart-count">0</span></a></li>
+                <li><a href="/account"><i class="fa-regular fa-user"></i><span>Account</span></a></li>
+                <li><a href="/account#settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a></li>
+                <li><a href="/contact"><i class="fa-regular fa-envelope"></i><span>Contact Us</span></a></li>
+            </ul>
         </div>
-    </div>
+    </aside>
+
+    <!-- ═══════════ CATEGORY MAIN CONTENT ═══════════ -->
+    <main class="app-main">
+
+        <!-- Category Banner -->
+        <div class="app-category-banner">
+            <h1 id="catTitle">Category Lots</h1>
+            <p id="catDesc">Verified wholesale inventory with confirmed availability and freight options.</p>
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="app-filter-pills">
+            <a href="/products" class="app-pill">All</a>
+            <a href="/category?cat=electronics" class="app-pill" data-cat="electronics">Electronics</a>
+            <a href="/category?cat=computers" class="app-pill" data-cat="computers">Computers</a>
+            <a href="/category?cat=phones" class="app-pill" data-cat="phones">Smartphones</a>
+            <a href="/category?cat=fashion" class="app-pill" data-cat="fashion">Fashion</a>
+            <a href="/category?cat=automotive" class="app-pill" data-cat="automotive">Automotive</a>
+            <a href="/category?cat=home" class="app-pill" data-cat="home">Home</a>
+            <a href="/category?cat=overstock" class="app-pill" data-cat="overstock">Liquidation</a>
+        </div>
+
+        <!-- Products Grid (grid-cols-2 / grid-cols-3) -->
+        <div class="grid-cols-2" id="catProductsGrid">
+            <!-- Rendered by JS from real seller products -->
+        </div>
+
+    </main>
+
+    <!-- ═══════════ COMPACT FOOTER ═══════════ -->
+    <footer class="app-footer">
+        <div class="app-footer-logo">
+            <img src="/logo.webp" alt="PSE Marketplace" />
+            <strong>PSE <b>Marketplace</b></strong>
+        </div>
+        <p>&copy; 2026 Pilot Sales Distribution, Inc. All rights reserved.</p>
+    </footer>
+
+    <!-- ═══════════ BOTTOM NAVIGATION ═══════════ -->
+    <nav class="app-bottom-nav" aria-label="Main navigation">
+        <a href="/" class="app-nav-item" data-nav="home">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/products" class="app-nav-item active" data-nav="categories">
+            <i class="fa-solid fa-shapes"></i>
+            <span>Categories</span>
+        </a>
+        <a href="/rfq" class="app-nav-item" data-nav="rfq">
+            <i class="fa-solid fa-file-invoice"></i>
+            <span>RFQ</span>
+        </a>
+        <a href="/cart" class="app-nav-item" data-nav="cart">
+            <div class="app-nav-icon-wrap">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="app-badge app-badge--cart cart-count">0</span>
+            </div>
+            <span>Cart</span>
+        </a>
+        <a href="/account" class="app-nav-item" data-nav="account">
+            <i class="fa-solid fa-user"></i>
+            <span>Account</span>
+        </a>
+    </nav>
+
 </div>
 
+<script src="/marketplace-app.js"></script>
 <script>
-    let allCategoryProducts = [];
-    let currentCategory = '';
+(async function () {
+    var params = new URLSearchParams(window.location.search);
+    var cat = params.get('cat') || params.get('category') || 'electronics';
 
-    async function loadCategoryProducts() {
-        const params = new URLSearchParams(window.location.search);
-        currentCategory = params.get('cat') || params.get('category') || 'electronics';
-        
-        const titleEl = document.getElementById('categoryTitle');
-        const descEl = document.getElementById('categoryDescription');
-        
-        titleEl.textContent = currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1);
-        descEl.textContent = `Verified wholesale ${currentCategory} products with confirmed availability.`;
+    document.querySelectorAll('.app-pill').forEach(function(pill) {
+        if (pill.getAttribute('data-cat') === cat) pill.classList.add('active');
+    });
 
-        try {
-            const response = await fetch(`/api/inventory?category=${encodeURIComponent(currentCategory)}&limit=100`);
-            const data = await response.json();
-            
-            allCategoryProducts = (data.data || []).map(item => ({
-                ...item,
-                slug: item.slug || item.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-                price: item.pricingMode === 'public' ? item.publicUnitPrice : null
-            }));
+    document.getElementById('catTitle').textContent = cat.charAt(0).toUpperCase() + cat.slice(1) + ' Wholesale';
+    document.getElementById('catDesc').textContent = 'Browse verified ' + cat + ' inventory lots from real admin and sellers.';
 
-            document.getElementById('categoryCount').textContent = allCategoryProducts.length;
-            renderCategoryProducts(allCategoryProducts);
-        } catch (e) {
-            console.error(e);
-            document.getElementById('categoryProductGrid').innerHTML = 
-                `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#64748b;">No products found in this category.</div>`;
-        }
-    }
+    var products = await window.PSEMarketplace.fetchLiveProducts();
+    var filtered = products.filter(function (p) { return p.category === cat; });
 
-    function renderCategoryProducts(products) {
-        const grid = document.getElementById('categoryProductGrid');
-        if (!products.length) {
-            grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;">No products available.</div>`;
+    var grid = document.getElementById('catProductsGrid');
+    if (grid) {
+        if (!filtered.length) {
+            grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:32px 12px; background:#fff; border-radius:14px; border:1px solid var(--app-border);"><i class="fa-solid fa-box-open" style="font-size:28px; color:var(--app-text-light); margin-bottom:6px;"></i><p style="font-size:12px; color:var(--app-text-muted); margin:0;">No products listed yet under ' + cat + '.</p></div>';
             return;
         }
 
-        grid.innerHTML = products.map(p => {
-            const price = p.price ? '$' + Number(p.price).toFixed(2) : 'Quote required';
-            const slug = p.slug || '';
-            return `
-                <div class="product-card">
-                    <div class="product-image" onclick="window.location.href='/product/${encodeURIComponent(slug)}'">
-                        <img src="${p.image_url || p.imageUrls?.[0] || '/logo.webp'}" alt="${p.title}" loading="lazy" onerror="this.src='/logo.webp'">
-                    </div>
-                    <div class="product-title">${p.title}</div>
-                    <div class="product-brand">${p.brand || 'Pilot Distribution'}</div>
-                    <div class="product-price">${price}</div>
-                    <div class="product-actions">
-                        <a href="/product/${encodeURIComponent(slug)}" class="btn-add" style="text-align:center;text-decoration:none;">
-                            <i class="fa-regular fa-eye"></i> Details
-                        </a>
-                        <a href="/rfq?dealId=${p.dealId || ''}" class="btn-add" style="background:var(--primary);text-align:center;text-decoration:none;">
-                            <i class="fa-regular fa-file-lines"></i> RFQ
-                        </a>
-                    </div>
-                </div>
-            `;
+        grid.innerHTML = filtered.map(function (p) {
+            var slug = p.slug || (p.title || 'product').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            var detailUrl = '/product-detail?slug=' + encodeURIComponent(slug);
+            return '' +
+                '<div class="app-card">' +
+                    '<div class="app-card-img" onclick="window.location.href=\'' + detailUrl + '\'">' +
+                        '<span class="app-card-badge">VERIFIED</span>' +
+                        '<img src="' + (p.image || '/logo.webp') + '" alt="' + p.title + '" loading="lazy" onerror="this.src=\'/logo.webp\'" />' +
+                    '</div>' +
+                    '<div class="app-card-body">' +
+                        '<div class="app-card-brand">' + (p.brand || p.supplier_name || 'Verified Supplier') + '</div>' +
+                        '<a href="' + detailUrl + '" class="app-card-title">' + p.title + '</a>' +
+                        '<div class="app-card-price-row">' +
+                            '<span class="app-card-price">$' + Number(p.price || 0).toFixed(2) + '</span>' +
+                        '</div>' +
+                        '<div class="app-card-moq"><i class="fa-solid fa-box"></i> MOQ: ' + (p.moq || 1) + ' units</div>' +
+                        '<button type="button" class="app-card-btn" onclick="window.handleAddToCart(\'' + p.id + '\', \'' + p.title + '\', ' + p.price + ', \'' + p.image + '\')">' +
+                            '<i class="fa-solid fa-cart-shopping"></i> Add to Cart' +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
         }).join('');
     }
-
-    function applyCategoryFilters() {
-        const sort = document.getElementById('sortSelect').value;
-        let filtered = [...allCategoryProducts];
-
-        if (sort === 'price-asc') {
-            filtered.sort((a, b) => (a.price || Infinity) - (b.price || Infinity));
-        } else if (sort === 'price-desc') {
-            filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
-        } else if (sort === 'newest') {
-            filtered.sort((a, b) => new Date(b.lastAvailabilityConfirmedAt || 0) - new Date(a.lastAvailabilityConfirmedAt || 0));
-        }
-
-        renderCategoryProducts(filtered);
-    }
-
-    function clearCategoryFilters() {
-        document.getElementById('sortSelect').value = 'default';
-        renderCategoryProducts(allCategoryProducts);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        loadCategoryProducts();
-        
-        // Search within category
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('input', () => {
-                const query = searchInput.value.toLowerCase();
-                const filtered = allCategoryProducts.filter(p => 
-                    p.title?.toLowerCase().includes(query) || 
-                    p.brand?.toLowerCase().includes(query)
-                );
-                renderCategoryProducts(filtered);
-            });
-        }
-    });
+})();
 </script>
-
-<script src="quickview.js"></script>
 </body>
 </html>

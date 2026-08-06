@@ -1556,6 +1556,11 @@
 
             allProducts = [];
             snapshot.forEach(doc => allProducts.push({ id: doc.id, ...doc.data() }));
+            try {
+                const currentLive = JSON.parse(localStorage.getItem('pse_live_products') || '[]');
+                const merged = [...currentLive.filter(p => p.supplier_id !== user.uid), ...allProducts];
+                localStorage.setItem('pse_live_products', JSON.stringify(merged));
+            } catch (e) {}
 
             if (allProducts.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-light); padding:2rem;">

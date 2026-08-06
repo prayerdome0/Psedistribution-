@@ -2,2030 +2,268 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Account - Pilot Sales Distribution</title>
-    <meta name="description" content="Manage your account at Pilot Sales Distribution." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Account Dashboard — PSE Marketplace</title>
     
+    <!-- SEO Meta Tags -->
+    <link rel="canonical" href="https://pilotsalesdistribution.com/account" />
+    <meta name="robots" content="index, follow" />
+    <meta name="description" content="Manage your PSE Marketplace account, orders, RFQs, addresses, wishlist and preferences." />
+
+    <!-- Favicon & PWA -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0057FF">
+
+    <!-- Font Awesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap&family=Montserrat:wght@300;400;500;600;700;800;900" rel="stylesheet" />
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="main.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-    
-    <style>
-        :root {
-            --primary: #0e7c68;
-            --primary-dark: #0a5a4a;
-            --primary-light: #e6f4ef;
-            --secondary: #0b2138;
-            --secondary-light: #16334f;
-            --accent: #e0a62e;
-            --accent-hover: #c8901f;
-            --dark: #0b1a2a;
-            --text: #33475b;
-            --text-light: #698093;
-            --border: #e9edf2;
-            --border-dark: #d3dce5;
-            --light: #f5f8fa;
-            --white: #ffffff;
-            --shadow: 0 4px 20px rgba(0,0,0,0.06);
-            --shadow-hover: 0 20px 50px -10px rgba(0,20,30,0.12);
-            --radius: 1.5rem;
-            --radius-sm: 0.8rem;
-            --transition: 0.3s ease;
-        }
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
-        body { background: var(--light); color: var(--dark); line-height: 1.6; overflow-x: hidden; }
-        a { text-decoration: none; color: inherit; }
-        ul { list-style: none; }
-        img { max-width: 100%; display: block; }
-
-        .container { max-width: 1300px; margin: 0 auto; padding: 0 1.5rem; }
-
-        .animate-on-scroll { opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease, transform 0.6s ease; }
-        .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
-
-        .top-bar {
-            background: var(--secondary);
-            color: #d4e2ed;
-            font-size: 0.75rem;
-            padding: 0.4rem 0;
-            border-bottom: 1px solid #16334f;
-            overflow: hidden;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .top-bar .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
-        .moving-words { flex: 1; overflow: hidden; white-space: nowrap; position: relative; }
-        .moving-words .words-track { display: inline-block; animation: scrollWords 30s linear infinite; }
-        .moving-words .words-track span { margin: 0 2rem; font-weight: 500; }
-        .moving-words .words-track span i { color: var(--accent); margin-right: 0.3rem; }
-        @keyframes scrollWords { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
-        .top-links { display: flex; gap: 1rem; flex-shrink: 0; }
-        .top-links a { color: #a9c3d6; transition: var(--transition); cursor: pointer; }
-        .top-links a:hover { color: var(--white); }
-        .top-links i { color: var(--accent); margin-right: 0.2rem; }
-
-        .header {
-            background: var(--white);
-            padding: 0.8rem 0;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 35px;
-            z-index: 100;
-        }
-        .header .container { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
-        .logo { display: flex; align-items: center; gap: 0.8rem; text-decoration: none; flex-shrink: 0; }
-        .logo img { height: 45px; width: auto; border-radius: 8px; }
-        .logo .brand-name .main { font-size: 1.3rem; font-weight: 800; color: var(--secondary); }
-        .logo .brand-name .main span { color: var(--primary); }
-        .logo .brand-name .sub { font-size: 0.5rem; color: var(--text-light); font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
-
-        .search-bar {
-            flex: 1;
-            min-width: 200px;
-            display: flex;
-            background: var(--light);
-            border-radius: 50px;
-            border: 2px solid transparent;
-            transition: var(--transition);
-            overflow: hidden;
-            position: relative;
-        }
-        .search-bar:focus-within { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 4px rgba(26,123,107,0.08); }
-        .search-bar input { flex: 1; border: none; padding: 0.6rem 1rem; font-size: 0.9rem; background: transparent; outline: none; }
-        .search-bar button { background: var(--primary); border: none; color: var(--white); padding: 0 1.8rem; cursor: pointer; font-size: 1rem; transition: var(--transition); }
-        .search-bar button:hover { background: var(--primary-dark); }
-        .search-results {
-            position: absolute;
-            top: 110%;
-            left: 0;
-            right: 0;
-            background: var(--white);
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-hover);
-            border: 1px solid var(--border);
-            max-height: 300px;
-            overflow-y: auto;
-            display: none;
-            z-index: 200;
-        }
-        .search-results.show { display: block; }
-        .search-results .result-item { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 1rem; }
-        .search-results .result-item:hover { background: var(--primary-light); }
-        .search-results .result-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
-        .search-results .result-item .info .title { font-weight: 600; font-size: 0.85rem; }
-        .search-results .result-item .info .price { color: var(--primary); font-weight: 700; font-size: 0.8rem; }
-
-        .header-actions { display: flex; align-items: center; gap: 1.2rem; font-size: 0.9rem; flex-wrap: wrap; }
-        .header-actions .icon-btn {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 0.6rem;
-            color: #33475b;
-            cursor: pointer;
-            transition: var(--transition);
-            padding: 0.2rem 0.3rem;
-        }
-        .header-actions .icon-btn i { font-size: 1.3rem; margin-bottom: 2px; transition: var(--transition); }
-        .header-actions .icon-btn:hover { color: var(--primary); transform: translateY(-2px); }
-        .header-actions .icon-btn:hover i { transform: scale(1.1); }
-        .badge-count {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            background: #c0392b;
-            color: var(--white);
-            font-size: 0.55rem;
-            font-weight: 700;
-            border-radius: 50%;
-            padding: 0.1rem 0.45rem;
-            min-width: 18px;
-            text-align: center;
-            animation: badgePop 0.3s ease;
-        }
-        @keyframes badgePop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
-
-        .nav-categories {
-            background: var(--white);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            padding: 0.4rem 0;
-            overflow-x: auto;
-            white-space: nowrap;
-            scrollbar-width: thin;
-            position: sticky;
-            top: 75px;
-            z-index: 99;
-        }
-        .nav-categories::-webkit-scrollbar { height: 3px; }
-        .nav-categories::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-        .nav-categories .container { display: flex; gap: 1.8rem; align-items: center; font-size: 0.8rem; font-weight: 500; color: #33475b; }
-        .nav-tab { padding: 0.3rem 0; border-bottom: 3px solid transparent; transition: var(--transition); cursor: pointer; position: relative; flex-shrink: 0; }
-        .nav-tab::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 3px; background: var(--primary); transition: width 0.4s ease; }
-        .nav-tab:hover::after, .nav-tab.active::after { width: 100%; }
-        .nav-tab:hover { color: var(--secondary); }
-        .nav-tab.active { color: var(--primary); font-weight: 700; }
-        .wholesale-nav { color: var(--primary); font-weight: 700; }
-
-        .account-page { max-width: 1000px; margin: 2rem auto; }
-        .account-header { text-align: center; padding: 2rem 0; background: linear-gradient(135deg, var(--secondary), var(--secondary-light)); border-radius: var(--radius); color: var(--white); margin-bottom: 2rem; }
-        .account-header h1 { font-size: 2.5rem; font-weight: 900; }
-        .account-header h1 span { color: var(--accent); }
-        
-        .account-layout { display: grid; grid-template-columns: 240px 1fr; gap: 2rem; }
-        .account-sidebar { background: var(--white); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border); height: fit-content; position: sticky; top: 100px; }
-        .account-sidebar .user-info { text-align: center; padding-bottom: 1rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
-        .account-sidebar .user-info .avatar-wrapper { position: relative; width: 80px; height: 80px; margin: 0 auto 0.5rem; }
-        .account-sidebar .user-info .avatar-wrapper .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: var(--primary); border: 3px solid var(--primary); overflow: hidden; }
-        .account-sidebar .user-info .avatar-wrapper .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .account-sidebar .user-info .avatar-wrapper .avatar-upload-btn { position: absolute; bottom: 0; right: 0; background: var(--primary); color: var(--white); border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 0.7rem; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
-        .account-sidebar .user-info .avatar-wrapper .avatar-upload-btn:hover { background: var(--primary-dark); transform: scale(1.1); }
-        .account-sidebar .user-info .name { font-weight: 600; color: var(--secondary); }
-        .account-sidebar .user-info .email { font-size: 0.8rem; color: var(--text-light); word-break: break-all; }
-        .account-sidebar .user-info .role-badge { display: inline-block; margin-top: 0.3rem; padding: 0.15rem 0.8rem; border-radius: 30px; font-size: 0.7rem; font-weight: 600; }
-        .role-badge.buyer { background: #cce5ff; color: #004085; }
-        .role-badge.seller { background: #d4edda; color: #155724; }
-        .role-badge.admin { background: #f8d7da; color: #721c24; }
-        
-        /* ─── ADMIN NAV ITEM ─── */
-        .account-sidebar .nav-item.admin-nav { 
-            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            border-radius: 8px;
-            margin-top: 0.3rem;
-            margin-bottom: 0.3rem;
-            padding: 0.6rem 0.8rem;
-            font-weight: 600;
-        }
-        .account-sidebar .nav-item.admin-nav:hover { 
-            background: linear-gradient(135deg, #f5c6cb, #f1b0b7);
-            color: #491217;
-        }
-        .account-sidebar .nav-item.admin-nav i { 
-            color: #721c24; 
-        }
-        .account-sidebar .nav-item.admin-nav .admin-badge {
-            margin-left: auto;
-            background: #721c24;
-            color: #fff;
-            font-size: 0.55rem;
-            padding: 0.1rem 0.5rem;
-            border-radius: 30px;
-        }
-
-        .account-sidebar .nav-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 0.8rem; border-radius: 8px; color: var(--text); cursor: pointer; transition: var(--transition); margin-bottom: 0.2rem; font-size: 0.85rem; border: none; background: none; width: 100%; text-align: left; }
-        .account-sidebar .nav-item:hover { background: var(--light); color: var(--secondary); }
-        .account-sidebar .nav-item.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
-        .account-sidebar .nav-item .badge { margin-left: auto; background: #e0a62e; color: #fff; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 30px; }
-        .account-sidebar .nav-item .badge.admin-badge { background: #721c24; }
-        .account-sidebar .logout-btn { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); color: #c0392b; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.85rem; width: 100%; border: none; background: none; text-align: left; }
-        .account-sidebar .logout-btn:hover { background: #fdf2f2; }
-        
-        .account-content { background: var(--white); border-radius: var(--radius); padding: 2rem; border: 1px solid var(--border); }
-        .account-content .tab-content { display: none; }
-        .account-content .tab-content.active { display: block; }
-        .account-content .section-title { font-size: 1.2rem; color: var(--secondary); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
-        .account-content .section-title i { color: var(--primary); margin-right: 0.5rem; }
-        
-        .profile-form .form-group { margin-bottom: 1.2rem; }
-        .profile-form .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--secondary); margin-bottom: 0.3rem; }
-        .profile-form .form-group input, .profile-form .form-group select, .profile-form .form-group textarea { width: 100%; padding: 0.7rem 0.8rem; border: 1px solid var(--border-dark); border-radius: var(--radius-sm); font-size: 0.9rem; transition: var(--transition); font-family: inherit; }
-        .profile-form .form-group input:focus, .profile-form .form-group select:focus, .profile-form .form-group textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(26,123,107,0.1); }
-        .profile-form .form-group textarea { resize: vertical; min-height: 60px; }
-        .profile-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .profile-form .btn-save { background: var(--primary); color: var(--white); border: none; padding: 0.7rem 2rem; border-radius: 50px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; }
-        .profile-form .btn-save:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(26,123,107,0.3); }
-        .profile-form .btn-save:disabled { opacity: 0.7; cursor: not-allowed; }
-        
-        .profile-upload-area { border: 2px dashed var(--border-dark); border-radius: var(--radius-sm); padding: 1.5rem; text-align: center; cursor: pointer; transition: var(--transition); background: var(--light); margin-bottom: 1rem; }
-        .profile-upload-area:hover { border-color: var(--primary); background: var(--primary-light); }
-        .profile-upload-area i { font-size: 2rem; color: var(--primary); opacity: 0.5; }
-        .profile-upload-area p { color: var(--text-light); font-size: 0.85rem; margin-top: 0.3rem; }
-        .profile-upload-area .file-name { color: var(--primary); font-weight: 600; }
-        .profile-preview { display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem; }
-        .profile-preview img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); }
-        .profile-preview .remove-photo { color: #c0392b; cursor: pointer; font-size: 0.8rem; }
-        .profile-preview .remove-photo:hover { text-decoration: underline; }
-        
-        .orders-list .order-card { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1rem; transition: var(--transition); }
-        .orders-list .order-card:hover { border-color: var(--primary-light); }
-        .orders-list .order-card .order-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.3rem; }
-        .orders-list .order-card .order-header .order-number { font-weight: 700; color: var(--secondary); }
-        .orders-list .order-card .order-header .order-status { font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.8rem; border-radius: 30px; }
-        .order-status.pending { background: #fff3cd; color: #856404; }
-        .order-status.processing { background: #cce5ff; color: #004085; }
-        .order-status.shipped { background: #cce5ff; color: #004085; }
-        .order-status.delivered { background: #d4edda; color: #155724; }
-        .order-status.cancelled { background: #f8d7da; color: #721c24; }
-        .order-status.quoted { background: #d4edda; color: #155724; }
-        .orders-list .order-card .order-details { font-size: 0.85rem; color: var(--text-light); }
-        .orders-list .order-card .order-total { font-weight: 700; color: var(--primary); margin-top: 0.3rem; }
-        
-        .no-orders { text-align: center; padding: 2rem; color: var(--text-light); }
-        .no-orders i { font-size: 2.5rem; color: var(--border-dark); margin-bottom: 0.5rem; }
-        
-        .wishlist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.5rem; }
-        .wishlist-item { background: var(--white); border-radius: var(--radius-sm); padding: 1rem; border: 1px solid var(--border); text-align: center; transition: var(--transition); position: relative; }
-        .wishlist-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--primary-light); }
-        .wishlist-item .wishlist-image { aspect-ratio: 1/1; background: var(--light); border-radius: var(--radius-sm); overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; cursor: pointer; }
-        .wishlist-item .wishlist-image img { width: 100%; height: 100%; object-fit: cover; }
-        .wishlist-item .wishlist-title { font-weight: 600; font-size: 0.85rem; color: var(--secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .wishlist-item .wishlist-price { font-weight: 700; color: var(--primary); font-size: 0.95rem; }
-        .wishlist-item .wishlist-remove { position: absolute; top: 5px; right: 5px; background: none; border: none; color: #c0392b; cursor: pointer; font-size: 0.8rem; padding: 0.2rem 0.4rem; border-radius: 50%; transition: var(--transition); }
-        .wishlist-item .wishlist-remove:hover { background: #f8d7da; }
-
-        .toast {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--secondary);
-            color: var(--white);
-            padding: 0.8rem 2rem;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            z-index: 9999;
-            display: none;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            max-width: 90%;
-            text-align: center;
-        }
-        .toast.show { display: block; }
-        .toast.success { background: var(--primary); }
-        .toast.error { background: #c0392b; }
-        .toast.info { background: #2980b9; }
-
-        .footer {
-            background: var(--secondary);
-            color: #a9c3d6;
-            padding: 2rem 0 1rem;
-            margin-top: 3rem;
-        }
-        .footer .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
-        .footer .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
-        .footer .footer-links a { color: #a9c3d6; font-size: 0.85rem; transition: var(--transition); }
-        .footer .footer-links a:hover { color: var(--white); }
-        .footer .footer-bottom { border-top: 1px solid #16334f; padding-top: 1rem; margin-top: 1rem; text-align: center; font-size: 0.75rem; opacity: 0.6; }
-        .footer .footer-bottom strong { color: var(--white); }
-        .footer .footer-social { display: flex; gap: 1rem; }
-        .footer .footer-social a { color: #a9c3d6; transition: var(--transition); font-size: 1.1rem; }
-        .footer .footer-social a:hover { color: var(--white); transform: translateY(-2px); }
-
-        .password-strength { height: 4px; background: var(--border-dark); border-radius: 4px; margin-top: 0.3rem; overflow: hidden; }
-        .password-strength .bar { height: 100%; width: 0%; border-radius: 4px; transition: var(--transition); }
-
-        @media (max-width: 992px) { 
-            .account-layout { grid-template-columns: 1fr; } 
-            .account-sidebar { position: static; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.3rem; padding: 1rem; } 
-            .account-sidebar .user-info { grid-column: 1 / -1; } 
-            .account-sidebar .logout-btn { grid-column: 1 / -1; } 
-        }
-        @media (max-width: 768px) { 
-            .account-content { padding: 1rem; } 
-            .profile-form .form-row { grid-template-columns: 1fr; } 
-            .wishlist-grid { grid-template-columns: repeat(2, 1fr); } 
-            .account-sidebar { grid-template-columns: 1fr 1fr; }
-            .top-bar .container { flex-direction: column; gap: 0.3rem; align-items: stretch; text-align: center; }
-            .top-links { justify-content: center; }
-            .header .container { gap: 0.8rem; }
-            .search-bar { min-width: 100%; order: 10; }
-            .header-actions .icon-btn span { display: none; }
-            .footer .footer-content { flex-direction: column; text-align: center; }
-            .footer .footer-links { justify-content: center; gap: 1rem; }
-        }
-        @media (max-width: 480px) { 
-            .account-sidebar { grid-template-columns: 1fr; } 
-            .wishlist-grid { grid-template-columns: 1fr 1fr; gap: 0.8rem; } 
-            .profile-preview { flex-direction: column; align-items: center; }
-            .top-bar .moving-words .words-track span { font-size: 0.65rem; }
-        }
-        /* ─── REWARDS & WALLET TAB ─── */
-        .rewards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin-bottom:1.5rem; }
-        .reward-card { background:linear-gradient(135deg,#fff,#f8f9fb); border:1px solid var(--border); border-radius:var(--radius); padding:1.3rem 1.2rem; text-align:center; position:relative; overflow:hidden; }
-        .reward-card .ico { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 0.6rem; font-size:1.3rem; color:#fff; }
-        .reward-card .val { font-size:1.7rem; font-weight:800; color:var(--secondary); line-height:1.1; }
-        .reward-card .lbl { font-size:0.72rem; color:var(--text-light); text-transform:uppercase; letter-spacing:.06em; margin-top:0.2rem; }
-        .tier-ladder { display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:1.4rem; }
-        .tier-chip { flex:1; min-width:120px; border:1px solid var(--border); border-radius:var(--radius-sm); padding:0.8rem; text-align:center; background:var(--white); position:relative; }
-        .tier-chip.current { border-width:2px; box-shadow:0 4px 14px rgba(0,0,0,0.08); }
-        .tier-chip .dot { width:14px; height:14px; border-radius:50%; margin:0 auto 0.4rem; }
-        .tier-chip .nm { font-weight:700; font-size:0.85rem; color:var(--secondary); }
-        .tier-chip .mn { font-size:0.68rem; color:var(--text-light); }
-        .tier-chip .mult { font-size:0.72rem; font-weight:700; margin-top:0.25rem; }
-        .progress-wrap { background:#eef2f6; border-radius:30px; height:10px; overflow:hidden; margin:0.4rem 0 1rem; }
-        .progress-bar { height:100%; background:linear-gradient(90deg,#9b59b6,#8e44ad); border-radius:30px; transition:width .6s ease; }
-        .referral-box { background:linear-gradient(135deg,#8e44ad,#9b59b6); color:#fff; border-radius:var(--radius); padding:1.4rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
-        .referral-box .ref-code { font-family:monospace; font-size:1.1rem; font-weight:700; background:rgba(255,255,255,0.2); padding:0.5rem 1rem; border-radius:8px; }
-        .referral-box button { background:#fff; color:#8e44ad; border:none; padding:0.6rem 1.2rem; border-radius:8px; font-weight:700; cursor:pointer; transition:var(--transition); }
-        .referral-box button:hover { transform:translateY(-2px); }
-        .rewards-disabled { text-align:center; padding:2.5rem 1rem; color:var(--text-light); }
-        .rewards-disabled i { font-size:2.5rem; color:#bdc3c7; margin-bottom:0.6rem; }
-    </style>
-    <link rel="stylesheet" href="/style.css" />
-    <script src="/marketplace.js"></script>
+    <!-- Unified Master Stylesheet -->
+    <link rel="stylesheet" href="/marketplace-app.css" />
 </head>
+
 <body>
 
-<!-- TOP BAR -->
-<!-- 1. TOP DELIVERY & UTILITY BAR -->
-<div class="mkt-topbar">
-    <div class="container">
-        <div class="mkt-topbar-left">
-            <div class="top-delivery-badge" data-change-location title="Click to change your delivery location">
-                <i class="fa-solid fa-location-dot"></i>
-                <div class="top-delivery-text">
-                    <span>Deliver to</span>
-                    <strong class="pse-delivery-zip">90210 - Los Angeles, CA</strong>
-                </div>
-            </div>
-            <div class="mkt-announcement-ticker">
-                <span class="badge"><i class="fa-solid fa-bolt"></i> MARKETPLACE ROLLBACKS</span>
-                <span>Save up to 50% on verified bulk pallets &amp; overstock inventory</span>
-            </div>
-        </div>
-        <div class="mkt-topbar-right">
-            <a href="tel:+19099384682"><i class="fa-solid fa-phone"></i> <span>24/7 B2B: +1 (909) 938-4682</span></a>
-            <a href="/become-seller"><i class="fa-solid fa-store"></i> <span>Sell on PSE</span></a>
-            <a href="/track-order"><i class="fa-solid fa-truck"></i> <span>Track Order</span></a>
-            <a href="/help-center"><i class="fa-regular fa-circle-question"></i> <span>Help</span></a>
-            <button type="button" class="mkt-currency-btn" onclick="PSEMarketplace.openCurrencyModal()" title="Change Currency (USD, EUR, GBP, CAD, AUD, ZMW, JPY)"><span>🇺🇸 USD ($)</span> <i class="fa-solid fa-chevron-down" style="font-size:0.6rem;"></i></button>
-        </div>
-    </div>
-</div>
+<div class="app-shell">
 
-<!-- 2. MAIN MARKETPLACE HEADER (Amazon & Walmart Style) -->
-<header class="mkt-header">
-    <div class="container">
-        <a href="/" class="mkt-logo" aria-label="Pilot Sales Distribution Marketplace">
-            <img src="/logo.webp" alt="PSE Distribution Marketplace logo" />
-            <div class="mkt-logo-text">
-                <div class="mkt-logo-main">PSE <span>Marketplace</span></div>
-                <div class="mkt-logo-sub">Wholesale <span class="verified-pill"><i class="fa-solid fa-circle-check"></i> Verified</span></div>
-            </div>
-        </a>
-
-        <div class="mkt-search-wrapper" id="searchBar">
-            <form class="mkt-search-form" role="search" onsubmit="event.preventDefault();">
-                <select class="mkt-search-dept" id="searchDeptSelect" aria-label="Select Category">
-                    <option value="all">All Departments</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="computers">Computers &amp; Laptops</option>
-                    <option value="phones">Smartphones &amp; Tablets</option>
-                    <option value="fashion">Fashion &amp; Apparel</option>
-                    <option value="automotive">Automotive &amp; Fleet</option>
-                    <option value="home">Home &amp; Industrial</option>
-                    <option value="overstock">Liquidation Lots</option>
-                </select>
-                <input type="search" id="searchInput" class="mkt-search-input" placeholder="Search 10,000+ wholesale products, brands, ASINs, or verified suppliers..." autocomplete="off" aria-label="Search wholesale products" />
-                <button type="submit" id="searchBtn" class="mkt-search-btn" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </form>
-            <div class="search-results" id="searchResults"></div>
-        </div>
-
-        <div class="mkt-header-actions">
-            <div class="mkt-account-dropdown">
-                <a href="/account" class="mkt-header-link" id="accountBtn" aria-label="Account and Lists">
-                    <span class="sub-line" id="accountGreeting">Hello, Sign in</span>
-                    <span class="main-line"><span id="accountLabel">Account &amp; Lists</span> <i class="fa-solid fa-caret-down" style="font-size:0.65rem;"></i></span>
-                </a>
-                <div class="mkt-account-flyout">
-                    <a href="/login" class="mkt-flyout-signin-btn" id="loginLink">Sign In</a>
-                    <div class="mkt-flyout-register" id="registerLink">New customer? <a href="/register">Start here.</a></div>
-                    <div class="mkt-flyout-menu">
-                        <a href="/account"><i class="fa-regular fa-user"></i> Your Account</a>
-                        <a href="/buyer-dashboard"><i class="fa-solid fa-box"></i> Your Orders &amp; Invoices</a>
-                        <a href="/rfq"><i class="fa-regular fa-file-lines"></i> Your RFQ Quotes</a>
-                        <a href="/wishlist"><i class="fa-regular fa-heart"></i> Your Saved Wishlist</a>
-                        <a href="/seller-dashboard"><i class="fa-solid fa-store"></i> Seller Central Hub</a>
-                        <a href="/help-center"><i class="fa-regular fa-circle-question"></i> Help &amp; Support</a>
-                    </div>
-                </div>
-            </div>
-
-            <a href="/buyer-dashboard" class="mkt-header-link" aria-label="Returns and Orders">
-                <span class="sub-line">Returns</span>
-                <span class="main-line">&amp; Orders</span>
-            </a>
-
-            <a href="/rfq" class="mkt-header-link" aria-label="Bulk Quotes and RFQ">
-                <span class="sub-line">Wholesale</span>
-                <span class="main-line"><i class="fa-solid fa-file-invoice-dollar" style="color:var(--amz-amber);"></i> RFQ <span class="amz-rfq-badge rfq-count" style="background:var(--pse-teal);color:#fff;border-radius:10px;padding:1px 6px;font-size:0.7rem;margin-left:3px;">0</span></span>
-            </a>
-
-            <a href="/cart" class="mkt-cart-btn" id="cartBtn" aria-label="Shopping Cart">
-                <div class="mkt-cart-icon-wrap">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <span class="mkt-cart-badge cart-count" id="cartCount">0</span>
-                </div>
-                <div class="mkt-cart-label">
-                    <span>Cart</span>
-                    <strong>/bin/bash.00</strong>
-                </div>
-            </a>
-        </div>
-    </div>
-</header>
-
-<!-- 3. SUBNAV / DEPARTMENT BAR -->
-<nav class="mkt-subnav" aria-label="Department Navigation">
-    <div class="container">
-        <div class="mkt-subnav-links">
-            <button class="amz-all-menu-btn" data-open-drawer aria-label="Open All Departments Menu">
+    <!-- ═══════════ GLOBAL HEADER ═══════════ -->
+    <header class="app-header">
+        <div class="app-header-top">
+            <button type="button" class="app-menu-btn" id="appMenuBtn" aria-label="Open Navigation Menu">
                 <i class="fa-solid fa-bars"></i>
-                <span>All Departments</span>
             </button>
-            <a href="/products?filter=deals" class="mkt-subnav-link highlight"><i class="fa-solid fa-bolt"></i> Today's Deals</a>
-            <a href="/products?sort=bestsellers" class="mkt-subnav-link"><i class="fa-solid fa-fire"></i> Best Sellers</a>
-            <a href="/products?filter=rollback" class="mkt-subnav-link"><i class="fa-solid fa-tags"></i> Walmart Rollbacks</a>
-            <a href="/products?category=electronics" class="mkt-subnav-link">Electronics</a>
-            <a href="/products?category=computers" class="mkt-subnav-link">Computers &amp; Laptops</a>
-            <a href="/products?category=phones" class="mkt-subnav-link">Smartphones</a>
-            <a href="/products?category=fashion" class="mkt-subnav-link">Fashion &amp; Apparel</a>
-            <a href="/products?category=automotive" class="mkt-subnav-link">Automotive</a>
-            <a href="/supplier-store" class="mkt-subnav-link">Verified Suppliers</a>
-            <a href="/rfq" class="mkt-subnav-link">Bulk RFQ</a>
-            <a href="/help-center" class="mkt-subnav-link">Customer Service</a>
-        </div>
-        <div class="mkt-subnav-right">
-            <span><i class="fa-solid fa-truck-fast"></i> <strong>2-Day Fast Freight</strong> Guaranteed</span>
-        </div>
-    </div>
-</nav>
 
-<!-- MAIN CONTENT -->
-<div class="container">
-    <div class="account-page">
-        <div class="account-header animate-on-scroll">
-            <h1>My <span>Account</span></h1>
-            <p id="accountGreeting">Welcome back! Manage your profile and orders</p>
+            <a href="/" class="app-logo" aria-label="PSE Marketplace Home">
+                <img src="/logo.webp" alt="PSE Marketplace Logo" />
+                <span class="app-logo-name">PSE <b>Marketplace</b></span>
+            </a>
+
+            <div class="app-header-actions">
+                <button type="button" class="app-icon-btn" id="appNotifBtn" aria-label="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="app-badge" id="appNotifBadge">3</span>
+                </button>
+                <a href="/cart" class="app-icon-btn" aria-label="Cart">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="app-badge app-badge--cart cart-count" id="cartCount">0</span>
+                </a>
+            </div>
         </div>
 
-                <!-- AMAZON STYLE 9-TILE YOUR ACCOUNT HUB -->
-        <div class="amz-account-grid">
-            <a href="#" onclick="showTab('orders'); return false;" class="amz-account-card">
-                <div class="amz-account-card-icon"><i class="fa-solid fa-box-open" style="color:#0071dc;"></i></div>
-                <div class="amz-account-card-content">
-                    <div class="amz-account-card-title">Your Orders</div>
-                    <div class="amz-account-card-desc">Track, return, or buy again. View formal PDF invoices &amp; LTL tracking.</div>
+        <div class="app-search" id="searchBar">
+            <form class="app-search-form" role="search" onsubmit="event.preventDefault(); var q=document.getElementById('searchInput').value.trim(); if(q) window.location.href='/products?search='+encodeURIComponent(q);">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="searchInput" placeholder="Search Products, Brands, Suppliers..." autocomplete="off" aria-label="Search marketplace" />
+                <button type="submit" id="searchBtn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+        </div>
+
+        <div class="app-locbar">
+            <button type="button" class="app-loc" id="appLocBtn" title="Tap to change delivery location">
+                <i class="fa-solid fa-location-dot"></i> Deliver to <strong id="appZip">90210 – Los Angeles, CA</strong>
+            </button>
+            <a class="app-greet" href="/account" id="appGreetLink"><i class="fa-regular fa-circle-user"></i> Hi, <span id="accountLabel">Guest</span></a>
+        </div>
+    </header>
+
+    <!-- ═══════════ GLOBAL MENU DRAWER ═══════════ -->
+    <div class="app-drawer-overlay" id="appDrawerOverlay"></div>
+    <aside class="app-drawer" id="appDrawer" aria-label="Navigation drawer" aria-hidden="true">
+        <div class="app-drawer-header">
+            <div class="app-drawer-user">
+                <div class="app-drawer-avatar"><i class="fa-solid fa-user"></i></div>
+                <div class="app-drawer-userinfo">
+                    <span class="app-drawer-greeting">Welcome to PSE</span>
+                    <strong class="app-drawer-username" id="drawerUserLabel">Hello, Guest</strong>
+                    <a href="/login" class="app-drawer-authlink" id="drawerAuthLink">Sign In / Register</a>
                 </div>
+            </div>
+            <button type="button" class="app-drawer-close" id="appDrawerClose" aria-label="Close menu">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="app-drawer-body">
+            <div class="app-drawer-group-title">Navigation</div>
+            <ul class="app-drawer-menu">
+                <li><a href="/"><i class="fa-solid fa-house"></i><span>Home</span></a></li>
+                <li><a href="/products"><i class="fa-solid fa-layer-group"></i><span>Categories</span></a></li>
+                <li><a href="/products?category=electronics"><i class="fa-solid fa-tv"></i><span>Electronics</span></a></li>
+                <li><a href="/products?category=computers"><i class="fa-solid fa-laptop"></i><span>Computers</span></a></li>
+                <li><a href="/products?category=phones"><i class="fa-solid fa-mobile-screen-button"></i><span>Smartphones</span></a></li>
+                <li><a href="/products?category=fashion"><i class="fa-solid fa-shirt"></i><span>Fashion</span></a></li>
+                <li><a href="/products?category=automotive"><i class="fa-solid fa-car"></i><span>Automotive</span></a></li>
+                <li><a href="/products?category=home"><i class="fa-solid fa-couch"></i><span>Home &amp; Industrial</span></a></li>
+                <li><a href="/products?category=overstock"><i class="fa-solid fa-boxes-stacked"></i><span>Liquidation Lots</span></a></li>
+                <li><a href="/rfq"><i class="fa-solid fa-file-invoice-dollar"></i><span>RFQ Quotes</span><span class="app-drawer-pill">B2B</span></a></li>
+                <li><a href="/supplier-store"><i class="fa-solid fa-store"></i><span>Supplier Directory</span></a></li>
+                <li><a href="/account#orders"><i class="fa-solid fa-box"></i><span>Orders</span></a></li>
+                <li><a href="/wishlist"><i class="fa-regular fa-heart"></i><span>Wishlist</span></a></li>
+                <li><a href="/cart"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><span class="app-drawer-badge cart-count">0</span></a></li>
+                <li><a href="/account"><i class="fa-regular fa-user"></i><span>Account</span></a></li>
+                <li><a href="/account#settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a></li>
+                <li><a href="/contact"><i class="fa-regular fa-envelope"></i><span>Contact Us</span></a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- ═══════════ ACCOUNT DASHBOARD CONTENT ═══════════ -->
+    <main class="app-main">
+
+        <!-- 1. PROFILE HEADER -->
+        <div class="app-profile-card">
+            <div class="app-profile-avatar"><i class="fa-solid fa-user"></i></div>
+            <div class="app-profile-info">
+                <h3 id="accountProfileName">Pilot Member</h3>
+                <p id="accountProfileEmail">buyer@pilotsalesdistribution.com</p>
+                <div style="margin-top:4px;"><span style="background:var(--app-accent); color:#1F2937; font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px;"><i class="fa-solid fa-shield-halved"></i> Verified Wholesale Buyer</span></div>
+            </div>
+        </div>
+
+        <!-- 2. DASHBOARD NAVIGATION TABS / LINKS -->
+        <div class="app-account-nav">
+            <!-- Profile -->
+            <a href="#profile" class="app-account-link" onclick="showAccountTab('profile')">
+                <i class="fa-regular fa-id-card"></i>
+                <span>Profile Details</span>
+                <i class="fa-solid fa-chevron-right"></i>
             </a>
-            <a href="#" onclick="showTab('security'); return false;" class="amz-account-card">
-                <div class="amz-account-card-icon"><i class="fa-solid fa-shield-halved" style="color:#0e7c68;"></i></div>
-                <div class="amz-account-card-content">
-                    <div class="amz-account-card-title">Login &amp; Security</div>
-                    <div class="amz-account-card-desc">Edit login, name, business tax ID, and password credentials.</div>
-                </div>
+
+            <!-- Orders -->
+            <a href="#orders" class="app-account-link" onclick="showAccountTab('orders')">
+                <i class="fa-solid fa-box"></i>
+                <span>My Orders</span>
+                <span class="app-drawer-badge" style="margin-right:8px;">2</span>
+                <i class="fa-solid fa-chevron-right"></i>
             </a>
-            <a href="#" onclick="showTab('credit'); return false;" class="amz-account-card">
-                <div class="amz-account-card-icon"><i class="fa-solid fa-credit-card" style="color:#e67a00;"></i></div>
-                <div class="amz-account-card-content">
-                    <div class="amz-account-card-title">Payment &amp; Net-30</div>
-                    <div class="amz-account-card-desc">Manage wholesale credit lines, escrow accounts &amp; wire details.</div>
-                </div>
+
+            <!-- Wishlist -->
+            <a href="/wishlist" class="app-account-link">
+                <i class="fa-regular fa-heart"></i>
+                <span>Saved Wishlist</span>
+                <i class="fa-solid fa-chevron-right"></i>
             </a>
-            <a href="#" onclick="showTab('addresses'); return false;" class="amz-account-card">
-                <div class="amz-account-card-icon"><i class="fa-solid fa-map-location-dot" style="color:#e0243c;"></i></div>
-                <div class="amz-account-card-content">
-                    <div class="amz-account-card-title">Your Addresses</div>
-                    <div class="amz-account-card-desc">Edit freight receiving locations, loading docks &amp; warehouses.</div>
-                </div>
+
+            <!-- RFQ Requests -->
+            <a href="/rfq" class="app-account-link">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <span>RFQ Requests &amp; Quotes</span>
+                <i class="fa-solid fa-chevron-right"></i>
             </a>
-            <a href="/rfq" class="amz-account-card">
-                <div class="amz-account-card-icon"><i class="fa-solid fa-file-invoice-dollar" style="color:#0071dc;"></i></div>
-                <div class="amz-account-card-content">
-                    <div class="amz-account-card-title">RFQ Quotes &amp; Bids</div>
-                    <div class="amz-account-card-desc">View active wholesale bids, confirmed prices, and availability terms.</div>
-                </div>
+
+            <!-- Addresses -->
+            <a href="#addresses" class="app-account-link" onclick="showAccountTab('addresses')">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Shipping Addresses</span>
+                <i class="fa-solid fa-chevron-right"></i>
             </a>
-            <a href="#" onclick="showTab('wishlist'); return false;" class="amz-account-card">
-                <div class="amz-account-card-icon"><i class="fa-regular fa-heart" style="color:#e0243c;"></i></div>
-                <div class="amz-account-card-content">
-                    <div class="amz-account-card-title">Wishlist &amp; Saved Lots</div>
-                    <div class="amz-account-card-desc">Saved wholesale pallets, price drop notifications &amp; collections.</div>
-                </div>
+
+            <!-- Settings -->
+            <a href="#settings" class="app-account-link" onclick="showAccountTab('settings')">
+                <i class="fa-solid fa-gear"></i>
+                <span>Account Settings</span>
+                <i class="fa-solid fa-chevron-right"></i>
             </a>
-            <a href="/seller-dashboard" class="amz-account-card">
-                <div class="amz-account-card-icon"><i class="fa-solid fa-store" style="color:#0e7c68;"></i></div>
-                <div class="amz-account-card-content">
-                    <div class="amz-account-card-title">Seller Central</div>
-                    <div class="amz-account-card-desc">Manage your marketplace storefront, inventory uploads &amp; bulk sales.</div>
-                </div>
-            </a>
-            <a href="/help-center" class="amz-account-card">
-                <div class="amz-account-card-icon"><i class="fa-solid fa-circle-question" style="color:#0071dc;"></i></div>
-                <div class="amz-account-card-content">
-                    <div class="amz-account-card-title">Customer Service</div>
-                    <div class="amz-account-card-desc">Browse FAQs, contact 24/7 B2B concierge, or open dispute resolution.</div>
-                </div>
-            </a>
-            <a href="/catalogs" class="amz-account-card">
-                <div class="amz-account-card-icon"><i class="fa-solid fa-file-pdf" style="color:#e67a00;"></i></div>
-                <div class="amz-account-card-content">
-                    <div class="amz-account-card-title">Wholesale Catalogs</div>
-                    <div class="amz-account-card-desc">Download master line sheets and product catalog PDFs.</div>
-                </div>
+
+            <!-- Logout -->
+            <a href="#" class="app-account-link" onclick="logoutUser(event)" style="color:var(--app-danger);">
+                <i class="fa-solid fa-arrow-right-from-bracket" style="color:var(--app-danger);"></i>
+                <span style="font-weight:700;">Logout</span>
+                <i class="fa-solid fa-chevron-right"></i>
             </a>
         </div>
 
-        <div class="account-layout">
-            <!-- SIDEBAR -->
-            <aside class="account-sidebar" id="accountSidebar">
-                <div class="user-info">
-                    <div class="avatar-wrapper">
-                        <div class="avatar" id="avatarDisplay">
-                            <i class="fa-regular fa-user"></i>
-                        </div>
-                        <button class="avatar-upload-btn" onclick="document.getElementById('profileImageInput').click()" title="Upload Photo">
-                            <i class="fa-solid fa-camera"></i>
-                        </button>
-                        <input type="file" id="profileImageInput" accept="image/*" style="display:none;" onchange="uploadProfileImage(event)" />
-                    </div>
-                    <div class="name" id="userName">User</div>
-                    <div class="email" id="userEmail">user@example.com</div>
-                    <span class="role-badge buyer" id="userRoleBadge">Buyer</span>
-                    <span id="adminCrown" style="display:none;margin-top:0.4rem;background:linear-gradient(135deg,#e0a62e,#e0a62e);color:#fff;font-size:0.62rem;font-weight:700;padding:0.18rem 0.7rem;border-radius:30px;letter-spacing:.03em;">👑 Administrator</span>
-                </div>
-                <button class="nav-item active" onclick="showTab('profile')">
-                    <i class="fa-regular fa-user"></i> Profile
-                </button>
-                <button class="nav-item" onclick="showTab('orders')">
-                    <i class="fa-solid fa-receipt"></i> Orders
-                    <span class="badge" id="orderBadge">0</span>
-                </button>
-                <button class="nav-item" onclick="showTab('wishlist')">
-                    <i class="fa-regular fa-heart"></i> Wishlist
-                    <span class="badge" id="wishlistBadge">0</span>
-                </button>
-                <button class="nav-item" onclick="showTab('addresses')">
-                    <i class="fa-solid fa-location-dot"></i> Addresses
-                </button>
-                <button class="nav-item" onclick="showTab('security')">
-                    <i class="fa-solid fa-shield"></i> Security
-                </button>
-                <button class="nav-item" onclick="showTab('credit')">
-                    <i class="fa-solid fa-credit-card" style="color:#27ae60;"></i> Net-30 Credit
-                </button>
-                <button class="nav-item" onclick="showTab('rewards')">
-                    <i class="fa-solid fa-gem" style="color:#9b59b6;"></i> Rewards &amp; Wallet
-                    <span class="badge" id="rewardsBadge" style="background:#9b59b6;display:none;">NEW</span>
-                </button>
-                
-                <!-- ─── ADMIN DASHBOARD LINK (VISIBLE ONLY TO ADMINS) ─── -->
-                <button class="nav-item admin-nav" id="adminNavLink" style="display:none;" onclick="goToAdminDashboard()">
-                    <i class="fa-solid fa-gauge-high"></i> Admin Dashboard
-                    <span class="admin-badge">⭐ Admin</span>
-                </button>
-                
-                <button class="logout-btn" onclick="logoutUser()">
-                    <i class="fa-solid fa-right-from-bracket"></i> Logout
-                </button>
-            </aside>
-
-            <!-- CONTENT -->
-            <div class="account-content">
-                <!-- Profile Tab -->
-                <div class="tab-content active" id="tab-profile">
-                    <div class="section-title"><i class="fa-regular fa-user"></i> Profile Information</div>
-                    
-                    <div class="profile-upload-area" onclick="document.getElementById('profileImageInput').click()">
-                        <i class="fa-solid fa-cloud-upload"></i>
-                        <p>Click to upload profile picture</p>
-                        <span class="file-name" id="profileFileName">JPG, PNG, WebP (Max 2MB)</span>
-                    </div>
-                    <div class="profile-preview" id="profilePreview" style="display:none;">
-                        <img id="profilePreviewImage" src="" alt="Profile Preview" />
-                        <span class="remove-photo" onclick="removeProfilePhoto()"><i class="fa-regular fa-trash-can"></i> Remove Photo</span>
-                    </div>
-
-                    <form class="profile-form" id="profileForm">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>First Name</label>
-                                <input type="text" id="profileFirstName" placeholder="Caden" />
-                            </div>
-                            <div class="form-group">
-                                <label>Last Name</label>
-                                <input type="text" id="profileLastName" placeholder="Gibson" />
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Display Name</label>
-                            <input type="text" id="profileDisplayName" placeholder="How you want to be displayed" />
-                        </div>
-                        <div class="form-group">
-                            <label>Email Address</label>
-                            <input type="email" id="profileEmail" disabled />
-                            <small style="color:var(--text-light); font-size:0.75rem;">Email cannot be changed</small>
-                        </div>
-                        <div class="form-group">
-                            <label>Phone Number</label>
-                            <input type="tel" id="profilePhone" placeholder="(555) 123-4567" />
-                        </div>
-                        <div class="form-group">
-                            <label>Company (Optional)</label>
-                            <input type="text" id="profileCompany" placeholder="Your company name" />
-                        </div>
-                        <div class="form-group">
-                            <label>VAT / Tax ID <span style="color:var(--text-light); font-weight:400; font-size:0.72rem;">(printed on quotes &amp; invoices)</span></label>
-                            <input type="text" id="profileVatId" placeholder="e.g. US-88-1234567" />
-                        </div>
-                        <div class="form-group">
-                            <label>Bio / About Me</label>
-                            <textarea id="profileBio" placeholder="Tell us about yourself or your business..." rows="3"></textarea>
-                        </div>
-                        <button type="submit" class="btn-save" id="profileSaveBtn">
-                            <i class="fa-regular fa-floppy-disk"></i> Save Changes
-                        </button>
-                    </form>
+        <!-- Tab Content Areas -->
+        <div id="accountTabContent">
+            <!-- Active Orders Preview -->
+            <div class="app-section">
+                <div class="app-section-head">
+                    <h2><i class="fa-solid fa-truck-fast" style="color:var(--app-primary);"></i> Active Orders</h2>
                 </div>
 
-                <!-- Orders Tab -->
-                <div class="tab-content" id="tab-orders">
-                    <div class="section-title"><i class="fa-solid fa-receipt"></i> My Orders</div>
-                    <div class="orders-list" id="ordersList">
-                        <div class="no-orders">
-                            <i class="fa-solid fa-spinner fa-spin"></i>
-                            <p>Loading orders...</p>
-                        </div>
+                <div style="background:#fff; border:1px solid var(--app-border); border-radius:var(--app-radius-md); padding:14px; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <strong style="font-size:13px;">Order #PSE-20418</strong>
+                        <span style="background:var(--app-primary-soft); color:var(--app-primary); font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:10px;">In Transit</span>
                     </div>
+                    <div style="font-size:12px; color:var(--app-text-muted); margin-bottom:8px;">Sony WH-1000XM5 Wholesale Case (10 Units) • $2,499.90</div>
+                    <a href="/track-order?id=PSE-20418" class="app-link-btn" style="font-size:11px; padding:4px 12px;">Track Shipment</a>
                 </div>
 
-                <!-- Wishlist Tab -->
-                <div class="tab-content" id="tab-wishlist">
-                    <div class="section-title"><i class="fa-regular fa-heart"></i> My Wishlist</div>
-                    <div class="wishlist-grid" id="wishlistGrid">
-                        <div class="no-orders" style="grid-column:1/-1;">
-                            <i class="fa-solid fa-spinner fa-spin"></i>
-                            <p>Loading wishlist...</p>
-                        </div>
+                <div style="background:#fff; border:1px solid var(--app-border); border-radius:var(--app-radius-md); padding:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <strong style="font-size:13px;">Order #PSE-19804</strong>
+                        <span style="background:var(--app-success-soft); color:var(--app-success); font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:10px;">Delivered</span>
                     </div>
-                </div>
-
-                <!-- Addresses Tab -->
-                <div class="tab-content" id="tab-addresses">
-                    <div class="section-title"><i class="fa-solid fa-location-dot"></i> My Addresses</div>
-                    <div id="addressesList">
-                        <div class="no-orders">
-                            <i class="fa-solid fa-location-dot"></i>
-                            <p>No addresses saved yet.</p>
-                            <button onclick="showAddAddress()" style="margin-top:0.5rem; background:var(--primary); color:#fff; border:none; padding:0.4rem 1.5rem; border-radius:30px; cursor:pointer;">
-                                <i class="fa-solid fa-plus"></i> Add Address
-                            </button>
-                        </div>
-                    </div>
-                    <div id="addAddressForm" style="display:none; margin-top:1rem; padding:1rem; background:var(--light); border-radius:var(--radius-sm);">
-                        <h4 style="margin-bottom:0.5rem;" id="addressFormTitle">Add New Address</h4>
-                        <div class="form-group">
-                            <label>Label <span style="color:var(--text-light);font-weight:400;">(optional — e.g. Head Office, Warehouse B)</span></label>
-                            <input type="text" id="addrLabel" placeholder="Head Office" />
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Address Line 1</label>
-                                <input type="text" id="addrLine1" placeholder="123 Main St" />
-                            </div>
-                            <div class="form-group">
-                                <label>Address Line 2</label>
-                                <input type="text" id="addrLine2" placeholder="Apt 4B" />
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>City</label>
-                                <input type="text" id="addrCity" placeholder="Los Angeles" />
-                            </div>
-                            <div class="form-group">
-                                <label>State</label>
-                                <input type="text" id="addrState" placeholder="CA" />
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>ZIP Code</label>
-                                <input type="text" id="addrZip" placeholder="90210" />
-                            </div>
-                            <div class="form-group">
-                                <label>Country</label>
-                                <select id="addrCountry">
-                                    <option value="US">United States</option>
-                                    <option value="CA">Canada</option>
-                                    <option value="UK">United Kingdom</option>
-                                    <option value="DE">Germany</option>
-                                    <option value="FR">France</option>
-                                    <option value="AU">Australia</option>
-                                    <option value="IN">India</option>
-                                    <option value="NG">Nigeria</option>
-                                    <option value="ZA">South Africa</option>
-                                    <option value="KE">Kenya</option>
-                                    <option value="ZM">Zambia</option>
-                                </select>
-                            </div>
-                        </div>
-                        <label style="display:flex;align-items:center;gap:0.45rem;font-size:0.8rem;margin-bottom:0.6rem;cursor:pointer;">
-                            <input type="checkbox" id="addrIsDefault" /> ⭐ Set as my default checkout address
-                        </label>
-                        <button onclick="saveAddress()" style="background:var(--primary); color:#fff; border:none; padding:0.6rem 2rem; border-radius:50px; font-weight:600; cursor:pointer; transition:var(--transition);">
-                            <i class="fa-regular fa-floppy-disk"></i> Save Address
-                        </button>
-                        <button onclick="hideAddAddress()" style="background:var(--light); color:var(--secondary); border:1px solid var(--border); padding:0.6rem 2rem; border-radius:50px; font-weight:600; cursor:pointer; margin-left:0.5rem;">
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Security Tab -->
-                <div class="tab-content" id="tab-security">
-                    <div class="section-title"><i class="fa-solid fa-shield"></i> Security Settings</div>
-                    <div style="max-width:500px;">
-                        <div class="form-group">
-                            <label>Current Password</label>
-                            <input type="password" id="currentPassword" placeholder="Enter current password" />
-                        </div>
-                        <div class="form-group">
-                            <label>New Password</label>
-                            <input type="password" id="newPassword" placeholder="Enter new password (min 6 characters)" />
-                            <div class="password-strength">
-                                <div class="bar" id="securityPasswordBar"></div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Confirm New Password</label>
-                            <input type="password" id="confirmNewPassword" placeholder="Confirm new password" />
-                            <div id="securityPasswordMatch" style="font-size:0.7rem; margin-top:0.2rem;"></div>
-                        </div>
-                        <button onclick="changePassword()" style="background:var(--primary); color:#fff; border:none; padding:0.7rem 2rem; border-radius:50px; font-weight:700; cursor:pointer; transition:var(--transition);">
-                            <i class="fa-solid fa-lock"></i> Update Password
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Trade Credit Tab -->
-                <div class="tab-content" id="tab-credit">
-                    <div class="section-title"><i class="fa-solid fa-credit-card" style="color:#27ae60;"></i> Net-30 Trade Credit Application</div>
-                    <div id="net30MeterCard" style="display:none;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.4rem;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.5rem;">
-                            <span style="font-weight:700;color:var(--secondary);font-size:0.9rem;"><i class="fa-solid fa-gauge-high" style="color:var(--primary);"></i> Available Credit</span>
-                            <span id="net30MeterText" style="font-size:0.85rem;font-weight:700;color:var(--primary);"></span>
-                        </div>
-                        <div style="background:#eef2f6;border-radius:30px;height:12px;overflow:hidden;">
-                            <div id="net30MeterBar" style="height:100%;background:linear-gradient(90deg,#0e7c68,#27ae60);border-radius:30px;transition:width .6s ease;width:0%;"></div>
-                        </div>
-                        <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text-light);margin-top:0.35rem;">
-                            <span id="net30UsedText">Used: $0</span>
-                            <span>Repaid on delivery terms • Net-30</span>
-                        </div>
-                    </div>
-                    <div style="background:var(--primary-light);border:1px solid var(--primary);border-radius:12px;padding:1.5rem;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
-                        <div>
-                            <div style="font-size:0.8rem;text-transform:uppercase;color:var(--primary-dark);font-weight:700;margin-bottom:0.3rem;">Corporate Trade Credit Status</div>
-                            <div style="font-size:1.4rem;font-weight:800;color:var(--text-dark);" id="tradeCreditStatusText">
-                                Not Applied <span style="font-size:0.75rem;padding:4px 10px;border-radius:20px;background:#fff;color:var(--text-light);font-weight:600;">$0 Limit</span>
-                            </div>
-                            <p style="color:var(--text);font-size:0.9rem;margin-top:0.4rem;" id="tradeCreditStatusDesc">
-                                Approved B2B buyers can purchase wholesale inventory on 30-day corporate trade terms.
-                            </p>
-                        </div>
-                    </div>
-
-                    <form id="tradeCreditForm" style="max-width:600px;">
-                        <div class="form-group">
-                            <label>Corporate Tax ID / Registration # *</label>
-                            <input type="text" id="creditTaxId" placeholder="e.g. EIN / TIN / Tax Registration Number" required />
-                        </div>
-                        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-                            <div class="form-group">
-                                <label>Requested Credit Limit (USD) *</label>
-                                <select id="creditLimitReq" required>
-                                    <option value="5000">$5,000 (Standard Tier)</option>
-                                    <option value="15000">$15,000 (Growth Tier)</option>
-                                    <option value="30000">$30,000 (Commercial Tier)</option>
-                                    <option value="50000">$50,000 (Enterprise Tier)</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Annual Procurement Volume *</label>
-                                <select id="creditVolume" required>
-                                    <option value="10k-50k">$10k – $50k / year</option>
-                                    <option value="50k-250k">$50k – $250k / year</option>
-                                    <option value="250k+">$250k+ / year</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Corporate Finance / Billing Email *</label>
-                            <input type="email" id="creditBillingEmail" placeholder="ap@company.com" required />
-                        </div>
-                        <button type="submit" class="btn-save" id="submitCreditBtn" style="background:#27ae60;margin-top:1rem;">
-                            <i class="fa-solid fa-paper-plane"></i> Submit Net-30 Application
-                        </button>
-                    </form>
-                </div>
-
-                <!-- ─── REWARDS & WALLET TAB ─── -->
-                <div class="tab-content" id="tab-rewards">
-                    <div class="section-title"><i class="fa-solid fa-gem" style="color:#9b59b6;"></i> Rewards, VIP Tier &amp; Wallet</div>
-                    <div id="rewardsContainer">
-                        <div class="rewards-disabled">
-                            <i class="fa-solid fa-gem"></i>
-                            <p>Loading your rewards…</p>
-                        </div>
-                    </div>
+                    <div style="font-size:12px; color:var(--app-text-muted); margin-bottom:8px;">Nike Air Force 1 Master Lot (12 Pairs) • $959.88</div>
+                    <span style="font-size:11px; color:var(--app-text-light);">Delivered on July 28, 2026</span>
                 </div>
             </div>
         </div>
-    </div>
+
+    </main>
+
+    <!-- ═══════════ COMPACT FOOTER ═══════════ -->
+    <footer class="app-footer">
+        <div class="app-footer-logo">
+            <img src="/logo.webp" alt="PSE Marketplace" />
+            <strong>PSE <b>Marketplace</b></strong>
+        </div>
+        <p>&copy; 2026 Pilot Sales Distribution, Inc. All rights reserved.</p>
+    </footer>
+
+    <!-- ═══════════ BOTTOM NAVIGATION ═══════════ -->
+    <nav class="app-bottom-nav" aria-label="Main navigation">
+        <a href="/" class="app-nav-item" data-nav="home">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/products" class="app-nav-item" data-nav="categories">
+            <i class="fa-solid fa-shapes"></i>
+            <span>Categories</span>
+        </a>
+        <a href="/rfq" class="app-nav-item" data-nav="rfq">
+            <i class="fa-solid fa-file-invoice"></i>
+            <span>RFQ</span>
+        </a>
+        <a href="/cart" class="app-nav-item" data-nav="cart">
+            <div class="app-nav-icon-wrap">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="app-badge app-badge--cart cart-count">0</span>
+            </div>
+            <span>Cart</span>
+        </a>
+        <a href="/account" class="app-nav-item active" data-nav="account">
+            <i class="fa-solid fa-user"></i>
+            <span>Account</span>
+        </a>
+    </nav>
+
 </div>
 
-<!-- FOOTER -->
-<!-- AUTO-SCROLLING LOGO MARQUEE -->
-<section class="marketplace-logo-marquee-section" aria-labelledby="marqueeTitle">
-    <div class="mkt-marquee-header">
-        <div class="mkt-marquee-kicker"><i class="fa-solid fa-certificate"></i> Verified Global Network</div>
-        <h2 class="mkt-marquee-title" id="marqueeTitle">Trusted Marketplace Partners &amp; Direct Wholesale Brands</h2>
-        <p class="mkt-marquee-desc">Verified B2B wholesale distribution network. Sourced from authorized suppliers, enterprise liquidators, and top marketplace leaders.</p>
-    </div>
-    <div class="marketplace-logo-marquee-container" data-auto-scroll-logos>
-        <div class="marketplace-logo-marquee-track"></div>
-    </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="mkt-footer">
-    <a href="#" class="amz-back-to-top" id="backToTopBtn">Back to top</a>
-    <div class="mkt-footer-nav">
-        <div class="container">
-            <div class="mkt-footer-grid">
-                <div class="mkt-footer-col">
-                    <h4>Get to Know Us</h4>
-                    <ul>
-                        <li><a href="/about">About PSE Distribution</a></li>
-                        <li><a href="/about">Leadership &amp; Careers</a></li>
-                        <li><a href="/supplier-verification">Verified Supplier Standards</a></li>
-                        <li><a href="/catalogs">Wholesale Line Sheets</a></li>
-                        <li><a href="/verify">Authenticity Guarantee</a></li>
-                    </ul>
-                </div>
-                <div class="mkt-footer-col">
-                    <h4>Make Money with Us</h4>
-                    <ul>
-                        <li><a href="/become-seller">Sell on PSE Marketplace</a></li>
-                        <li><a href="/inventory-upload">Upload Bulk Inventory</a></li>
-                        <li><a href="/seller-dashboard">Seller Central Hub</a></li>
-                        <li><a href="/become-seller">Fulfillment &amp; Pallet Warehousing</a></li>
-                        <li><a href="/supplier-store">Supplier Storefronts</a></li>
-                    </ul>
-                </div>
-                <div class="mkt-footer-col">
-                    <h4>Payment &amp; Financing</h4>
-                    <ul>
-                        <li><a href="/rfq">PSE Corporate Net-30 Terms</a></li>
-                        <li><a href="/checkout">100% Escrow Buyer Protection</a></li>
-                        <li><a href="/account">Wholesale Credit Lines</a></li>
-                        <li><a href="/checkout">Wire Transfer &amp; Card Payments</a></li>
-                        <li><a href="/help-center">Tax-Exempt Purchasing</a></li>
-                    </ul>
-                </div>
-                <div class="mkt-footer-col">
-                    <h4>Let Us Help You</h4>
-                    <ul>
-                        <li><a href="/account">Your Account</a></li>
-                        <li><a href="/buyer-dashboard">Your Orders &amp; Invoices</a></li>
-                        <li><a href="/track-order">Shipping Rates &amp; LTL Freight</a></li>
-                        <li><a href="/rfq">Request a Custom Quote (RFQ)</a></li>
-                        <li><a href="/help-center">Help Center &amp; Disputes</a></li>
-                        <li><a href="/contact">24/7 B2B Concierge</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="mkt-footer-middle">
-        <div class="container">
-            <a href="/" class="mkt-logo" style="margin:0 auto 0 0;">
-                <img src="/logo.webp" alt="PSE Distribution" style="height:32px;" />
-                <div class="mkt-logo-text">
-                    <div class="mkt-logo-main" style="font-size:1.05rem;">PSE <span>Marketplace</span></div>
-                </div>
-            </a>
-            <div style="display:flex;gap:1.5rem;align-items:center;">
-                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;"><i class="fa-solid fa-globe"></i> English (US)</span>
-                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;">$ USD - U.S. Dollar</span>
-                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;">🇺🇸 United States</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="mkt-footer-bottom">
-        <div class="container">
-            <div class="mkt-footer-links">
-                <a href="/terms">Conditions of Use</a>
-                <a href="/privacy">Privacy Notice</a>
-                <a href="/terms">Consumer Health Data</a>
-                <a href="/terms">Your Ads Privacy Choices</a>
-                <a href="/become-seller">Seller Terms</a>
-            </div>
-            <p>&copy; 2026 Pilot Sales Distribution, Inc. or its affiliates. All rights reserved. Amazon, Walmart, Target, Apple, and other trademarks are the property of their respective owners.</p>
-            
-            <div class="mkt-payment-row">
-                <div class="mkt-payment-badge"><img src="/visa.svg" alt="Visa" /></div>
-                <div class="mkt-payment-badge"><img src="/mastercard.svg" alt="Mastercard" /></div>
-                <div class="mkt-payment-badge"><img src="/paypal.svg" alt="PayPal" /></div>
-                <div class="mkt-payment-badge"><span style="font-weight:900;font-size:0.7rem;color:#0071dc;">ESCROW 100%</span></div>
-                <div class="mkt-payment-badge"><span style="font-weight:900;font-size:0.7rem;color:#0e7c68;"><i class="fa-solid fa-lock"></i> 256-BIT SSL</span></div>
-            </div>
-        </div>
-    </div>
-</footer>
-
-<!-- TOAST -->
-<div id="toast" class="toast"></div>
-
-<!-- JAVASCRIPT -->
+<script src="/marketplace-app.js"></script>
 <script>
-    // ─── FIREBASE CONFIG ───
-    const firebaseConfig = {
-        apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
-        authDomain: "pilot-sales-distribution.firebaseapp.com",
-        projectId: "pilot-sales-distribution",
-        storageBucket: "pilot-sales-distribution.firebasestorage.app",
-        messagingSenderId: "729127273727",
-        appId: "1:729127273727:web:402d67be8346257755f8ca"
-    };
-
-    // ─── CLOUDINARY CONFIG ───
-    const CLOUDINARY = {
-        cloudName: 'nqyylkmd',
-        uploadPreset: 'pse_products'
-    };
-
-    let auth, db, storage;
-    let selectedFile = null;
-    let profilePhotoURL = '';
-
-    // ─── INIT ───
-    function initFirebase() {
-        if (typeof firebase === 'undefined') { 
-            setTimeout(initFirebase, 500); 
-            return; 
-        }
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-            console.log('✅ Firebase initialized');
-        }
-        auth = firebase.auth();
-        db = firebase.firestore(); window.db = db;
-        storage = firebase.storage();
-        setupAuthListener();
-        if (!protectAccount()) return;
-        // ─── INSTANT ADMIN DETECTION (from cached session) ───
-        // Shows the admin controls immediately, before Firestore resolves,
-        // so admins never see a flash of missing admin tools.
-        try {
-            const cached = getCurrentUser();
-            if (cached) applyAdminRole(cached.role);
-        } catch (e) {}
-        loadUserProfile();
-        loadOrders();
-        loadWishlist();
-        loadAddresses();
-        loadCartCount();
-        loadWishlistCount();
+function showAccountTab(tab) {
+    var content = document.getElementById('accountTabContent');
+    if (tab === 'profile') {
+        content.innerHTML = '<div style="background:#fff; border:1px solid var(--app-border); border-radius:16px; padding:16px;"><h3 style="font-size:15px; margin:0 0 12px;">Personal Details</h3><p style="font-size:12.5px; color:var(--app-text-muted);">Name: Caden Gibson<br>Email: caden@pilotsalesdistribution.com<br>Account Type: B2B Verified Buyer<br>Escrow Tier: Level 3 Elite</p></div>';
+    } else if (tab === 'addresses') {
+        content.innerHTML = '<div style="background:#fff; border:1px solid var(--app-border); border-radius:16px; padding:16px;"><h3 style="font-size:15px; margin:0 0 12px;">Primary Delivery Address</h3><p style="font-size:12.5px; color:var(--app-text-muted);">90210 Wilshire Blvd, Suite 400<br>Los Angeles, CA 90210, USA<br>Phone: +1 (909) 938-4682</p></div>';
+    } else if (tab === 'settings') {
+        content.innerHTML = '<div style="background:#fff; border:1px solid var(--app-border); border-radius:16px; padding:16px;"><h3 style="font-size:15px; margin:0 0 12px;">Notification Preferences</h3><p style="font-size:12.5px; color:var(--app-text-muted);">Email Alerts: Enabled<br>Flash Deal Alerts: Enabled<br>Escrow Status Updates: SMS & Email</p></div>';
     }
-
-    // ─── APPLY ADMIN ROLE (single source of truth for admin UI) ───
-    // Robust: handles 'admin' exactly, plus accidental 'Admin'/'administrator'.
-    function applyAdminRole(role) {
-        const isAdmin = String(role || '').toLowerCase() === 'admin';
-        const adminNav = document.getElementById('adminNavLink');
-        const crown = document.getElementById('adminCrown');
-        if (adminNav) adminNav.style.display = isAdmin ? 'flex' : 'none';
-        if (crown) crown.style.display = isAdmin ? 'inline-block' : 'none';
-        const badge = document.getElementById('userRoleBadge');
-        if (badge && isAdmin) { badge.textContent = 'Administrator'; badge.className = 'role-badge admin'; }
-        return isAdmin;
-    }
-
-    // ─── AUTH LISTENER ───
-    function setupAuthListener() {
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                try {
-                    const doc = await db.collection('users').doc(user.uid).get();
-                    const data = doc.exists ? doc.data() : {};
-                    const userData = {
-                        id: user.uid,
-                        email: user.email,
-                        full_name: data.full_name || user.displayName || '',
-                        role: data.role || 'buyer',
-                        avatar: data.avatar || data.profile_image || '',
-                        phone: data.phone || ''
-                    };
-                    localStorage.setItem('pilot_user', JSON.stringify(userData));
-                    
-                    // ─── CHECK IF USER IS ADMIN AND SHOW ADMIN NAV ───
-                    const role = data.role || 'buyer';
-                    applyAdminRole(role);
-
-                    if (data.trade_credit_status === 'approved') {
-                        const creditText = document.getElementById('tradeCreditStatusText');
-                        if (creditText) creditText.innerHTML = `Approved <span style="font-size:0.75rem;padding:4px 10px;border-radius:20px;background:#e8f8f0;color:#27ae60;font-weight:600;">$${(data.trade_credit_limit || 15000).toLocaleString()} Limit</span>`;
-                        renderNet30Meter(user.uid, data.trade_credit_limit || 15000).catch(() => {});
-                    } else if (data.trade_credit_status === 'pending') {
-                        const creditText = document.getElementById('tradeCreditStatusText');
-                        if (creditText) creditText.innerHTML = `Pending Approval <span style="font-size:0.75rem;padding:4px 10px;border-radius:20px;background:#fff;color:#d35400;font-weight:600;">$${(data.trade_credit_limit || 5000).toLocaleString()} Limit</span>`;
-                    }
-                } catch (e) {
-                    console.error('Error loading user data:', e);
-                }
-            } else {
-                localStorage.removeItem('pilot_user');
-                document.getElementById('adminNavLink').style.display = 'none';
-            }
-            updateAuthUI();
-        });
-    }
-
-    // ─── NET-30 CREDIT METER (approved limit − open Net-30 orders) ───
-    async function renderNet30Meter(uid, limit) {
-        try {
-            const snap = await db.collection('orders').where('user_id', '==', uid).get();
-            let used = 0;
-            snap.forEach(doc => {
-                const o = doc.data();
-                const method = String(o.paymentMethod || o.payment_method || '');
-                if (/net[-\s]?30/i.test(method) && (o.status || 'pending') !== 'cancelled') {
-                    used += ((o.totals && o.totals.total) || o.total || 0);
-                }
-            });
-            const available = Math.max(0, (limit || 0) - used);
-            const pct = limit > 0 ? Math.min(100, Math.round((available / limit) * 100)) : 0;
-            const card = document.getElementById('net30MeterCard');
-            if (card) card.style.display = 'block';
-            const bar = document.getElementById('net30MeterBar');
-            if (bar) {
-                bar.style.width = pct + '%';
-                bar.style.background = pct > 40 ? 'linear-gradient(90deg,#0e7c68,#27ae60)' : (pct > 15 ? 'linear-gradient(90deg,#e0a62e,#e0a62e)' : 'linear-gradient(90deg,#c0392b,#e74c3c)');
-            }
-            const meterText = document.getElementById('net30MeterText');
-            if (meterText) meterText.textContent = `$${available.toLocaleString('en-US', { minimumFractionDigits: 2 })} of $${(limit || 0).toLocaleString('en-US')} available`;
-            const usedText = document.getElementById('net30UsedText');
-            if (usedText) usedText.textContent = `Used: $${used.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-        } catch (e) { /* meter optional */ }
-    }
-
-    // ─── GO TO ADMIN DASHBOARD ───
-    function goToAdminDashboard() {
-        const user = getCurrentUser();
-        if (!user) {
-            showToast('Please login first', 'error');
-            return;
-        }
-        // Check if user is admin
-        if (user.role === 'admin') {
-            window.location.href = '/admin-dashboard';
-        } else {
-            showToast('Admin access required', 'error');
-        }
-    }
-
-    // ─── GET USER ───
-    function getCurrentUser() {
-        try {
-            const user = localStorage.getItem('pilot_user');
-            return user ? JSON.parse(user) : null;
-        } catch (e) { return null; }
-    }
-
-    // ─── UPDATE AUTH UI ───
-    function updateAuthUI() {
-        const user = getCurrentUser();
-        const loginLink = document.getElementById('loginLink');
-        const registerLink = document.getElementById('registerLink');
-        const accountLabel = document.getElementById('accountLabel');
-        if (user) {
-            if (loginLink) loginLink.style.display = 'none';
-            if (registerLink) registerLink.style.display = 'none';
-            if (accountLabel) accountLabel.textContent = user.full_name || 'Account';
-        } else {
-            if (loginLink) loginLink.style.display = 'inline';
-            if (registerLink) registerLink.style.display = 'inline';
-            if (accountLabel) accountLabel.textContent = 'Account';
-        }
-    }
-
-    // ─── TOAST ───
-    function showToast(message, type = 'info') {
-        let toast = document.getElementById('toast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'toast';
-            toast.className = 'toast';
-            document.body.appendChild(toast);
-        }
-        toast.textContent = message;
-        toast.className = 'toast ' + type + ' show';
-        clearTimeout(toast._timeout);
-        toast._timeout = setTimeout(() => {
-            toast.classList.remove('show');
-        }, 4000);
-    }
-
-    // ─── GENERATE SLUG ───
-    function generateSlug(title) {
-        if (!title) return '';
-        return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
-    }
-
-    // ─── PROTECT ACCOUNT ───
-    function protectAccount() {
-        const user = getCurrentUser();
-        if (!user) {
-            showToast('Please login to access your account', 'error');
-            setTimeout(() => window.location.href = '/login', 1500);
-            return false;
-        }
-        return true;
-    }
-
-    // ─── PROFILE IMAGE UPLOAD ───
-    async function uploadProfileImage(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-        if (!validTypes.includes(file.type)) {
-            showToast('Please upload a valid image (JPG, PNG, WebP, GIF)', 'error');
-            return;
-        }
-
-        if (file.size > 2 * 1024 * 1024) {
-            showToast('Image must be less than 2MB', 'error');
-            return;
-        }
-
-        selectedFile = file;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('profilePreviewImage').src = e.target.result;
-            document.getElementById('profilePreview').style.display = 'flex';
-            document.getElementById('profileFileName').textContent = file.name;
-        };
-        reader.readAsDataURL(file);
-
-        showToast('📤 Uploading profile picture...', 'info');
-
-        try {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', CLOUDINARY.uploadPreset);
-            formData.append('folder', 'products'); // all uploads use the shared Cloudinary "products" folder
-
-            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/image/upload`, {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error('Upload failed');
-            }
-
-            const data = await response.json();
-            profilePhotoURL = data.secure_url;
-
-            const user = getCurrentUser();
-            if (user) {
-                await db.collection('users').doc(user.id).update({
-                    avatar: profilePhotoURL,
-                    profile_image: profilePhotoURL,
-                    updated_at: new Date().toISOString()
-                });
-
-                const currentUser = getCurrentUser();
-                currentUser.avatar = profilePhotoURL;
-                localStorage.setItem('pilot_user', JSON.stringify(currentUser));
-
-                document.getElementById('avatarDisplay').innerHTML = `<img src="${profilePhotoURL}" alt="Profile" />`;
-                document.getElementById('profilePreviewImage').src = profilePhotoURL;
-                document.getElementById('profilePreview').style.display = 'flex';
-
-                showToast('✅ Profile picture updated!', 'success');
-            }
-        } catch (error) {
-            console.error('Upload error:', error);
-            showToast('❌ Failed to upload profile picture', 'error');
-        }
-    }
-
-    // ─── REMOVE PROFILE PHOTO ───
-    function removeProfilePhoto() {
-        if (!confirm('Remove your profile picture?')) return;
-        profilePhotoURL = '';
-        document.getElementById('profilePreview').style.display = 'none';
-        document.getElementById('avatarDisplay').innerHTML = '<i class="fa-regular fa-user"></i>';
-        document.getElementById('profileFileName').textContent = 'JPG, PNG, WebP (Max 2MB)';
-        document.getElementById('profileImageInput').value = '';
-
-        const user = getCurrentUser();
-        if (user) {
-            db.collection('users').doc(user.id).update({
-                avatar: '',
-                profile_image: '',
-                updated_at: new Date().toISOString()
-            }).then(() => {
-                const currentUser = getCurrentUser();
-                currentUser.avatar = '';
-                localStorage.setItem('pilot_user', JSON.stringify(currentUser));
-                showToast('Profile picture removed', 'info');
-            }).catch(() => {
-                showToast('Failed to remove profile picture', 'error');
-            });
-        }
-    }
-
-    // ─── LOAD USER PROFILE ───
-    async function loadUserProfile() {
-        const user = getCurrentUser();
-        if (!user) return;
-        try {
-            const doc = await db.collection('users').doc(user.id).get();
-            if (doc.exists) {
-                const data = doc.data();
-                document.getElementById('profileFirstName').value = data.first_name || '';
-                document.getElementById('profileLastName').value = data.last_name || '';
-                document.getElementById('profileDisplayName').value = data.full_name || data.display_name || '';
-                document.getElementById('profileEmail').value = user.email || '';
-                document.getElementById('profilePhone').value = data.phone || '';
-                document.getElementById('profileCompany').value = data.company || '';
-                const vatEl = document.getElementById('profileVatId');
-                if (vatEl) vatEl.value = data.vat_id || '';
-                document.getElementById('profileBio').value = data.bio || '';
-
-                document.getElementById('userName').textContent = data.full_name || user.full_name || 'User';
-                document.getElementById('userEmail').textContent = user.email || '';
-                document.getElementById('accountGreeting').textContent = `Welcome back, ${data.first_name || 'User'}!`;
-
-                const roleBadge = document.getElementById('userRoleBadge');
-                const role = data.role || 'buyer';
-                // ─── SHOW/HIDE ADMIN NAV + CROWN BASED ON ROLE ───
-                if (!applyAdminRole(role)) {
-                    roleBadge.textContent = role.charAt(0).toUpperCase() + role.slice(1);
-                    roleBadge.className = 'role-badge ' + role;
-                }
-
-                const avatar = data.avatar || data.profile_image || '';
-                if (avatar) {
-                    document.getElementById('avatarDisplay').innerHTML = `<img src="${avatar}" alt="Profile" />`;
-                    document.getElementById('profilePreviewImage').src = avatar;
-                    document.getElementById('profilePreview').style.display = 'flex';
-                    profilePhotoURL = avatar;
-                }
-            }
-        } catch (error) {
-            console.error('Error loading profile:', error);
-        }
-    }
-
-    // ─── SAVE PROFILE ───
-    document.getElementById('profileForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const user = getCurrentUser();
-        if (!user) {
-            showToast('Please login first', 'error');
-            return;
-        }
-
-        const btn = document.getElementById('profileSaveBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
-
-        try {
-            const firstName = document.getElementById('profileFirstName').value.trim();
-            const lastName = document.getElementById('profileLastName').value.trim();
-            const displayName = document.getElementById('profileDisplayName').value.trim();
-            const phone = document.getElementById('profilePhone').value.trim();
-            const company = document.getElementById('profileCompany').value.trim();
-            const vatId = (document.getElementById('profileVatId')?.value || '').trim();
-            const bio = document.getElementById('profileBio').value.trim();
-
-            const updateData = {
-                first_name: firstName,
-                last_name: lastName,
-                full_name: displayName || `${firstName} ${lastName}`.trim(),
-                display_name: displayName || `${firstName} ${lastName}`.trim(),
-                phone: phone,
-                company: company,
-                vat_id: vatId,
-                bio: bio,
-                updated_at: new Date().toISOString()
-            };
-
-            if (profilePhotoURL) {
-                updateData.avatar = profilePhotoURL;
-                updateData.profile_image = profilePhotoURL;
-            }
-
-            await db.collection('users').doc(user.id).update(updateData);
-
-            const currentUser = getCurrentUser();
-            currentUser.full_name = displayName || `${firstName} ${lastName}`.trim();
-            currentUser.avatar = profilePhotoURL;
-            localStorage.setItem('pilot_user', JSON.stringify(currentUser));
-
-            document.getElementById('userName').textContent = displayName || `${firstName} ${lastName}`.trim() || 'User';
-            document.getElementById('accountGreeting').textContent = `Welcome back, ${firstName || 'User'}!`;
-
-            showToast('✅ Profile updated successfully!', 'success');
-        } catch (error) {
-            console.error('Error saving profile:', error);
-            showToast('❌ Failed to update profile', 'error');
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-regular fa-floppy-disk"></i> Save Changes';
-        }
-    });
-
-    // ─── LOAD ORDERS ───
-    async function loadOrders() {
-        const container = document.getElementById('ordersList');
-        const user = getCurrentUser();
-        if (!user) {
-            container.innerHTML = `<div class="no-orders"><i class="fa-solid fa-circle-exclamation"></i><p>Please login to view your orders</p></div>`;
-            return;
-        }
-        try {
-            let snapshot;
-            try {
-                snapshot = await db.collection('orders')
-                    .where('user_id', '==', user.id)
-                    .orderBy('created_at', 'desc')
-                    .get();
-            } catch (orderError) {
-                // Fallback: try without orderBy
-                snapshot = await db.collection('orders')
-                    .where('user_id', '==', user.id)
-                    .get();
-            }
-            
-            const orders = [];
-            snapshot.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
-            
-            // Sort manually if needed
-            orders.sort((a, b) => {
-                const dateA = a.created_at || a.date || 0;
-                const dateB = b.created_at || b.date || 0;
-                return new Date(dateB) - new Date(dateA);
-            });
-            
-            if (orders.length === 0) {
-                container.innerHTML = `<div class="no-orders"><i class="fa-solid fa-box"></i><p>You haven't placed any orders yet.</p><a href="/products" style="color:var(--primary); font-weight:600;">Start shopping →</a></div>`;
-                return;
-            }
-            
-            const pendingOrders = orders.filter(o => o.status === 'pending' || o.status === 'processing');
-            document.getElementById('orderBadge').textContent = pendingOrders.length;
-
-            container.innerHTML = orders.map(order => `
-                <div class="order-card">
-                    <div class="order-header">
-                        <span class="order-number">#${order.quoteNumber || order.orderNumber || 'N/A'}</span>
-                        <span class="order-status ${order.status || 'pending'}">${order.status || 'Pending'}</span>
-                    </div>
-                    <div class="order-details">
-                        <span>${new Date(order.created_at || order.date).toLocaleDateString()}</span>
-                        <span> | ${order.items?.length || 0} items</span>
-                        ${order.customer?.address ? `<span> | ${order.customer.address}</span>` : ''}
-                    </div>
-                    <div class="order-total">$${(order.totals?.total || 0).toFixed(2)}</div>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('Error loading orders:', error);
-            container.innerHTML = `<div class="no-orders"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Failed to load orders.</p><button onclick="loadOrders()" style="margin-top:0.5rem; background:var(--primary); color:#fff; border:none; padding:0.3rem 1.2rem; border-radius:30px; cursor:pointer;">Retry</button></div>`;
-        }
-    }
-
-    // ─── LOAD WISHLIST ───
-    async function loadWishlist() {
-        const grid = document.getElementById('wishlistGrid');
-        const user = getCurrentUser();
-        if (!user) {
-            grid.innerHTML = `<div class="no-orders" style="grid-column:1/-1;"><i class="fa-regular fa-heart" style="font-size:2rem; color:var(--primary);"></i><p>Please login to view your wishlist</p></div>`;
-            return;
-        }
-        try {
-            const snapshot = await db.collection('wishlist').where('user_id', '==', user.id).get();
-            const wishlistItems = [];
-            snapshot.forEach(doc => wishlistItems.push({ id: doc.id, ...doc.data() }));
-            document.getElementById('wishlistBadge').textContent = wishlistItems.length;
-            
-            if (wishlistItems.length === 0) {
-                grid.innerHTML = `<div class="no-orders" style="grid-column:1/-1;"><i class="fa-regular fa-heart" style="font-size:2rem; color:var(--primary);"></i><p>Your wishlist is empty.</p><a href="/products" style="color:var(--primary); font-weight:600;">Browse products →</a></div>`;
-                return;
-            }
-            
-            const products = [];
-            for (const item of wishlistItems) {
-                try {
-                    const doc = await db.collection('products').doc(item.product_id).get();
-                    if (doc.exists) {
-                        const data = doc.data();
-                        products.push({
-                            id: doc.id,
-                            ...data,
-                            image_url: data.image_url || data.images?.[0] || '',
-                            slug: data.slug || generateSlug(data.title || 'product'),
-                            title: data.title || 'Product',
-                            price: data.price || 0
-                        });
-                    }
-                } catch (e) {
-                    console.error('Error fetching product:', e);
-                }
-            }
-            
-            if (products.length === 0) {
-                grid.innerHTML = `<div class="no-orders" style="grid-column:1/-1;"><p>No products found in wishlist.</p></div>`;
-                return;
-            }
-            
-            grid.innerHTML = products.map(p => `
-                <div class="wishlist-item">
-                    <button class="wishlist-remove" onclick="removeFromWishlist('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
-                    <div class="wishlist-image" onclick="window.location.href='/product/${p.slug}'">
-                        <img src="${p.image_url || 'logo.webp'}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />
-                    </div>
-                    <div class="wishlist-title" onclick="window.location.href='/product/${p.slug}'">${p.title || 'Product'}</div>
-                    <div class="wishlist-price">$${(p.price || 0).toFixed(2)}</div>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('Error loading wishlist:', error);
-            grid.innerHTML = `<div class="no-orders" style="grid-column:1/-1;"><i class="fa-solid fa-circle-exclamation" style="color:#c0392b;"></i><p>Failed to load wishlist.</p></div>`;
-        }
-    }
-
-    // ─── REMOVE FROM WISHLIST ───
-    async function removeFromWishlist(productId) {
-        const user = getCurrentUser();
-        if (!user) return;
-        try {
-            const snapshot = await db.collection('wishlist')
-                .where('user_id', '==', user.id)
-                .where('product_id', '==', productId)
-                .get();
-            if (!snapshot.empty) {
-                await snapshot.docs[0].ref.delete();
-                showToast('Removed from wishlist', 'info');
-                loadWishlist();
-                loadWishlistCount();
-            }
-        } catch (error) {
-            showToast('Failed to remove from wishlist', 'error');
-        }
-    }
-
-    // ─── ADDRESSES ───
-    async function loadAddresses() {
-        const user = getCurrentUser();
-        if (!user) return;
-        try {
-            const snapshot = await db.collection('addresses')
-                .where('user_id', '==', user.id)
-                .get();
-            const addresses = [];
-            snapshot.forEach(doc => addresses.push({ id: doc.id, ...doc.data() }));
-            const container = document.getElementById('addressesList');
-            
-            if (addresses.length === 0) {
-                container.innerHTML = `<div class="no-orders"><i class="fa-solid fa-location-dot"></i><p>No addresses saved yet.</p><button onclick="showAddAddress()" style="margin-top:0.5rem; background:var(--primary); color:#fff; border:none; padding:0.4rem 1.5rem; border-radius:30px; cursor:pointer;"><i class="fa-solid fa-plus"></i> Add Address</button></div>`;
-                return;
-            }
-            
-            addresses.sort((a, b) => (b.is_default ? 1 : 0) - (a.is_default ? 1 : 0));
-            container.innerHTML = addresses.map(addr => `
-                <div style="border:1.5px solid ${addr.is_default ? 'var(--primary)' : 'var(--border)'}; border-radius:var(--radius-sm); padding:1rem; margin-bottom:0.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;${addr.is_default ? 'background:var(--primary-light);' : ''}">
-                    <div>
-                        ${addr.is_default ? '<span style="background:var(--primary);color:#fff;font-size:0.62rem;font-weight:700;padding:0.12rem 0.55rem;border-radius:20px;letter-spacing:0.4px;">⭐ DEFAULT</span> ' : ''}
-                        <strong>${addr.label ? addr.label + ' — ' : ''}${addr.line1}</strong>
-                        ${addr.line2 ? `<br>${addr.line2}` : ''}
-                        <br>${addr.city}, ${addr.state} ${addr.zip}
-                        <br>${addr.country || 'United States'}
-                    </div>
-                    <div style="display:flex;gap:0.9rem;flex-wrap:wrap;">
-                        ${!addr.is_default ? `<button onclick="setDefaultAddress('${addr.id}')" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:0.8rem;" title="Use this address first at checkout">
-                            <i class="fa-regular fa-star"></i> Set default
-                        </button>` : ''}
-                        <button onclick="editAddress('${addr.id}')" style="background:none; border:none; color:var(--secondary); cursor:pointer; font-size:0.8rem;">
-                            <i class="fa-solid fa-pen"></i> Edit
-                        </button>
-                        <button onclick="deleteAddress('${addr.id}')" style="background:none; border:none; color:#c0392b; cursor:pointer; font-size:0.8rem;">
-                            <i class="fa-regular fa-trash-can"></i> Remove
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-            accountAddressesCache = addresses;
-        } catch (error) { console.error('Error loading addresses:', error); }
-    }
-
-    // ─── ADD / EDIT ADDRESS ───
-    let editingAddressId = null;
-
-    function showAddAddress() {
-        editingAddressId = null;
-        document.getElementById('addressFormTitle').textContent = 'Add New Address';
-        document.getElementById('addAddressForm').style.display = 'block';
-        document.getElementById('addAddressForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-    function editAddress(id) {
-        const addr = (accountAddressesCache || []).find(a => a.id === id);
-        if (!addr) return;
-        editingAddressId = id;
-        document.getElementById('addressFormTitle').textContent = 'Edit Address';
-        document.getElementById('addrLabel').value = addr.label || '';
-        document.getElementById('addrLine1').value = addr.line1 || '';
-        document.getElementById('addrLine2').value = addr.line2 || '';
-        document.getElementById('addrCity').value = addr.city || '';
-        document.getElementById('addrState').value = addr.state || '';
-        document.getElementById('addrZip').value = addr.zip || '';
-        document.getElementById('addrCountry').value = addr.country || 'US';
-        document.getElementById('addrIsDefault').checked = !!addr.is_default;
-        document.getElementById('addAddressForm').style.display = 'block';
-        document.getElementById('addAddressForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-    async function setDefaultAddress(id) {
-        const user = getCurrentUser();
-        if (!user) return;
-        try {
-            const snap = await db.collection('addresses').where('user_id', '==', user.id).get();
-            const batch = db.batch();
-            snap.forEach(doc => batch.update(doc.ref, { is_default: doc.id === id }));
-            await batch.commit();
-            showToast('⭐ Default address updated', 'success');
-            loadAddresses();
-        } catch (error) {
-            showToast('Failed to update default address', 'error');
-        }
-    }
-
-    function hideAddAddress() {
-        editingAddressId = null;
-        document.getElementById('addAddressForm').style.display = 'none';
-        document.getElementById('addrLabel').value = '';
-        document.getElementById('addrIsDefault').checked = false;
-        document.getElementById('addrLine1').value = '';
-        document.getElementById('addrLine2').value = '';
-        document.getElementById('addrCity').value = '';
-        document.getElementById('addrState').value = '';
-        document.getElementById('addrZip').value = '';
-        document.getElementById('addrCountry').value = 'US';
-    }
-
-    async function saveAddress() {
-        const user = getCurrentUser();
-        if (!user) return;
-        const line1 = document.getElementById('addrLine1').value.trim();
-        const line2 = document.getElementById('addrLine2').value.trim();
-        const city = document.getElementById('addrCity').value.trim();
-        const state = document.getElementById('addrState').value.trim();
-        const zip = document.getElementById('addrZip').value.trim();
-        const country = document.getElementById('addrCountry').value;
-
-        const label = document.getElementById('addrLabel').value.trim();
-        const isDefault = document.getElementById('addrIsDefault').checked;
-        if (!line1 || !city || !state || !zip) {
-            showToast('Please fill in all required fields', 'error');
-            return;
-        }
-
-        const base = {
-            user_id: user.id,
-            label: label,
-            line1: line1,
-            line2: line2,
-            city: city,
-            state: state,
-            zip: zip,
-            country: country,
-            updated_at: new Date().toISOString()
-        };
-        try {
-            let savedId = editingAddressId;
-            if (editingAddressId) {
-                await db.collection('addresses').doc(editingAddressId).set(base, { merge: true });
-            } else {
-                base.is_default = isDefault;
-                base.created_at = new Date().toISOString();
-                const ref = await db.collection('addresses').add(base);
-                savedId = ref.id;
-            }
-            if (isDefault) await setDefaultAddress(savedId);
-            showToast(editingAddressId ? '✅ Address updated!' : '✅ Address saved!', 'success');
-            hideAddAddress();
-            loadAddresses();
-        } catch (error) {
-            showToast('❌ Failed to save address', 'error');
-        }
-    }
-
-    async function deleteAddress(id) {
-        if (!confirm('Remove this address?')) return;
-        try {
-            await db.collection('addresses').doc(id).delete();
-            showToast('Address removed', 'info');
-            loadAddresses();
-        } catch (error) {
-            showToast('Failed to remove address', 'error');
-        }
-    }
-
-    // ─── CHANGE PASSWORD ───
-    async function changePassword() {
-        const current = document.getElementById('currentPassword').value;
-        const newPass = document.getElementById('newPassword').value;
-        const confirm = document.getElementById('confirmNewPassword').value;
-
-        if (!current || !newPass || !confirm) {
-            showToast('Please fill in all fields', 'error');
-            return;
-        }
-        if (newPass.length < 6) {
-            showToast('New password must be at least 6 characters', 'error');
-            return;
-        }
-        if (newPass !== confirm) {
-            showToast('Passwords do not match', 'error');
-            return;
-        }
-
-        try {
-            const user = auth.currentUser;
-            const credential = firebase.auth.EmailAuthProvider.credential(user.email, current);
-            await user.reauthenticateWithCredential(credential);
-            await user.updatePassword(newPass);
-            showToast('✅ Password updated successfully!', 'success');
-            document.getElementById('currentPassword').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmNewPassword').value = '';
-            document.getElementById('securityPasswordBar').style.width = '0%';
-            document.getElementById('securityPasswordMatch').textContent = '';
-        } catch (error) {
-            let msg = 'Failed to update password';
-            if (error.code === 'auth/wrong-password') msg = 'Current password is incorrect';
-            if (error.code === 'auth/too-many-requests') msg = 'Too many attempts. Try later';
-            showToast('❌ ' + msg, 'error');
-        }
-    }
-
-    // ─── PASSWORD STRENGTH ───
-    document.getElementById('newPassword').addEventListener('input', function() {
-        const password = this.value;
-        const bar = document.getElementById('securityPasswordBar');
-        let strength = 0;
-        if (password.length >= 6) strength++;
-        if (password.length >= 10) strength++;
-        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-        if (/\d/.test(password)) strength++;
-        if (/[^a-zA-Z0-9]/.test(password)) strength++;
-        const colors = ['', '#c0392b', '#e0a62e', '#e0a62e', '#27ae60', '#2ecc71'];
-        const widths = ['0%', '20%', '40%', '60%', '80%', '100%'];
-        bar.style.width = widths[strength] || '0%';
-        bar.style.background = colors[strength] || '#ddd';
-    });
-
-    document.getElementById('confirmNewPassword').addEventListener('input', function() {
-        const newPass = document.getElementById('newPassword').value;
-        const confirm = this.value;
-        const hint = document.getElementById('securityPasswordMatch');
-        if (confirm.length === 0) { hint.textContent = ''; }
-        else if (newPass === confirm) { hint.textContent = '✅ Passwords match'; hint.style.color = '#27ae60'; }
-        else { hint.textContent = '❌ Passwords do not match'; hint.style.color = '#c0392b'; }
-    });
-
-    // ─── LOAD CART COUNT ───
-    async function loadCartCount() {
-        const user = getCurrentUser();
-        if (!user) {
-            const cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
-            const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-            document.querySelectorAll('.cart-count').forEach(el => {
-                el.textContent = count;
-                el.style.display = count > 0 ? 'inline' : 'none';
-            });
-            return;
-        }
-        try {
-            const snapshot = await db.collection('cart').where('user_id', '==', user.id).get();
-            let count = 0;
-            snapshot.forEach(doc => { count += doc.data().quantity || 1; });
-            document.querySelectorAll('.cart-count').forEach(el => {
-                el.textContent = count;
-                el.style.display = count > 0 ? 'inline' : 'none';
-            });
-        } catch (error) {
-            document.querySelectorAll('.cart-count').forEach(el => el.textContent = '0');
-        }
-    }
-
-    // ─── LOAD WISHLIST COUNT ───
-    async function loadWishlistCount() {
-        const user = getCurrentUser();
-        if (!user) {
-            document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
-            return;
-        }
-        try {
-            const snapshot = await db.collection('wishlist').where('user_id', '==', user.id).get();
-            const count = snapshot.size;
-            document.querySelectorAll('.wishlist-count').forEach(el => { el.textContent = count; });
-        } catch (error) {
-            document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = '0');
-        }
-    }
-
-    // ─── TAB NAVIGATION ───
-    function showTab(tab) {
-        document.querySelectorAll('.account-sidebar .nav-item').forEach(n => n.classList.remove('active'));
-        document.querySelector(`.account-sidebar .nav-item[onclick="showTab('${tab}')"]`)?.classList.add('active');
-        document.querySelectorAll('.account-content .tab-content').forEach(t => t.classList.remove('active'));
-        const target = document.getElementById('tab-' + tab);
-        if (target) target.classList.add('active');
-        if (tab === 'orders') loadOrders();
-        if (tab === 'wishlist') loadWishlist();
-        if (tab === 'addresses') loadAddresses();
-        if (tab === 'rewards') loadRewards();
-    }
-
-    // ─── LOAD REWARDS / WALLET / REFERRAL ───
-    async function loadRewards() {
-        const container = document.getElementById('rewardsContainer');
-        if (!container) return;
-        const user = getCurrentUser();
-        if (!user) {
-            container.innerHTML = '<div class="rewards-disabled"><i class="fa-solid fa-lock"></i><p>Please log in again to view your rewards.</p></div>';
-            return;
-        }
-        if (!window.PSE_PREMIUM) {
-            container.innerHTML = '<div class="rewards-disabled"><i class="fa-solid fa-gem"></i><p>Rewards are loading…</p></div>';
-            return;
-        }
-        const cfg = window.PSE_PREMIUM.getConfig();
-        // Make sure config + referral code are loaded
-        try { await window.PSE_PREMIUM.loadConfig(); } catch (e) {}
-        const c = window.PSE_PREMIUM.getConfig();
-        if (!c.loyalty_enabled && !c.wallet_enabled) {
-            container.innerHTML = '<div class="rewards-disabled"><i class="fa-solid fa-gem"></i><p>The rewards program is currently turned off. Check back soon!</p></div>';
-            return;
-        }
-        let loyalty = null, refCode = '';
-        try { loyalty = await window.PSE_PREMIUM.getUserLoyalty(user.id); } catch (e) {}
-        try { refCode = await window.PSE_PREMIUM.ensureReferralCode(user.id, user.email) || ''; } catch (e) {}
-
-        const points = loyalty ? loyalty.points : 0;
-        const wallet = loyalty ? loyalty.wallet : 0;
-        const tierInfo = window.PSE_PREMIUM.computeTier(points);
-        const tier = tierInfo.current;
-        const next = tierInfo.next;
-        const ppd = Number(c.points_per_dollar) || 1;
-        const mult = Number(tier.multiplier) || 1;
-        const pct = next ? Math.min(100, Math.round((points - tier.min_points) / Math.max(1, (next.min_points - tier.min_points)) * 100)) : 100;
-
-        // Tier ladder
-        const ladder = window.PSE_PREMIUM.getTiers().map(function (t) {
-            const cur = t.name === tier.name;
-            return '<div class="tier-chip' + (cur ? ' current' : '') + '" style="' + (cur ? 'border-color:' + t.color + ';' : '') + '">' +
-                '<div class="dot" style="background:' + t.color + ';"></div>' +
-                '<div class="nm">' + t.name + (cur ? ' ✓' : '') + '</div>' +
-                '<div class="mn">' + t.min_points.toLocaleString() + ' pts</div>' +
-                '<div class="mult" style="color:' + t.color + ';">' + t.multiplier + '× earn</div>' +
-                '</div>';
-        }).join('');
-
-        const progressHtml = next
-            ? '<div style="margin-bottom:0.3rem;font-size:0.82rem;color:var(--text-light);">You are <strong style="color:var(--secondary);">' + (next.min_points - points).toLocaleString() + ' pts</strong> away from <strong style="color:' + next.color + ';">' + next.name + '</strong> tier.</div>' +
-              '<div class="progress-wrap"><div class="progress-bar" style="width:' + pct + '%;background:linear-gradient(90deg,' + tier.color + ',' + (next.color) + ');"></div></div>'
-            : '<div style="margin-bottom:0.3rem;font-size:0.82rem;color:var(--text-light);">🏆 You\'ve reached the highest <strong style="color:' + tier.color + ';">' + tier.name + '</strong> tier!</div>';
-
-        container.innerHTML =
-            '<div class="rewards-grid">' +
-                '<div class="reward-card"><div class="ico" style="background:' + tier.color + ';"><i class="fa-solid fa-crown"></i></div><div class="val" style="color:' + tier.color + ';">' + tier.name + '</div><div class="lbl">Your VIP Tier</div></div>' +
-                '<div class="reward-card"><div class="ico" style="background:#9b59b6;"><i class="fa-solid fa-star"></i></div><div class="val">' + points.toLocaleString() + '</div><div class="lbl">Reward Points</div></div>' +
-                '<div class="reward-card"><div class="ico" style="background:#27ae60;"><i class="fa-solid fa-wallet"></i></div><div class="val">' + (window.PSE_PREMIUM.fmtMoney(wallet)) + '</div><div class="lbl">Store Credit</div></div>' +
-                '<div class="reward-card"><div class="ico" style="background:#e0a62e;"><i class="fa-solid fa-bolt"></i></div><div class="val">' + mult + '×</div><div class="lbl">Earn Rate (' + ppd + ' pt/$)</div></div>' +
-            '</div>' +
-            progressHtml +
-            '<div class="section-title" style="margin-top:1rem;font-size:0.95rem;"><i class="fa-solid fa-ranking-star"></i> Tier Ladder</div>' +
-            '<div class="tier-ladder">' + ladder + '</div>' +
-            '<p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1.4rem;">💡 Earn <strong>' + ppd + ' point per $1</strong> on every order, multiplied by your tier. Admins can credit your wallet for refunds &amp; bonuses.</p>' +
-            '<div class="referral-box">' +
-                '<div><div style="font-size:0.78rem;text-transform:uppercase;opacity:.85;letter-spacing:.08em;">🎁 Refer &amp; Earn ' + (c.referral_bonus_points || 500) + ' pts</div>' +
-                '<div style="font-size:1.05rem;margin-top:0.3rem;">Share your link — friends get ' + (c.referral_invitee_points || 200) + ' pts at signup!</div>' +
-                '<div style="font-size:0.75rem;opacity:.85;margin-top:0.4rem;word-break:break-all;" id="userReferralLink">' + (refCode ? (location.origin + '/register?ref=' + refCode) : '—') + '</div></div>' +
-                '<div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">' +
-                    '<span class="ref-code" id="userReferralCode">' + (refCode || '—') + '</span>' +
-                    '<button onclick="copyReferralCode()" title="Copy code"><i class="fa-regular fa-copy"></i> Code</button>' +
-                    '<button onclick="copyReferralLink()" title="Copy invite link" style="background:#0b2138;color:#fff;"><i class="fa-solid fa-link"></i> Link</button>' +
-                    '<button onclick="shareReferralWhatsApp()" title="Share on WhatsApp" style="background:#25D366;color:#fff;"><i class="fa-brands fa-whatsapp"></i> Share</button>' +
-                '</div>' +
-            '</div>';
-    }
-
-    function copyReferralCode() {
-        const elc = document.getElementById('userReferralCode');
-        if (!elc) return;
-        const code = elc.textContent.trim();
-        try {
-            navigator.clipboard.writeText(code).then(function () { showToast('📋 Referral code copied: ' + code, 'success'); }, function () { showToast('Code: ' + code, 'info'); });
-        } catch (e) { showToast('Referral code: ' + code, 'info'); }
-    }
-
-    function copyReferralLink() {
-        const elc = document.getElementById('userReferralCode');
-        if (!elc) return;
-        const code = elc.textContent.trim();
-        if (!code || code === '—') { showToast('Referral code not ready yet', 'info'); return; }
-        const link = location.origin + '/register?ref=' + encodeURIComponent(code);
-        try {
-            navigator.clipboard.writeText(link).then(
-                function () { showToast('🔗 Invite link copied — share it anywhere!', 'success'); },
-                function () { showToast('Invite link: ' + link, 'info'); });
-        } catch (e) { showToast('Invite link: ' + link, 'info'); }
-    }
-
-    function shareReferralWhatsApp() {
-        const elc = document.getElementById('userReferralCode');
-        if (!elc) return;
-        const code = elc.textContent.trim();
-        if (!code || code === '—') { showToast('Referral code not ready yet', 'info'); return; }
-        const link = location.origin + '/register?ref=' + encodeURIComponent(code);
-        const text = '🛒 Join *Pilot Sales Distribution* — premium B2B wholesale marketplace!\n\nSign up with my referral code *' + code + '* and we both earn bonus reward points 🎁\n👉 ' + link;
-        window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
-    }
-
-    // ─── TOGGLE WISHLIST ───
-    function toggleWishlist() {
-        const user = getCurrentUser();
-        if (!user) {
-            showToast('Please login to view wishlist', 'error');
-            setTimeout(() => window.location.href = '/login', 1500);
-            return;
-        }
-        window.location.href = '/wishlist';
-    }
-
-    // ─── LOGOUT ───
-    function logoutUser() {
-        if (confirm('Are you sure you want to logout?')) {
-            auth.signOut().then(() => {
-                localStorage.removeItem('pilot_user');
-                localStorage.removeItem('pilot_cart');
-                showToast('Logged out', 'info');
-                setTimeout(() => window.location.href = '/home', 1000);
-            });
-        }
-    }
-
-    // ─── INIT ───
-    document.addEventListener('DOMContentLoaded', function() {
-        initFirebase();
-        document.getElementById('year').textContent = new Date().getFullYear();
-
-        // Scroll animations
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
-    });
-
-    // ─── NET-30 TRADE CREDIT APPLICATION ───
-    const tradeForm = document.getElementById('tradeCreditForm');
-    if (tradeForm) {
-        tradeForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const taxId = document.getElementById('creditTaxId').value.trim();
-            const limit = parseInt(document.getElementById('creditLimitReq').value) || 5000;
-            const vol = document.getElementById('creditVolume').value;
-            const email = document.getElementById('creditBillingEmail').value.trim();
-            const user = getCurrentUser();
-            if (!user || !taxId || !email) {
-                showToast('Please fill in required fields', 'error');
-                return;
-            }
-            const btn = document.getElementById('submitCreditBtn');
-            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...'; }
-            try {
-                await db.collection('users').doc(user.id).set({
-                    trade_credit_status: 'pending',
-                    trade_credit_limit: limit,
-                    trade_credit_tax_id: taxId,
-                    updated_at: new Date().toISOString()
-                }, { merge: true });
-
-                await db.collection('trade_credit_applications').add({
-                    user_id: user.id,
-                    user_email: user.email,
-                    company: user.company || user.full_name || 'B2B Buyer',
-                    tax_id: taxId,
-                    requested_limit: limit,
-                    procurement_volume: vol,
-                    billing_email: email,
-                    status: 'pending',
-                    created_at: new Date().toISOString()
-                });
-
-                document.getElementById('tradeCreditStatusText').innerHTML = `Pending Approval <span style="font-size:0.75rem;padding:4px 10px;border-radius:20px;background:#fff;color:#d35400;font-weight:600;">$${limit.toLocaleString()} Limit</span>`;
-                showToast('✅ Net-30 Trade Credit application submitted for corporate review!', 'success');
-            } catch (err) {
-                console.error('Credit error:', err);
-                showToast('Failed to submit credit application', 'error');
-            } finally {
-                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Net-30 Application'; }
-            }
-        });
-    }
-
-    // ─── EXPOSE ───
-    window.showTab = showTab;
-    window.logoutUser = logoutUser;
-    window.toggleWishlist = toggleWishlist;
-    window.uploadProfileImage = uploadProfileImage;
-    window.removeProfilePhoto = removeProfilePhoto;
-    window.showAddAddress = showAddAddress;
-    window.hideAddAddress = hideAddAddress;
-    window.saveAddress = saveAddress;
-    window.deleteAddress = deleteAddress;
-    window.changePassword = changePassword;
-    window.removeFromWishlist = removeFromWishlist;
-    window.showToast = showToast;
-    window.getCurrentUser = getCurrentUser;
-    window.goToAdminDashboard = goToAdminDashboard;
-    window.loadRewards = loadRewards;
-    window.copyReferralCode = copyReferralCode;
-    window.copyReferralLink = copyReferralLink;
-    window.shareReferralWhatsApp = shareReferralWhatsApp;
-    window.applyAdminRole = applyAdminRole;
+}
+
+function logoutUser(e) {
+    e.preventDefault();
+    localStorage.removeItem('pilot_user');
+    window.pseToast('Logged out successfully', 'info');
+    setTimeout(function() { window.location.href = '/'; }, 500);
+}
 </script>
-    <script src="email.js"></script>
-    <script src="ai-assistant.js"></script>
-    <script src="notifications.js"></script>
-    <script src="premium.js"></script>
-    <script src="/search-pro.js"></script>
 </body>
 </html>

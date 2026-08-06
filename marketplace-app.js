@@ -1,78 +1,74 @@
 /* ============================================================================
-   PSE MARKETPLACE — MOBILE APP HOMEPAGE ENGINE
-   Hero slider · flash countdown · product grids (featured/latest/recommended)
-   · top suppliers · wishlist · notifications · category sheet · recently viewed
+   PSE MARKETPLACE — MASTER MOBILE-FIRST JAVASCRIPT ENGINE
+   Real Admin & Seller Data Integration · Firebase Firestore · App Shell
    ========================================================================== */
+
 (function (window, document) {
     'use strict';
 
-    var FEED_CACHE_KEY = 'pse_app_feed_v1';
-    var FEED_CACHE_TTL = 5 * 60 * 1000;
+    /* ─── FIREBASE INITIALIZATION ───────────────────────────────────────── */
+    var firebaseConfig = {
+        apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
+        authDomain: "pilot-sales-distribution.firebaseapp.com",
+        projectId: "pilot-sales-distribution",
+        storageBucket: "pilot-sales-distribution.firebasestorage.app",
+        messagingSenderId: "729127273727",
+        appId: "1:729127273727:web:402d67be8346257755f8ca"
+    };
 
-    /* ─── FALLBACK CATALOG (used when the inventory API is unreachable) ──── */
-    var FALLBACK_PRODUCTS = [
-        { id: 'fb-1',  title: 'Sony WH-1000XM5 Wireless Noise-Cancelling Headphones', brand: 'Sony',      category: 'electronics', price: 249.99, oldPrice: 399.99, image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80', rating: '4.9', reviews: 1284, moq: 5 },
-        { id: 'fb-2',  title: 'iPhone 15 Pro Max 256GB — Factory Sealed (Case of 10)', brand: 'Apple',     category: 'phones',     price: 1099.00, oldPrice: 1299.00, image_url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80', rating: '4.8', reviews: 2310, moq: 10 },
-        { id: 'fb-3',  title: 'MacBook Pro 14" M3 512GB — Sealed Wholesale Lot',        brand: 'Apple',     category: 'computers',  price: 1399.00, oldPrice: 1799.00, image_url: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80', rating: '4.9', reviews: 864, moq: 5 },
-        { id: 'fb-4',  title: 'Nike Air Force 1 \'07 — Bulk Case (12 Pairs)',            brand: 'Nike',      category: 'fashion',    price: 79.99,  oldPrice: 115.00,  image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80', rating: '4.7', reviews: 1752, moq: 12 },
-        { id: 'fb-5',  title: 'Samsung 55" 4K QLED TV — Pallet of 6',                  brand: 'Samsung',   category: 'electronics', price: 549.00, oldPrice: 899.00, image_url: 'https://images.unsplash.com/photo-1461151304267-38535e780c79?auto=format&fit=crop&w=600&q=80', rating: '4.8', reviews: 640, moq: 6 },
-        { id: 'fb-6',  title: 'Dell XPS 15 9530 Core i9 — Refurb Elite (Lot of 5)',    brand: 'Dell',      category: 'computers',  price: 999.00, oldPrice: 1450.00, image_url: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80', rating: '4.6', reviews: 421, moq: 5 },
-        { id: 'fb-7',  title: 'Casio G-Shock GA-2100 — Wholesale Display Case (20)',   brand: 'Casio',     category: 'fashion',    price: 59.99,  oldPrice: 99.00,  image_url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80', rating: '4.7', reviews: 968, moq: 20 },
-        { id: 'fb-8',  title: 'Bosch 18V Power Tool Kit — Contractor Pallet',         brand: 'Bosch',     category: 'home',       price: 189.00, oldPrice: 320.00,  image_url: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=600&q=80', rating: '4.8', reviews: 512, moq: 4 },
-        { id: 'fb-9',  title: 'Bose QuietComfort Ultra Earbuds — Case of 10',         brand: 'Bose',      category: 'electronics', price: 199.00, oldPrice: 299.00, image_url: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=600&q=80', rating: '4.7', reviews: 388, moq: 10 },
-        { id: 'fb-10', title: 'Adidas Ultraboost Light — Mixed Size Bulk Lot (30)',   brand: 'Adidas',    category: 'fashion',    price: 69.99,  oldPrice: 140.00,  image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=600&q=80', rating: '4.6', reviews: 1105, moq: 30 },
-        { id: 'fb-11', title: 'HP LaserJet Pro M479fdw — Sealed (Lot of 4)',          brand: 'HP',        category: 'computers',  price: 429.00, oldPrice: 599.00, image_url: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=600&q=80', rating: '4.7', reviews: 296, moq: 4 },
-        { id: 'fb-12', title: 'Oculus Quest 3 128GB — Wholesale Bundle (Case of 6)',  brand: 'Meta',      category: 'electronics', price: 389.00, oldPrice: 499.00, image_url: 'https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?auto=format&fit=crop&w=600&q=80', rating: '4.8', reviews: 730, moq: 6 },
-        { id: 'fb-13', title: 'Apple Watch Series 9 GPS 45mm — Case of 8',            brand: 'Apple',     category: 'electronics', price: 329.00, oldPrice: 429.00, image_url: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=600&q=80', rating: '4.8', reviews: 1490, moq: 8 },
-        { id: 'fb-14', title: 'KitchenAid Stand Mixer 5Qt — Wholesale Pallet (12)',   brand: 'KitchenAid', category: 'home',     price: 249.00, oldPrice: 379.00, image_url: 'https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?auto=format&fit=crop&w=600&q=80', rating: '4.7', reviews: 583, moq: 12 },
-        { id: 'fb-15', title: 'Samsung Galaxy S24 Ultra 512GB — Factory Sealed (10)', brand: 'Samsung',   category: 'phones',     price: 999.00, oldPrice: 1319.00, image_url: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=600&q=80', rating: '4.8', reviews: 1122, moq: 10 },
-        { id: 'fb-16', title: 'LG 27" 4K UHD Monitor — Enterprise Lot (8)',           brand: 'LG',        category: 'computers',  price: 289.00, oldPrice: 399.00, image_url: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=600&q=80', rating: '4.6', reviews: 344, moq: 8 }
-    ];
+    function initFirebase() {
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                window.db = firebase.firestore();
+                window.auth = firebase.auth();
+            } catch (e) {
+                console.warn('Firebase initialization note:', e);
+            }
+        }
+    }
 
-    /* ─── TOP SUPPLIERS ─────────────────────────────────────────────────── */
-    var SUPPLIERS = [
-        { name: 'Amazon',            file: '/amazon.svg',    rating: '4.8', reviews: 1240, tier: 'Marketplace Partner' },
-        { name: 'Walmart',           file: '/walmart.svg',   rating: '4.7', reviews: 986,  tier: 'Retail Partner' },
-        { name: 'Apple',             file: '/apple.svg',     rating: '4.9', reviews: 2310, tier: 'Authorized Bulk' },
-        { name: 'Samsung',           file: '/samsung.svg',   rating: '4.8', reviews: 1875, tier: 'Global Tech' },
-        { name: 'Sony',              file: '/sony.svg',      rating: '4.8', reviews: 1102, tier: 'Audio & Gaming' },
-        { name: 'Nike',              file: '/nike.svg',      rating: '4.7', reviews: 1644, tier: 'Apparel & Footwear' },
-        { name: 'Dell',              file: '/dell.svg',      rating: '4.7', reviews: 873,  tier: 'Enterprise Tech' },
-        { name: 'HP',                file: '/hp.svg',        rating: '4.6', reviews: 742,  tier: 'Printing & PCs' },
-        { name: 'Lenovo',            file: '/lenovo.svg',    rating: '4.7', reviews: 905,  tier: 'Laptops & Servers' },
-        { name: 'Adidas',            file: '/adidas.svg',    rating: '4.6', reviews: 688,  tier: 'Athletic Wholesale' },
-        { name: 'Google',            file: '/google.svg',    rating: '4.8', reviews: 519,  tier: 'Hardware & Smart' },
-        { name: 'LG',                file: '/lg.svg',        rating: '4.6', reviews: 434,  tier: 'Displays & Home' }
-    ];
+    /* ─── TOAST NOTIFICATION ────────────────────────────────────────────── */
+    window.pseToast = function (msg, type) {
+        var existing = document.getElementById('pseToast');
+        if (existing) existing.remove();
+        var toast = document.createElement('div');
+        toast.id = 'pseToast';
+        toast.className = 'pse-toast ' + (type || 'info');
+        toast.textContent = msg;
+        document.body.appendChild(toast);
+        setTimeout(function () { toast.classList.add('show'); }, 10);
+        setTimeout(function () {
+            toast.classList.remove('show');
+            setTimeout(function () { toast.remove(); }, 300);
+        }, 2600);
+    };
 
-    /* ─── HELPERS ───────────────────────────────────────────────────────── */
+    /* ─── STORAGE HELPERS ───────────────────────────────────────────────── */
+    function lsGet(key, fallback) {
+        try {
+            var val = localStorage.getItem(key);
+            return val ? JSON.parse(val) : fallback;
+        } catch (e) {
+            return fallback;
+        }
+    }
+
+    function lsSet(key, value) {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+        } catch (e) {}
+    }
+
     function esc(s) {
         return String(s == null ? '' : s)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
-    function money(n) {
-        var v = Number(n);
-        if (!isFinite(v)) v = 0;
-        return v.toFixed(2);
-    }
-
     function slugify(title) {
         return String(title || 'product').toLowerCase()
             .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 80);
-    }
-
-    function lsGet(key, fallback) {
-        try { return JSON.parse(localStorage.getItem(key) || 'null') || fallback; } catch (e) { return fallback; }
-    }
-
-    function lsSet(key, value) {
-        try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
-    }
-
-    function productUrl(p) {
-        return '/product-detail?slug=' + encodeURIComponent(p.slug || slugify(p.title));
     }
 
     function stars(rating) {
@@ -85,238 +81,202 @@
         return out;
     }
 
-    /* ─── WISHLIST ──────────────────────────────────────────────────────── */
-    function getWishlist() {
-        return lsGet('pilot_wishlist', []);
+    /* ─── GLOBAL MENU DRAWER (☰ top left) ───────────────────────────────── */
+    function initDrawer() {
+        var menuBtn = document.getElementById('appMenuBtn');
+        var drawer = document.getElementById('appDrawer');
+        var overlay = document.getElementById('appDrawerOverlay');
+        var closeBtn = document.getElementById('appDrawerClose');
+
+        if (!menuBtn || !drawer || !overlay) return;
+
+        function openDrawer() {
+            drawer.classList.add('open');
+            overlay.classList.add('open');
+            drawer.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+            drawer.classList.remove('open');
+            overlay.classList.remove('open');
+            drawer.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        menuBtn.addEventListener('click', openDrawer);
+        overlay.addEventListener('click', closeDrawer);
+        if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && drawer.classList.contains('open')) {
+                closeDrawer();
+            }
+        });
     }
 
-    window.toggleWishlist = function (id, title, price, img, slug, btnEl) {
-        var wl = getWishlist();
-        var idx = wl.findIndex(function (w) { return String(w.id) === String(id); });
-        if (idx >= 0) {
-            wl.splice(idx, 1);
-            if (btnEl) btnEl.classList.remove('active');
-            if (btnEl) btnEl.querySelector('i').className = 'fa-regular fa-heart';
-            if (window.pseToast) window.pseToast('Removed from wishlist', 'info');
-        } else {
-            wl.unshift({ id: String(id), title: String(title || 'Product'), price: Number(price) || 0, image: img || '/logo.webp', slug: slug || slugify(title), brand: 'PSE Marketplace' });
-            if (btnEl) btnEl.classList.add('active');
-            if (btnEl) btnEl.querySelector('i').className = 'fa-solid fa-heart';
-            if (window.pseToast) window.pseToast('❤️ Saved to your wishlist', 'success');
-        }
-        lsSet('pilot_wishlist', wl);
-        if (window.PSEMarketplace && typeof window.PSEMarketplace.syncCounters === 'function') {
-            window.PSEMarketplace.syncCounters();
-        }
+    /* ─── NOTIFICATIONS PANEL ───────────────────────────────────────────── */
+    function initNotifications() {
+        var btn = document.getElementById('appNotifBtn');
+        var panel = document.getElementById('appNotifPanel');
+        var badge = document.getElementById('appNotifBadge');
+        if (!btn || !panel) return;
+
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            panel.hidden = !panel.hidden;
+            if (!panel.hidden && badge) badge.style.display = 'none';
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!panel.hidden && !panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+                panel.hidden = true;
+            }
+        });
+    }
+
+    /* ─── DELIVERY LOCATION (Tap to Cycle) ──────────────────────────────── */
+    var PSE_LOCATIONS = [
+        '90210 – Los Angeles, CA',
+        '10001 – New York, NY',
+        '60601 – Chicago, IL',
+        '75001 – Dallas, TX',
+        '33101 – Miami, FL',
+        '98101 – Seattle, WA',
+        'London – United Kingdom 🇬🇧',
+        'Lusaka – Zambia 🇿🇲',
+        'Worldwide Delivery 🌐'
+    ];
+
+    function initLocation() {
+        var btn = document.getElementById('appLocBtn');
+        var zipEl = document.getElementById('appZip');
+        if (!btn || !zipEl) return;
+
+        var saved = localStorage.getItem('pse_marketplace_zip') || PSE_LOCATIONS[0];
+        var idx = PSE_LOCATIONS.indexOf(saved);
+        if (idx === -1) idx = 0;
+        zipEl.textContent = PSE_LOCATIONS[idx];
+
+        btn.addEventListener('click', function () {
+            idx = (idx + 1) % PSE_LOCATIONS.length;
+            zipEl.textContent = PSE_LOCATIONS[idx];
+            localStorage.setItem('pse_marketplace_zip', PSE_LOCATIONS[idx]);
+            window.pseToast('📍 Delivering to ' + PSE_LOCATIONS[idx], 'info');
+        });
+    }
+
+    /* ─── LIVE CART & BADGE SYNC ────────────────────────────────────────── */
+    window.syncCartCount = function () {
+        var cart = lsGet('pilot_cart', []);
+        var count = cart.reduce(function (sum, item) { return sum + (item.quantity || 1); }, 0);
+        document.querySelectorAll('.cart-count, #cartCount').forEach(function (el) {
+            el.textContent = count;
+        });
     };
 
-    function isWishlisted(id) {
-        return getWishlist().some(function (w) { return String(w.id) === String(id); });
-    }
-
-    /* ─── CART ──────────────────────────────────────────────────────────── */
     window.handleAddToCart = function (id, title, price, img) {
         var cart = lsGet('pilot_cart', []);
         var existing = cart.find(function (item) { return String(item.id) === String(id); });
         if (existing) {
             existing.quantity = (existing.quantity || 1) + 1;
         } else {
-            cart.push({ id: String(id), title: String(title || 'Product'), price: Number(price) || 0, image: img || '/logo.webp', quantity: 1 });
+            cart.push({
+                id: String(id),
+                title: String(title || 'Wholesale Product'),
+                price: Number(price) || 0,
+                image: img || '/logo.webp',
+                quantity: 1
+            });
         }
         lsSet('pilot_cart', cart);
-        if (typeof window.loadCartCount === 'function') window.loadCartCount();
-        if (window.PSEMarketplace && typeof window.PSEMarketplace.openSideCart === 'function') {
-            window.PSEMarketplace.openSideCart();
+        window.syncCartCount();
+        window.pseToast('🛒 Added to Cart!', 'success');
+    };
+
+    /* ─── WISHLIST ──────────────────────────────────────────────────────── */
+    window.getWishlist = function () {
+        return lsGet('pilot_wishlist', []);
+    };
+
+    window.isWishlisted = function (id) {
+        return window.getWishlist().some(function (w) { return String(w.id) === String(id); });
+    };
+
+    window.toggleWishlist = function (id, title, price, img, slug, btnEl) {
+        var wl = window.getWishlist();
+        var idx = wl.findIndex(function (w) { return String(w.id) === String(id); });
+        if (idx >= 0) {
+            wl.splice(idx, 1);
+            if (btnEl) btnEl.classList.remove('active');
+            if (btnEl) btnEl.querySelector('i').className = 'fa-regular fa-heart';
+            window.pseToast('Removed from wishlist', 'info');
+        } else {
+            wl.unshift({
+                id: String(id),
+                title: String(title || 'Wholesale Lot'),
+                price: Number(price) || 0,
+                image: img || '/logo.webp',
+                slug: slug || slugify(title)
+            });
+            if (btnEl) btnEl.classList.add('active');
+            if (btnEl) btnEl.querySelector('i').className = 'fa-solid fa-heart';
+            window.pseToast('❤️ Saved to wishlist!', 'success');
         }
-        if (window.pseToast) window.pseToast('🛒 Added to cart — ' + String(title).substring(0, 28) + '…', 'success');
+        lsSet('pilot_wishlist', wl);
     };
 
-    window.appBuyNow = function (id, title, price, img) {
-        window.handleAddToCart(id, title, price, img);
-        setTimeout(function () {
-            window.location.href = '/cart';
-        }, 650);
-    };
+    /* ─── USER & AUTH STATE SYNC ────────────────────────────────────────── */
+    function updateAuthUI() {
+        var user = lsGet('pilot_user', null);
+        var label = document.getElementById('accountLabel');
+        var drawerUser = document.getElementById('drawerUserLabel');
+        var drawerAuth = document.getElementById('drawerAuthLink');
 
-    /* ─── FEED (inventory API → normalized products) ────────────────────── */
-    function normalize(item) {
-        var isPublicPrice = item.pricingMode === 'public' && isFinite(Number(item.publicUnitPrice));
-        var availability = item.status === 'confirm-availability' || item.quantityMode === 'confirm'
-            ? 'confirm'
-            : (Number.isInteger(item.availableToSell) && item.availableToSell > 0 ? 'in-stock' : 'unavailable');
-        return {
-            id: item.dealId,
-            dealId: item.dealId,
-            slug: item.slug || slugify(item.title || 'product'),
-            title: item.title || 'Product',
-            brand: item.brand || 'PSE Marketplace',
-            moq: item.moqUnits || 0,
-            category: item.category || 'electronics',
-            condition: item.condition || 'Brand New',
-            price: isPublicPrice ? Number(item.publicUnitPrice) : 49.99,
-            oldPrice: null,
-            image_url: (item.imageUrls && item.imageUrls[0]) || '/logo.webp',
-            availability: availability,
-            rating: (4.5 + Math.random() * 0.4).toFixed(1),
-            reviews: Math.floor(120 + Math.random() * 850)
-        };
-    }
-
-    function fetchFeed() {
-        // cached?
-        try {
-            var cached = JSON.parse(sessionStorage.getItem(FEED_CACHE_KEY) || 'null');
-            if (cached && cached.ts && Date.now() - cached.ts < FEED_CACHE_TTL && Array.isArray(cached.items)) {
-                return Promise.resolve(cached.items);
+        if (user && user.full_name) {
+            var firstName = user.full_name.split(' ')[0];
+            if (label) label.textContent = firstName;
+            if (drawerUser) drawerUser.textContent = user.full_name;
+            if (drawerAuth) {
+                drawerAuth.textContent = 'Sign Out';
+                drawerAuth.href = '#';
+                drawerAuth.onclick = function (e) {
+                    e.preventDefault();
+                    localStorage.removeItem('pilot_user');
+                    if (window.auth && typeof window.auth.signOut === 'function') window.auth.signOut();
+                    window.location.reload();
+                };
             }
-        } catch (e) {}
-
-        var origin = (window.PSEInventory && typeof window.PSEInventory.apiOrigin === 'function')
-            ? window.PSEInventory.apiOrigin()
-            : window.location.origin;
-
-        var url = new URL('/api/inventory', origin);
-        url.searchParams.set('limit', '60');
-
-        return fetch(url.toString(), { headers: { 'Accept': 'application/json' } })
-            .then(function (res) {
-                if (!res.ok) throw new Error('feed unavailable');
-                return res.json();
-            })
-            .then(function (payload) {
-                var items = (payload && payload.data) || [];
-                var products = items.map(normalize).filter(Boolean);
-                try {
-                    sessionStorage.setItem(FEED_CACHE_KEY, JSON.stringify({ ts: Date.now(), items: products }));
-                } catch (e) {}
-                return products;
-            })
-            .catch(function () { return []; });
-    }
-
-    /* ─── CARD TEMPLATES ────────────────────────────────────────────────── */
-    function discountOf(p, fallbackIdx) {
-        if (p.oldPrice && Number(p.oldPrice) > Number(p.price)) {
-            return Math.round((1 - Number(p.price) / Number(p.oldPrice)) * 100);
+        } else {
+            if (label) label.textContent = 'Guest';
+            if (drawerUser) drawerUser.textContent = 'Hello, Guest';
+            if (drawerAuth) {
+                drawerAuth.textContent = 'Sign In / Register';
+                drawerAuth.href = '/login';
+                drawerAuth.onclick = null;
+            }
         }
-        var d = [15, 20, 25, 30, 35, 40, 45, 50][fallbackIdx % 8];
-        p.oldPrice = (Number(p.price) / (1 - d / 100)).toFixed(2);
-        return d;
     }
 
-    function wishBtn(p, size) {
-        var active = isWishlisted(p.id);
-        return '<button type="button" class="app-wish-btn' + (active ? ' active' : '') + '" aria-label="Toggle wishlist" ' +
-            'onclick="event.stopPropagation();toggleWishlist(\'' + esc(p.id) + '\',\'' + esc(p.title).replace(/'/g, "\\'") + '\',' + Number(p.price) + ',\'' + esc(p.image_url) + '\',\'' + esc(p.slug) + '\',this)">' +
-            '<i class="' + (active ? 'fa-solid' : 'fa-regular') + ' fa-heart"></i></button>';
+    /* ─── BOTTOM NAVIGATION HIGHLIGHT ───────────────────────────────────── */
+    function highlightBottomNav() {
+        var path = window.location.pathname;
+        var navItems = document.querySelectorAll('.app-nav-item');
+        navItems.forEach(function (item) {
+            var navType = item.getAttribute('data-nav');
+            var isCurrent = false;
+
+            if (navType === 'home' && (path === '/' || path.indexOf('index') !== -1)) isCurrent = true;
+            else if (navType === 'categories' && (path.indexOf('products') !== -1 || path.indexOf('category') !== -1)) isCurrent = true;
+            else if (navType === 'rfq' && path.indexOf('rfq') !== -1) isCurrent = true;
+            else if (navType === 'cart' && path.indexOf('cart') !== -1) isCurrent = true;
+            else if (navType === 'account' && (path.indexOf('account') !== -1 || path.indexOf('buyer-dashboard') !== -1 || path.indexOf('seller-dashboard') !== -1)) isCurrent = true;
+
+            item.classList.toggle('active', isCurrent);
+        });
     }
 
-    function compareBtn(p) {
-        return '<button type="button" class="app-cmp-btn" title="Add to comparison" aria-label="Compare product" ' +
-            'onclick="event.stopPropagation();window.PSEMarketplace && PSEMarketplace.toggleCompare({id:\'' + esc(p.id) + '\',title:\'' + esc(p.title).replace(/'/g, "\\'") + '\',price:' + Number(p.price) + ',image_url:\'' + esc(p.image_url) + '\',slug:\'' + esc(p.slug) + '\'})">' +
-            '<i class="fa-solid fa-scale-balanced"></i></button>';
-    }
-
-    function gridCard(p, idx, showDiscount) {
-        var disc = showDiscount ? discountOf(p, idx) : null;
-        return '' +
-            '<div class="app-card" onclick="window.location.href=\'' + productUrl(p) + '\'">' +
-                '<div class="app-card-img">' +
-                    '<img src="' + esc(p.image_url) + '" alt="' + esc(p.title) + '" loading="lazy" onerror="this.onerror=null;this.src=\'/logo.webp\'" />' +
-                    wishBtn(p) + compareBtn(p) +
-                    (disc ? '<span class="app-discount">-' + disc + '%</span>' : '') +
-                '</div>' +
-                '<div class="app-card-brand">' + esc(p.brand || 'PSE Marketplace') + ' <i class="fa-solid fa-circle-check" title="Verified product"></i></div>' +
-                '<h3 class="app-card-title">' + esc(p.title) + '</h3>' +
-                '<div class="app-card-rating"><span class="app-stars">' + stars(p.rating) + '</span><span class="app-rating-num">' + esc(p.rating) + '</span> (' + (p.reviews || 0).toLocaleString() + ')</div>' +
-                '<div class="app-card-price">' +
-                    '<span class="app-price"><small>$</small>' + money(p.price).split('.')[0] + '.<small>' + money(p.price).split('.')[1] + '</small></span>' +
-                    (p.oldPrice ? '<span class="app-old-price">$' + money(p.oldPrice) + '</span>' : '') +
-                '</div>' +
-                '<button type="button" class="app-card-cta" onclick="event.stopPropagation();handleAddToCart(\'' + esc(p.id) + '\',\'' + esc(p.title).replace(/'/g, "\\'") + '\',' + Number(p.price) + ',\'' + esc(p.image_url) + '\')">' +
-                    '<i class="fa-solid fa-cart-shopping"></i> Add to Cart' +
-                '</button>' +
-            '</div>';
-    }
-
-    function hCard(p, idx, opts) {
-        opts = opts || {};
-        var disc = opts.discount ? discountOf(p, idx) : null;
-        var cta = opts.buyNow
-            ? '<button type="button" class="app-card-cta app-card-cta--buy" onclick="event.stopPropagation();appBuyNow(\'' + esc(p.id) + '\',\'' + esc(p.title).replace(/'/g, "\\'") + '\',' + Number(p.price) + ',\'' + esc(p.image_url) + '\')"><i class="fa-solid fa-bolt"></i> Buy Now</button>'
-            : '<button type="button" class="app-card-cta" onclick="event.stopPropagation();handleAddToCart(\'' + esc(p.id) + '\',\'' + esc(p.title).replace(/'/g, "\\'") + '\',' + Number(p.price) + ',\'' + esc(p.image_url) + '\')"><i class="fa-solid fa-cart-shopping"></i> Add</button>';
-        return '' +
-            '<div class="app-hcard" onclick="window.location.href=\'' + productUrl(p) + '\'">' +
-                '<div class="app-card-img">' +
-                    '<img src="' + esc(p.image_url) + '" alt="' + esc(p.title) + '" loading="lazy" onerror="this.onerror=null;this.src=\'/logo.webp\'" />' +
-                    wishBtn(p) + compareBtn(p) +
-                    (disc ? '<span class="app-discount">-' + disc + '%</span>' : '') +
-                '</div>' +
-                '<div class="app-card-brand">' + esc(p.brand || 'PSE Marketplace') + ' <i class="fa-solid fa-circle-check"></i></div>' +
-                '<h3 class="app-card-title">' + esc(p.title) + '</h3>' +
-                '<div class="app-card-rating"><span class="app-stars">' + stars(p.rating) + '</span><span class="app-rating-num">' + esc(p.rating) + '</span> (' + (p.reviews || 0).toLocaleString() + ')</div>' +
-                '<div class="app-card-price">' +
-                    '<span class="app-price"><small>$</small>' + money(p.price).split('.')[0] + '.<small>' + money(p.price).split('.')[1] + '</small></span>' +
-                    (p.oldPrice ? '<span class="app-old-price">$' + money(p.oldPrice) + '</span>' : '') +
-                '</div>' +
-                cta +
-            '</div>';
-    }
-
-    /* ─── RENDERERS ─────────────────────────────────────────────────────── */
-    function renderInto(id, html) {
-        var el = document.getElementById(id);
-        if (el) el.innerHTML = html;
-    }
-
-    function renderProducts(products) {
-        if (!products || !products.length) products = FALLBACK_PRODUCTS.slice();
-        if (!products.length) return;
-
-        var flash = products.slice(0, 8);
-        var featured = products.slice(8, 14);
-        if (featured.length < 4) featured = products.slice(0, 6);
-        var latest = products.slice(14, 26);
-        if (latest.length < 4) latest = products.slice(0, 6);
-        var recommended = products.slice(0, 10).slice().reverse();
-        if (recommended.length < 4) recommended = products.slice(0, 6);
-
-        renderInto('flashRow', flash.map(function (p, i) { return hCard(p, i, { discount: true, buyNow: true }); }).join(''));
-        renderInto('featuredGrid', featured.map(function (p, i) { return gridCard(p, i, true); }).join(''));
-        renderInto('latestGrid', latest.map(function (p, i) { return gridCard(p, i, false); }).join(''));
-        renderInto('recommendedRow', recommended.map(function (p, i) { return hCard(p, i, {}); }).join(''));
-    }
-
-    function renderSuppliers() {
-        renderInto('suppliersRow', SUPPLIERS.map(function (s) {
-            return '' +
-                '<div class="app-supplier">' +
-                    '<div class="app-supplier-logo"><img src="' + esc(s.file) + '" alt="' + esc(s.name) + ' logo" loading="lazy" onerror="this.onerror=null;this.src=\'/logo.webp\'" /></div>' +
-                    '<div class="app-supplier-name">' + esc(s.name) + '</div>' +
-                    '<span class="app-supplier-verified"><i class="fa-solid fa-circle-check"></i> Verified</span>' +
-                    '<div class="app-supplier-rating"><span class="app-stars">' + stars(s.rating) + '</span> ' + esc(s.rating) + ' · ' + s.reviews.toLocaleString() + ' reviews</div>' +
-                    '<a class="app-supplier-btn" href="/supplier-store?brand=' + encodeURIComponent(s.name) + '" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">Visit Store</a>' +
-                '</div>';
-        }).join(''));
-    }
-
-    function renderRecentlyViewed() {
-        var section = document.getElementById('recentlyViewedSection');
-        if (!section) return;
-        var recent = lsGet('pse_recently_viewed', []);
-        if (!recent.length) { section.hidden = true; return; }
-        section.hidden = false;
-        renderInto('recentlyViewedRow', recent.slice(0, 8).map(function (p, i) {
-            var norm = {
-                id: p.id, title: p.title, brand: p.brand || 'PSE Marketplace',
-                price: Number(p.price) || 0, image_url: p.image_url || p.image || '/logo.webp',
-                slug: p.slug || slugify(p.title), rating: '4.7', reviews: 0
-            };
-            return hCard(norm, i, {});
-        }).join(''));
-    }
-
-    /* ─── FLASH COUNTDOWN (ends at midnight, restarts daily) ────────────── */
+    /* ─── FLASH COUNTDOWN TIMER ─────────────────────────────────────────── */
     function initFlashTimer() {
         var el = document.getElementById('appTimer');
         if (!el) return;
@@ -335,164 +295,218 @@
         setInterval(tick, 1000);
     }
 
-    /* ─── HERO SLIDER ───────────────────────────────────────────────────── */
-    function initHero() {
-        var slides = document.querySelectorAll('.app-hero-slide');
-        var dots = document.querySelectorAll('.app-hero-dots button');
-        if (!slides.length) return;
-        var idx = 0;
-        var timer = null;
+    /* ─── REAL ADMIN & SELLER DATA LOADER ───────────────────────────────── */
+    async function fetchLiveProducts() {
+        var products = [];
 
-        function show(i) {
-            idx = (i + slides.length) % slides.length;
-            slides.forEach(function (s, n) { s.classList.toggle('active', n === idx); });
-            dots.forEach(function (d, n) { d.classList.toggle('active', n === idx); });
+        // 1. Try Firestore database where Admin & Sellers save products
+        try {
+            if (typeof firebase !== 'undefined') {
+                initFirebase();
+                if (window.db) {
+                    var snapshot = await window.db.collection('products').get();
+                    if (!snapshot.empty) {
+                        snapshot.forEach(function (doc) {
+                            var data = doc.data();
+                            if (data && data.status !== 'deleted' && data.status !== 'draft') {
+                                var img = data.image_url || (Array.isArray(data.images) && data.images.length ? data.images[0] : '/logo.webp');
+                                products.push({
+                                    id: doc.id,
+                                    dealId: data.dealId || doc.id,
+                                    title: data.title || 'Wholesale Lot',
+                                    brand: data.brand || data.supplier_name || 'Verified Seller',
+                                    supplier_name: data.supplier_name || data.brand || 'Verified Seller',
+                                    supplier_id: data.supplier_id || 'admin',
+                                    price: parseFloat(data.price) || 0,
+                                    oldPrice: data.old_price ? parseFloat(data.old_price) : (data.oldPrice ? parseFloat(data.oldPrice) : null),
+                                    moq: parseInt(data.moq) || 1,
+                                    stock: parseInt(data.stock) || 0,
+                                    category: (data.category || 'electronics').toLowerCase(),
+                                    description: data.description || '',
+                                    image: img,
+                                    images: Array.isArray(data.images) && data.images.length ? data.images : [img],
+                                    rating: data.rating ? String(data.rating) : '4.8',
+                                    reviews: data.reviews || 0,
+                                    slug: data.slug || (data.title ? slugify(data.title) : doc.id),
+                                    created_at: data.created_at || ''
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('Firestore fetch note:', e);
         }
 
-        function next() { show(idx + 1); }
-
-        function start() {
-            stop();
-            timer = setInterval(next, 5500);
+        // 2. Check local live cache created by Admin/Seller
+        if (!products.length) {
+            try {
+                var cached = JSON.parse(localStorage.getItem('pse_live_products') || '[]');
+                if (Array.isArray(cached) && cached.length) {
+                    products = cached;
+                }
+            } catch (e) {}
         }
-        function stop() { if (timer) clearInterval(timer); }
 
-        dots.forEach(function (d, n) {
-            d.addEventListener('click', function () { show(n); start(); });
-        });
-
-        var hero = document.getElementById('appHero');
-        if (hero) {
-            hero.addEventListener('touchstart', stop, { passive: true });
-            hero.addEventListener('touchend', function () { setTimeout(start, 4000); }, { passive: true });
+        // 3. Cache the verified products
+        if (products.length) {
+            try { localStorage.setItem('pse_live_products', JSON.stringify(products)); } catch (e) {}
         }
-        start();
+
+        window.PSEMarketplace.products = products;
+        return products;
     }
 
-    /* ─── NOTIFICATIONS PANEL (static markup in index.html) ────────────── */
-    function initNotifications() {
-        var btn = document.getElementById('appNotifBtn');
-        var panel = document.getElementById('appNotifPanel');
-        var badge = document.getElementById('appNotifBadge');
-        if (!btn || !panel) return;
+    /* ─── REAL SUPPLIERS LOADER ─────────────────────────────────────────── */
+    function extractRealSuppliers(products) {
+        var supplierMap = {};
+        products.forEach(function (p) {
+            var name = p.supplier_name || p.brand || 'Verified Supplier';
+            if (!supplierMap[name]) {
+                var logo = '/logo.webp';
+                var lower = name.toLowerCase();
+                if (lower.indexOf('sony') !== -1) logo = '/sony.svg';
+                else if (lower.indexOf('apple') !== -1) logo = '/apple.svg';
+                else if (lower.indexOf('samsung') !== -1) logo = '/samsung.svg';
+                else if (lower.indexOf('dell') !== -1) logo = '/dell.svg';
+                else if (lower.indexOf('nike') !== -1) logo = '/nike.svg';
+                else if (lower.indexOf('adidas') !== -1) logo = '/adidas.svg';
+                else if (lower.indexOf('hp') !== -1) logo = '/hp.svg';
+                else if (lower.indexOf('lenovo') !== -1) logo = '/lenovo.svg';
+                else if (lower.indexOf('lg') !== -1) logo = '/lg.svg';
+                else if (lower.indexOf('amazon') !== -1) logo = '/amazon.svg';
+                else if (lower.indexOf('walmart') !== -1) logo = '/walmart.svg';
 
-        btn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            panel.hidden = !panel.hidden;
-            if (!panel.hidden && badge) badge.style.display = 'none';
-        });
-        document.addEventListener('click', function (e) {
-            if (!panel.hidden && !panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-                panel.hidden = true;
+                supplierMap[name] = {
+                    name: name,
+                    file: logo,
+                    rating: p.rating || '4.8',
+                    reviews: p.reviews || 12,
+                    supplier_id: p.supplier_id || 'admin'
+                };
             }
         });
+
+        var list = Object.values(supplierMap);
+        window.PSEMarketplace.suppliers = list;
+        return list;
     }
 
-    /* ─── CATEGORY BOTTOM SHEET ─────────────────────────────────────────── */
-    var SHEET_CATEGORIES = [
-        { name: 'Electronics',    icon: 'fa-tv',                    cat: 'electronics' },
-        { name: 'Smartphones',    icon: 'fa-mobile-screen-button',  cat: 'phones' },
-        { name: 'Computers',      icon: 'fa-laptop',                cat: 'computers' },
-        { name: 'Fashion',        icon: 'fa-shirt',                 cat: 'fashion' },
-        { name: 'Automotive',     icon: 'fa-car',                   cat: 'automotive' },
-        { name: 'Home & Tools',   icon: 'fa-couch',                 cat: 'home' },
-        { name: 'Sports',         icon: 'fa-baseball-bat-ball',     cat: 'sports' },
-        { name: 'Liquidation',    icon: 'fa-boxes-packing',         cat: 'overstock' },
-        { name: 'Today\'s Deals', icon: 'fa-bolt',                  cat: 'deals' },
-        { name: 'Best Sellers',   icon: 'fa-fire',                  cat: 'bestsellers' },
-        { name: 'Gaming',         icon: 'fa-gamepad',               cat: 'gaming' },
-        { name: 'All Products',   icon: 'fa-border-all',            cat: 'all' }
-    ];
+    /* ─── CARD BUILDER (Clean 2-col / 3-col Card) ────────────────────────── */
+    function renderProductCard(p, isDeal) {
+        var wish = window.isWishlisted(p.id);
+        var price = Number(p.price || 0).toFixed(2);
+        var oldPrice = p.oldPrice ? '$' + Number(p.oldPrice).toFixed(2) : '';
+        var slug = p.slug || slugify(p.title);
+        var detailUrl = '/product-detail?slug=' + encodeURIComponent(slug);
 
-    function buildSheet() {
-        if (document.getElementById('appCatSheet')) return;
-        var grid = SHEET_CATEGORIES.map(function (c) {
-            var href = c.cat === 'all' ? '/products' : (c.cat === 'deals' ? '/products?filter=deals' : (c.cat === 'bestsellers' ? '/products?sort=bestsellers' : '/products?category=' + c.cat));
-            return '<a class="app-sheet-cat" href="' + href + '">' +
-                '<div class="app-cat-icon"><i class="fa-solid ' + c.icon + '"></i></div>' +
-                '<span>' + esc(c.name) + '</span>' +
-            '</a>';
-        }).join('');
-
-        var overlay = document.createElement('div');
-        overlay.className = 'app-sheet-overlay';
-        overlay.id = 'appSheetOverlay';
-        overlay.style.display = 'none';
-        overlay.addEventListener('click', closeAppCategories);
-
-        var sheet = document.createElement('div');
-        sheet.className = 'app-sheet';
-        sheet.id = 'appCatSheet';
-        sheet.setAttribute('role', 'dialog');
-        sheet.setAttribute('aria-label', 'Browse categories');
-        sheet.innerHTML =
-            '<div class="app-sheet-grip"></div>' +
-            '<div class="app-sheet-head"><h3>Browse Categories</h3>' +
-            '<button type="button" class="app-sheet-close" onclick="closeAppCategories()" aria-label="Close"><i class="fa-solid fa-xmark"></i></button></div>' +
-            '<div class="app-sheet-grid">' + grid + '</div>' +
-            '<a class="app-sheet-sell" href="/become-seller">' +
-                '<div><strong>Start Selling on PSE</strong><br /><span>Reach 15,000+ verified wholesale buyers</span></div>' +
-                '<i class="fa-solid fa-arrow-right"></i>' +
-            '</a>';
-
-        document.body.appendChild(overlay);
-        document.body.appendChild(sheet);
+        return '' +
+            '<div class="app-card">' +
+                '<div class="app-card-img" onclick="window.location.href=\'' + detailUrl + '\'">' +
+                    (isDeal ? '<span class="app-card-badge app-card-badge--deal">FLASH DEAL</span>' : '<span class="app-card-badge">VERIFIED</span>') +
+                    '<button type="button" class="app-card-wish ' + (wish ? 'active' : '') + '" onclick="event.stopPropagation(); window.toggleWishlist(\'' + p.id + '\', \'' + esc(p.title) + '\', ' + p.price + ', \'' + esc(p.image) + '\', \'' + slug + '\', this)" aria-label="Save to wishlist">' +
+                        '<i class="' + (wish ? 'fa-solid' : 'fa-regular') + ' fa-heart"></i>' +
+                    '</button>' +
+                    '<img src="' + esc(p.image || '/logo.webp') + '" alt="' + esc(p.title) + '" loading="lazy" onerror="this.src=\'/logo.webp\'" />' +
+                '</div>' +
+                '<div class="app-card-body">' +
+                    '<div class="app-card-brand">' + esc(p.brand || p.supplier_name || 'Verified Supplier') + '</div>' +
+                    '<a href="' + detailUrl + '" class="app-card-title">' + esc(p.title) + '</a>' +
+                    '<div class="app-card-rating">' +
+                        '<span class="app-stars">' + stars(p.rating || '4.8') + '</span>' +
+                        '<span>' + esc(p.rating || '4.8') + '</span>' +
+                    '</div>' +
+                    '<div class="app-card-price-row">' +
+                        '<span class="app-card-price">$' + price + '</span>' +
+                        (oldPrice ? '<span class="app-card-oldprice">' + oldPrice + '</span>' : '') +
+                    '</div>' +
+                    '<div class="app-card-moq"><i class="fa-solid fa-box"></i> MOQ: ' + (p.moq || 1) + ' units</div>' +
+                    '<button type="button" class="app-card-btn" onclick="window.handleAddToCart(\'' + p.id + '\', \'' + esc(p.title) + '\', ' + p.price + ', \'' + esc(p.image) + '\')">' +
+                        '<i class="fa-solid fa-cart-shopping"></i> Add to Cart' +
+                    '</button>' +
+                '</div>' +
+            '</div>';
     }
 
-    window.openAppCategories = function () {
-        buildSheet();
-        var sheet = document.getElementById('appCatSheet');
-        var overlay = document.getElementById('appSheetOverlay');
-        if (!sheet) return;
-        sheet.classList.add('open');
-        overlay.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    };
+    /* ─── SUPPLIER CARD BUILDER ─────────────────────────────────────────── */
+    function renderSupplierCard(s) {
+        return '' +
+            '<div class="app-supplier-card">' +
+                '<div class="app-supplier-logo">' +
+                    '<img src="' + esc(s.file) + '" alt="' + esc(s.name) + '" loading="lazy" onerror="this.src=\'/logo.webp\'" />' +
+                '</div>' +
+                '<div class="app-supplier-name">' + esc(s.name) + '</div>' +
+                '<div class="app-supplier-verified"><i class="fa-solid fa-circle-check"></i> Verified Supplier</div>' +
+                '<div class="app-supplier-rating"><span class="app-stars">' + stars(s.rating) + '</span> ' + esc(s.rating) + ' (' + s.reviews + ')</div>' +
+                '<a href="/supplier-store?brand=' + encodeURIComponent(s.name) + '" class="app-supplier-btn">Visit Store</a>' +
+            '</div>';
+    }
 
-    window.closeAppCategories = function () {
-        var sheet = document.getElementById('appCatSheet');
-        var overlay = document.getElementById('appSheetOverlay');
-        if (sheet) sheet.classList.remove('open');
-        if (overlay) overlay.style.display = 'none';
-        document.body.style.overflow = '';
-    };
+    /* ─── HOMEPAGE LIVE RENDERER ────────────────────────────────────────── */
+    async function renderHomepageFeed() {
+        var flashGrid = document.getElementById('flashGrid');
+        var featuredGrid = document.getElementById('featuredGrid');
+        var suppliersGrid = document.getElementById('suppliersGrid');
+        var recommendedGrid = document.getElementById('recommendedGrid');
+        var recentGrid = document.getElementById('recentGrid');
 
-    /* ─── BOTTOM NAV ────────────────────────────────────────────────────── */
-    function initBottomNav() {
-        document.querySelectorAll('.app-nav-item').forEach(function (item) {
-            item.addEventListener('click', function () {
-                var isSheet = item.getAttribute('data-nav') === 'categories';
-                if (!isSheet) {
-                    document.querySelectorAll('.app-nav-item').forEach(function (n) { n.classList.remove('active'); });
-                    item.classList.add('active');
-                }
-            });
-        });
+        if (!flashGrid && !featuredGrid && !suppliersGrid) return;
+
+        var products = await fetchLiveProducts();
+        var suppliers = extractRealSuppliers(products);
+
+        if (!products.length) {
+            var emptyHtml = '<div style="grid-column:1/-1; text-align:center; padding:24px 12px; background:#fff; border-radius:12px; border:1px solid var(--app-border);"><i class="fa-solid fa-box-open" style="font-size:28px; color:var(--app-text-light); margin-bottom:6px;"></i><p style="font-size:12px; color:var(--app-text-muted); margin:0;">No products listed yet by verified sellers.</p></div>';
+            if (flashGrid) flashGrid.innerHTML = emptyHtml;
+            if (featuredGrid) featuredGrid.innerHTML = emptyHtml;
+            if (suppliersGrid) suppliersGrid.innerHTML = emptyHtml;
+            if (recommendedGrid) recommendedGrid.innerHTML = emptyHtml;
+            if (recentGrid) recentGrid.innerHTML = emptyHtml;
+            return;
+        }
+
+        if (flashGrid) {
+            var deals = products.filter(function (p) { return p.oldPrice; });
+            if (!deals.length) deals = products.slice(0, 4);
+            flashGrid.innerHTML = deals.slice(0, 4).map(function (p) { return renderProductCard(p, true); }).join('');
+        }
+        if (featuredGrid) {
+            featuredGrid.innerHTML = products.slice(0, 6).map(function (p) { return renderProductCard(p, false); }).join('');
+        }
+        if (suppliersGrid) {
+            suppliersGrid.innerHTML = suppliers.slice(0, 6).map(renderSupplierCard).join('');
+        }
+        if (recommendedGrid) {
+            recommendedGrid.innerHTML = products.slice(0, 4).map(function (p) { return renderProductCard(p, false); }).join('');
+        }
+        if (recentGrid) {
+            var recent = products.slice().reverse();
+            recentGrid.innerHTML = recent.slice(0, 4).map(function (p) { return renderProductCard(p, false); }).join('');
+        }
     }
 
     /* ─── INIT ──────────────────────────────────────────────────────────── */
-    function init() {
-        renderSuppliers();
-        renderRecentlyViewed();
-        initFlashTimer();
-        initHero();
+    document.addEventListener('DOMContentLoaded', function () {
+        initFirebase();
+        initDrawer();
         initNotifications();
-        initBottomNav();
-        fetchFeed().then(function (feed) {
-            renderProducts(feed && feed.length ? feed : FALLBACK_PRODUCTS.slice());
-        });
-    }
+        initLocation();
+        window.syncCartCount();
+        updateAuthUI();
+        highlightBottomNav();
+        initFlashTimer();
+        renderHomepageFeed();
+    });
 
-    window.PSEMarketplaceApp = {
-        init: init,
-        renderProducts: renderProducts,
-        renderRecentlyViewed: renderRecentlyViewed,
-        refreshFeed: function () {
-            try { sessionStorage.removeItem(FEED_CACHE_KEY); } catch (e) {}
-            fetchFeed().then(function (feed) {
-                renderProducts(feed && feed.length ? feed : FALLBACK_PRODUCTS.slice());
-            });
-        }
+    window.PSEMarketplace = {
+        initFirebase: initFirebase,
+        initDrawer: initDrawer,
+        syncCartCount: window.syncCartCount,
+        updateAuthUI: updateAuthUI,
+        fetchLiveProducts: fetchLiveProducts,
+        products: [],
+        suppliers: []
     };
 
 })(window, document);
