@@ -352,7 +352,7 @@
                         '<h2 id="qvModalTitle" style="font-size:1.3rem;font-weight:800;color:#0f1111;margin:0.5rem 0;">Wholesale Product</h2>',
                         '<div style="color:#de7921;font-size:0.85rem;margin-bottom:0.8rem;">★★★★★ <span id="qvModalRating" style="color:#007185;font-weight:700;">4.9 (840 reviews)</span></div>',
                         '<div style="font-size:1.6rem;font-weight:900;color:#0f1111;margin-bottom:0.5rem;" id="qvModalPrice">$189.00</div>',
-                        '<div style="font-size:0.78rem;color:#0e7c68;font-weight:700;margin-bottom:1rem;"><i class="fa-solid fa-circle-check"></i> In Stock • FOB California Hub</div>',
+                        '<div style="font-size:0.78rem;color:#0e7c68;font-weight:700;margin-bottom:1rem;"><i class="fa-solid fa-circle-check"></i> In Stock • Worldwide availability</div>',
                         '<ul style="padding-left:1.2rem;font-size:0.82rem;color:#334155;line-height:1.4;margin-bottom:1.5rem;" id="qvModalSpecs">',
                             '<li>Factory-sealed master packaging ready for resale.</li>',
                             '<li>Verified authenticity with QA inspection certificate.</li>',

@@ -120,6 +120,15 @@
         var btn = document.getElementById('appNotifBtn');
         var panel = document.getElementById('appNotifPanel');
         var badge = document.getElementById('appNotifBadge');
+        // Some pages have the bell but previously had no panel at all.
+        if (btn && !panel) {
+            panel = document.createElement('div');
+            panel.id = 'appNotifPanel';
+            panel.className = 'app-notif-panel';
+            panel.hidden = true;
+            panel.innerHTML = '<div style="padding:12px 14px;border-bottom:1px solid var(--app-border);font-weight:800;">Notifications</div><div style="padding:14px;color:var(--app-text-muted);font-size:13px;">No new notifications.</div>';
+            (btn.closest('.app-header') || document.body).appendChild(panel);
+        }
         if (!btn || !panel) return;
 
         btn.addEventListener('click', function (e) {
@@ -300,10 +309,29 @@
     // no image. Treat it as "no image" and substitute the neutral product
     // placeholder so the site logo never appears on a product card.
     function pseCleanProductImage(img) {
+        // Imports may contain a URL, protocol-relative URL, data/blob URL,
+        // Firebase/Cloudinary object, JSON array, or a comma separated CSV value.
+        // Never reject a valid remote URL just because it is not from our CDN.
+        if (img && typeof img === 'object') {
+            if (Array.isArray(img)) return pseCleanProductImage(img[0]);
+            img = img.secure_url || img.url || img.downloadURL || img.download_url || img.src || img.image_url || img.imageUrl || '';
+        }
         var v = String(img || '').trim();
+        if (v.charAt(0) === '[') { try { return pseCleanProductImage(JSON.parse(v)); } catch (e) {} }
+        if (v.indexOf(',') !== -1 && !/^data:/i.test(v)) v = v.split(',')[0].trim();
         if (!v || v === '/logo.webp' || v === 'logo.webp') return '/product-placeholder.svg';
+        // Keep absolute, protocol-relative, data/blob and ordinary site-relative URLs.
         return v;
     }
+    // A broken remote image should never leave a blank card. This is delegated
+    // so it also covers cards rendered by extensions and imported catalogues.
+    document.addEventListener('error', function (event) {
+        var img = event.target;
+        if (img && img.tagName === 'IMG' && !img.dataset.pseImageFallback) {
+            img.dataset.pseImageFallback = '1';
+            img.src = '/product-placeholder.svg';
+        }
+    }, true);
     window.pseCleanProductImage = pseCleanProductImage;
 
     /* ─── REAL ADMIN & SELLER DATA LOADER ───────────────────────────────── */

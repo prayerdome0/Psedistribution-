@@ -54,6 +54,11 @@
             </div>
         </div>
 
+        <div class="app-notif-panel" id="appNotifPanel" hidden style="position:absolute;right:16px;top:64px;z-index:1000;">
+            <div style="padding:12px 14px;border-bottom:1px solid var(--app-border);font-weight:800;">Notifications</div>
+            <div id="accountNotificationList" style="padding:14px;color:var(--app-text-muted);font-size:13px;">No new notifications.</div>
+        </div>
+
         <div class="app-search" id="searchBar">
             <form class="app-search-form" role="search" onsubmit="event.preventDefault(); var q=document.getElementById('searchInput').value.trim(); if(q) window.location.href='/products?search='+encodeURIComponent(q);">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -138,6 +143,13 @@
                 <i class="fa-solid fa-box"></i>
                 <span>My Orders</span>
                 <span id="accountOrdersBadge" class="app-drawer-badge" style="margin-right:8px; display:none;">0</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+            <!-- Admin shortcut (shown only after the live Firestore role check) -->
+            <a href="/admin-dashboard" id="accountAdminLink" class="app-account-link" style="display:none; color:var(--app-primary);">
+                <i class="fa-solid fa-user-shield"></i>
+                <span>Admin Dashboard</span>
                 <i class="fa-solid fa-chevron-right"></i>
             </a>
 
@@ -348,8 +360,28 @@ function initAccountPage() {
         badgeEl.innerHTML = '<i class="fa-solid ' + icon + '"></i> ' + label;
     }
 
-    // Re-render the default "orders" tab so it reflects the real user.
+    // Render the default tab immediately, then verify the role against the
+    // live users/{uid} document. The cached role can be stale after promotion.
     showAccountTab('orders');
+    var adminLink = document.getElementById('accountAdminLink');
+    function reflectAdminRole(isAdmin) {
+        if (adminLink) adminLink.style.display = isAdmin ? 'flex' : 'none';
+        if (isAdmin && badgeEl) {
+            badgeEl.innerHTML = '<i class="fa-solid fa-user-shield"></i> Administrator';
+        }
+    }
+    reflectAdminRole(String(user.role || '').toLowerCase() === 'admin');
+    if (typeof window.requireAdmin === 'function') {
+        // requireAdmin refreshes pilot_user from Firestore; do not use the
+        // result as authorization, only to keep this navigation in sync.
+        window.requireAdmin().then(function (isAdmin) {
+            var fresh = getUser() || user;
+            if (nameEl) nameEl.textContent = fresh.full_name || 'Pilot Member';
+            if (emailEl) emailEl.textContent = fresh.email || '';
+            reflectAdminRole(isAdmin || String(fresh.role || '').toLowerCase() === 'admin');
+            if (String(fresh.role || '').toLowerCase() === 'admin') showAccountTab('orders');
+        }).catch(function () {});
+    }
 }
 
 function logoutUser(e) {
