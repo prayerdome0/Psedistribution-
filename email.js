@@ -991,8 +991,7 @@ async function sendEmailResend(templateType, data, toEmail) {
         // Fallback 2: mailto
         return sendEmailFallback(templateType, data, toEmail);
     }
-}
-}
+    }
 
 // ─── SEND EMAIL USING MAILTO FALLBACK ───
 function sendEmailFallback(templateType, data, toEmail) {
