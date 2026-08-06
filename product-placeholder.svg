@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <rect width="600" height="600" fill="#F4F6F9"/>
+  <!-- subtle inner card -->
+  <rect x="70" y="70" width="460" height="460" rx="24" fill="#FFFFFF"/>
+  <!-- box / package icon -->
+  <g fill="none" stroke="#C4CCD6" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M300 150 L460 235 L460 405 L300 490 L140 405 L140 235 Z"/>
+    <path d="M300 150 L300 350"/>
+    <path d="M140 235 L300 350 L460 235"/>
+  </g>
+  <!-- tag line -->
+  <text x="300" y="545" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="600" fill="#C4CCD6" text-anchor="middle">Product Image</text>
+</svg>

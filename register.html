@@ -178,21 +178,10 @@
 
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="/marketplace-app.js"></script>
-<script>
-function handleRegisterSubmit(e) {
-    e.preventDefault();
-    var name = document.getElementById('regName').value;
-    var email = document.getElementById('regEmail').value;
-    localStorage.setItem('pilot_user', JSON.stringify({
-        full_name: name,
-        email: email,
-        role: 'buyer'
-    }));
-    window.PSEMarketplace.updateAuthUI();
-    window.pseToast('Account created successfully!', 'success');
-    setTimeout(function() { window.location.href = '/account'; }, 600);
-}
-</script>
+<script src="/auth.js"></script>
 </body>
 </html>

@@ -84,7 +84,7 @@
         currentQuickViewProduct = product;
 
         // Populate data
-        document.getElementById('qvImage').src = product.image_url || product.images?.[0] || '/logo.webp';
+        document.getElementById('qvImage').src = product.image_url || product.images?.[0] || '/product-placeholder.svg';
         document.getElementById('qvBrand').textContent = product.brand || 'Pilot Distribution';
         document.getElementById('qvTitle').textContent = product.title || 'Product';
 

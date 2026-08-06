@@ -30,7 +30,7 @@
             id: String(product.id),
             title: String(product.title || 'Product'),
             price: parseFloat(product.price) || 0,
-            image_url: String(product.image_url || product.image || '/logo.webp'),
+            image_url: String(product.image_url || product.image || '/product-placeholder.svg'),
             slug: String(product.slug || product.id),
             brand: String(product.brand || 'Pilot Distribution')
         });
@@ -60,7 +60,7 @@
                 ${recent.map(p => `
                     <div class="product-card">
                         <div class="product-image" onclick="window.location.href='/product/${esc(p.slug || p.id)}'">
-                            <img src="${esc(p.image_url || '/logo.webp')}" alt="${esc(p.title)}" loading="lazy" onerror="this.onerror=null;this.src='/logo.webp'">
+                            <img src="${esc(p.image_url || '/product-placeholder.svg')}" alt="${esc(p.title)}" loading="lazy" onerror="this.onerror=null;this.src='/product-placeholder.svg'">
                         </div>
                         <div class="product-title">${esc(p.title)}</div>
                         <div class="product-brand">${esc(p.brand)}</div>

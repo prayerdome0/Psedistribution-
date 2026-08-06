@@ -39,12 +39,24 @@ service cloud.firestore {
     // ─── USERS ───
     match /users/{userId} {
       allow read: if isAdmin() || request.auth.uid == userId;
-      // Registration creates the doc; further edits restricted to own profile.
-      allow create: if isSignedIn() && request.auth.uid == userId;
+      // A brand-new user may only create their OWN profile, and only as a
+      // 'buyer' (role omitted is treated as buyer). This stops anyone from
+      // registering themselves as admin/seller.
+      function isSelfRegistered() {
+        return request.auth.uid == userId
+          && (!('role' in request.resource.data) || request.resource.data.role == 'buyer');
+      }
+      // Non-admin users may edit their own profile but must NOT be able to
+      // change their own role. Only an existing admin may change a role.
+      function preservesOwnRole() {
+        return request.auth.uid == userId
+          && request.resource.data.get('role', 'buyer') == resource.data.get('role', 'buyer');
+      }
+      allow create: if isSignedIn() && isSelfRegistered();
       // ⚠️ Referral bonus increments another user's loyalty_points client-side.
       //    Allow only when ONLY loyalty_points/updated_at change.
-      allow update: if request.auth.uid == userId
-        || isAdmin()
+      allow update: if isAdmin()
+        || preservesOwnRole()
         || (isSignedIn()
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['loyalty_points', 'updated_at']));
       allow delete: if isAdmin();

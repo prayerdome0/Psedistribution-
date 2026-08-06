@@ -185,7 +185,7 @@
                 id: String(id),
                 title: String(title || 'Wholesale Product'),
                 price: Number(price) || 0,
-                image: img || '/logo.webp',
+                image: img || '/product-placeholder.svg',
                 quantity: 1
             });
         }
@@ -216,7 +216,7 @@
                 id: String(id),
                 title: String(title || 'Wholesale Lot'),
                 price: Number(price) || 0,
-                image: img || '/logo.webp',
+                image: img || '/product-placeholder.svg',
                 slug: slug || slugify(title)
             });
             if (btnEl) btnEl.classList.add('active');
@@ -295,6 +295,17 @@
         setInterval(tick, 1000);
     }
 
+    /* ─── PRODUCT IMAGE SANITIZER ───────────────────────────────────────── */
+    // The company logo (/logo.webp) was used as a stand-in for products with
+    // no image. Treat it as "no image" and substitute the neutral product
+    // placeholder so the site logo never appears on a product card.
+    function pseCleanProductImage(img) {
+        var v = String(img || '').trim();
+        if (!v || v === '/logo.webp' || v === 'logo.webp') return '/product-placeholder.svg';
+        return v;
+    }
+    window.pseCleanProductImage = pseCleanProductImage;
+
     /* ─── REAL ADMIN & SELLER DATA LOADER ───────────────────────────────── */
     async function fetchLiveProducts() {
         var products = [];
@@ -309,7 +320,7 @@
                         snapshot.forEach(function (doc) {
                             var data = doc.data();
                             if (data && data.status !== 'deleted' && data.status !== 'draft') {
-                                var img = data.image_url || (Array.isArray(data.images) && data.images.length ? data.images[0] : '/logo.webp');
+                                var img = pseCleanProductImage(data.image_url || (Array.isArray(data.images) && data.images.length ? data.images[0] : ''));
                                 products.push({
                                     id: doc.id,
                                     dealId: data.dealId || doc.id,
@@ -344,7 +355,13 @@
             try {
                 var cached = JSON.parse(localStorage.getItem('pse_live_products') || '[]');
                 if (Array.isArray(cached) && cached.length) {
-                    products = cached;
+                    // Sanitize any stale entries that carry the logo as their image.
+                    products = cached.map(function (p) {
+                        if (p && (p.image === '/logo.webp' || p.image === 'logo.webp')) {
+                            p.image = '/product-placeholder.svg';
+                        }
+                        return p;
+                    });
                 }
             } catch (e) {}
         }
@@ -408,7 +425,7 @@
                     '<button type="button" class="app-card-wish ' + (wish ? 'active' : '') + '" onclick="event.stopPropagation(); window.toggleWishlist(\'' + p.id + '\', \'' + esc(p.title) + '\', ' + p.price + ', \'' + esc(p.image) + '\', \'' + slug + '\', this)" aria-label="Save to wishlist">' +
                         '<i class="' + (wish ? 'fa-solid' : 'fa-regular') + ' fa-heart"></i>' +
                     '</button>' +
-                    '<img src="' + esc(p.image || '/logo.webp') + '" alt="' + esc(p.title) + '" loading="lazy" onerror="this.src=\'/logo.webp\'" />' +
+                    '<img src="' + esc(p.image || '/product-placeholder.svg') + '" alt="' + esc(p.title) + '" loading="lazy" onerror="this.src=\'/product-placeholder.svg\'" />' +
                 '</div>' +
                 '<div class="app-card-body">' +
                     '<div class="app-card-brand">' + esc(p.brand || p.supplier_name || 'Verified Supplier') + '</div>' +
@@ -434,7 +451,7 @@
         return '' +
             '<div class="app-supplier-card">' +
                 '<div class="app-supplier-logo">' +
-                    '<img src="' + esc(s.file) + '" alt="' + esc(s.name) + '" loading="lazy" onerror="this.src=\'/logo.webp\'" />' +
+                    '<img src="' + esc(s.file) + '" alt="' + esc(s.name) + '" loading="lazy" onerror="this.src=\'/product-placeholder.svg\'" />' +
                 '</div>' +
                 '<div class="app-supplier-name">' + esc(s.name) + '</div>' +
                 '<div class="app-supplier-verified"><i class="fa-solid fa-circle-check"></i> Verified Supplier</div>' +

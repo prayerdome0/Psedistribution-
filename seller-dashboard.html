@@ -2029,7 +2029,7 @@
                     stock: parseInt(values[headers.indexOf('stock')]) || 100,
                     sku: values[headers.indexOf('sku')] || '',
                     description: values[headers.indexOf('description')] || 'Wholesale product listed by verified supplier.',
-                    image_url: values[headers.indexOf('image_url')] || '/logo.webp',
+                    image_url: values[headers.indexOf('image_url')] || '/product-placeholder.svg',
                     slug: generateSlug(values[headers.indexOf('title')] || values[0]),
                     supplier_id: user.uid,
                     seller_id: user.uid,
@@ -2262,6 +2262,7 @@
     <script src="email.js"></script>
     <script src="ai-assistant.js"></script>
     <script src="notifications.js"></script>
+    <script src="/auth.js"></script>
     <script src="premium.js"></script>
 </body>
 </html>

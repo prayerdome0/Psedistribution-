@@ -383,6 +383,15 @@
     function el(id) { return document.getElementById(id); }
 
     async function requireAdmin() {
+        // Real admin check: verify against Firebase Auth currentUser + the
+        // Firestore users/{uid} document (enforced by security rules), NOT the
+        // spoofable localStorage cache. Falls back to the cache only when the
+        // shared auth module is unavailable.
+        if (typeof window.requireAdmin === 'function') {
+            var ok = await window.requireAdmin();
+            if (!ok) toast('Admin access required', 'error');
+            return ok;
+        }
         var u = uid();
         if (!u || u.role !== 'admin') {
             toast('Admin access required', 'error');

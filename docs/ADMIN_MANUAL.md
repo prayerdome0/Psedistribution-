@@ -179,6 +179,33 @@ Settings → Roles.
 **Custom roles** are subsets of `admin`. Create one to delegate, e.g.,
 "fulfilment agent" who can move orders but not edit prices.
 
+### 8a. How accounts and admin access really work
+
+- The `/register` page creates a **real Firebase Auth account** and a Firestore
+  `users/{uid}` document. New accounts are **always created as `buyer`** — a
+  self-registered user can never grant themselves `admin` or `seller`.
+  Firestore security rules (`firestore.rules`) enforce this on both create and
+  update, so a tampered request is rejected server-side.
+- `/login` verifies the password against Firebase Auth and loads the account's
+  `role` from the Firestore `users/{uid}` document — it never trusts the
+  browser. **Admins are sent to `/admin-dashboard`** after sign-in; buyers to
+  `/account`.
+- Admin-gated actions inside the dashboard verify the signed-in Firebase user's
+  Firestore role (not `localStorage`), so editing `localStorage` cannot grant
+  admin powers.
+
+**To provision the first admin** (there is no self-serve "make me admin" path by
+design):
+1. Create the account via `/register` (or Firebase Console → Authentication).
+2. Find the account's `uid` in Firebase Console → Authentication → Users.
+3. Firebase Console → Firestore Database → `users/<uid>`, set the field
+   `role` to `"admin"` (add the document if it does not exist).
+4. Have the user sign in at `/login` — they will be routed to the admin
+   dashboard.
+
+Existing admins can also promote users to `admin`/`seller` from the admin
+dashboard's team/roles editor.
+
 ---
 
 ## 9. Sales reports

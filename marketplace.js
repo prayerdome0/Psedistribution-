@@ -84,7 +84,7 @@
         var cardsHtml = BRAND_LOGOS.map(function (b) {
             return '<div class="amz-brand-chip" title="' + b.name + ' - ' + b.tag + '" onclick="window.location.href=\'/products?brand=' + encodeURIComponent(b.name.toLowerCase()) + '\'">' +
                 '<div class="amz-brand-logo-wrap">' +
-                    '<img src="' + b.file + '" alt="' + b.name + ' wholesale logo" loading="lazy" onerror="this.onerror=null;this.src=\'/logo.webp\'" />' +
+                    '<img src="' + b.file + '" alt="' + b.name + ' wholesale logo" loading="lazy" onerror="this.onerror=null;this.src=\'/product-placeholder.svg\'" />' +
                 '</div>' +
                 '<div class="amz-brand-info">' +
                     '<span class="amz-brand-name">' + b.name + '</span>' +
@@ -310,7 +310,7 @@
             return [
                 '<div class="mkt-drawer-item">',
                     '<div class="mkt-drawer-item-img">',
-                        '<img src="' + (item.image || '/logo.webp') + '" alt="' + (item.title || 'Item') + '" onerror="this.src=\'/logo.webp\'" />',
+                        '<img src="' + (item.image || '/product-placeholder.svg') + '" alt="' + (item.title || 'Item') + '" onerror="this.src=\'/product-placeholder.svg\'" />',
                     '</div>',
                     '<div class="mkt-drawer-item-details">',
                         '<div class="mkt-drawer-item-title">' + (item.title || 'Wholesale Lot') + '</div>',
@@ -345,7 +345,7 @@
                 '<button class="mkt-modal-close" onclick="PSEMarketplace.closeQuickView()">&times;</button>',
                 '<div class="mkt-qv-grid">',
                     '<div class="mkt-qv-img-wrap">',
-                        '<img id="qvModalImg" src="/logo.webp" alt="Quick View Product" />',
+                        '<img id="qvModalImg" src="/product-placeholder.svg" alt="Quick View Product" />',
                     '</div>',
                     '<div>',
                         '<span class="mkt-badge-bestseller" id="qvModalBadge"><i class="fa-solid fa-bolt"></i> Best Seller</span>',
@@ -381,7 +381,7 @@
         var modal = document.getElementById('mktQuickViewModal');
         if (!modal || !product) return;
 
-        document.getElementById('qvModalImg').src = product.image_url || product.image || '/logo.webp';
+        document.getElementById('qvModalImg').src = product.image_url || product.image || '/product-placeholder.svg';
         document.getElementById('qvModalTitle').textContent = product.title || 'Wholesale Lot';
         document.getElementById('qvModalPrice').textContent = formatPrice(product.price || 0);
         document.getElementById('qvModalFullLink').href = '/product-detail?slug=' + encodeURIComponent(product.slug || '');
@@ -795,7 +795,7 @@
         }
 
         chips.innerHTML = compareItems.map(function (item, idx) {
-            return '<div class="mkt-compare-chip"><img src="' + (item.image_url || item.image || '/logo.webp') + '" alt="" /><span>' + (item.title.substring(0, 18)) + '...</span><button onclick="PSEMarketplace.removeCompareItem(' + idx + ')" style="background:none;border:none;color:#94a3b8;cursor:pointer;">&times;</button></div>';
+            return '<div class="mkt-compare-chip"><img src="' + (item.image_url || item.image || '/product-placeholder.svg') + '" alt="" /><span>' + (item.title.substring(0, 18)) + '...</span><button onclick="PSEMarketplace.removeCompareItem(' + idx + ')" style="background:none;border:none;color:#94a3b8;cursor:pointer;">&times;</button></div>';
         }).join('');
     }
 
@@ -826,7 +826,7 @@
         }
 
         var tableHtml = '<table class="mkt-specs-table" style="width:100%;"><thead><tr style="background:#f1f5f9;"><th style="padding:0.75rem;">Spec / Metric</th>' +
-            compareItems.map(function (i) { return '<th style="padding:0.75rem;text-align:left;"><img src="' + (i.image_url || i.image || '/logo.webp') + '" style="height:40px;object-fit:contain;display:block;margin-bottom:4px;" />' + i.title.substring(0, 25) + '...</th>'; }).join('') +
+            compareItems.map(function (i) { return '<th style="padding:0.75rem;text-align:left;"><img src="' + (i.image_url || i.image || '/product-placeholder.svg') + '" style="height:40px;object-fit:contain;display:block;margin-bottom:4px;" />' + i.title.substring(0, 25) + '...</th>'; }).join('') +
             '</tr></thead><tbody>' +
             '<tr><td class="spec-name">Unit Price</td>' + compareItems.map(function (i) { return '<td style="font-weight:800;color:#b12704;">' + formatPrice(i.price || 0) + '</td>'; }).join('') + '</tr>' +
             '<tr><td class="spec-name">Brand / Supplier</td>' + compareItems.map(function (i) { return '<td>' + (i.brand || 'PSE Verified') + '</td>'; }).join('') + '</tr>' +
