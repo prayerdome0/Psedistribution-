@@ -47,10 +47,13 @@ from pse_inventory._packet import load_atomic_store_module  # noqa: E402
 from pse_inventory.snapshot_builder import PublishBlocked, build_snapshot  # noqa: E402
 from pse_inventory.postgres_store import PostgresSnapshotStore  # noqa: E402
 
+# i.ibb.co is ImgBB's HTTPS image CDN.  It is deliberately the direct-media
+# host, not ibb.co/imgbb.com share-page hosts (which return HTML, not images).
 DEFAULT_MEDIA_HOSTS = {
     "pilotsalesdistribution.com",
     "www.pilotsalesdistribution.com",
     "cdn.pilotsalesdistribution.com",
+    "i.ibb.co",
 }
 
 EXIT_OK = 0

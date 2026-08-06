@@ -337,7 +337,7 @@
         // Never reject a valid remote URL just because it is not from our CDN.
         if (img && typeof img === 'object') {
             if (Array.isArray(img)) return pseCleanProductImage(img[0]);
-            img = img.secure_url || img.url || img.downloadURL || img.download_url || img.src || img.image_url || img.imageUrl || '';
+            img = img.secure_url || img.url || img.downloadURL || img.download_url || img.src || img.image_url || img.imageUrl || img.imageUrls || img.images || '';
         }
         var v = String(img || '').trim();
         if (v.charAt(0) === '[') { try { return pseCleanProductImage(JSON.parse(v)); } catch (e) {} }
@@ -371,7 +371,12 @@
                         snapshot.forEach(function (doc) {
                             var data = doc.data();
                             if (data && data.status !== 'deleted' && data.status !== 'draft') {
-                                var img = pseCleanProductImage(data.image_url || (Array.isArray(data.images) && data.images.length ? data.images[0] : ''));
+                                // Support all import field variants. In particular, ImgBB
+                                // direct links (https://i.ibb.co/...) are ordinary HTTPS
+                                // images and must not be replaced by the placeholder.
+                                var sourceImages = data.image_url || data.imageUrl || data.image || data.imageUrls || data.image_urls || data.images || data.gallery || data.photos || '';
+                                var img = pseCleanProductImage(sourceImages);
+                                var gallery = Array.isArray(sourceImages) ? sourceImages.map(pseCleanProductImage).filter(Boolean) : [img];
                                 products.push({
                                     id: doc.id,
                                     dealId: data.dealId || doc.id,
@@ -386,7 +391,8 @@
                                     category: (data.category || 'electronics').toLowerCase(),
                                     description: data.description || '',
                                     image: img,
-                                    images: Array.isArray(data.images) && data.images.length ? data.images : [img],
+                                    image_url: img,
+                                    images: gallery.length ? gallery : [img],
                                     rating: data.rating ? String(data.rating) : '4.8',
                                     reviews: data.reviews || 0,
                                     slug: data.slug || (data.title ? slugify(data.title) : doc.id),
@@ -408,9 +414,10 @@
                 if (Array.isArray(cached) && cached.length) {
                     // Sanitize any stale entries that carry the logo as their image.
                     products = cached.map(function (p) {
-                        if (p && (p.image === '/logo.webp' || p.image === 'logo.webp')) {
-                            p.image = '/product-placeholder.svg';
-                        }
+                        if (!p || typeof p !== 'object') return p;
+                        var cachedImage = pseCleanProductImage(p.image || p.image_url || p.imageUrl || p.imageUrls || p.images || p.gallery || p.photos || '');
+                        p.image = cachedImage;
+                        p.image_url = cachedImage;
                         return p;
                     });
                 }
