@@ -29,7 +29,7 @@
 
     // ─── CONFIG & STATE ────────────────────────────────────────────────────────
     var ZIP_KEY = 'pse_marketplace_zip';
-    var DEFAULT_ZIP = '90210 - Los Angeles, CA';
+    var DEFAULT_ZIP = 'Worldwide 🌐';
     var CURRENCY_KEY = 'pse_marketplace_currency';
     var COMPARE_KEY = 'pse_marketplace_compare';
     var THEME_KEY = 'pse_marketplace_theme';

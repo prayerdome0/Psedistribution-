@@ -146,15 +146,7 @@
 
     /* ─── DELIVERY LOCATION (Tap to Cycle) ──────────────────────────────── */
     var PSE_LOCATIONS = [
-        '90210 – Los Angeles, CA',
-        '10001 – New York, NY',
-        '60601 – Chicago, IL',
-        '75001 – Dallas, TX',
-        '33101 – Miami, FL',
-        '98101 – Seattle, WA',
-        'London – United Kingdom 🇬🇧',
-        'Lusaka – Zambia 🇿🇲',
-        'Worldwide Delivery 🌐'
+        'Worldwide 🌐'
     ];
 
     function initLocation() {
@@ -162,16 +154,11 @@
         var zipEl = document.getElementById('appZip');
         if (!btn || !zipEl) return;
 
-        var saved = localStorage.getItem('pse_marketplace_zip') || PSE_LOCATIONS[0];
-        var idx = PSE_LOCATIONS.indexOf(saved);
-        if (idx === -1) idx = 0;
-        zipEl.textContent = PSE_LOCATIONS[idx];
-
+        // Always show Worldwide – single global delivery option
+        localStorage.setItem('pse_marketplace_zip', PSE_LOCATIONS[0]);
+        zipEl.textContent = PSE_LOCATIONS[0];
         btn.addEventListener('click', function () {
-            idx = (idx + 1) % PSE_LOCATIONS.length;
-            zipEl.textContent = PSE_LOCATIONS[idx];
-            localStorage.setItem('pse_marketplace_zip', PSE_LOCATIONS[idx]);
-            window.pseToast('📍 Delivering to ' + PSE_LOCATIONS[idx], 'info');
+            window.pseToast('🌐 We deliver Worldwide', 'info');
         });
     }
 
