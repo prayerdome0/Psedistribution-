@@ -3519,6 +3519,19 @@
                 }
             });
         }, (error) => { console.log('Orders listener error:', error.message); });
+
+        // Checkout quotation requests are RFQs, not paid orders. This listener
+        // gives the admin an immediate, real-time prompt wherever they are in
+        // the dashboard and refreshes the RFQ tab when it is already open.
+        db.collection('rfqs').where('status', '==', 'pending').onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach(change => {
+                if (change.type === 'added' && change.doc.data().source === 'checkout_quote_request') {
+                    const data = change.doc.data();
+                    showToast(`📄 New checkout quotation from ${data.customer?.name || data.user_email || 'buyer'}`, 'success');
+                    if (document.getElementById('tab-rfqs').classList.contains('active')) loadRFQs();
+                }
+            });
+        }, (error) => { console.log('RFQ listener error:', error.message); });
     }
 
     // ─── INIT ───

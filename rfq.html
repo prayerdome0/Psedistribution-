@@ -22,6 +22,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
+    <!-- Firebase: RFQs are stored in the protected buyer/admin workflow. -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <!-- Unified Master Stylesheet -->
     <link rel="stylesheet" href="/marketplace-app.css" />
 </head>
@@ -175,14 +179,7 @@
                 <h2><i class="fa-solid fa-clock-rotate-left" style="color:var(--app-primary);"></i> My RFQ Quotes</h2>
             </div>
             <div id="rfqList" style="display:flex; flex-direction:column; gap:10px;">
-                <div style="background:#fff; border:1px solid var(--app-border); border-radius:var(--app-radius-md); padding:12px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                        <strong style="font-size:13px;">RFQ #RFQ-9041</strong>
-                        <span style="background:var(--app-accent-soft); color:var(--app-accent-dark); font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:10px;">Quoted</span>
-                    </div>
-                    <div style="font-size:12px; color:var(--app-text-muted); margin-bottom:6px;">Sony WH-1000XM5 (25 Units) • Quote: $235.00/unit</div>
-                    <span style="font-size:10.5px; color:var(--app-text-light);">Submitted 2 hours ago</span>
-                </div>
+                <p style="font-size:12px;color:var(--app-text-muted);margin:0;">Sign in to view your submitted quotation requests.</p>
             </div>
         </section>
 
@@ -228,20 +225,70 @@
 
 <script src="/marketplace-app.js"></script>
 <script>
-function handleRFQSubmit(e) {
-    e.preventDefault();
-    var product = document.getElementById('rfqProduct').value;
-    var qty = document.getElementById('rfqQty').value;
-    window.pseToast('✅ RFQ Submitted! Suppliers will respond within 24h.', 'success');
-    
-    var rfqList = document.getElementById('rfqList');
-    if (rfqList) {
-        var card = document.createElement('div');
-        card.style.cssText = 'background:#fff; border:1px solid var(--app-border); border-radius:12px; padding:12px;';
-        card.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;"><strong style="font-size:13px;">RFQ #' + Math.floor(1000 + Math.random() * 9000) + '</strong><span style="background:var(--app-primary-soft); color:var(--app-primary); font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:10px;">Pending Quotes</span></div><div style="font-size:12px; color:var(--app-text-muted); margin-bottom:6px;">' + product + ' (' + qty + ' Units)</div><span style="font-size:10.5px; color:var(--app-text-light);">Submitted just now</span>';
-        rfqList.prepend(card);
+function rfqStatusLabel(status) { return String(status || 'pending').replace(/_/g, ' '); }
+function rfqText(value) { return String(value == null ? '' : value); }
+function renderRFQs(records) {
+    var list = document.getElementById('rfqList');
+    list.replaceChildren();
+    if (!records.length) {
+        var empty = document.createElement('p');
+        empty.style.cssText = 'font-size:12px;color:var(--app-text-muted);margin:0;';
+        empty.textContent = 'No quotation requests have been submitted yet.';
+        list.appendChild(empty); return;
     }
+    records.forEach(function(rfq) {
+        var card = document.createElement('div');
+        card.style.cssText = 'background:#fff;border:1px solid var(--app-border);border-radius:var(--app-radius-md);padding:12px;';
+        var heading = document.createElement('div'); heading.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;';
+        var ref = document.createElement('strong'); ref.style.fontSize = '13px'; ref.textContent = rfq.reference || ('RFQ-' + rfq.id.slice(0, 8).toUpperCase());
+        var status = document.createElement('span'); status.style.cssText = 'background:var(--app-primary-soft);color:var(--app-primary);font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:10px;text-transform:capitalize;'; status.textContent = rfqStatusLabel(rfq.status);
+        heading.append(ref, status);
+        var details = document.createElement('div'); details.style.cssText = 'font-size:12px;color:var(--app-text-muted);margin-bottom:6px;'; details.textContent = rfqText(rfq.title) + ' (' + Number(rfq.quantity || 0) + ' units)';
+        var submitted = document.createElement('span'); submitted.style.cssText = 'font-size:10.5px;color:var(--app-text-light);'; submitted.textContent = 'Submitted ' + (rfq.created_at ? new Date(rfq.created_at).toLocaleString() : 'recently');
+        card.append(heading, details, submitted); list.appendChild(card);
+    });
 }
+async function loadRFQs() {
+    if (!window.auth || !window.db) return;
+    var user = window.auth.currentUser;
+    if (!user) { renderRFQs([]); return; }
+    try {
+        var snapshot = await window.db.collection('rfqs').where('user_id', '==', user.uid).get();
+        var records = snapshot.docs.map(function(doc) { return Object.assign({ id: doc.id }, doc.data()); });
+        records.sort(function(a, b) { return String(b.created_at || '').localeCompare(String(a.created_at || '')); });
+        renderRFQs(records);
+    } catch (error) { console.error('Unable to load RFQs:', error); window.pseToast('Unable to load your quote requests.', 'error'); }
+}
+async function handleRFQSubmit(e) {
+    e.preventDefault();
+    if (!window.auth || !window.db || !window.auth.currentUser) {
+        window.pseToast('Please sign in before submitting an RFQ.', 'error');
+        window.location.href = '/login?redirect=' + encodeURIComponent('/rfq'); return;
+    }
+    var button = e.currentTarget.querySelector('button[type="submit"]'); button.disabled = true;
+    try {
+        var user = window.auth.currentUser;
+        var quantity = Number(document.getElementById('rfqQty').value);
+        var unitTarget = Number(document.getElementById('rfqTargetPrice').value || 0);
+        var reference = 'PSE-RFQ-' + Date.now().toString(36).toUpperCase();
+        await window.db.collection('rfqs').add({
+            reference: reference, title: document.getElementById('rfqProduct').value.trim(),
+            category: document.getElementById('rfqCategory').value, quantity: quantity,
+            budget: unitTarget > 0 ? unitTarget * quantity : null, currency: 'USD',
+            destination: document.getElementById('rfqDestination').value.trim(),
+            description: document.getElementById('rfqNotes').value.trim(), user_id: user.uid,
+            user_email: user.email || '', status: 'pending', source: 'rfq_form',
+            created_at: new Date().toISOString(), updated_at: new Date().toISOString()
+        });
+        e.currentTarget.reset(); window.pseToast('RFQ submitted. PSE will prepare a quotation.', 'success'); await loadRFQs();
+    } catch (error) { console.error('Unable to submit RFQ:', error); window.pseToast('Unable to submit RFQ. Please try again.', 'error'); }
+    finally { button.disabled = false; }
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var wait = setInterval(function() { if (window.auth && window.db) { clearInterval(wait); window.auth.onAuthStateChanged(loadRFQs); } }, 50);
+    setTimeout(function() { clearInterval(wait); }, 5000);
+});
+</script>
 </script>
 </body>
 </html>
