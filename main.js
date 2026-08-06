@@ -115,7 +115,7 @@
     // do not all use the same image field (and some store a Cloudinary result
     // object instead of a string), so keep image selection in one place.
     function productImage(product, fallback) {
-        fallback = fallback || '/logo.webp';
+        fallback = fallback || '/product-placeholder.svg';
         var seen = [];
         function find(value) {
             if (!value || seen.indexOf(value) !== -1) return '';
@@ -153,7 +153,7 @@
     function useImageFallback(img, fallback) {
         if (!img || img.dataset.imageFallbackApplied) return;
         img.dataset.imageFallbackApplied = 'true';
-        img.src = fallback || '/logo.webp';
+        img.src = fallback || '/product-placeholder.svg';
     }
 
     window.getProductImage = productImage;

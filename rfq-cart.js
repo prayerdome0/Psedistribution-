@@ -29,7 +29,7 @@
                 dealId: dealId,
                 title: title,
                 price: price || 0,
-                image: image || '/logo.webp',
+                image: image || '/product-placeholder.svg',
                 quantity: 1
             });
         }

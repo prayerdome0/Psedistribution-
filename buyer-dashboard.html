@@ -907,7 +907,7 @@
                 <div class="wishlist-item">
                     <button class="wishlist-remove" onclick="removeFromWishlist('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
                     <div class="wishlist-image" onclick="window.location.href='/product/${p.slug}'">
-                        <img src="${p.image_url || 'logo.webp'}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />
+                        <img src="${p.image_url || '/product-placeholder.svg'}" alt="${p.title}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box\\'></i>'" />
                     </div>
                     <div class="wishlist-title">${p.title || 'Product'}</div>
                     <div class="wishlist-price">$${(p.price || 0).toFixed(2)}</div>
@@ -1497,6 +1497,7 @@
     <script src="email.js"></script>
     <script src="ai-assistant.js"></script>
     <script src="notifications.js"></script>
+    <script src="/auth.js"></script>
     <script src="premium.js"></script>
     <script src="/search-pro.js"></script>
 </body>

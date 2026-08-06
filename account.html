@@ -119,8 +119,8 @@
             <div class="app-profile-avatar"><i class="fa-solid fa-user"></i></div>
             <div class="app-profile-info">
                 <h3 id="accountProfileName">Pilot Member</h3>
-                <p id="accountProfileEmail">buyer@pilotsalesdistribution.com</p>
-                <div style="margin-top:4px;"><span style="background:var(--app-accent); color:#1F2937; font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px;"><i class="fa-solid fa-shield-halved"></i> Verified Wholesale Buyer</span></div>
+                <p id="accountProfileEmail" style="opacity:0.6;">Signed in…</p>
+                <div style="margin-top:4px;"><span id="accountProfileBadge" style="background:var(--app-accent); color:#1F2937; font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px;"><i class="fa-solid fa-shield-halved"></i> Verified Wholesale Buyer</span></div>
             </div>
         </div>
 
@@ -137,7 +137,7 @@
             <a href="#orders" class="app-account-link" onclick="showAccountTab('orders')">
                 <i class="fa-solid fa-box"></i>
                 <span>My Orders</span>
-                <span class="app-drawer-badge" style="margin-right:8px;">2</span>
+                <span id="accountOrdersBadge" class="app-drawer-badge" style="margin-right:8px; display:none;">0</span>
                 <i class="fa-solid fa-chevron-right"></i>
             </a>
 
@@ -178,32 +178,7 @@
         </div>
 
         <!-- Tab Content Areas -->
-        <div id="accountTabContent">
-            <!-- Active Orders Preview -->
-            <div class="app-section">
-                <div class="app-section-head">
-                    <h2><i class="fa-solid fa-truck-fast" style="color:var(--app-primary);"></i> Active Orders</h2>
-                </div>
-
-                <div style="background:#fff; border:1px solid var(--app-border); border-radius:var(--app-radius-md); padding:14px; margin-bottom:10px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                        <strong style="font-size:13px;">Order #PSE-20418</strong>
-                        <span style="background:var(--app-primary-soft); color:var(--app-primary); font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:10px;">In Transit</span>
-                    </div>
-                    <div style="font-size:12px; color:var(--app-text-muted); margin-bottom:8px;">Sony WH-1000XM5 Wholesale Case (10 Units) • $2,499.90</div>
-                    <a href="/track-order?id=PSE-20418" class="app-link-btn" style="font-size:11px; padding:4px 12px;">Track Shipment</a>
-                </div>
-
-                <div style="background:#fff; border:1px solid var(--app-border); border-radius:var(--app-radius-md); padding:14px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                        <strong style="font-size:13px;">Order #PSE-19804</strong>
-                        <span style="background:var(--app-success-soft); color:var(--app-success); font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:10px;">Delivered</span>
-                    </div>
-                    <div style="font-size:12px; color:var(--app-text-muted); margin-bottom:8px;">Nike Air Force 1 Master Lot (12 Pairs) • $959.88</div>
-                    <span style="font-size:11px; color:var(--app-text-light);">Delivered on July 28, 2026</span>
-                </div>
-            </div>
-        </div>
+        <div id="accountTabContent"></div>
 
     </main>
 
@@ -245,25 +220,147 @@
 
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="/marketplace-app.js"></script>
+<script src="/auth.js"></script>
 <script>
+function escHtml(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function getUser() {
+    try { return window.getCurrentUser ? window.getCurrentUser() : (JSON.parse(localStorage.getItem('pilot_user') || 'null')); } catch (e) { return null; }
+}
+
 function showAccountTab(tab) {
     var content = document.getElementById('accountTabContent');
+    if (!content) return;
+    var user = getUser() || {};
+    var name = escHtml(user.full_name || user.email || '—');
+    var email = escHtml(user.email || '—');
+    var role = escHtml(user.role || 'buyer');
+    var roleLabel = (role === 'admin') ? 'Administrator' : (role === 'seller') ? 'Verified Seller' : 'B2B Verified Buyer';
+
     if (tab === 'profile') {
-        content.innerHTML = '<div style="background:#fff; border:1px solid var(--app-border); border-radius:16px; padding:16px;"><h3 style="font-size:15px; margin:0 0 12px;">Personal Details</h3><p style="font-size:12.5px; color:var(--app-text-muted);">Name: Caden Gibson<br>Email: caden@pilotsalesdistribution.com<br>Account Type: B2B Verified Buyer<br>Escrow Tier: Level 3 Elite</p></div>';
+        content.innerHTML = '<div style="background:#fff; border:1px solid var(--app-border); border-radius:16px; padding:16px;"><h3 style="font-size:15px; margin:0 0 12px;">Personal Details</h3><p style="font-size:12.5px; color:var(--app-text-muted);">Name: ' + name + '<br>Email: ' + email + '<br>Account Type: ' + roleLabel + '<br>Role: ' + role + '</p></div>';
+    } else if (tab === 'orders') {
+        content.innerHTML = '<div style="background:#fff; border:1px solid var(--app-border); border-radius:16px; padding:16px; text-align:center;"><h3 style="font-size:15px; margin:0 0 8px;">My Orders</h3><p style="font-size:12.5px; color:var(--app-text-muted); margin:0;"><i class="fa-solid fa-spinner fa-spin"></i> Loading your orders…</p></div>';
+        loadAccountOrders();
     } else if (tab === 'addresses') {
-        content.innerHTML = '<div style="background:#fff; border:1px solid var(--app-border); border-radius:16px; padding:16px;"><h3 style="font-size:15px; margin:0 0 12px;">Primary Delivery Address</h3><p style="font-size:12.5px; color:var(--app-text-muted);">90210 Wilshire Blvd, Suite 400<br>Los Angeles, CA 90210, USA<br>Phone: +1 (909) 938-4682</p></div>';
+        content.innerHTML = '<div style="background:#fff; border:1px solid var(--app-border); border-radius:16px; padding:16px;"><h3 style="font-size:15px; margin:0 0 12px;">Shipping Addresses</h3><p style="font-size:12.5px; color:var(--app-text-muted);">No saved addresses yet.</p></div>';
     } else if (tab === 'settings') {
-        content.innerHTML = '<div style="background:#fff; border:1px solid var(--app-border); border-radius:16px; padding:16px;"><h3 style="font-size:15px; margin:0 0 12px;">Notification Preferences</h3><p style="font-size:12.5px; color:var(--app-text-muted);">Email Alerts: Enabled<br>Flash Deal Alerts: Enabled<br>Escrow Status Updates: SMS & Email</p></div>';
+        content.innerHTML = '<div style="background:#fff; border:1px solid var(--app-border); border-radius:16px; padding:16px;"><h3 style="font-size:15px; margin:0 0 12px;">Account Settings</h3><p style="font-size:12.5px; color:var(--app-text-muted);">Signed in as ' + name + ' (' + email + ')<br>Role: ' + roleLabel + '</p></div>';
     }
+}
+
+function loadAccountOrders() {
+    var user = getUser();
+    var content = document.getElementById('accountTabContent');
+    if (!user || !user.id) {
+        content.innerHTML = '<div style="background:#fff; border:1px solid var(--app-border); border-radius:16px; padding:16px;"><h3 style="font-size:15px; margin:0 0 8px;">My Orders</h3><p style="font-size:12.5px; color:var(--app-text-muted); margin:0;">Sign in to see your orders.</p></div>';
+        return;
+    }
+    var db = (window.firebase && window.firebase.firestore) ? window.firebase.firestore() : null;
+    if (!db) {
+        content.innerHTML = '<div style="background:#fff; border:1px solid var(--app-border); border-radius:16px; padding:16px;"><h3 style="font-size:15px; margin:0 0 8px;">My Orders</h3><p style="font-size:12.5px; color:var(--app-text-muted); margin:0;">Orders service is unavailable right now.</p></div>';
+        return;
+    }
+    db.collection('orders').where('user_id', '==', user.id)
+        .orderBy('created_at', 'desc')
+        .limit(20)
+        .get()
+        .then(function (snap) {
+            var orders = [];
+            snap.forEach(function (doc) { orders.push({ id: doc.id, data: doc.data() }); });
+            var badge = document.getElementById('accountOrdersBadge');
+            if (badge) {
+                badge.textContent = orders.length;
+                badge.style.display = orders.length ? 'inline-block' : 'none';
+            }
+            if (!orders.length) {
+                content.innerHTML = '<div style="background:#fff; border:1px solid var(--app-border); border-radius:16px; padding:16px;"><h3 style="font-size:15px; margin:0 0 8px;">My Orders</h3><p style="font-size:12.5px; color:var(--app-text-muted); margin:0;">No orders yet. Your RFQ responses and orders will appear here.</p></div>';
+                return;
+            }
+            var html = '<div class="app-section"><div class="app-section-head"><h2><i class="fa-solid fa-box" style="color:var(--app-primary);"></i> My Orders (' + orders.length + ')</h2></div>';
+            orders.forEach(function (o) {
+                var d = o.data || {};
+                var ref = d.reference || d.order_id || o.id;
+                var title = d.title || d.description || (Array.isArray(d.items) && d.items.length ? d.items.map(function (i) { return i.title || 'Item'; }).join(', ') : 'Order');
+                var total = d.total != null ? d.total : d.amount;
+                var price = (total != null) ? '$' + Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+                var status = String(d.status || 'processing').toUpperCase();
+                var statusClass = status === 'DELIVERED' ? 'var(--app-success-soft); color:var(--app-success)' : (status === 'CANCELLED' || status === 'REJECTED' ? 'var(--app-danger-soft); color:var(--app-danger)' : 'var(--app-primary-soft); color:var(--app-primary)');
+                var date = '';
+                if (d.created_at) {
+                    try { date = new Date(d.created_at).toLocaleDateString(); } catch (e) {}
+                }
+                html += '<div style="background:#fff; border:1px solid var(--app-border); border-radius:var(--app-radius-md); padding:14px; margin-bottom:10px;">' +
+                    '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
+                        '<strong style="font-size:13px;">#' + escHtml(ref) + '</strong>' +
+                        '<span style="background:' + statusClass + '; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:10px;">' + escHtml(status) + '</span>' +
+                    '</div>' +
+                    '<div style="font-size:12px; color:var(--app-text-muted); margin-bottom:6px;">' + escHtml(title) + '</div>' +
+                    '<div style="font-size:12px; color:var(--app-text-light);">' + (price ? '<span style="color:var(--app-text); font-weight:700;">' + escHtml(price) + '</span>' : '') + (date ? ' &middot; ' + escHtml(date) : '') + '</div>' +
+                '</div>';
+            });
+            html += '</div>';
+            content.innerHTML = html;
+        })
+        .catch(function () {
+            content.innerHTML = '<div style="background:#fff; border:1px solid var(--app-border); border-radius:16px; padding:16px;"><h3 style="font-size:15px; margin:0 0 8px;">My Orders</h3><p style="font-size:12.5px; color:var(--app-text-muted); margin:0;">Could not load your orders. Please try again later.</p></div>';
+        });
+}
+
+function initAccountPage() {
+    var user = getUser();
+    var main = document.querySelector('.app-main');
+    if (!main) return;
+
+    if (!user || !user.email) {
+        // Guest — show a sign-in prompt instead of an empty dashboard.
+        main.innerHTML =
+            '<div style="max-width:420px; margin:0 auto; text-align:center; padding:40px 16px;">' +
+                '<div style="font-size:42px; color:var(--app-primary); margin-bottom:12px;"><i class="fa-solid fa-user-lock"></i></div>' +
+                '<h1 style="font-size:20px; font-weight:900; margin:0 0 8px;">You need to sign in</h1>' +
+                '<p style="font-size:13.5px; color:var(--app-text-muted); margin:0 0 20px;">Create an account or sign in to access your orders, RFQs, wishlist and account settings.</p>' +
+                '<div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">' +
+                    '<a href="/login" class="app-checkout-btn" style="text-decoration:none;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</a>' +
+                    '<a href="/register" class="app-checkout-btn" style="text-decoration:none; background:var(--app-success);"><i class="fa-solid fa-user-plus"></i> Create Account</a>' +
+                '</div>' +
+            '</div>';
+        return;
+    }
+
+    // Real signed-in user — populate profile header.
+    var nameEl = document.getElementById('accountProfileName');
+    var emailEl = document.getElementById('accountProfileEmail');
+    var badgeEl = document.getElementById('accountProfileBadge');
+    if (nameEl) nameEl.textContent = user.full_name || 'Pilot Member';
+    if (emailEl) emailEl.textContent = user.email || '';
+    if (badgeEl) {
+        var role = user.role || 'buyer';
+        var label = (role === 'admin') ? 'Administrator' : (role === 'seller') ? 'Verified Seller' : 'Verified Wholesale Buyer';
+        var icon = (role === 'admin') ? 'fa-user-shield' : (role === 'seller') ? 'fa-store' : 'fa-shield-halved';
+        badgeEl.innerHTML = '<i class="fa-solid ' + icon + '"></i> ' + label;
+    }
+
+    // Re-render the default "orders" tab so it reflects the real user.
+    showAccountTab('orders');
 }
 
 function logoutUser(e) {
     e.preventDefault();
-    localStorage.removeItem('pilot_user');
+    if (typeof window.logoutUser === 'function') { window.logoutUser(); return; }
+    try { localStorage.removeItem('pilot_user'); } catch (err) {}
     window.pseToast('Logged out successfully', 'info');
     setTimeout(function() { window.location.href = '/'; }, 500);
 }
+
+document.addEventListener('DOMContentLoaded', function () { initAccountPage(); });
 </script>
 </body>
 </html>

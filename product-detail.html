@@ -122,7 +122,7 @@
         <!-- 1. PRODUCT IMAGE GALLERY -->
         <div class="app-detail-gallery">
             <div class="app-detail-mainimg">
-                <img id="detailMainImg" src="/logo.webp" alt="Product Image" />
+                <img id="detailMainImg" src="/product-placeholder.svg" alt="Product Image" />
             </div>
             <div class="app-detail-thumbs" id="detailThumbStrip">
                 <!-- Dynamically rendered -->
@@ -300,7 +300,7 @@ async function loadProductDetail() {
         var thumbStrip = document.getElementById('detailThumbStrip');
         if (thumbStrip && Array.isArray(found.images) && found.images.length > 1) {
             thumbStrip.innerHTML = found.images.map(function(img, idx) {
-                return '<div class="app-detail-thumb ' + (idx === 0 ? 'active' : '') + '" onclick="switchThumb(this, \'' + img + '\')"><img src="' + img + '" onerror="this.src=\'/logo.webp\'" /></div>';
+                return '<div class="app-detail-thumb ' + (idx === 0 ? 'active' : '') + '" onclick="switchThumb(this, \'' + img + '\')"><img src="' + img + '" onerror="this.src=\'/product-placeholder.svg\'" /></div>';
             }).join('');
         }
     } else {
@@ -322,7 +322,7 @@ async function loadProductDetail() {
                 '<div class="app-card">' +
                     '<div class="app-card-img" onclick="window.location.href=\'/product-detail?slug=' + encodeURIComponent(pSlug) + '\'">' +
                         '<span class="app-card-badge">VERIFIED</span>' +
-                        '<img src="' + (p.image || '/logo.webp') + '" alt="' + p.title + '" loading="lazy" onerror="this.src=\'/logo.webp\'" />' +
+                        '<img src="' + (p.image || '/product-placeholder.svg') + '" alt="' + p.title + '" loading="lazy" onerror="this.src=\'/product-placeholder.svg\'" />' +
                     '</div>' +
                     '<div class="app-card-body">' +
                         '<div class="app-card-brand">' + (p.brand || p.supplier_name || 'Verified Supplier') + '</div>' +
