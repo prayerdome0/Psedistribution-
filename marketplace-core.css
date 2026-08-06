@@ -1,0 +1,1868 @@
+/* ============================================================================
+   MARKETPLACE-CORE.CSS — Amazon & Walmart Grade Design System
+   Pilot Sales Distribution (PSE Distribution)
+   ============================================================================ */
+
+:root {
+    /* Amazon & Walmart Marketplace Palette (Light Default) */
+    --amz-navy: #131921;
+    --amz-slate: #232f3e;
+    --amz-dark: #0f1111;
+    --amz-dark-alt: #1a222d;
+    --amz-gold: #ffd814;
+    --amz-gold-hover: #f7ca00;
+    --amz-orange: #ffa41c;
+    --amz-orange-hover: #fa8900;
+    --amz-amber: #febd69;
+    --amz-link: #007185;
+    --amz-link-hover: #c7511f;
+
+    --wmt-blue: #0071dc;
+    --wmt-blue-dark: #004f9a;
+    --wmt-yellow: #ffc220;
+    --wmt-light-blue: #e6f1fc;
+
+    --pse-teal: #0e7c68;
+    --pse-teal-dark: #0a5a4a;
+    --pse-teal-light: #e6f4ef;
+
+    --mkt-bg: #eaeded;
+    --mkt-bg-alt: #f3f4f6;
+    --mkt-card-bg: #ffffff;
+    --mkt-border: #d5d9d9;
+    --mkt-border-light: #e2e8f0;
+    --mkt-text: #0f1111;
+    --mkt-text-secondary: #565959;
+    --mkt-text-muted: #767676;
+
+    --badge-bestseller: #e67a00;
+    --badge-choice: #232f3e;
+    --badge-rollback: #de1c24;
+    --badge-prime: #0071dc;
+    --star-gold: #de7921;
+
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 14px rgba(0,0,0,0.08);
+    --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.12);
+    --shadow-hover: 0 15px 35px -5px rgba(0,20,40,0.14);
+}
+
+/* Dark Theme Overrides */
+body.dark-theme {
+    --mkt-bg: #0b1320;
+    --mkt-bg-alt: #0f172a;
+    --mkt-card-bg: #1e293b;
+    --mkt-border: #334155;
+    --mkt-border-light: #1e293b;
+    --mkt-text: #f8fafc;
+    --mkt-text-secondary: #cbd5e1;
+    --mkt-text-muted: #94a3b8;
+    background-color: #0b1320 !important;
+    color: #f8fafc !important;
+}
+body.dark-theme .mkt-card-deck .amz-tile-card,
+body.dark-theme .mkt-product-card,
+body.dark-theme .mkt-filter-sidebar,
+body.dark-theme .mkt-catalog-header,
+body.dark-theme .mkt-cart-card,
+body.dark-theme .mkt-summary-card,
+body.dark-theme .amz-buy-box,
+body.dark-theme .mkt-detail-sec,
+body.dark-theme .mkt-roi-card,
+body.dark-theme .mkt-track-card,
+body.dark-theme .amz-account-card,
+body.dark-theme .mkt-modal-box,
+body.dark-theme .mkt-cart-drawer,
+body.dark-theme .mkt-chat-box,
+body.dark-theme .marketplace-logo-marquee-section,
+body.dark-theme .flash-deals-banner,
+body.dark-theme .mkt-guarantees-banner,
+body.dark-theme .dept-circle-item,
+body.dark-theme .mkt-live-activity-pill,
+body.dark-theme .mkt-compare-tray {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+body.dark-theme .mkt-card-title,
+body.dark-theme .amz-tile-title,
+body.dark-theme .mkt-detail-title,
+body.dark-theme .mkt-current-price,
+body.dark-theme .mkt-detail-price,
+body.dark-theme .buybox-unit-price,
+body.dark-theme .mkt-filter-title,
+body.dark-theme .mkt-marquee-title,
+body.dark-theme .flash-deals-text h2,
+body.dark-theme .guarantee-content h3,
+body.dark-theme .amz-account-card-title,
+body.dark-theme .mkt-cart-header h1 {
+    color: #f8fafc !important;
+}
+body.dark-theme .mkt-search-form {
+    background: #1e293b;
+    border-color: #475569;
+}
+body.dark-theme .mkt-search-input {
+    background: #1e293b;
+    color: #f8fafc;
+}
+body.dark-theme .mkt-search-dept {
+    background: #0f172a;
+    color: #f8fafc;
+    border-right-color: #475569;
+}
+body.dark-theme .amz-brand-chip {
+    background: #0f172a;
+    border-color: #334155;
+}
+body.dark-theme .amz-brand-name {
+    color: #f8fafc;
+}
+body.dark-theme .mkt-specs-table tr:nth-child(even) {
+    background: #0f172a;
+}
+body.dark-theme .mkt-specs-table td {
+    border-color: #334155;
+    color: #cbd5e1;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   1. MARKETPLACE TOP ANNOUNCEMENT & DELIVERY BAR
+   ──────────────────────────────────────────────────────────────────────────── */
+.mkt-topbar {
+    background: var(--amz-navy);
+    color: #e3e6e6;
+    font-size: 0.76rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    position: relative;
+    z-index: 1001;
+}
+
+.mkt-topbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.mkt-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    flex: 1 1 auto;
+    min-width: 260px;
+}
+
+.top-delivery-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #fff;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+.top-delivery-badge:hover {
+    background: rgba(255,255,255,0.12);
+}
+.top-delivery-badge i {
+    color: var(--amz-amber);
+    font-size: 0.9rem;
+}
+.top-delivery-text {
+    font-size: 0.72rem;
+    line-height: 1.1;
+}
+.top-delivery-text span {
+    display: block;
+    color: #94a3b8;
+    font-size: 0.65rem;
+}
+.top-delivery-text strong {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.mkt-announcement-ticker {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #cbd5e1;
+    font-weight: 500;
+    font-size: 0.74rem;
+}
+.mkt-announcement-ticker .badge {
+    background: var(--wmt-yellow);
+    color: #0f1111;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 0.15rem 0.45rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mkt-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    flex-shrink: 0;
+}
+.mkt-topbar-right a {
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.mkt-topbar-right a:hover {
+    color: #ffffff;
+}
+.mkt-topbar-right a i {
+    color: var(--amz-amber);
+}
+
+/* Currency & Theme Pickers */
+.mkt-currency-btn,
+.mkt-theme-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #ffd814;
+    font-weight: 800;
+    font-size: 0.74rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: all 0.2s;
+}
+.mkt-currency-btn:hover,
+.mkt-theme-btn:hover {
+    background: rgba(255,255,255,0.22);
+    border-color: #ffd814;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   2. MAIN MARKETPLACE HEADER
+   ──────────────────────────────────────────────────────────────────────────── */
+.mkt-header {
+    background: var(--amz-navy);
+    padding: 0.65rem 0;
+    color: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+}
+
+.mkt-header .container {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+/* Logo */
+.mkt-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: #ffffff;
+    flex-shrink: 0;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+}
+.mkt-logo:hover {
+    border-color: rgba(255,255,255,0.4);
+}
+.mkt-logo img {
+    height: 38px;
+    width: auto;
+    border-radius: 6px;
+}
+.mkt-logo-text {
+    line-height: 1.15;
+}
+.mkt-logo-main {
+    font-size: 1.18rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.mkt-logo-main span {
+    color: var(--amz-amber);
+}
+.mkt-logo-sub {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #94a3b8;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.mkt-logo-sub .verified-pill {
+    background: var(--pse-teal);
+    color: #fff;
+    font-size: 0.55rem;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-weight: 700;
+}
+
+/* Search Bar */
+.mkt-search-wrapper {
+    flex: 1;
+    min-width: 240px;
+    position: relative;
+}
+
+.mkt-search-form {
+    display: flex;
+    align-items: stretch;
+    height: 42px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.mkt-search-form:focus-within {
+    border-color: var(--amz-orange);
+    box-shadow: 0 0 0 3px rgba(255, 164, 28, 0.3);
+}
+
+.mkt-search-dept {
+    background: #f3f4f6;
+    border: none;
+    border-right: 1px solid #d5d9d9;
+    color: #0f1111;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0 0.75rem;
+    cursor: pointer;
+    outline: none;
+    max-width: 145px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+.mkt-search-dept:hover {
+    background: #e2e8f0;
+}
+
+.mkt-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 0 1rem;
+    font-size: 0.92rem;
+    color: #0f1111;
+    background: #ffffff;
+}
+.mkt-search-input::placeholder {
+    color: #767676;
+    font-size: 0.88rem;
+}
+
+.mkt-search-btn {
+    background: var(--amz-amber);
+    border: none;
+    outline: none;
+    width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #0f1111;
+    font-size: 1.15rem;
+    transition: background 0.2s;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+.mkt-search-btn:hover {
+    background: var(--amz-orange);
+}
+
+/* Header Actions */
+.mkt-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.mkt-header-link {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 0.35rem 0.6rem;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+    position: relative;
+    cursor: pointer;
+}
+.mkt-header-link:hover {
+    border-color: rgba(255,255,255,0.4);
+}
+.mkt-header-link .sub-line {
+    font-size: 0.68rem;
+    color: #94a3b8;
+    line-height: 1.1;
+}
+.mkt-header-link .main-line {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Account Flyout Dropdown */
+.mkt-account-dropdown {
+    position: relative;
+}
+.mkt-account-flyout {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    width: 270px;
+    background: #ffffff;
+    color: #0f1111;
+    border-radius: 8px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.25);
+    border: 1px solid #d5d9d9;
+    padding: 1rem;
+    z-index: 1050;
+}
+.mkt-account-dropdown:hover .mkt-account-flyout,
+.mkt-account-dropdown:focus-within .mkt-account-flyout {
+    display: block;
+}
+.mkt-flyout-signin-btn {
+    display: block;
+    width: 100%;
+    background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+    border: 1px solid #a88734;
+    border-radius: 6px;
+    padding: 0.55rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #111;
+    text-align: center;
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+.mkt-flyout-signin-btn:hover {
+    background: linear-gradient(to bottom, #f5d78e, #eeb933);
+}
+.mkt-flyout-register {
+    font-size: 0.75rem;
+    color: #565959;
+    text-align: center;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+.mkt-flyout-register a {
+    color: var(--amz-link);
+    text-decoration: none;
+    font-weight: 600;
+}
+.mkt-flyout-register a:hover {
+    text-decoration: underline;
+    color: var(--amz-link-hover);
+}
+.mkt-flyout-menu a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.4rem 0.2rem;
+    font-size: 0.82rem;
+    color: #334155;
+    text-decoration: none;
+    border-radius: 4px;
+}
+.mkt-flyout-menu a:hover {
+    color: var(--amz-link-hover);
+    background: #f8fafc;
+    padding-left: 0.4rem;
+}
+
+/* Cart Button */
+.mkt-cart-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 0.35rem 0.7rem;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+    position: relative;
+    cursor: pointer;
+}
+.mkt-cart-btn:hover {
+    border-color: rgba(255,255,255,0.4);
+}
+.mkt-cart-icon-wrap {
+    position: relative;
+    font-size: 1.55rem;
+    line-height: 1;
+}
+.mkt-cart-badge {
+    position: absolute;
+    top: -6px;
+    left: 12px;
+    background: var(--amz-orange);
+    color: #0f1111;
+    font-weight: 900;
+    font-size: 0.78rem;
+    min-width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+}
+.mkt-cart-label {
+    font-size: 0.84rem;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+}
+.mkt-cart-label span {
+    font-size: 0.66rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   3. SUBNAV / DEPARTMENT BAR
+   ──────────────────────────────────────────────────────────────────────────── */
+.mkt-subnav {
+    background: var(--amz-slate);
+    color: #ffffff;
+    font-size: 0.83rem;
+    padding: 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    scrollbar-width: none;
+}
+.mkt-subnav::-webkit-scrollbar {
+    display: none;
+}
+
+.mkt-subnav .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.2rem;
+}
+
+.mkt-subnav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.amz-all-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 0.85rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.07);
+    transition: all 0.2s;
+    font-size: 0.84rem;
+}
+.amz-all-menu-btn:hover {
+    border-color: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.15);
+}
+
+.mkt-subnav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.55rem 0.75rem;
+    color: #e2e8f0;
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+.mkt-subnav-link:hover {
+    border-color: rgba(255,255,255,0.4);
+    color: #ffffff;
+}
+.mkt-subnav-link.highlight {
+    color: var(--amz-amber);
+    font-weight: 700;
+}
+
+.mkt-subnav-right {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.78rem;
+    color: #cbd5e1;
+    padding-left: 0.5rem;
+}
+.mkt-subnav-right i {
+    color: var(--amz-amber);
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   4. AMAZON-STYLE SLIDE-OUT ALL DEPARTMENTS DRAWER
+   ──────────────────────────────────────────────────────────────────────────── */
+.amz-drawer-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(3px);
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.amz-drawer-overlay.show {
+    display: block;
+    opacity: 1;
+}
+
+.amz-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 360px;
+    max-width: 85vw;
+    height: 100vh;
+    background: #ffffff;
+    color: #0f1111;
+    z-index: 9999;
+    transform: translateX(-100%);
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 8px 0 30px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+.amz-drawer.open {
+    transform: translateX(0);
+}
+
+.amz-drawer-header {
+    background: var(--amz-slate);
+    color: #ffffff;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+.amz-drawer-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+}
+.amz-drawer-user i {
+    font-size: 1.5rem;
+    color: var(--amz-amber);
+}
+.amz-drawer-close {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 0.3rem;
+    transition: transform 0.2s;
+}
+.amz-drawer-close:hover {
+    transform: scale(1.15);
+    color: var(--amz-amber);
+}
+
+.amz-drawer-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 0;
+}
+
+.amz-drawer-sec {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+.amz-drawer-sec:last-child {
+    border-bottom: none;
+}
+.amz-drawer-title {
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #0f1111;
+    padding: 0.25rem 1.25rem 0.5rem;
+}
+.amz-drawer-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 1.25rem;
+    font-size: 0.88rem;
+    color: #334155;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+}
+.amz-drawer-link:hover {
+    background: #f1f5f9;
+    color: var(--amz-link-hover);
+    padding-left: 1.45rem;
+}
+.amz-drawer-link i.fa-chevron-right {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   5. AUTO-SCROLLING BRAND & MARKETPLACE LOGO MARQUEE
+   ──────────────────────────────────────────────────────────────────────────── */
+.marketplace-logo-marquee-section {
+    background: #ffffff;
+    padding: 2.2rem 0 2rem;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    position: relative;
+    overflow: hidden;
+}
+
+.mkt-marquee-header {
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto 1.4rem;
+    padding: 0 1rem;
+}
+.mkt-marquee-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--pse-teal-light);
+    color: var(--pse-teal-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.85rem;
+    border-radius: 50px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 0.5rem;
+}
+.mkt-marquee-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--amz-dark);
+    letter-spacing: -0.3px;
+    margin-bottom: 0.35rem;
+}
+.mkt-marquee-desc {
+    font-size: 0.86rem;
+    color: var(--mkt-text-secondary);
+}
+
+.marketplace-logo-marquee-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    padding: 0.5rem 0;
+}
+
+.marketplace-logo-marquee-track {
+    display: flex;
+    width: max-content;
+    animation: amzMarqueeScroll 38s linear infinite;
+    will-change: transform;
+}
+.marketplace-logo-marquee-track:hover {
+    animation-play-state: paused;
+}
+
+.marquee-group {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding-right: 1.25rem;
+    flex-shrink: 0;
+}
+
+@keyframes amzMarqueeScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.amz-brand-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.65rem 1.1rem;
+    min-width: 175px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    user-select: none;
+}
+.amz-brand-chip:hover {
+    background: #ffffff;
+    border-color: var(--amz-orange);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 113, 220, 0.12);
+}
+
+.amz-brand-logo-wrap {
+    width: 48px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.amz-brand-logo-wrap img {
+    max-width: 100%;
+    max-height: 28px;
+    object-fit: contain;
+    filter: grayscale(15%);
+    transition: filter 0.2s, transform 0.2s;
+}
+.amz-brand-chip:hover .amz-brand-logo-wrap img {
+    filter: grayscale(0%);
+    transform: scale(1.06);
+}
+
+.amz-brand-info {
+    display: flex;
+    flex-direction: column;
+}
+.amz-brand-name {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #0f1111;
+    line-height: 1.2;
+}
+.amz-brand-tag {
+    font-size: 0.65rem;
+    color: var(--pse-teal);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.amz-brand-tag i {
+    font-size: 0.62rem;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   6. SCARCITY METER & STOCK DEPLETION BAR
+   ──────────────────────────────────────────────────────────────────────────── */
+.mkt-scarcity-meter {
+    background: #fff5f5;
+    border: 1px solid #fed7d7;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    margin: 0.85rem 0;
+    font-size: 0.82rem;
+    color: #9b2c2c;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.mkt-scarcity-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 700;
+}
+.mkt-scarcity-track {
+    width: 100%;
+    height: 8px;
+    background: #fed7d7;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.mkt-scarcity-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #e53e3e, #dd6b20);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   7. INTERACTIVE LTL FREIGHT CALCULATOR WIDGET
+   ──────────────────────────────────────────────────────────────────────────── */
+.mkt-freight-calculator-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.2rem;
+    margin: 1.2rem 0;
+}
+.mkt-freight-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0f1111;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.6rem;
+}
+.mkt-freight-input-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+}
+.mkt-freight-input-group input {
+    flex: 1;
+    padding: 0.45rem 0.8rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.84rem;
+    outline: none;
+}
+.mkt-freight-results {
+    font-size: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+.mkt-freight-row {
+    display: flex;
+    justify-content: space-between;
+    color: #334155;
+}
+.mkt-freight-row strong {
+    color: #0e7c68;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   8. SLIDE-OVER CART DRAWER ("Side Cart")
+   ──────────────────────────────────────────────────────────────────────────── */
+.mkt-cart-drawer-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(3px);
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.mkt-cart-drawer-overlay.show {
+    display: block;
+    opacity: 1;
+}
+
+.mkt-cart-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    max-width: 90vw;
+    height: 100vh;
+    background: #ffffff;
+    color: #0f1111;
+    z-index: 9999;
+    transform: translateX(100%);
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -8px 0 30px rgba(0,0,0,0.25);
+    overflow: hidden;
+}
+.mkt-cart-drawer.open {
+    transform: translateX(0);
+}
+
+.mkt-cart-drawer-header {
+    background: var(--amz-navy);
+    color: #ffffff;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+.mkt-cart-drawer-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.mkt-cart-drawer-title i {
+    color: var(--amz-amber);
+}
+.mkt-cart-drawer-close {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 1.6rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 0.3rem;
+}
+.mkt-cart-drawer-close:hover {
+    color: var(--amz-amber);
+}
+
+.mkt-drawer-shipping-bar {
+    background: #e6f4ef;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid #c3e6cb;
+    font-size: 0.78rem;
+    color: #0a5a4a;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.mkt-drawer-progress-track {
+    width: 100%;
+    height: 6px;
+    background: #d1e7dd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.mkt-drawer-progress-fill {
+    height: 100%;
+    background: var(--pse-teal);
+    transition: width 0.3s ease;
+}
+
+.mkt-cart-drawer-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.mkt-drawer-item {
+    display: flex;
+    gap: 0.85rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+.mkt-drawer-item-img {
+    width: 64px;
+    height: 64px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.mkt-drawer-item-img img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+.mkt-drawer-item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.mkt-drawer-item-title {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #0f1111;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.mkt-drawer-item-price {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0f1111;
+}
+
+.mkt-cart-drawer-footer {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    padding: 1.25rem;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.mkt-drawer-subtotal {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0f1111;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   9. QUICK VIEW & OTHER MODALS
+   ──────────────────────────────────────────────────────────────────────────── */
+.mkt-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+.mkt-modal-overlay.show {
+    display: flex;
+    opacity: 1;
+}
+
+.mkt-modal-box {
+    background: #ffffff;
+    border-radius: 12px;
+    max-width: 850px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    padding: 2rem;
+}
+.mkt-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #f1f5f9;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #334155;
+    transition: all 0.2s;
+}
+.mkt-modal-close:hover {
+    background: #e2e8f0;
+    color: #0f1111;
+}
+
+.mkt-qv-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+.mkt-qv-img-wrap {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.mkt-qv-img-wrap img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   10. WHOLESALE RESALE PROFIT & ROI CALCULATOR
+   ──────────────────────────────────────────────────────────────────────────── */
+.mkt-roi-card {
+    background: linear-gradient(145deg, #ffffff, #f8fafc);
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+.mkt-roi-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0f1111;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+}
+.mkt-roi-title i {
+    color: var(--pse-teal);
+}
+.mkt-roi-subtitle {
+    font-size: 0.82rem;
+    color: #565959;
+    margin-bottom: 1.25rem;
+}
+.mkt-roi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: center;
+}
+.mkt-roi-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+.mkt-roi-field label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 0.3rem;
+}
+.mkt-roi-field input,
+.mkt-roi-field select {
+    width: 100%;
+    padding: 0.55rem 0.85rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    outline: none;
+}
+.mkt-roi-field input:focus {
+    border-color: var(--pse-teal);
+}
+
+.mkt-roi-results {
+    background: #0f172a;
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+.mkt-roi-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #cbd5e1;
+}
+.mkt-roi-metric strong {
+    font-size: 1.1rem;
+    color: #ffffff;
+}
+.mkt-roi-metric.highlight strong {
+    font-size: 1.4rem;
+    color: #2fd68b;
+    font-weight: 900;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   11. LIVE MARKETPLACE ACTIVITY TICKER (Social Proof)
+   ──────────────────────────────────────────────────────────────────────────── */
+.mkt-live-activity-pill {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    background: #ffffff;
+    border: 1px solid #d5d9d9;
+    border-left: 4px solid var(--pse-teal);
+    border-radius: 10px;
+    padding: 0.75rem 1.1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    max-width: 380px;
+    z-index: 9980;
+    transform: translateY(120px);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
+}
+.mkt-live-activity-pill.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+.mkt-activity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--pse-teal-light);
+    color: var(--pse-teal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+.mkt-activity-content {
+    font-size: 0.78rem;
+    color: #0f1111;
+    line-height: 1.3;
+}
+.mkt-activity-time {
+    font-size: 0.68rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+.mkt-activity-close {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0 0.2rem;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   12. SIDE-BY-SIDE FLOATING PRODUCT COMPARISON TRAY
+   ──────────────────────────────────────────────────────────────────────────── */
+.mkt-compare-tray {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border-top: 2px solid var(--amz-orange);
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.15);
+    padding: 0.75rem 0;
+    z-index: 9985;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.mkt-compare-tray.show {
+    transform: translateY(0);
+}
+.mkt-compare-tray .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+.mkt-compare-chips {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+.mkt-compare-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.76rem;
+    color: #0f1111;
+}
+.mkt-compare-chip img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   13. 24/7 B2B LIVE CONCIERGE & WHATSAPP WIDGET
+   ──────────────────────────────────────────────────────────────────────────── */
+.mkt-chat-trigger {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: linear-gradient(135deg, #0e7c68, #0a5a4a);
+    color: #ffffff;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    box-shadow: 0 8px 24px rgba(14, 124, 104, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    cursor: pointer;
+    z-index: 9990;
+    transition: transform 0.25s, box-shadow 0.25s;
+    border: 2px solid #ffffff;
+}
+.mkt-chat-trigger:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 30px rgba(14, 124, 104, 0.55);
+}
+.mkt-chat-pulse {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background: #22c55e;
+    border: 2px solid #fff;
+    border-radius: 50%;
+}
+
+.mkt-chat-box {
+    display: none;
+    position: fixed;
+    bottom: 96px;
+    right: 24px;
+    width: 360px;
+    max-width: 90vw;
+    height: 480px;
+    max-height: 80vh;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+    border: 1px solid #e2e8f0;
+    z-index: 9991;
+    flex-direction: column;
+    overflow: hidden;
+}
+.mkt-chat-box.open {
+    display: flex;
+}
+
+.mkt-chat-header {
+    background: var(--amz-navy);
+    color: #ffffff;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.mkt-chat-header-info {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.mkt-chat-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--pse-teal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+.mkt-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: #f8fafc;
+}
+.mkt-msg {
+    max-width: 82%;
+    padding: 0.65rem 0.9rem;
+    border-radius: 12px;
+    font-size: 0.84rem;
+    line-height: 1.35;
+}
+.mkt-msg.bot {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #0f1111;
+    align-self: flex-start;
+    border-bottom-left-radius: 2px;
+}
+.mkt-msg.user {
+    background: var(--pse-teal);
+    color: #ffffff;
+    align-self: flex-end;
+    border-bottom-right-radius: 2px;
+}
+
+.mkt-chat-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    padding: 0.5rem 1rem;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+}
+.mkt-chat-chip {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 16px;
+    padding: 0.3rem 0.65rem;
+    font-size: 0.72rem;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.mkt-chat-chip:hover {
+    background: var(--pse-teal-light);
+    border-color: var(--pse-teal);
+    color: var(--pse-teal-dark);
+}
+
+.mkt-chat-input-row {
+    padding: 0.75rem 1rem;
+    background: #ffffff;
+    display: flex;
+    gap: 0.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+.mkt-chat-input-row input {
+    flex: 1;
+    border: 1px solid #cbd5e1;
+    border-radius: 20px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.84rem;
+    outline: none;
+}
+.mkt-chat-input-row button {
+    background: var(--pse-teal);
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   14. VISUAL FREIGHT & ORDER TRACKING MILESTONES
+   ──────────────────────────────────────────────────────────────────────────── */
+.mkt-track-card {
+    background: #ffffff;
+    border: 1px solid #d5d9d9;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+.mkt-track-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin: 2.5rem 0 2rem;
+}
+.mkt-track-steps::before {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: 20px;
+    right: 20px;
+    height: 4px;
+    background: #e2e8f0;
+    z-index: 1;
+}
+.mkt-track-progress-line {
+    position: absolute;
+    top: 18px;
+    left: 20px;
+    height: 4px;
+    background: var(--pse-teal);
+    z-index: 2;
+    transition: width 0.4s ease;
+}
+
+.mkt-track-step {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+    max-width: 140px;
+}
+.mkt-track-dot {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    color: #64748b;
+    transition: all 0.3s;
+}
+.mkt-track-step.done .mkt-track-dot {
+    background: var(--pse-teal);
+    border-color: var(--pse-teal);
+    color: #ffffff;
+}
+.mkt-track-step.active .mkt-track-dot {
+    background: var(--amz-orange);
+    border-color: var(--amz-orange);
+    color: #ffffff;
+}
+.mkt-track-step-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #334155;
+    line-height: 1.25;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   15. MULTI-SKU FAST RE-ORDER MATRIX
+   ──────────────────────────────────────────────────────────────────────────── */
+.mkt-fast-reorder-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #d5d9d9;
+}
+.mkt-fast-reorder-table th {
+    background: #f1f5f9;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 800;
+    color: #0f1111;
+    border-bottom: 2px solid #cbd5e1;
+}
+.mkt-fast-reorder-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   16. AMAZON / WALMART FOOTER
+   ──────────────────────────────────────────────────────────────────────────── */
+.mkt-footer {
+    background: var(--amz-navy);
+    color: #ffffff;
+    margin-top: 3rem;
+}
+
+.amz-back-to-top {
+    background: #37475a;
+    color: #ffffff;
+    text-align: center;
+    padding: 0.85rem 0;
+    font-size: 0.84rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: block;
+    text-decoration: none;
+}
+.amz-back-to-top:hover {
+    background: #485769;
+}
+
+.mkt-footer-nav {
+    background: var(--amz-slate);
+    padding: 3rem 0 2.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.mkt-footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+}
+
+.mkt-footer-col h4 {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    letter-spacing: 0.2px;
+}
+
+.mkt-footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.mkt-footer-col a {
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 0.82rem;
+    transition: color 0.2s;
+}
+.mkt-footer-col a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+.mkt-footer-middle {
+    background: var(--amz-slate);
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.mkt-footer-middle .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.mkt-footer-bottom {
+    background: var(--amz-navy);
+    padding: 1.8rem 0;
+    font-size: 0.74rem;
+    color: #94a3b8;
+    text-align: center;
+}
+.mkt-footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+.mkt-footer-links a {
+    color: #cbd5e1;
+    text-decoration: none;
+}
+.mkt-footer-links a:hover {
+    text-decoration: underline;
+    color: #ffffff;
+}
+
+.mkt-payment-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+.mkt-payment-badge {
+    background: #ffffff;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.mkt-payment-badge img {
+    height: 16px;
+    width: auto;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   17. RESPONSIVE QUERIES
+   ──────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .amz-card-deck {
+        grid-template-columns: repeat(2, 1fr);
+        margin-top: 1rem;
+    }
+    .mkt-footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    .mkt-roi-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .mkt-topbar-left .mkt-announcement-ticker {
+        display: none;
+    }
+    .mkt-header .container {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    .mkt-search-wrapper {
+        order: 3;
+        width: 100%;
+        min-width: 100%;
+    }
+    .mkt-search-dept {
+        display: none;
+    }
+    .amz-card-deck {
+        grid-template-columns: 1fr;
+    }
+    .mkt-footer-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    .mkt-qv-grid {
+        grid-template-columns: 1fr;
+    }
+    .mkt-track-steps {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: flex-start;
+    }
+    .mkt-track-steps::before {
+        display: none;
+    }
+    .mkt-track-step {
+        flex-direction: row;
+        text-align: left;
+        max-width: 100%;
+    }
+}

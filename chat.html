@@ -495,6 +495,8 @@
         }
     </style>
     <link rel="stylesheet" href="/style.css" />
+    <script src="/marketplace.js"></script>
+    <link rel="stylesheet" href="/marketplace-core.css" />
 </head>
 <body>
 
@@ -636,27 +638,103 @@
 <!-- ============================================ -->
 <!-- FOOTER -->
 <!-- ============================================ -->
-<footer class="footer">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-links">
-                <a href="/about">About</a>
-                <a href="/contact">Contact</a>
-                <a href="/help-center">Help</a>
-                <a href="/privacy">Privacy Policy</a>
-                <a href="/terms">Terms &amp; Conditions</a>
-                <a href="/become-seller">Become a Seller</a>
-                <a href="/supplier-verification">Supplier Verification</a>
-            </div>
-            <div class="footer-social">
-                <a href="#"><i class="fa-brands fa-facebook"></i></a>
-                <a href="#"><i class="fa-brands fa-twitter"></i></a>
-                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+<!-- AUTO-SCROLLING LOGO MARQUEE -->
+<section class="marketplace-logo-marquee-section" aria-labelledby="marqueeTitle">
+    <div class="mkt-marquee-header">
+        <div class="mkt-marquee-kicker"><i class="fa-solid fa-certificate"></i> Verified Global Network</div>
+        <h2 class="mkt-marquee-title" id="marqueeTitle">Trusted Marketplace Partners &amp; Direct Wholesale Brands</h2>
+        <p class="mkt-marquee-desc">Verified B2B wholesale distribution network. Sourced from authorized suppliers, enterprise liquidators, and top marketplace leaders.</p>
+    </div>
+    <div class="marketplace-logo-marquee-container" data-auto-scroll-logos>
+        <div class="marketplace-logo-marquee-track"></div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="mkt-footer">
+    <a href="#" class="amz-back-to-top" id="backToTopBtn">Back to top</a>
+    <div class="mkt-footer-nav">
+        <div class="container">
+            <div class="mkt-footer-grid">
+                <div class="mkt-footer-col">
+                    <h4>Get to Know Us</h4>
+                    <ul>
+                        <li><a href="/about">About PSE Distribution</a></li>
+                        <li><a href="/about">Leadership &amp; Careers</a></li>
+                        <li><a href="/supplier-verification">Verified Supplier Standards</a></li>
+                        <li><a href="/catalogs">Wholesale Line Sheets</a></li>
+                        <li><a href="/verify">Authenticity Guarantee</a></li>
+                    </ul>
+                </div>
+                <div class="mkt-footer-col">
+                    <h4>Make Money with Us</h4>
+                    <ul>
+                        <li><a href="/become-seller">Sell on PSE Marketplace</a></li>
+                        <li><a href="/inventory-upload">Upload Bulk Inventory</a></li>
+                        <li><a href="/seller-dashboard">Seller Central Hub</a></li>
+                        <li><a href="/become-seller">Fulfillment &amp; Pallet Warehousing</a></li>
+                        <li><a href="/supplier-store">Supplier Storefronts</a></li>
+                    </ul>
+                </div>
+                <div class="mkt-footer-col">
+                    <h4>Payment &amp; Financing</h4>
+                    <ul>
+                        <li><a href="/rfq">PSE Corporate Net-30 Terms</a></li>
+                        <li><a href="/checkout">100% Escrow Buyer Protection</a></li>
+                        <li><a href="/account">Wholesale Credit Lines</a></li>
+                        <li><a href="/checkout">Wire Transfer &amp; Card Payments</a></li>
+                        <li><a href="/help-center">Tax-Exempt Purchasing</a></li>
+                    </ul>
+                </div>
+                <div class="mkt-footer-col">
+                    <h4>Let Us Help You</h4>
+                    <ul>
+                        <li><a href="/account">Your Account</a></li>
+                        <li><a href="/buyer-dashboard">Your Orders &amp; Invoices</a></li>
+                        <li><a href="/track-order">Shipping Rates &amp; LTL Freight</a></li>
+                        <li><a href="/rfq">Request a Custom Quote (RFQ)</a></li>
+                        <li><a href="/help-center">Help Center &amp; Disputes</a></li>
+                        <li><a href="/contact">24/7 B2B Concierge</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
-        <div class="footer-bottom">
-            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
+    </div>
+    
+    <div class="mkt-footer-middle">
+        <div class="container">
+            <a href="/" class="mkt-logo" style="margin:0 auto 0 0;">
+                <img src="/logo.webp" alt="PSE Distribution" style="height:32px;" />
+                <div class="mkt-logo-text">
+                    <div class="mkt-logo-main" style="font-size:1.05rem;">PSE <span>Marketplace</span></div>
+                </div>
+            </a>
+            <div style="display:flex;gap:1.5rem;align-items:center;">
+                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;"><i class="fa-solid fa-globe"></i> English (US)</span>
+                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;">$ USD - U.S. Dollar</span>
+                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;">🇺🇸 United States</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="mkt-footer-bottom">
+        <div class="container">
+            <div class="mkt-footer-links">
+                <a href="/terms">Conditions of Use</a>
+                <a href="/privacy">Privacy Notice</a>
+                <a href="/terms">Consumer Health Data</a>
+                <a href="/terms">Your Ads Privacy Choices</a>
+                <a href="/become-seller">Seller Terms</a>
+            </div>
+            <p>&copy; 2026 Pilot Sales Distribution, Inc. or its affiliates. All rights reserved. Amazon, Walmart, Target, Apple, and other trademarks are the property of their respective owners.</p>
+            
+            <div class="mkt-payment-row">
+                <div class="mkt-payment-badge"><img src="/visa.svg" alt="Visa" /></div>
+                <div class="mkt-payment-badge"><img src="/mastercard.svg" alt="Mastercard" /></div>
+                <div class="mkt-payment-badge"><img src="/paypal.svg" alt="PayPal" /></div>
+                <div class="mkt-payment-badge"><span style="font-weight:900;font-size:0.7rem;color:#0071dc;">ESCROW 100%</span></div>
+                <div class="mkt-payment-badge"><span style="font-weight:900;font-size:0.7rem;color:#0e7c68;"><i class="fa-solid fa-lock"></i> 256-BIT SSL</span></div>
+            </div>
         </div>
     </div>
 </footer>

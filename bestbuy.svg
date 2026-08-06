@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 70" width="180" height="70">
+  <path fill="#FFE600" d="M10 8h120l30 30-30 24H10z"/>
+  <circle cx="145" cy="38" r="6" fill="#0046BE"/>
+  <text x="20" y="32" font-family="Arial Black, Arial, sans-serif" font-size="18" font-weight="900" fill="#000000">BEST</text>
+  <text x="20" y="54" font-family="Arial Black, Arial, sans-serif" font-size="18" font-weight="900" fill="#000000">BUY</text>
+</svg>
