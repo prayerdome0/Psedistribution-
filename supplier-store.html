@@ -182,52 +182,134 @@
         }
     </style>
     <link rel="stylesheet" href="/style.css" />
+    <script src="/marketplace.js"></script>
+    <link rel="stylesheet" href="/marketplace-core.css" />
 </head>
 <body>
 
 <!-- HEADER -->
-<header class="header">
+<!-- 1. TOP DELIVERY & UTILITY BAR -->
+<div class="mkt-topbar">
     <div class="container">
-        <a href="/home" class="logo">
-            <img src="/logo.webp" alt="Pilot Sales Distribution" />
-            <div class="brand-name">
-                <span class="main">PSE <span>Distribution</span></span>
-                <span class="sub">wholesale</span>
+        <div class="mkt-topbar-left">
+            <div class="top-delivery-badge" data-change-location title="Click to change your delivery location">
+                <i class="fa-solid fa-location-dot"></i>
+                <div class="top-delivery-text">
+                    <span>Deliver to</span>
+                    <strong class="pse-delivery-zip">90210 - Los Angeles, CA</strong>
+                </div>
+            </div>
+            <div class="mkt-announcement-ticker">
+                <span class="badge"><i class="fa-solid fa-bolt"></i> MARKETPLACE ROLLBACKS</span>
+                <span>Save up to 50% on verified bulk pallets &amp; overstock inventory</span>
+            </div>
+        </div>
+        <div class="mkt-topbar-right">
+            <a href="tel:+19099384682"><i class="fa-solid fa-phone"></i> <span>24/7 B2B: +1 (909) 938-4682</span></a>
+            <a href="/become-seller"><i class="fa-solid fa-store"></i> <span>Sell on PSE</span></a>
+            <a href="/track-order"><i class="fa-solid fa-truck"></i> <span>Track Order</span></a>
+            <a href="/help-center"><i class="fa-regular fa-circle-question"></i> <span>Help</span></a>
+            <button type="button" class="mkt-currency-btn" onclick="PSEMarketplace.openCurrencyModal()" title="Change Currency (USD, EUR, GBP, CAD, AUD, ZMW, JPY)"><span>🇺🇸 USD ($)</span> <i class="fa-solid fa-chevron-down" style="font-size:0.6rem;"></i></button>
+        </div>
+    </div>
+</div>
+
+<!-- 2. MAIN MARKETPLACE HEADER (Amazon & Walmart Style) -->
+<header class="mkt-header">
+    <div class="container">
+        <a href="/" class="mkt-logo" aria-label="Pilot Sales Distribution Marketplace">
+            <img src="/logo.webp" alt="PSE Distribution Marketplace logo" />
+            <div class="mkt-logo-text">
+                <div class="mkt-logo-main">PSE <span>Marketplace</span></div>
+                <div class="mkt-logo-sub">Wholesale <span class="verified-pill"><i class="fa-solid fa-circle-check"></i> Verified</span></div>
             </div>
         </a>
-        <div class="search-bar" id="searchBar">
-            <input type="text" id="searchInput" placeholder="Search wholesale products..." autocomplete="off" />
-            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+
+        <div class="mkt-search-wrapper" id="searchBar">
+            <form class="mkt-search-form" role="search" onsubmit="event.preventDefault();">
+                <select class="mkt-search-dept" id="searchDeptSelect" aria-label="Select Category">
+                    <option value="all">All Departments</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="computers">Computers &amp; Laptops</option>
+                    <option value="phones">Smartphones &amp; Tablets</option>
+                    <option value="fashion">Fashion &amp; Apparel</option>
+                    <option value="automotive">Automotive &amp; Fleet</option>
+                    <option value="home">Home &amp; Industrial</option>
+                    <option value="overstock">Liquidation Lots</option>
+                </select>
+                <input type="search" id="searchInput" class="mkt-search-input" placeholder="Search 10,000+ wholesale products, brands, ASINs, or verified suppliers..." autocomplete="off" aria-label="Search wholesale products" />
+                <button type="submit" id="searchBtn" class="mkt-search-btn" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </form>
             <div class="search-results" id="searchResults"></div>
         </div>
-        <div class="header-actions">
-            <a href="#" class="icon-btn" onclick="toggleWishlist()">
-                <i class="fa-regular fa-heart"></i>
-                <span>Wishlist</span>
-                <span class="badge-count wishlist-count">0</span>
+
+        <div class="mkt-header-actions">
+            <div class="mkt-account-dropdown">
+                <a href="/account" class="mkt-header-link" id="accountBtn" aria-label="Account and Lists">
+                    <span class="sub-line" id="accountGreeting">Hello, Sign in</span>
+                    <span class="main-line"><span id="accountLabel">Account &amp; Lists</span> <i class="fa-solid fa-caret-down" style="font-size:0.65rem;"></i></span>
+                </a>
+                <div class="mkt-account-flyout">
+                    <a href="/login" class="mkt-flyout-signin-btn" id="loginLink">Sign In</a>
+                    <div class="mkt-flyout-register" id="registerLink">New customer? <a href="/register">Start here.</a></div>
+                    <div class="mkt-flyout-menu">
+                        <a href="/account"><i class="fa-regular fa-user"></i> Your Account</a>
+                        <a href="/buyer-dashboard"><i class="fa-solid fa-box"></i> Your Orders &amp; Invoices</a>
+                        <a href="/rfq"><i class="fa-regular fa-file-lines"></i> Your RFQ Quotes</a>
+                        <a href="/wishlist"><i class="fa-regular fa-heart"></i> Your Saved Wishlist</a>
+                        <a href="/seller-dashboard"><i class="fa-solid fa-store"></i> Seller Central Hub</a>
+                        <a href="/help-center"><i class="fa-regular fa-circle-question"></i> Help &amp; Support</a>
+                    </div>
+                </div>
+            </div>
+
+            <a href="/buyer-dashboard" class="mkt-header-link" aria-label="Returns and Orders">
+                <span class="sub-line">Returns</span>
+                <span class="main-line">&amp; Orders</span>
             </a>
-            <a href="/cart" class="icon-btn">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span>Cart</span>
-                <span class="badge-count cart-count">0</span>
+
+            <a href="/rfq" class="mkt-header-link" aria-label="Bulk Quotes and RFQ">
+                <span class="sub-line">Wholesale</span>
+                <span class="main-line"><i class="fa-solid fa-file-invoice-dollar" style="color:var(--amz-amber);"></i> RFQ <span class="amz-rfq-badge rfq-count" style="background:var(--pse-teal);color:#fff;border-radius:10px;padding:1px 6px;font-size:0.7rem;margin-left:3px;">0</span></span>
             </a>
-            <a href="/account" class="icon-btn" id="accountBtn">
-                <i class="fa-regular fa-user"></i>
-                <span id="accountLabel">Account</span>
+
+            <a href="/cart" class="mkt-cart-btn" id="cartBtn" aria-label="Shopping Cart">
+                <div class="mkt-cart-icon-wrap">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="mkt-cart-badge cart-count" id="cartCount">0</span>
+                </div>
+                <div class="mkt-cart-label">
+                    <span>Cart</span>
+                    <strong>/bin/bash.00</strong>
+                </div>
             </a>
         </div>
     </div>
 </header>
 
-<!-- NAVIGATION -->
-<nav class="nav-categories">
+<!-- 3. SUBNAV / DEPARTMENT BAR -->
+<nav class="mkt-subnav" aria-label="Department Navigation">
     <div class="container">
-        <a href="/home"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="/products" class="active"><i class="fa-solid fa-box"></i> Products</a>
-        <a href="/about"><i class="fa-solid fa-info-circle"></i> About</a>
-        <a href="/contact"><i class="fa-solid fa-envelope"></i> Contact</a>
-        <a href="/help-center"><i class="fa-solid fa-circle-question"></i> Help</a>
-        <a href="/become-seller" class="wholesale-nav"><i class="fa-solid fa-store"></i> Sell</a>
+        <div class="mkt-subnav-links">
+            <button class="amz-all-menu-btn" data-open-drawer aria-label="Open All Departments Menu">
+                <i class="fa-solid fa-bars"></i>
+                <span>All Departments</span>
+            </button>
+            <a href="/products?filter=deals" class="mkt-subnav-link highlight"><i class="fa-solid fa-bolt"></i> Today's Deals</a>
+            <a href="/products?sort=bestsellers" class="mkt-subnav-link"><i class="fa-solid fa-fire"></i> Best Sellers</a>
+            <a href="/products?filter=rollback" class="mkt-subnav-link"><i class="fa-solid fa-tags"></i> Walmart Rollbacks</a>
+            <a href="/products?category=electronics" class="mkt-subnav-link">Electronics</a>
+            <a href="/products?category=computers" class="mkt-subnav-link">Computers &amp; Laptops</a>
+            <a href="/products?category=phones" class="mkt-subnav-link">Smartphones</a>
+            <a href="/products?category=fashion" class="mkt-subnav-link">Fashion &amp; Apparel</a>
+            <a href="/products?category=automotive" class="mkt-subnav-link">Automotive</a>
+            <a href="/supplier-store" class="mkt-subnav-link">Verified Suppliers</a>
+            <a href="/rfq" class="mkt-subnav-link">Bulk RFQ</a>
+            <a href="/help-center" class="mkt-subnav-link">Customer Service</a>
+        </div>
+        <div class="mkt-subnav-right">
+            <span><i class="fa-solid fa-truck-fast"></i> <strong>2-Day Fast Freight</strong> Guaranteed</span>
+        </div>
     </div>
 </nav>
 
@@ -323,27 +405,103 @@
 </div>
 
 <!-- FOOTER -->
-<footer class="footer">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-links">
-                <a href="/about">About</a>
-                <a href="/contact">Contact</a>
-                <a href="/help-center">Help</a>
-                <a href="/privacy">Privacy Policy</a>
-                <a href="/terms">Terms &amp; Conditions</a>
-                <a href="/become-seller">Become a Seller</a>
-                <a href="/supplier-verification">Supplier Verification</a>
-            </div>
-            <div class="footer-social">
-                <a href="#"><i class="fa-brands fa-facebook"></i></a>
-                <a href="#"><i class="fa-brands fa-twitter"></i></a>
-                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+<!-- AUTO-SCROLLING LOGO MARQUEE -->
+<section class="marketplace-logo-marquee-section" aria-labelledby="marqueeTitle">
+    <div class="mkt-marquee-header">
+        <div class="mkt-marquee-kicker"><i class="fa-solid fa-certificate"></i> Verified Global Network</div>
+        <h2 class="mkt-marquee-title" id="marqueeTitle">Trusted Marketplace Partners &amp; Direct Wholesale Brands</h2>
+        <p class="mkt-marquee-desc">Verified B2B wholesale distribution network. Sourced from authorized suppliers, enterprise liquidators, and top marketplace leaders.</p>
+    </div>
+    <div class="marketplace-logo-marquee-container" data-auto-scroll-logos>
+        <div class="marketplace-logo-marquee-track"></div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="mkt-footer">
+    <a href="#" class="amz-back-to-top" id="backToTopBtn">Back to top</a>
+    <div class="mkt-footer-nav">
+        <div class="container">
+            <div class="mkt-footer-grid">
+                <div class="mkt-footer-col">
+                    <h4>Get to Know Us</h4>
+                    <ul>
+                        <li><a href="/about">About PSE Distribution</a></li>
+                        <li><a href="/about">Leadership &amp; Careers</a></li>
+                        <li><a href="/supplier-verification">Verified Supplier Standards</a></li>
+                        <li><a href="/catalogs">Wholesale Line Sheets</a></li>
+                        <li><a href="/verify">Authenticity Guarantee</a></li>
+                    </ul>
+                </div>
+                <div class="mkt-footer-col">
+                    <h4>Make Money with Us</h4>
+                    <ul>
+                        <li><a href="/become-seller">Sell on PSE Marketplace</a></li>
+                        <li><a href="/inventory-upload">Upload Bulk Inventory</a></li>
+                        <li><a href="/seller-dashboard">Seller Central Hub</a></li>
+                        <li><a href="/become-seller">Fulfillment &amp; Pallet Warehousing</a></li>
+                        <li><a href="/supplier-store">Supplier Storefronts</a></li>
+                    </ul>
+                </div>
+                <div class="mkt-footer-col">
+                    <h4>Payment &amp; Financing</h4>
+                    <ul>
+                        <li><a href="/rfq">PSE Corporate Net-30 Terms</a></li>
+                        <li><a href="/checkout">100% Escrow Buyer Protection</a></li>
+                        <li><a href="/account">Wholesale Credit Lines</a></li>
+                        <li><a href="/checkout">Wire Transfer &amp; Card Payments</a></li>
+                        <li><a href="/help-center">Tax-Exempt Purchasing</a></li>
+                    </ul>
+                </div>
+                <div class="mkt-footer-col">
+                    <h4>Let Us Help You</h4>
+                    <ul>
+                        <li><a href="/account">Your Account</a></li>
+                        <li><a href="/buyer-dashboard">Your Orders &amp; Invoices</a></li>
+                        <li><a href="/track-order">Shipping Rates &amp; LTL Freight</a></li>
+                        <li><a href="/rfq">Request a Custom Quote (RFQ)</a></li>
+                        <li><a href="/help-center">Help Center &amp; Disputes</a></li>
+                        <li><a href="/contact">24/7 B2B Concierge</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
-        <div class="footer-bottom">
-            &copy; <span id="year"></span> <strong>Pilot Sales Distribution</strong>. All rights reserved.
+    </div>
+    
+    <div class="mkt-footer-middle">
+        <div class="container">
+            <a href="/" class="mkt-logo" style="margin:0 auto 0 0;">
+                <img src="/logo.webp" alt="PSE Distribution" style="height:32px;" />
+                <div class="mkt-logo-text">
+                    <div class="mkt-logo-main" style="font-size:1.05rem;">PSE <span>Marketplace</span></div>
+                </div>
+            </a>
+            <div style="display:flex;gap:1.5rem;align-items:center;">
+                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;"><i class="fa-solid fa-globe"></i> English (US)</span>
+                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;">$ USD - U.S. Dollar</span>
+                <span style="border:1px solid #565959;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.78rem;">🇺🇸 United States</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="mkt-footer-bottom">
+        <div class="container">
+            <div class="mkt-footer-links">
+                <a href="/terms">Conditions of Use</a>
+                <a href="/privacy">Privacy Notice</a>
+                <a href="/terms">Consumer Health Data</a>
+                <a href="/terms">Your Ads Privacy Choices</a>
+                <a href="/become-seller">Seller Terms</a>
+            </div>
+            <p>&copy; 2026 Pilot Sales Distribution, Inc. or its affiliates. All rights reserved. Amazon, Walmart, Target, Apple, and other trademarks are the property of their respective owners.</p>
+            
+            <div class="mkt-payment-row">
+                <div class="mkt-payment-badge"><img src="/visa.svg" alt="Visa" /></div>
+                <div class="mkt-payment-badge"><img src="/mastercard.svg" alt="Mastercard" /></div>
+                <div class="mkt-payment-badge"><img src="/paypal.svg" alt="PayPal" /></div>
+                <div class="mkt-payment-badge"><span style="font-weight:900;font-size:0.7rem;color:#0071dc;">ESCROW 100%</span></div>
+                <div class="mkt-payment-badge"><span style="font-weight:900;font-size:0.7rem;color:#0e7c68;"><i class="fa-solid fa-lock"></i> 256-BIT SSL</span></div>
+            </div>
         </div>
     </div>
 </footer>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 60" width="140" height="60">
+  <circle cx="30" cy="30" r="26" fill="#0096D6"/>
+  <text x="16" y="40" font-family="'Segoe UI', Arial, sans-serif" font-size="28" font-style="italic" font-weight="bold" fill="#ffffff">hp</text>
+  <text x="70" y="39" font-family="'Segoe UI', Arial, sans-serif" font-size="24" font-weight="bold" fill="#0096D6">HP Inc.</text>
+</svg>
