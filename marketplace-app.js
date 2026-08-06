@@ -163,30 +163,66 @@
     }
 
     /* ─── LIVE CART & BADGE SYNC ────────────────────────────────────────── */
+    // Robust badge sync that handles both legacy `id` and `product_id` shapes
+    // and keeps local cart compatible with main.js Firestore cart helpers.
     window.syncCartCount = function () {
         var cart = lsGet('pilot_cart', []);
-        var count = cart.reduce(function (sum, item) { return sum + (item.quantity || 1); }, 0);
+        var count = 0;
+        for (var i = 0; i < cart.length; i++) {
+            var it = cart[i];
+            if (!it || typeof it !== 'object') continue;
+            count += Number(it.quantity || 1) || 0;
+        }
         document.querySelectorAll('.cart-count, #cartCount').forEach(function (el) {
             el.textContent = count;
+            // app-badge should stay visible even at 0 for layout; legacy badges hide at 0
+            if (el.classList && el.classList.contains('cart-count') && !el.classList.contains('app-badge')) {
+                el.style.display = count > 0 ? 'inline' : 'none';
+            }
         });
+        try { window.dispatchEvent(new CustomEvent('pse_cart_updated', { detail: { count: count } })); } catch (e) {}
+        // also let main.js know if it is loaded
+        if (window.updateCartUI && window.updateCartUI !== window.syncCartCount) {
+            try { /* main.js handles Firestore sync separately */ } catch(e) {}
+        }
     };
 
     window.handleAddToCart = function (id, title, price, img) {
+        if (!id) { window.pseToast('Unable to add this product — missing ID', 'error'); return; }
+        var pid = String(id);
+        var cleanImg = (typeof pseCleanProductImage === 'function') ? pseCleanProductImage(img || '/product-placeholder.svg') : (img || '/product-placeholder.svg');
         var cart = lsGet('pilot_cart', []);
-        var existing = cart.find(function (item) { return String(item.id) === String(id); });
+        var existing = null;
+        for (var i = 0; i < cart.length; i++) {
+            var cand = cart[i];
+            if (!cand) continue;
+            var candId = String(cand.product_id || cand.id || cand.productId || '');
+            if (candId === pid) { existing = cand; break; }
+        }
         if (existing) {
-            existing.quantity = (existing.quantity || 1) + 1;
+            existing.quantity = (Number(existing.quantity) || 1) + 1;
+            // keep images normalized (in case older entry had broken logo)
+            if (cleanImg && cleanImg !== '/product-placeholder.svg') {
+                existing.image = cleanImg;
+                existing.image_url = cleanImg;
+            }
         } else {
             cart.push({
-                id: String(id),
+                id: pid,
+                product_id: pid,
+                productId: pid,
                 title: String(title || 'Wholesale Product'),
+                name: String(title || 'Wholesale Product'),
                 price: Number(price) || 0,
-                image: img || '/product-placeholder.svg',
+                image: cleanImg,
+                image_url: cleanImg,
                 quantity: 1
             });
         }
         lsSet('pilot_cart', cart);
+        try { localStorage.setItem('pilot_cart_ts', String(Date.now())); } catch(e) {}
         window.syncCartCount();
+        if (window.updateCartUI) { try { window.updateCartUI(); } catch(e) {} }
         window.pseToast('🛒 Added to Cart!', 'success');
     };
 

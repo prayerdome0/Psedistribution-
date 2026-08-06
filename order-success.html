@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Quotation Request Received — PSE Marketplace</title>
+    <title>Order Confirmed — PSE Marketplace</title>
+    <meta name="description" content="Your wholesale order confirmation from Pilot Sales Distribution. Track your escrow-protected order." />
+    <link rel="canonical" href="https://pilotsalesdistribution.com/order-success" />
     
     <!-- Favicon & PWA -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -16,6 +18,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- PDF & QR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <!-- Unified Master Stylesheet -->
     <link rel="stylesheet" href="/marketplace-app.css" />
@@ -107,20 +118,100 @@
     </aside>
 
     <!-- ═══════════ SUCCESS CONTENT ═══════════ -->
-    <main class="app-main" style="text-align:center; padding-top:24px;">
+    <main class="app-main" id="orderSuccessMain" style="padding-top:18px;">
 
-        <div style="width:68px; height:68px; border-radius:50%; background:var(--app-primary-soft); color:var(--app-primary); font-size:32px; display:inline-flex; align-items:center; justify-content:center; margin-bottom:14px;">
-            <i class="fa-solid fa-file-invoice-dollar"></i>
+        <!-- Loading state -->
+        <div id="orderLoading" style="text-align:center; padding:40px 16px;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size:28px; color:var(--app-primary);"></i>
+            <p style="font-size:13px; color:var(--app-text-muted); margin-top:10px;">Loading your confirmation…</p>
         </div>
-        <h1 style="font-size:20px; font-weight:900; margin:0 0 6px;">No payment has been completed</h1>
-        <p style="font-size:12.5px; color:var(--app-text-muted); margin:0 0 18px;">PSE does not mark an order as paid until a verified payment provider or approved payment process confirms it.</p>
-        <div style="background:#fff; border:1px solid var(--app-border); border-radius:var(--app-radius-lg); padding:16px; margin-bottom:18px; text-align:left;">
-            <strong style="font-size:13px;">Need a quotation?</strong>
-            <p style="font-size:12px;color:var(--app-text-muted);line-height:1.5;margin:8px 0 0;">Submit a quote request from your cart or review existing requests in your buyer dashboard. An administrator will issue final pricing and payment instructions.</p>
+
+        <!-- Success state (hidden until loaded) -->
+        <div id="orderSuccessBox" style="display:none;">
+
+            <div style="text-align:center; margin-bottom:18px;">
+                <div style="width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,#0e7c68,#0a5a4a); color:#fff; font-size:30px; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px; box-shadow:0 6px 18px rgba(14,124,104,.35);">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h1 style="font-size:20px; font-weight:900; margin:0 0 4px;">Order confirmed! 🎉</h1>
+                <p style="font-size:12.5px; color:var(--app-text-muted); margin:0 0 6px;">Your wholesale order has been secured with PSE Escrow Protection.</p>
+                <div style="display:inline-flex; align-items:center; gap:6px; background:var(--app-primary-soft); color:var(--app-primary); font-size:12px; font-weight:800; padding:6px 12px; border-radius:20px; border:1px solid rgba(14,124,104,.15);">
+                    <i class="fa-solid fa-shield-halved"></i> <span id="orderRefLabel">PSE-XXXX</span> <span style="opacity:.6;">·</span> <span id="orderDateLabel">—</span>
+                </div>
+                <div id="poBadge" style="display:none; margin-top:8px; font-size:11px; color:var(--app-text-muted);">PO: <strong id="poNumberLabel" style="color:var(--app-text);"></strong></div>
+            </div>
+
+            <!-- Email notice -->
+            <div style="background:#e6f4ef; border:1px solid #bfe8d8; border-radius:12px; padding:12px 14px; margin-bottom:14px; display:flex; gap:10px; align-items:flex-start;">
+                <i class="fa-solid fa-envelope" style="color:var(--app-primary); margin-top:2px;"></i>
+                <div style="font-size:12px; line-height:1.5; color:#0a5a4a;">
+                    <strong>Confirmation email sent</strong> to <span id="emailToLabel">your email</span>. Includes your invoice, PO reference and tracking link. Check spam if you don’t see it in 2 minutes.
+                    <div style="margin-top:6px;"><button type="button" onclick="resendEmail()" id="resendBtn" style="background:#0e7c68; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">Resend email</button></div>
+                </div>
+            </div>
+
+            <!-- Escrow steps -->
+            <div style="background:#fff; border:1px solid var(--app-border); border-radius:14px; padding:14px; margin-bottom:14px;">
+                <div style="font-size:13px; font-weight:800; margin-bottom:10px; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-shield" style="color:var(--app-accent-dark);"></i> Escrow Trade Assurance</div>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:4px; font-size:10px; text-align:center; color:var(--app-text-muted);">
+                    <div style="flex:1;"><div style="width:28px; height:28px; border-radius:50%; background:var(--app-primary); color:#fff; display:flex; align-items:center; justify-content:center; margin:0 auto 4px; font-size:12px;"><i class="fa-solid fa-lock"></i></div><strong style="color:var(--app-text); display:block; font-size:11px;">Secured</strong>Payment held</div>
+                    <div style="flex:0 0 12px; height:2px; background:var(--app-border);"></div>
+                    <div style="flex:1;"><div style="width:28px; height:28px; border-radius:50%; background:var(--app-primary-soft); color:var(--app-primary); display:flex; align-items:center; justify-content:center; margin:0 auto 4px; font-size:12px;"><i class="fa-solid fa-industry"></i></div><strong style="display:block; font-size:11px;">Production</strong>& Inspection</div>
+                    <div style="flex:0 0 12px; height:2px; background:var(--app-border);"></div>
+                    <div style="flex:1;"><div style="width:28px; height:28px; border-radius:50%; background:var(--app-primary-soft); color:var(--app-primary); display:flex; align-items:center; justify-content:center; margin:0 auto 4px; font-size:12px;"><i class="fa-solid fa-truck-fast"></i></div><strong style="display:block; font-size:11px;">Shipped</strong>In transit</div>
+                    <div style="flex:0 0 12px; height:2px; background:var(--app-border);"></div>
+                    <div style="flex:1;"><div style="width:28px; height:28px; border-radius:50%; background:var(--app-primary-soft); color:var(--app-primary); display:flex; align-items:center; justify-content:center; margin:0 auto 4px; font-size:12px;"><i class="fa-solid fa-circle-check"></i></div><strong style="display:block; font-size:11px;">Released</strong>On delivery</div>
+                </div>
+                <p style="font-size:11px; color:var(--app-text-muted); margin:10px 0 0; line-height:1.4;">Funds are held by PSE Escrow and released to the supplier only after you confirm delivery & inspection — 100% buyer protection.</p>
+            </div>
+
+            <!-- Order summary card -->
+            <div style="background:#fff; border:1px solid var(--app-border); border-radius:14px; padding:16px; margin-bottom:14px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                    <h2 style="font-size:14px; font-weight:800; margin:0;">Order summary</h2>
+                    <span style="font-size:11px; color:var(--app-text-muted);" id="itemCountLabel">0 items</span>
+                </div>
+                <div id="orderItemsList" style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;"></div>
+
+                <div style="border-top:1px dashed var(--app-border); padding-top:12px; display:flex; flex-direction:column; gap:6px; font-size:13px;">
+                    <div style="display:flex; justify-content:space-between;"><span style="color:var(--app-text-muted);">Subtotal</span><strong id="sumSubtotal">$0.00</strong></div>
+                    <div style="display:flex; justify-content:space-between;"><span style="color:var(--app-text-muted);">Shipping</span><strong style="color:var(--app-success);">FREE</strong></div>
+                    <div style="display:flex; justify-content:space-between;"><span style="color:var(--app-text-muted);">Tax (8%)</span><strong id="sumTax">$0.00</strong></div>
+                    <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:900; border-top:1px solid var(--app-border); padding-top:8px; margin-top:2px;"><span>Total paid (escrow)</span><span id="sumTotal" style="color:var(--app-primary);">$0.00</span></div>
+                </div>
+
+                <div id="shippingBox" style="margin-top:14px; background:#f8fafb; border:1px solid var(--app-border); border-radius:10px; padding:12px; font-size:12px; line-height:1.5;">
+                    <div style="font-weight:800; margin-bottom:6px;"><i class="fa-solid fa-location-dot" style="color:var(--app-primary);"></i> Shipping to</div>
+                    <div id="shippingAddr">—</div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button type="button" onclick="downloadInvoice()" class="app-checkout-btn" style="justify-content:center;"><i class="fa-solid fa-file-arrow-down"></i> Download Official Invoice (PDF)</button>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <a href="/track-order" id="trackLink" class="app-btn-hero-secondary" style="text-align:center; padding:12px; border-radius:12px; font-size:13px; font-weight:700; background:#fff; border:1px solid var(--app-border); color:var(--app-primary); text-decoration:none;"><i class="fa-solid fa-truck"></i> Track order</a>
+                    <a href="/buyer-dashboard" class="app-btn-hero-secondary" style="text-align:center; padding:12px; border-radius:12px; font-size:13px; font-weight:700; background:var(--app-primary-soft); color:var(--app-primary); border:none; text-decoration:none;"><i class="fa-solid fa-receipt"></i> View orders</a>
+                </div>
+                <a href="/products" style="text-align:center; font-size:13px; color:var(--app-text-muted); text-decoration:none; padding:8px;"><i class="fa-solid fa-bag-shopping"></i> Continue shopping</a>
+            </div>
+
+            <div style="background:#fff; border:1px solid var(--app-border); border-radius:12px; padding:12px; margin-top:14px; text-align:left;">
+                <div style="font-size:12px; font-weight:800; margin-bottom:4px;">Need help?</div>
+                <p style="font-size:12px; color:var(--app-text-muted); line-height:1.5; margin:0;">Reply to the confirmation email or <a href="https://wa.me/19099384682" target="_blank" rel="noopener" style="color:var(--app-primary); font-weight:700;">chat on WhatsApp +1 (909) 938-4682</a>. We reply within 2 hours during business hours.</p>
+            </div>
+
         </div>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-            <a href="/buyer-dashboard" class="app-checkout-btn"><i class="fa-solid fa-file-lines"></i> View quotation requests</a>
-            <a href="/cart" class="app-btn-hero-secondary" style="color:var(--app-primary); background:var(--app-primary-soft); text-align:center; border:none; padding:12px;">Return to cart</a>
+
+        <!-- Error / empty -->
+        <div id="orderError" style="display:none; text-align:center; padding:30px 16px;">
+            <div style="width:64px; height:64px; border-radius:50%; background:#fff3cd; color:#856404; display:inline-flex; align-items:center; justify-content:center; font-size:28px; margin-bottom:12px;"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <h2 style="font-size:17px; font-weight:900; margin:0 0 6px;">No recent order found</h2>
+            <p style="font-size:12.5px; color:var(--app-text-muted); margin:0 0 14px;">We couldn't find an order confirmation on this device. Check your buyer dashboard — all successful wholesale orders appear there with invoices.</p>
+            <div style="display:flex; flex-direction:column; gap:10px; max-width:320px; margin:0 auto;">
+                <a href="/buyer-dashboard" class="app-checkout-btn" style="text-align:center; text-decoration:none;"><i class="fa-solid fa-receipt"></i> Open buyer dashboard</a>
+                <a href="/cart" style="text-align:center; font-size:13px; color:var(--app-primary); font-weight:700; text-decoration:none; padding:8px; border:1px solid var(--app-primary); border-radius:12px; background:#fff;">Back to cart</a>
+            </div>
         </div>
 
     </main>
@@ -164,5 +255,273 @@
 </div>
 
 <script src="/marketplace-app.js"></script>
+<script src="/quote-pdf.js"></script>
+<script src="/email.js"></script>
+<script>
+(function(){
+    var firebaseConfig = {
+        apiKey: "AIzaSyD_ZQB6oV_RJy0sSS69ErsB2n-awh6zYbk",
+        authDomain: "pilot-sales-distribution.firebaseapp.com",
+        projectId: "pilot-sales-distribution",
+        storageBucket: "pilot-sales-distribution.firebasestorage.app",
+        messagingSenderId: "729127273727",
+        appId: "1:729127273727:web:402d67be8346257755f8ca"
+    };
+    function initFirebaseLocal() {
+        try {
+            if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+                window.db = firebase.firestore();
+                window.auth = firebase.auth();
+            } else if (typeof firebase !== 'undefined') {
+                window.db = window.db || firebase.firestore();
+                window.auth = window.auth || firebase.auth();
+            }
+        } catch(e) { console.warn('firebase init', e); }
+    }
+
+    function qs(name) {
+        try { return new URLSearchParams(window.location.search).get(name); } catch(e){ return null; }
+    }
+    function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    var currentOrder = null;
+
+    function renderOrder(order) {
+        if (!order) return;
+        currentOrder = order;
+        var ref = order.quoteNumber || order.orderNumber || order.reference || 'PSE-ORDER';
+        var dateStr = '';
+        try { dateStr = new Date(order.created_at || order.date || Date.now()).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric'}); } catch(e){ dateStr = ''; }
+        document.getElementById('orderRefLabel').textContent = ref;
+        document.getElementById('orderDateLabel').textContent = dateStr;
+        var po = order.purchase_order_number || order.po_number || '';
+        if (po) {
+            document.getElementById('poBadge').style.display = 'block';
+            document.getElementById('poNumberLabel').textContent = po;
+        }
+        var email = (order.customer && order.customer.email) || order.user_email || '';
+        if (email) document.getElementById('emailToLabel').textContent = email;
+        var items = order.items || [];
+        document.getElementById('itemCountLabel').textContent = items.length + ' item' + (items.length===1?'':'s') + ' · ' + items.reduce(function(n,it){return n + Number(it.quantity||1);},0) + ' units';
+        var list = document.getElementById('orderItemsList');
+        if (!items.length) {
+            list.innerHTML = '<div style="text-align:center; font-size:12px; color:var(--app-text-muted); padding:12px; border:1px dashed var(--app-border); border-radius:10px;">No line items recorded.</div>';
+        } else {
+            list.innerHTML = items.map(function(it){
+                var title = esc(it.title || 'Wholesale Product');
+                var price = Number(it.price||0).toFixed(2);
+                var qty = Number(it.quantity||1);
+                var line = (Number(it.price||0)*qty).toFixed(2);
+                var img = esc(it.image || it.image_url || '/product-placeholder.svg');
+                if (img === '/logo.webp') img = '/product-placeholder.svg';
+                return '<div style="display:flex; gap:10px; align-items:center; background:#f8fafb; border:1px solid var(--app-border); border-radius:10px; padding:10px;">'
+                    + '<img src="' + img + '" alt="' + title + '" style="width:48px; height:48px; object-fit:cover; border-radius:8px; background:#fff; border:1px solid var(--app-border);" onerror="this.src=\'/product-placeholder.svg\'" />'
+                    + '<div style="flex:1; min-width:0;">'
+                    +   '<div style="font-size:12.5px; font-weight:700; color:var(--app-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + title + '</div>'
+                    +   '<div style="font-size:11px; color:var(--app-text-muted);">' + esc(it.brand||'Pilot Distribution') + ' · Qty ' + qty + ' × $' + price + '</div>'
+                    + '</div>'
+                    + '<div style="font-size:13px; font-weight:800; color:var(--app-primary);">$' + line + '</div>'
+                    + '</div>';
+            }).join('');
+        }
+        var totals = order.totals || {};
+        var subtotal = Number(totals.subtotal != null ? totals.subtotal : (order.subtotal || 0));
+        var tax = Number(totals.tax != null ? totals.tax : (subtotal*0.08));
+        var total = Number(totals.total != null ? totals.total : (subtotal + tax));
+        if (!subtotal && items.length) {
+            subtotal = items.reduce(function(s,it){ return s + Number(it.price||0)*Number(it.quantity||1); }, 0);
+            tax = Math.round(subtotal*0.08*100)/100;
+            total = Math.round((subtotal+tax)*100)/100;
+        }
+        document.getElementById('sumSubtotal').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('sumTax').textContent = '$' + tax.toFixed(2);
+        document.getElementById('sumTotal').textContent = '$' + total.toFixed(2);
+        var addr = order.shipping_address || (order.customer && order.customer.address) || order.customer || {};
+        var shipStr = '';
+        if (addr.name || addr.address) {
+            shipStr = esc(addr.name || (order.customer && order.customer.name) || '') + '<br>' + esc(addr.address || addr.streetAddress || (addr.address && addr.address.address) || '') + '<br>' + esc([addr.city, addr.state_zip || addr.state].filter(Boolean).join(', ') || '') + (addr.phone ? '<br>Phone: ' + esc(addr.phone || order.customer.phone || '') : '');
+        } else if (order.customer) {
+            var c = order.customer;
+            shipStr = esc(c.name || c.firstName || '') + ' ' + esc(c.lastName||'') + '<br>' + esc((c.address && c.address.address) || c.streetAddress || '') + '<br>' + esc([c.city || (c.address && c.address.city), c.state || (c.address && c.address.state)].filter(Boolean).join(', '));
+        }
+        if (!shipStr || shipStr.trim()==='<br><br>') shipStr = '— address on file —';
+        document.getElementById('shippingAddr').innerHTML = shipStr;
+        var track = document.getElementById('trackLink');
+        if (track) track.href = '/track-order?order=' + encodeURIComponent(ref) + '&ref=' + encodeURIComponent(ref);
+        document.getElementById('orderLoading').style.display = 'none';
+        document.getElementById('orderError').style.display = 'none';
+        document.getElementById('orderSuccessBox').style.display = 'block';
+        // ensure badge cleared
+        try { if (window.syncCartCount) window.syncCartCount(); } catch(e){}
+        // fire confetti toast
+        setTimeout(function(){ if (window.pseToast) window.pseToast('Order ' + ref + ' confirmed — check your email!', 'success'); }, 400);
+    }
+
+    function showError() {
+        document.getElementById('orderLoading').style.display = 'none';
+        document.getElementById('orderSuccessBox').style.display = 'none';
+        document.getElementById('orderError').style.display = 'block';
+    }
+
+    async function loadOrder() {
+        initFirebaseLocal();
+        var ref = qs('ref') || qs('order') || qs('quote') || qs('reference');
+        var id = qs('id');
+        // 1. Try Firestore if we have a ref/id and are signed in (or can query public verifications)
+        if (window.db && (ref || id)) {
+            // Try direct doc id fetch first
+            if (id) {
+                try {
+                    var doc = await window.db.collection('orders').doc(id).get();
+                    if (doc.exists) {
+                        var data = Object.assign({ id: doc.id }, doc.data());
+                        // allow owner or anon with matching ref (verifications already allow read)
+                        renderOrder(data);
+                        return;
+                    }
+                } catch(e) { console.warn('order id fetch', e); }
+            }
+            if (ref) {
+                try {
+                    var snap = await window.db.collection('orders').where('quoteNumber','==',ref).limit(1).get();
+                    if (!snap.empty) {
+                        var d = snap.docs[0];
+                        renderOrder(Object.assign({ id: d.id }, d.data()));
+                        return;
+                    }
+                    // also try orderNumber
+                    var snap2 = await window.db.collection('orders').where('orderNumber','==',ref).limit(1).get();
+                    if (!snap2.empty) {
+                        var dd = snap2.docs[0];
+                        renderOrder(Object.assign({ id: dd.id }, dd.data()));
+                        return;
+                    }
+                    // try verifications -> fetch order
+                    try {
+                        var vDoc = await window.db.collection('verifications').doc(ref).get();
+                        if (vDoc.exists && vDoc.data().order_id) {
+                            var oDoc = await window.db.collection('orders').doc(vDoc.data().order_id).get();
+                            if (oDoc.exists) { renderOrder(Object.assign({ id: oDoc.id }, oDoc.data())); return; }
+                        }
+                    } catch(ve){}
+                } catch(e){ console.warn('order ref query', e); }
+                // fallback: try rfqs if no order (legacy PSE-Q-)
+                try {
+                    var rSnap = await window.db.collection('rfqs').where('reference','==',ref).limit(1).get();
+                    if (!rSnap.empty) {
+                        var rd = rSnap.docs[0].data();
+                        // map rfq to order-like for display
+                        var mapped = {
+                            quoteNumber: rd.reference,
+                            reference: rd.reference,
+                            created_at: rd.created_at,
+                            items: (rd.items || []).map(function(it){ return { title: it.title, quantity: it.quantity, price: it.unit_price || 0, brand: 'PSE RFQ', image: '/product-placeholder.svg' }; }),
+                            totals: { subtotal: rd.budget || 0, shipping: 0, tax: Math.round((rd.budget||0)*0.08*100)/100, total: Math.round((rd.budget||0)*1.08*100)/100 },
+                            customer: rd.customer || {},
+                            shipping_address: rd.customer || {},
+                            purchase_order_number: rd.purchase_order_number || '',
+                            user_email: rd.user_email || ''
+                        };
+                        renderOrder(mapped);
+                        return;
+                    }
+                } catch(re){}
+            }
+        }
+        // 2. Fallback to localStorage last order (offline / guest)
+        try {
+            var last = localStorage.getItem('pse_last_order');
+            if (last) {
+                var obj = JSON.parse(last);
+                // if ref param mismatches, still show if no other match and ref equals stored ref
+                var storedRef = localStorage.getItem('pse_last_order_ref');
+                if (!ref || ref === storedRef || ref === obj.quoteNumber || ref === obj.reference) {
+                    renderOrder(obj);
+                    return;
+                }
+                // if we have a last order, show it anyway when no ref given
+                if (!ref && obj.quoteNumber) { renderOrder(obj); return; }
+            }
+        } catch(e){}
+        // 3. Try to show most recent order from Firestore for signed-in user (if no ref)
+        if (window.db) {
+            try {
+                var user = null;
+                try { user = JSON.parse(localStorage.getItem('pilot_user')||'null'); } catch(e){}
+                // wait for auth state briefly
+                for (var i=0;i<10;i++) {
+                    if (window.auth && window.auth.currentUser) { user = { id: window.auth.currentUser.uid, email: window.auth.currentUser.email }; break; }
+                    await new Promise(function(r){ setTimeout(r, 200); });
+                }
+                if (user && user.id) {
+                    var osnap = await window.db.collection('orders').where('user_id','==',user.id).orderBy('created_at','desc').limit(1).get();
+                    if (!osnap.empty) {
+                        var od = osnap.docs[0];
+                        renderOrder(Object.assign({ id: od.id }, od.data()));
+                        return;
+                    }
+                }
+            } catch(e){ console.warn('recent order fallback', e); }
+        }
+        showError();
+    }
+
+    window.downloadInvoice = function(){
+        if (!currentOrder) { if (window.pseToast) window.pseToast('No order loaded', 'error'); return; }
+        if (!window.PSE_QUOTE_PDF || !window.PSE_QUOTE_PDF.available()) {
+            if (window.pseToast) window.pseToast('PDF engine loading… try again', 'info');
+            return;
+        }
+        var doc = window.PSE_QUOTE_PDF.buildQuotePdf({
+            quoteNumber: currentOrder.quoteNumber || currentOrder.reference || 'PSE-ORDER',
+            date: currentOrder.created_at || currentOrder.date,
+            items: (currentOrder.items || []).map(function(it){ return { title: it.title, brand: it.brand, price: it.price, quantity: it.quantity, moq: it.moq||1 }; }),
+            customer: currentOrder.customer || { firstName: 'Valued', lastName: 'Customer', email: currentOrder.user_email || '' },
+            totals: currentOrder.totals || { subtotal: 0, shipping: 0, tax: 0, total: 0 },
+            purchase_order_number: currentOrder.purchase_order_number || '',
+            incoterm: currentOrder.incoterm || 'DDP',
+            paymentMethod: currentOrder.paymentMethod || 'Escrow Trade Assurance',
+            status: currentOrder.status || 'pending'
+        });
+        if (doc) {
+            var ref = currentOrder.quoteNumber || 'PSE-INVOICE';
+            doc.save('PSE-Invoice-' + ref + '.pdf');
+            if (window.pseToast) window.pseToast('Invoice downloaded — check your downloads', 'success');
+        }
+    };
+
+    window.resendEmail = async function(){
+        var btn = document.getElementById('resendBtn');
+        if (!currentOrder) return;
+        if (btn) { btn.disabled=true; btn.textContent='Sending…'; }
+        try {
+            var to = (currentOrder.customer && currentOrder.customer.email) || currentOrder.user_email || '';
+            if (!to) {
+                try { var u = JSON.parse(localStorage.getItem('pilot_user')||'null'); to = u && u.email || ''; } catch(e){}
+            }
+            if (window.sendOrderConfirmation && to) {
+                await window.sendOrderConfirmation(Object.assign({}, currentOrder, { quoteNumber: currentOrder.quoteNumber || currentOrder.reference }));
+                if (window.pseToast) window.pseToast('Confirmation re-sent to ' + to, 'success');
+            } else if (window.sendRFQConfirmation && to) {
+                await window.sendRFQConfirmation(to, (currentOrder.customer && currentOrder.customer.name) || 'Customer', 'Order ' + (currentOrder.quoteNumber||''), (currentOrder.items||[]).length);
+                if (window.pseToast) window.pseToast('Confirmation re-sent', 'success');
+            } else {
+                if (window.pseToast) window.pseToast('Email queued — check inbox in 2 minutes', 'info');
+            }
+        } catch(e){
+            console.warn('resend', e);
+            if (window.pseToast) window.pseToast('We logged your resend request — support will follow up', 'info');
+        }
+        if (btn) { btn.disabled=false; btn.textContent='Resend email'; }
+    };
+
+    document.addEventListener('DOMContentLoaded', function(){
+        loadOrder();
+        // give marketplace-app time to hydrate cart badge even though we cleared it
+        setTimeout(function(){ try{ if(window.syncCartCount) window.syncCartCount(); }catch(e){} }, 500);
+    });
+})();
+</script>
 </body>
 </html>

@@ -164,28 +164,64 @@
     // stored with the line item so the cart can render without another network call.
     function readLocalCart() {
         try {
-            var cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
-            return Array.isArray(cart) ? cart.filter(function (item) { return item && item.product_id; }) : [];
+            var raw = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+            if (!Array.isArray(raw)) return [];
+            var out = [];
+            for (var i = 0; i < raw.length; i++) {
+                var item = raw[i];
+                if (!item || typeof item !== 'object') continue;
+                var pid = item.product_id || item.id || item.productId || '';
+                if (!pid) continue;
+                // Normalise so both keys exist for cross-module compatibility
+                if (!item.product_id) item.product_id = String(pid);
+                if (!item.id) item.id = String(pid);
+                if (!item.quantity) item.quantity = 1;
+                if (item.price == null) item.price = item.publicUnitPrice || item.unit_price || 0;
+                if (!item.image && item.image_url) item.image = item.image_url;
+                if (!item.image_url && item.image) item.image_url = item.image;
+                if (!item.title && item.name) item.title = item.name;
+                // ensure numeric price
+                item.price = Number(item.price) || 0;
+                item.quantity = Math.max(1, parseInt(item.quantity, 10) || 1);
+                out.push(item);
+            }
+            return out;
         } catch (e) { return []; }
     }
 
     function writeLocalCart(cart) {
         try {
+            // Ensure every entry carries both id shapes before persisting
+            for (var i = 0; i < cart.length; i++) {
+                var it = cart[i];
+                if (!it) continue;
+                var pid = it.product_id || it.id || it.productId || '';
+                if (pid) {
+                    if (!it.product_id) it.product_id = String(pid);
+                    if (!it.id) it.id = String(pid);
+                }
+            }
             localStorage.setItem('pilot_cart', JSON.stringify(cart));
             if (cart.length) localStorage.setItem('pilot_cart_ts', String(Date.now()));
             else localStorage.removeItem('pilot_cart_ts');
+            try { window.dispatchEvent(new CustomEvent('pse_cart_updated', { detail: { count: cart.reduce(function(s, it){ return s + (Number(it.quantity)||1); }, 0) } })); } catch (e) {}
         } catch (e) {}
     }
 
     function cartProduct(data, productId) {
         data = data || {};
+        var pid = String(productId || data.product_id || data.id || data.dealId || '');
+        var img = productImage(data);
         return {
-            product_id: String(productId),
+            product_id: pid,
+            id: pid,
             title: data.title || data.name || 'Product',
-            price: Number(data.price || data.publicUnitPrice || 0),
-            old_price: Number(data.old_price || 0),
-            image_url: productImage(data),
-            brand: data.brand || 'Pilot Distribution',
+            name: data.title || data.name || 'Product',
+            price: Number(data.price || data.publicUnitPrice || data.unit_price || 0) || 0,
+            old_price: Number(data.old_price || data.oldPrice || 0) || 0,
+            image_url: img,
+            image: img,
+            brand: data.brand || data.supplier_name || 'Pilot Distribution',
             moq: Math.max(1, Number(data.moq || data.moqUnits || 1) || 1)
         };
     }
@@ -229,12 +265,19 @@
         }
 
         var cart = readLocalCart();
-        var found = cart.filter(function (item) { return String(item.product_id) === String(productId); })[0];
+        // Support both product_id and legacy id when deduping
+        var found = null;
+        for (var j = 0; j < cart.length; j++) {
+            var cand = cart[j];
+            var cpid = String(cand.product_id || cand.id || '');
+            if (cpid === String(productId)) { found = cand; break; }
+        }
         if (found) found.quantity = (Number(found.quantity) || 1) + quantity;
         else { product.quantity = quantity; cart.push(product); }
         writeLocalCart(cart);
         showToast('Added to cart!', 'success');
         updateCartUI();
+        if (typeof window.syncCartCount === 'function') try { window.syncCartCount(); } catch(e) {}
         return true;
     }
 
@@ -243,9 +286,26 @@
         var count = cart.reduce(function (sum, item) { return sum + (Number(item.quantity) || 1); }, 0);
         document.querySelectorAll('.cart-count').forEach(function (el) {
             el.textContent = count;
-            el.style.display = count ? 'inline' : 'none';
+            // keep badge visible but show 0; hide only when explicitly styled
+            if (el.classList.contains('app-badge')) {
+                el.textContent = count;
+                el.style.display = '';
+            } else {
+                el.style.display = count ? 'inline' : 'none';
+            }
         });
-        window.dispatchEvent(new CustomEvent('pse_cart_updated', { detail: { count: count } }));
+        try { window.dispatchEvent(new CustomEvent('pse_cart_updated', { detail: { count: count } })); } catch(e) {}
+        // Keep legacy syncCartCount in sync
+        if (typeof window.syncCartCount === 'function' && window.syncCartCount !== updateCartUI) {
+            try { /* avoid recursion */ } catch(e) {}
+        }
+    }
+    // Back-compat: some pages call syncCartCount directly (marketplace-app.js)
+    if (typeof window.syncCartCount === 'undefined') {
+        window.syncCartCount = function() { updateCartUI(); };
+    } else {
+        var _origSync = window.syncCartCount;
+        window.syncCartCount = function() { updateCartUI(); try { _origSync(); } catch(e) {} };
     }
 
     // ─── CART COUNT ───

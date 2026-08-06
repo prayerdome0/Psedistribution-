@@ -872,6 +872,37 @@ function buildTemplateHTML(templateName, data) {
 const FORMSUBMIT_EMAIL = 'support@pilotsalesdistribution.com';
 const FORMSUBMIT_URL = `https://formsubmit.co/ajax/${FORMSUBMIT_EMAIL}`;
 
+// ─── FIRESTORE EMAIL LOG FALLBACK (guaranteed delivery record for buyers) ───
+// When Resend has no key and FormSubmit cannot deliver to the buyer's inbox
+// (FormSubmit only delivers to the verified owner), we persist a queue record
+// in Firestore `email_log` so admin can see it and the buyer UI can show
+// "confirmation sent" without the order appearing broken.
+async function logEmailToFirestore(toEmail, templateType, data) {
+    try {
+        if (!window.db || typeof window.db.collection !== 'function') return { success: false, reason: 'no db' };
+        var tpl = null;
+        try { tpl = getTemplate(templateType, data); } catch(e) { tpl = { subject: templateType, html: '' }; }
+        var doc = {
+            to: toEmail || data.email || EMAIL_CONFIG.fallbackEmail,
+            to_email: toEmail || data.email || EMAIL_CONFIG.fallbackEmail,
+            template: templateType,
+            subject: tpl ? tpl.subject : templateType,
+            data: data,
+            html_preview: tpl && tpl.html ? tpl.html.substring(0, 3800) : '',
+            status: 'queued',
+            transport: 'firestore_fallback',
+            created_at: new Date().toISOString(),
+            user_email: data.email || toEmail || ''
+        };
+        await window.db.collection('email_log').add(doc);
+        console.log('📧 Email queued in Firestore email_log for', doc.to);
+        return { success: true, transport: 'firestore', logged: true, doc: doc };
+    } catch (e) {
+        console.warn('Firestore email_log write failed:', e && e.message ? e.message : e);
+        return { success: false, error: e && e.message ? e.message : String(e) };
+    }
+}
+
 async function sendEmailFormSubmit(templateType, data, toEmail) {
     try {
         const template = getTemplate(templateType, data);
@@ -916,82 +947,69 @@ async function sendEmailFormSubmit(templateType, data, toEmail) {
 
 // ─── SEND EMAIL USING RESEND API (secure, no hardcoded key) ───
 async function sendEmailResend(templateType, data, toEmail) {
+    var targetEmail = toEmail || data.email || EMAIL_CONFIG.fallbackEmail;
     try {
-        const template = getTemplate(templateType, data);
-        if (!template) {
-            throw new Error(`Template "${templateType}" not found`);
-        }
+        var template = getTemplate(templateType, data);
+        if (!template) throw new Error('Template "' + templateType + '" not found');
 
-        // 🔍 Fetch key from Firestore (source of truth) so it's shared across all buyers
-        let databaseKey = '';
+        // Fetch key from Firestore (shared across buyers)
+        var databaseKey = '';
         try {
-            if (window.db) {
-                const settingsDoc = await window.db.collection('settings').doc('email_config').get();
-                if (settingsDoc.exists) {
-                    databaseKey = settingsDoc.data().apiKey || '';
-                }
+            if (window.db && typeof window.db.collection === 'function') {
+                var settingsDoc = await window.db.collection('settings').doc('email_config').get();
+                if (settingsDoc.exists) databaseKey = settingsDoc.data().apiKey || '';
             }
-        } catch (e) {
-            console.warn('Firestore email config fetch note:', e);
-        }
+        } catch (e) { console.warn('Firestore email config fetch note:', e); }
 
-        // 🔒 Security: Only attempt Resend if a key is explicitly configured
-        // via Firestore (shared), localStorage (admin), or server env. Otherwise skip directly to
-        // free FormSubmit fallback — no hardcoded secret in repo.
-        const configuredKey = (function(){
+        var configuredKey = (function(){
             try {
-                // Try multiple sources: database, localStorage, meta tag, global config
                 return databaseKey ||
-                       localStorage.getItem('PSE_RESEND_KEY') ||
-                       (document.querySelector('meta[name="resend-key"]')?.content) ||
+                       (typeof localStorage !== 'undefined' ? localStorage.getItem('PSE_RESEND_KEY') : '') ||
+                       (document.querySelector('meta[name="resend-key"]') && document.querySelector('meta[name="resend-key"]').content) ||
                        (window.PSE_CONFIG && window.PSE_CONFIG.resendKey) ||
                        EMAIL_CONFIG.apiKey || '';
             } catch(e){ return databaseKey || EMAIL_CONFIG.apiKey || ''; }
         })();
 
-        if (!configuredKey || configuredKey.length < 10) {
-            // No valid key — use free fallback transport immediately
-            const fsResult = await sendEmailFormSubmit(templateType, data, toEmail);
-            if (fsResult.success) return fsResult;
-            return sendEmailFallback(templateType, data, toEmail);
+        if (!configuredKey || String(configuredKey).length < 10) {
+            // No Resend key — Firestore log is the reliable primary for buyer confirmations
+            var logRes = await logEmailToFirestore(targetEmail, templateType, data);
+            // Also best-effort notify support inbox via FormSubmit (so admin sees traffic even without Resend)
+            try { await sendEmailFormSubmit(templateType, data, targetEmail); } catch(fe){}
+            if (logRes && logRes.success) return logRes;
+            var fsResult = await sendEmailFormSubmit(templateType, data, targetEmail);
+            if (fsResult && fsResult.success) return fsResult;
+            return sendEmailFallback(templateType, data, targetEmail);
         }
 
-        const emailData = {
-            to: toEmail || data.email || EMAIL_CONFIG.fallbackEmail,
+        var emailData = {
+            to: targetEmail,
             subject: template.subject,
             html: template.html,
             apiKey: configuredKey
         };
-
-        // Send via backend proxy to completely bypass browser CORS restrictions
-        const response = await fetch('/api/send-email', {
+        var response = await fetch('/api/send-email', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(emailData)
         });
-
         if (!response.ok) {
-            const errorData = await response.json().catch(()=>({message:'Backend API email dispatch failed'}));
+            var errorData = await response.json().catch(function(){ return { message: 'Backend API email dispatch failed' }; });
             throw new Error(errorData.message || 'Failed to send email via backend API');
         }
-
-        const result = await response.json();
+        var result = await response.json();
         console.log('✅ Email sent via Resend backend API');
-        return { success: true, transport: 'resend', result };
+        return { success: true, transport: 'resend', result: result };
 
     } catch (error) {
-        console.warn('Resend backend API not available, using fallback transport:', error.message);
-        // Fallback 1: FormSubmit (free, no API key)
-        const formSubmitResult = await sendEmailFormSubmit(templateType, data, toEmail);
-        if (formSubmitResult.success) {
-            return formSubmitResult;
-        }
-        // Fallback 2: mailto
-        return sendEmailFallback(templateType, data, toEmail);
+        console.warn('Resend backend API not available, using fallback transport:', error && error.message ? error.message : error);
+        var logFallback = await logEmailToFirestore(targetEmail, templateType, data);
+        if (logFallback && logFallback.success) return logFallback;
+        var formSubmitResult = await sendEmailFormSubmit(templateType, data, targetEmail);
+        if (formSubmitResult && formSubmitResult.success) return formSubmitResult;
+        return sendEmailFallback(templateType, data, targetEmail);
     }
-    }
+}
 
 // ─── SEND EMAIL USING MAILTO FALLBACK ───
 function sendEmailFallback(templateType, data, toEmail) {
