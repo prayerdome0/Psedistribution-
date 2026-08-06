@@ -57,8 +57,36 @@
         return item;
     }
 
+    // ImgBB serves images from i.ibb.co. Keep that direct HTTPS URL intact;
+    // unlike an ibb.co or imgbb.com share page it can be used in an <img> tag.
+    // This also makes imports tolerant of one URL, a JSON array, or media
+    // objects returned by common upload integrations.
+    function imageUrls(value) {
+        const urls = [];
+        const seen = new Set();
+        function add(candidate) {
+            if (!candidate) return;
+            if (Array.isArray(candidate)) { candidate.forEach(add); return; }
+            if (typeof candidate === 'object') {
+                add(candidate.secure_url || candidate.url || candidate.downloadURL || candidate.download_url || candidate.src || candidate.image_url || candidate.imageUrl);
+                return;
+            }
+            let url = String(candidate).trim();
+            if (url.startsWith('[')) {
+                try { add(JSON.parse(url)); return; } catch (error) { /* use the original value */ }
+            }
+            if (url.includes(',') && !/^data:/i.test(url)) url = url.split(',')[0].trim();
+            if (!url || seen.has(url)) return;
+            seen.add(url);
+            urls.push(url);
+        }
+        add(value);
+        return urls;
+    }
+
     function mapItem(item, meta) {
         scanPublicItem(item);
+        const images = imageUrls(item.imageUrls || item.image_urls || item.images || item.image_url || item.imageUrl);
         const isPublicPrice = item.pricingMode === 'public'
             && Number.isFinite(Number(item.publicUnitPrice));
         const available = Number.isInteger(item.availableToSell) && item.availableToSell > 0;
@@ -78,8 +106,8 @@
             availability: confirm ? 'confirm' : (available ? 'in-stock' : 'unavailable'),
             pricingMode: item.pricingMode || 'rfq',
             price: isPublicPrice ? Number(item.publicUnitPrice) : null,
-            image_url: Array.isArray(item.imageUrls) ? (item.imageUrls[0] || '') : '',
-            imageUrls: Array.isArray(item.imageUrls) ? item.imageUrls.slice() : [],
+            image_url: images[0] || '',
+            imageUrls: images,
             fob: item.fob || '',
             freightTerms: item.freightTerms || 'Freight quoted separately unless explicitly included.',
             inspectionTerms: item.inspectionTerms || '',
