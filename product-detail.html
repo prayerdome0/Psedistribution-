@@ -27,7 +27,6 @@
     
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/style.css" />
-    <link rel="stylesheet" href="/marketplace-core.css" />
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -262,6 +261,11 @@
             }
         }
     </style>
+<!-- SEO:STRUCTURED-DATA -->breadcrumb-product
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://pilotsalesdistribution.com/"},{"@type":"ListItem","position":2,"name":"Products","item":"https://pilotsalesdistribution.com/products"},{"@type":"ListItem","position":3,"name":"Product","item":"https://pilotsalesdistribution.com/product-detail"}]}
+</script>
+
 </head>
 <body style="background:#eaeded;">
 
@@ -745,99 +749,154 @@
 
 <!-- 9. SCRIPTS -->
 <script>
-    let activeProduct = {
-        id: '101',
-        title: 'Apple AirPods Pro (2nd Gen) with MagSafe Case (USB-C) - Bulk 25pk Master Case',
-        brand: 'Apple',
-        price: 189.00,
-        oldPrice: 249.00,
-        images: [
-            'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?auto=format&fit=crop&w=600&q=80',
-            'https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?auto=format&fit=crop&w=600&q=80',
-            'https://images.unsplash.com/photo-1572536147248-ac59a8abfa4b?auto=format&fit=crop&w=600&q=80'
-        ]
-    };
+    let activeProduct = null;
 
     function selectThumb(idx) {
         const thumbs = document.querySelectorAll('.mkt-thumb-item');
         thumbs.forEach((t, i) => t.classList.toggle('active', i === idx));
-        if (activeProduct.images && activeProduct.images[idx]) {
-            document.getElementById('mainProductPhoto').src = activeProduct.images[idx];
+        if (activeProduct && activeProduct.imageUrls && activeProduct.imageUrls[idx]) {
+            const mainImg = document.getElementById('mainProductPhoto');
+            if (mainImg) mainImg.src = activeProduct.imageUrls[idx];
+        }
+    }
+
+    function mapInventoryDetail(raw) {
+        if (window.PSEInventory && typeof window.PSEInventory.mapItem === 'function') {
+            const mapped = window.PSEInventory.mapItem(raw);
+            mapped.rfqOnly = mapped.pricingMode === 'rfq' || mapped.price === null || !Number.isFinite(mapped.price);
+            return mapped;
+        }
+        const isPublic = raw.pricingMode === 'public' && Number.isFinite(Number(raw.publicUnitPrice));
+        const rfqOnly = !isPublic || raw.pricingMode === 'rfq';
+        return {
+            id: String(raw.dealId || raw.id || ''),
+            dealId: String(raw.dealId || ''),
+            slug: raw.slug || '',
+            title: raw.title || 'Wholesale Lot',
+            shortDescription: raw.shortDescription || '',
+            brand: raw.brand || 'Verified Supplier',
+            category: raw.category || 'other',
+            condition: raw.condition || 'New',
+            moq: Number(raw.moqUnits || 1),
+            availableToSell: Number(raw.availableToSell || 0),
+            pricingMode: raw.pricingMode || 'rfq',
+            rfqOnly: rfqOnly,
+            price: isPublic ? Number(raw.publicUnitPrice) : null,
+            image_url: Array.isArray(raw.imageUrls) ? (raw.imageUrls[0] || '') : (raw.image_url || '/logo.webp'),
+            imageUrls: Array.isArray(raw.imageUrls) && raw.imageUrls.length ? raw.imageUrls : ['/logo.webp'],
+            fob: raw.fob || 'Los Angeles, CA',
+            freightTerms: raw.freightTerms || 'Freight quoted separately unless explicitly included.',
+            inspectionTerms: raw.inspectionTerms || 'Inspection before release available by appointment.',
+            returnTerms: raw.returnTerms || 'Authenticity guaranteed. Final sale under standard wholesale invoice terms.',
+            sourceVersion: raw.sourceVersion || '',
+            snapshotVersion: raw.snapshotVersion || ''
+        };
+    }
+
+    function renderProductDetail(p) {
+        if (!p) return;
+        document.getElementById('productTitle').textContent = p.title;
+        const breadcrumb = document.getElementById('breadcrumbTitle');
+        if (breadcrumb) breadcrumb.textContent = p.title;
+        const brandLink = document.getElementById('brandStoreLink');
+        if (brandLink) brandLink.textContent = 'Brand: ' + p.brand + ' • Deal ID: ' + (p.dealId || p.id);
+        
+        const unitPriceEl = document.getElementById('unitPriceDisplay');
+        const buyboxPriceEl = document.getElementById('buyboxUnitPrice');
+        const buyboxCartBtn = document.getElementById('buyboxAddToCartBtn');
+        const buyboxBuyBtn = document.getElementById('buyboxBuyNowBtn');
+        const buyboxRfqBtn = document.getElementById('buyboxRfqBtn');
+
+        if (p.rfqOnly || p.price === null) {
+            if (unitPriceEl) unitPriceEl.textContent = 'Quote on Request';
+            if (buyboxPriceEl) buyboxPriceEl.textContent = 'Quote on Request';
+            if (buyboxCartBtn) buyboxCartBtn.style.display = 'none';
+            if (buyboxBuyBtn) buyboxBuyBtn.style.display = 'none';
+            if (buyboxRfqBtn) buyboxRfqBtn.style.display = 'block';
+        } else {
+            if (unitPriceEl) unitPriceEl.textContent = '$' + Number(p.price).toFixed(2);
+            if (buyboxPriceEl) {
+                buyboxPriceEl.textContent = '$' + Number(p.price).toFixed(2);
+                buyboxPriceEl.setAttribute('data-price', p.price);
+            }
+            if (buyboxCartBtn) buyboxCartBtn.style.display = 'flex';
+            if (buyboxBuyBtn) buyboxBuyBtn.style.display = 'flex';
+        }
+
+        const mainPhoto = document.getElementById('mainProductPhoto');
+        if (mainPhoto) mainPhoto.src = p.image_url || (p.imageUrls && p.imageUrls[0]) || '/logo.webp';
+        const thumb0 = document.getElementById('thumb0');
+        if (thumb0) thumb0.src = p.image_url || (p.imageUrls && p.imageUrls[0]) || '/logo.webp';
+
+        const rfqUrl = `/rfq?dealId=${encodeURIComponent(p.dealId || '')}&slug=${encodeURIComponent(p.slug || '')}&product=${encodeURIComponent(p.title || '')}&quantity=${p.moq || 1}&sourceVersion=${encodeURIComponent(p.sourceVersion || '')}&snapshotVersion=${encodeURIComponent(p.snapshotVersion || '')}`;
+        if (buyboxRfqBtn) buyboxRfqBtn.href = rfqUrl;
+
+        if (buyboxCartBtn) {
+            buyboxCartBtn.onclick = () => {
+                const qty = parseInt(document.getElementById('buyboxQty').value, 10) || p.moq || 1;
+                let cart = [];
+                try { cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]'); } catch (e) {}
+                const existing = cart.find(i => i.id === p.id);
+                if (existing) existing.quantity = (existing.quantity || 1) + qty;
+                else cart.push({ id: p.id, title: p.title, price: p.price || 0, image: p.image_url, quantity: qty });
+                localStorage.setItem('pilot_cart', JSON.stringify(cart));
+                if (window.PSEMarketplace) window.PSEMarketplace.syncCounters();
+                if (window.PSEMarketplace) { window.PSEMarketplace.openSideCart(); }
+                if (window.pseToast) window.pseToast('Added ' + qty + ' units to your cart!', 'success');
+            };
+        }
+
+        if (buyboxBuyBtn) {
+            buyboxBuyBtn.onclick = () => {
+                if (buyboxCartBtn) buyboxCartBtn.click();
+                setTimeout(() => { window.location.href = '/checkout'; }, 200);
+            };
         }
     }
 
     async function loadProductDetail() {
         const params = new URLSearchParams(window.location.search);
-        const slug = params.get('slug');
-        const id = params.get('id');
+        const slug = params.get('slug') || params.get('id') || 'apple-airpods-pro-2nd-gen';
 
-        // Sample product fallback lookup
-        if (slug || id) {
-            // Check if matches known items
-            if (slug && slug.includes('samsung')) {
-                activeProduct = {
-                    id: '102',
-                    title: 'Samsung Galaxy S24 Ultra 512GB Titanium Black - Unlocked Factory Case',
-                    brand: 'Samsung',
-                    price: 899.00,
-                    oldPrice: 1299.00,
-                    images: ['https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=600&q=80']
-                };
-            } else if (slug && slug.includes('dell')) {
-                activeProduct = {
-                    id: '103',
-                    title: 'Dell XPS 15 OLED Touch 32GB RAM 1TB SSD Core i9 - Enterprise Pallet Lot',
-                    brand: 'Dell',
-                    price: 1450.00,
-                    oldPrice: 2199.00,
-                    images: ['https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80']
-                };
-            }
+        try {
+            const res = await fetch('/api/inventory/' + encodeURIComponent(slug), {
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!res.ok) throw new Error('Product not found: ' + res.status);
+            const raw = await res.json();
+            activeProduct = mapInventoryDetail(raw);
+            renderProductDetail(activeProduct);
+        } catch (e) {
+            console.error('Failed to load product detail from API:', e);
+            try {
+                const listRes = await fetch('/api/inventory?limit=1', { headers: { 'Accept': 'application/json' } });
+                if (listRes.ok) {
+                    const listData = await listRes.json();
+                    if (listData.data && listData.data.length) {
+                        activeProduct = mapInventoryDetail(listData.data[0]);
+                        renderProductDetail(activeProduct);
+                    }
+                }
+            } catch (e2) {}
         }
-
-        // Update DOM
-        document.getElementById('productTitle').textContent = activeProduct.title;
-        document.getElementById('breadcrumbTitle').textContent = activeProduct.title;
-        document.getElementById('brandStoreLink').textContent = 'Visit the ' + activeProduct.brand + ' Store | Verified Partner';
-        document.getElementById('unitPriceDisplay').textContent = '$' + activeProduct.price.toFixed(2);
-        document.getElementById('oldPriceDisplay').textContent = '$' + activeProduct.oldPrice.toFixed(2);
-        document.getElementById('buyboxUnitPrice').textContent = '$' + activeProduct.price.toFixed(2);
-        document.getElementById('buyboxUnitPrice').setAttribute('data-price', activeProduct.price);
-        document.getElementById('mainProductPhoto').src = activeProduct.images[0];
-        document.getElementById('thumb0').src = activeProduct.images[0];
-
-        // Wire buy box buttons
-        document.getElementById('buyboxAddToCartBtn').onclick = () => {
-            const qty = parseInt(document.getElementById('buyboxQty').value, 10) || 1;
-            let cart = [];
-            try { cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]'); } catch (e) {}
-            const existing = cart.find(i => i.id === activeProduct.id);
-            if (existing) existing.quantity = (existing.quantity || 1) + qty;
-            else cart.push({ id: activeProduct.id, title: activeProduct.title, price: activeProduct.price, image: activeProduct.images[0], quantity: qty });
-            localStorage.setItem('pilot_cart', JSON.stringify(cart));
-            if (window.PSEMarketplace) window.PSEMarketplace.syncCounters();
-            if (window.PSEMarketplace) { window.PSEMarketplace.openSideCart(); }
-            if (window.pseToast) window.pseToast('Added ' + qty + ' units to your cart!', 'success');
-        };
-
-        document.getElementById('buyboxBuyNowBtn').onclick = () => {
-            document.getElementById('buyboxAddToCartBtn').click();
-            setTimeout(() => { window.location.href = '/checkout'; }, 200);
-        };
-
-        document.getElementById('buyboxRfqBtn').href = '/rfq?product=' + encodeURIComponent(activeProduct.title) + '&quantity=10';
     }
 
     function handleAddToWishlist() {
+        if (!activeProduct) return;
         let wishlist = [];
         try { wishlist = JSON.parse(localStorage.getItem('pilot_wishlist') || '[]'); } catch (e) {}
         if (!wishlist.find(i => i.id === activeProduct.id)) {
-            wishlist.push({ id: activeProduct.id, title: activeProduct.title, price: activeProduct.price, image: activeProduct.images[0] });
+            wishlist.push({ id: activeProduct.id, title: activeProduct.title, price: activeProduct.price, image: activeProduct.image_url });
             localStorage.setItem('pilot_wishlist', JSON.stringify(wishlist));
         }
         if (window.PSEMarketplace) { window.PSEMarketplace.openSideCart(); }
-            if (window.pseToast) window.pseToast('Added to your Wishlist!', 'success');
+        if (window.pseToast) window.pseToast('Added to your Wishlist!', 'success');
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadProductDetail();
+    });
+</script>
 
     document.addEventListener('DOMContentLoaded', () => {
         loadProductDetail();
