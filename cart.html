@@ -187,10 +187,42 @@
 
 <script src="/marketplace-app.js"></script>
 <script>
+function escHtml(s) {
+    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function getCart() {
+    try {
+        var raw = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+        if (!Array.isArray(raw)) return [];
+        // normalise legacy shapes
+        return raw.filter(function(it){ return it && (it.product_id || it.id || it.productId); }).map(function(it){
+            var copy = Object.assign({}, it);
+            var pid = String(copy.product_id || copy.id || copy.productId || '');
+            if (!copy.product_id) copy.product_id = pid;
+            if (!copy.id) copy.id = pid;
+            copy.title = copy.title || copy.name || 'Wholesale Product';
+            copy.price = Number(copy.price || copy.publicUnitPrice || copy.unit_price || 0) || 0;
+            copy.quantity = Math.max(1, parseInt(copy.quantity,10) || 1);
+            copy.image = copy.image || copy.image_url || '/product-placeholder.svg';
+            copy.image_url = copy.image_url || copy.image || '/product-placeholder.svg';
+            if (window.pseCleanProductImage) { try { copy.image = window.pseCleanProductImage(copy.image); copy.image_url = copy.image; } catch(e) {} }
+            return copy;
+        });
+    } catch (e) { return []; }
+}
+function saveCart(cart) {
+    try {
+        // persist with both keys for compatibility
+        for (var i=0;i<cart.length;i++) { var it=cart[i]; if (it && (it.product_id||it.id)) { var p=String(it.product_id||it.id); it.product_id=p; it.id=p; } }
+        localStorage.setItem('pilot_cart', JSON.stringify(cart));
+        if (cart.length) localStorage.setItem('pilot_cart_ts', String(Date.now()));
+        else localStorage.removeItem('pilot_cart_ts');
+    } catch(e) {}
+    try { if (window.syncCartCount) window.syncCartCount(); } catch(e) {}
+    try { if (window.updateCartUI) window.updateCartUI(); } catch(e) {}
+}
 function renderCart() {
-    var cart = [];
-    try { cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]'); } catch (e) {}
-
+    var cart = getCart();
     var container = document.getElementById('cartItemsList');
     var summary = document.getElementById('cartSummaryBox');
 
@@ -209,20 +241,23 @@ function renderCart() {
         var qty = Number(item.quantity || 1);
         var itemTotal = price * qty;
         subtotal += itemTotal;
+        var title = escHtml(item.title || 'Wholesale Product');
+        var img = escHtml(item.image || item.image_url || '/product-placeholder.svg');
 
         return '' +
             '<div class="app-cart-card">' +
                 '<div class="app-cart-card-img">' +
-                    '<img src="' + (item.image || '/product-placeholder.svg') + '" alt="' + item.title + '" onerror="this.src=\'/product-placeholder.svg\'" />' +
+                    '<img src="' + img + '" alt="' + title + '" onerror="this.src=\'/product-placeholder.svg\'; this.onerror=null;" />' +
                 '</div>' +
                 '<div class="app-cart-card-body">' +
-                    '<div class="app-cart-card-title">' + item.title + '</div>' +
+                    '<div class="app-cart-card-title">' + title + '</div>' +
                     '<div class="app-cart-card-price">$' + price.toFixed(2) + ' <span style="font-size:11px; font-weight:500; color:var(--app-text-muted);">/ unit</span></div>' +
-                    '<div class="app-qty-control">' +
-                        '<button type="button" onclick="updateQty(' + idx + ', -1)">-</button>' +
-                        '<span>' + qty + '</span>' +
-                        '<button type="button" onclick="updateQty(' + idx + ', 1)">+</button>' +
+                    '<div class="app-qty-control" role="group" aria-label="Quantity">' +
+                        '<button type="button" onclick="updateQty(' + idx + ', -1)" aria-label="Decrease quantity">-</button>' +
+                        '<span aria-live="polite">' + qty + '</span>' +
+                        '<button type="button" onclick="updateQty(' + idx + ', 1)" aria-label="Increase quantity">+</button>' +
                     '</div>' +
+                    '<div style="font-size:11px;color:var(--app-text-muted);margin-top:4px;">Line: $' + itemTotal.toFixed(2) + '</div>' +
                 '</div>' +
                 '<button type="button" class="app-cart-card-del" onclick="deleteItem(' + idx + ')" aria-label="Remove item">' +
                     '<i class="fa-regular fa-trash-can"></i>' +
@@ -235,35 +270,37 @@ function renderCart() {
 }
 
 function updateQty(idx, delta) {
-    var cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+    var cart = getCart();
     if (cart[idx]) {
-        cart[idx].quantity = (cart[idx].quantity || 1) + delta;
+        cart[idx].quantity = (Number(cart[idx].quantity) || 1) + delta;
         if (cart[idx].quantity <= 0) {
             cart.splice(idx, 1);
+            if (window.pseToast) window.pseToast('Item removed from cart', 'info');
         }
-        localStorage.setItem('pilot_cart', JSON.stringify(cart));
-        window.syncCartCount();
+        saveCart(cart);
         renderCart();
     }
 }
 
 function deleteItem(idx) {
-    var cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]');
+    var cart = getCart();
     cart.splice(idx, 1);
-    localStorage.setItem('pilot_cart', JSON.stringify(cart));
-    window.syncCartCount();
+    saveCart(cart);
     renderCart();
-    window.pseToast('Item removed from cart', 'info');
+    if (window.pseToast) window.pseToast('Item removed from cart', 'info');
 }
 
 function clearCart() {
-    localStorage.removeItem('pilot_cart');
-    window.syncCartCount();
+    try { localStorage.removeItem('pilot_cart'); localStorage.removeItem('pilot_cart_ts'); } catch(e) {}
+    try { if (window.syncCartCount) window.syncCartCount(); } catch(e) {}
+    try { if (window.updateCartUI) window.updateCartUI(); } catch(e) {}
     renderCart();
-    window.pseToast('Cart cleared', 'info');
+    if (window.pseToast) window.pseToast('Cart cleared', 'info');
 }
 
 document.addEventListener('DOMContentLoaded', renderCart);
+window.addEventListener('storage', function(e){ if (e.key === 'pilot_cart' || e.key === 'pilot_cart_ts') renderCart(); });
+window.addEventListener('pse_cart_updated', renderCart);
 </script>
 </body>
 </html>
