@@ -61,17 +61,34 @@ service cloud.firestore {
     }
 
     // ─── CART & WISHLIST (owner-only) ───
+    // Keep create/update/delete separate: `request.resource` does not exist on
+    // deletes, so a combined write rule can silently block cart removals.
     match /cart/{docId} {
-      allow read, write: if isSignedIn()
-        && (request.resource.data.get('user_id', resource.data.get('user_id', null)) == request.auth.uid || isAdmin());
+      allow read, delete: if isSignedIn()
+        && (resource.data.get('user_id', null) == request.auth.uid || isAdmin());
+      allow create: if isSignedIn()
+        && (request.resource.data.get('user_id', null) == request.auth.uid || isAdmin());
+      allow update: if isSignedIn()
+        && (resource.data.get('user_id', null) == request.auth.uid || isAdmin())
+        && (request.resource.data.get('user_id', null) == resource.data.get('user_id', null));
     }
     match /wishlist/{docId} {
-      allow read, write: if isSignedIn()
-        && (request.resource.data.get('user_id', resource.data.get('user_id', null)) == request.auth.uid || isAdmin());
+      allow read, delete: if isSignedIn()
+        && (resource.data.get('user_id', null) == request.auth.uid || isAdmin());
+      allow create: if isSignedIn()
+        && (request.resource.data.get('user_id', null) == request.auth.uid || isAdmin());
+      allow update: if isSignedIn()
+        && (resource.data.get('user_id', null) == request.auth.uid || isAdmin())
+        && (request.resource.data.get('user_id', null) == resource.data.get('user_id', null));
     }
     match /addresses/{docId} {
-      allow read, write: if isSignedIn()
-        && (request.resource.data.get('user_id', resource.data.get('user_id', null)) == request.auth.uid || isAdmin());
+      allow read, delete: if isSignedIn()
+        && (resource.data.get('user_id', null) == request.auth.uid || isAdmin());
+      allow create: if isSignedIn()
+        && (request.resource.data.get('user_id', null) == request.auth.uid || isAdmin());
+      allow update: if isSignedIn()
+        && (resource.data.get('user_id', null) == request.auth.uid || isAdmin())
+        && (request.resource.data.get('user_id', null) == resource.data.get('user_id', null));
     }
 
     // ─── ORDERS / QUOTATIONS ───

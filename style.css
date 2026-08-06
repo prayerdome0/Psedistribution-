@@ -1028,23 +1028,8 @@
     margin: 1.8rem 0;
 }
 
-@media (max-width: 1100px) {
-    .product-grid-2col,
-    .product-grid.professional-2 {
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 1.6rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .product-grid-2col,
-    .product-grid.professional-2 {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-    }
-}
-
-@media (max-width: 480px) {
+/* This is intentionally a two-up grid at every tablet and desktop width. */
+@media (max-width: 600px) {
     .product-grid-2col,
     .product-grid.professional-2 {
         grid-template-columns: 1fr;

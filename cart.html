@@ -639,22 +639,22 @@
 
                 // Load from Firebase
                 for (const item of cartData) {
-                    const product = await fetchProductById(item.product_id);
-                    if (product) {
-                        items.push({
-                            id: item.id,
-                            product_id: item.product_id,
-                            title: item.title || product.title,
-                            price: item.price !== undefined ? item.price : product.price,
-                            old_price: product.old_price,
-                            image: product.image_url,
-                            brand: product.brand || 'Pilot Distribution',
-                            moq: product.moq || 1,
-                            quantity: item.quantity || 1,
-                            is_sample: !!item.is_sample,
-                            tier_label: item.tier_label || ''
-                        });
-                    }
+                    // New cart records include a product snapshot. Prefer it when
+                    // the catalog document has been unpublished or is offline.
+                    const product = await fetchProductById(item.product_id) || item;
+                    items.push({
+                        id: item.id,
+                        product_id: item.product_id,
+                        title: item.title || product.title || 'Product',
+                        price: item.price !== undefined ? item.price : (product.price || 0),
+                        old_price: item.old_price !== undefined ? item.old_price : (product.old_price || 0),
+                        image: item.image_url || product.image_url || '',
+                        brand: item.brand || product.brand || 'Pilot Distribution',
+                        moq: item.moq || product.moq || 1,
+                        quantity: item.quantity || 1,
+                        is_sample: !!item.is_sample,
+                        tier_label: item.tier_label || ''
+                    });
                 }
             } else {
                 // Guest user - use localStorage
