@@ -1046,7 +1046,7 @@
                     '</div>',
                     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">',
                         '<a href="/pse_wholesale_products_template.csv" download style="font-size:0.8rem;color:#007185;font-weight:700;"><i class="fa-solid fa-download"></i> Download Sample CSV Template</a>',
-                        '<button type="button" class="mkt-chat-chip" onclick="PSEMarketplace.loadSampleCsvData()"><i class="fa-solid fa-bolt"></i> Load Demo 3-Pallet Order</button>',
+                        '<button type="button" class="mkt-chat-chip" onclick="PSEMarketplace.loadSampleCsvData()"><i class="fa-solid fa-bolt"></i> Load Standard 3-Pallet Order</button>',
                     '</div>',
                     '<button class="buybox-btn-cart" style="padding:0.85rem;font-size:0.95rem;" onclick="PSEMarketplace.processCsvOrder()">Process Line Items &amp; Add to Cart</button>',
                 '</div>'

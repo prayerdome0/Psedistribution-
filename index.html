@@ -45,8 +45,6 @@
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/style.css" />
-    <link rel="stylesheet" href="/marketplace-core.css" />
-    <link rel="stylesheet" href="/home-redesign.css" />
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -405,6 +403,21 @@
             }
         }
     </style>
+<!-- SEO:STRUCTURED-DATA -->organization
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Organization","name":"Pilot Sales Distribution","url":"https://pilotsalesdistribution.com","logo":"https://pilotsalesdistribution.com/logo.webp","description":"Verified B2B wholesale marketplace. Real-time inventory, freight quoted per product, RFQ-first purchasing.","sameAs":["https://wa.me/19099384682"],"contactPoint":[{"@type":"ContactPoint","telephone":"+1-909-938-4682","contactType":"sales","availableLanguage":["English"],"areaServed":"Worldwide"}]}
+</script>
+
+<!-- SEO:STRUCTURED-DATA -->website
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","name":"Pilot Sales Distribution","url":"https://pilotsalesdistribution.com","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://pilotsalesdistribution.com/products?search={search_term_string}"},"query-input":"required name=search_term_string"}}
+</script>
+
+<!-- SEO:STRUCTURED-DATA -->breadcrumb-home
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://pilotsalesdistribution.com/"}]}
+</script>
+
 </head>
 <body class="pse-home" style="background:#eaeded;">
 
@@ -1087,29 +1100,11 @@
         let products = [];
         try {
             const feed = await fetchInventoryFeed();
-            if (feed.items && feed.items.length) {
+            if (feed && feed.items && feed.items.length) {
                 products = feed.items.map(mapInv);
             }
         } catch (e) {
-            console.log('Using curated marketplace inventory catalog');
-        }
-
-        // Fallback curated marketplace products if API is offline
-        if (!products.length && window.PSE_CATALOG_DATA && window.PSE_CATALOG_DATA.categories) {
-            // Built from sample catalog
-        }
-
-        if (!products.length) {
-            products = [
-                { id: '101', slug: 'apple-airpods-pro-2nd-gen', title: 'Apple AirPods Pro (2nd Gen) with MagSafe Case (USB-C) - Bulk 25pk', brand: 'Apple', price: 189.00, oldPrice: 249.00, rating: '4.9', reviews: 1420, image_url: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?auto=format&fit=crop&w=600&q=80', badge: 'Best Seller', moq: 5 },
-                { id: '102', slug: 'samsung-galaxy-s24-ultra-512gb', title: 'Samsung Galaxy S24 Ultra 512GB Titanium Black - Unlocked Factory Case', brand: 'Samsung', price: 899.00, oldPrice: 1299.00, rating: '4.8', reviews: 890, image_url: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=600&q=80', badge: 'Rollback', moq: 3 },
-                { id: '103', slug: 'dell-xps-15-oled-laptop', title: 'Dell XPS 15 OLED Touch 32GB RAM 1TB SSD Core i9 - Enterprise Pallet Lot', brand: 'Dell', price: 1450.00, oldPrice: 2199.00, rating: '4.7', reviews: 430, image_url: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80', badge: 'Choice', moq: 2 },
-                { id: '104', slug: 'sony-wh-1000xm5-wireless-headphones', title: 'Sony WH-1000XM5 Wireless Noise-Canceling Headphones - Wholesale Master Carton', brand: 'Sony', price: 279.00, oldPrice: 399.00, rating: '4.9', reviews: 2100, image_url: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=600&q=80', badge: 'Best Seller', moq: 10 },
-                { id: '105', slug: 'nike-air-max-90-wholesale-pack', title: 'Nike Air Max 90 Classic Edition Assorted Men Sizes - Wholesale Case of 12', brand: 'Nike', price: 68.00, oldPrice: 130.00, rating: '4.8', reviews: 670, image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80', badge: 'Rollback', moq: 12 },
-                { id: '106', slug: 'hp-laserjet-enterprise-printer', title: 'HP Color LaserJet Enterprise Multi-Function Commercial Printer Lot', brand: 'HP', price: 420.00, oldPrice: 750.00, rating: '4.6', reviews: 310, image_url: 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?auto=format&fit=crop&w=600&q=80', badge: 'Choice', moq: 2 },
-                { id: '107', slug: 'lenovo-thinkpad-t14-gen4', title: 'Lenovo ThinkPad T14 Gen 4 Core i7 16GB RAM 512GB SSD - Bulk Lot of 10', brand: 'Lenovo', price: 620.00, oldPrice: 1099.00, rating: '4.8', reviews: 540, image_url: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=600&q=80', badge: 'Best Seller', moq: 5 },
-                { id: '108', slug: 'nvidia-geforce-rtx-4080-super', title: 'NVIDIA GeForce RTX 4080 Super 16GB GDDR6X - Verified Factory Sealed 6pk', brand: 'NVIDIA', price: 840.00, oldPrice: 1199.00, rating: '4.9', reviews: 1890, image_url: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=600&q=80', badge: 'Hot Deal', moq: 2 }
-            ];
+            console.error('Inventory feed load failed:', e);
         }
 
         featuredProducts = products;
