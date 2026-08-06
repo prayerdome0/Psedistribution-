@@ -17,6 +17,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
+    <!-- Firebase: quote requests are stored in the protected RFQ workflow. -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <!-- Unified Master Stylesheet -->
     <link rel="stylesheet" href="/marketplace-app.css" />
 </head>
@@ -111,54 +116,33 @@
 
         <h1 style="font-size:18px; font-weight:900; margin:0 0 14px;"><i class="fa-solid fa-shield-halved" style="color:var(--app-primary);"></i> Secure Escrow Checkout</h1>
 
-        <form onsubmit="handlePlaceOrder(event)">
+        <form id="checkoutForm" onsubmit="handleQuoteRequest(event)">
             <!-- 1. SHIPPING ADDRESS -->
             <div style="background:#fff; border:1px solid var(--app-border); border-radius:var(--app-radius-lg); padding:16px; margin-bottom:14px;">
                 <h3 style="font-size:14px; font-weight:800; margin:0 0 12px; display:flex; align-items:center; gap:6px;">
                     <i class="fa-solid fa-location-dot" style="color:var(--app-primary);"></i> 1. Shipping Address
                 </h3>
                 <div style="display:flex; flex-direction:column; gap:10px;">
-                    <input type="text" placeholder="Full Name or Company Name" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
-                    <input type="text" placeholder="Street Address / Suite" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
+                    <input id="customerName" name="customerName" type="text" placeholder="Full Name or Company Name" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
+                    <input id="streetAddress" name="streetAddress" type="text" placeholder="Street Address / Suite" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <input type="text" placeholder="City" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
-                        <input type="text" placeholder="State / ZIP" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
+                        <input id="city" name="city" type="text" placeholder="City" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
+                        <input id="stateZip" name="stateZip" type="text" placeholder="State / ZIP" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
                     </div>
-                    <input type="tel" placeholder="Phone Number for Freight Delivery" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
+                    <input id="phone" name="phone" type="tel" placeholder="Phone Number for Freight Delivery" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
                 </div>
             </div>
 
-            <!-- 2. PAYMENT METHOD -->
+            <!-- 2. QUOTATION REQUEST -->
             <div style="background:#fff; border:1px solid var(--app-border); border-radius:var(--app-radius-lg); padding:16px; margin-bottom:14px;">
-                <h3 style="font-size:14px; font-weight:800; margin:0 0 12px; display:flex; align-items:center; gap:6px;">
-                    <i class="fa-solid fa-credit-card" style="color:var(--app-primary);"></i> 2. Payment Method
+                <h3 style="font-size:14px; font-weight:800; margin:0 0 8px; display:flex; align-items:center; gap:6px;">
+                    <i class="fa-solid fa-file-invoice-dollar" style="color:var(--app-primary);"></i> 2. Request a final quotation
                 </h3>
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                    <label style="display:flex; align-items:center; gap:10px; padding:10px; border:1px solid var(--app-primary); border-radius:var(--app-radius-md); background:var(--app-primary-soft); cursor:pointer;">
-                        <input type="radio" name="payment" checked />
-                        <div style="flex:1;">
-                            <strong style="font-size:13px; color:var(--app-primary);">PSE 100% Escrow Protection</strong>
-                            <div style="font-size:11px; color:var(--app-text-muted);">Funds held securely until shipment inspection</div>
-                        </div>
-                        <i class="fa-solid fa-lock" style="color:var(--app-primary);"></i>
-                    </label>
-
-                    <label style="display:flex; align-items:center; gap:10px; padding:10px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); cursor:pointer;">
-                        <input type="radio" name="payment" />
-                        <div style="flex:1;">
-                            <strong style="font-size:13px;">Credit / Debit Card</strong>
-                            <div style="font-size:11px; color:var(--app-text-muted);">Visa, MasterCard, American Express</div>
-                        </div>
-                    </label>
-
-                    <label style="display:flex; align-items:center; gap:10px; padding:10px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); cursor:pointer;">
-                        <input type="radio" name="payment" />
-                        <div style="flex:1;">
-                            <strong style="font-size:13px;">PayPal / Wire Transfer</strong>
-                            <div style="font-size:11px; color:var(--app-text-muted);">Instant B2B settlement</div>
-                        </div>
-                    </label>
-                </div>
+                <p style="font-size:12px;color:var(--app-text-muted);margin:0 0 10px;line-height:1.5;">Online payment is not available until a verified payment provider is connected. Submit this request to PSE; an administrator will prepare the final quote and payment instructions.</p>
+                <label style="display:flex;align-items:flex-start;gap:9px;font-size:12px;cursor:pointer;">
+                    <input id="quoteConsent" type="checkbox" required style="margin-top:2px;">
+                    <span>I confirm these contact and delivery details may be sent to PSE to prepare this quotation.</span>
+                </label>
             </div>
 
             <!-- 3. ORDER SUMMARY -->
@@ -173,8 +157,8 @@
                     <span style="color:var(--app-success); font-weight:700;">FREE</span>
                 </div>
                 <div class="app-summary-row">
-                    <span>Escrow Service Fee</span>
-                    <span style="color:var(--app-success); font-weight:700;">$0.00</span>
+                    <span>Payment</span>
+                    <span style="font-weight:700;">Quoted by PSE</span>
                 </div>
                 <div class="app-summary-row total">
                     <span>Total Due</span>
@@ -182,7 +166,7 @@
                 </div>
 
                 <button type="submit" class="app-checkout-btn" style="margin-top:14px;">
-                    <i class="fa-solid fa-lock"></i> Place Escrow Order &amp; Pay
+                    <i class="fa-brands fa-whatsapp"></i> Submit quote request &amp; open WhatsApp
                 </button>
             </div>
         </form>
@@ -229,22 +213,79 @@
 
 <script src="/marketplace-app.js"></script>
 <script>
+/* A quote request is deliberately not a payment. Card details are never collected here. */
+var PSE_ADMIN_WHATSAPP = '19099384682';
+
+function cartItems() {
+    try { return JSON.parse(localStorage.getItem('pilot_cart') || '[]'); } catch (e) { return []; }
+}
+function quoteTotal(items) {
+    return items.reduce(function(sum, item) { return sum + (Number(item.price || 0) * Number(item.quantity || 1)); }, 0);
+}
 function loadCheckoutTotals() {
-    var cart = [];
-    try { cart = JSON.parse(localStorage.getItem('pilot_cart') || '[]'); } catch (e) {}
-    var total = cart.reduce(function(sum, item) { return sum + ((item.price || 0) * (item.quantity || 1)); }, 0);
-    if (total === 0) total = 249.99; // Fallback demo total
+    var items = cartItems();
+    var total = quoteTotal(items);
     document.getElementById('chkSubtotal').textContent = '$' + total.toFixed(2);
     document.getElementById('chkTotal').textContent = '$' + total.toFixed(2);
+    var submit = document.querySelector('#checkoutForm button[type="submit"]');
+    if (!items.length) {
+        submit.disabled = true;
+        submit.title = 'Add products to your cart before requesting a quotation.';
+        submit.style.opacity = '.55';
+        window.pseToast('Your cart is empty. Add products before requesting a quotation.', 'info');
+    }
 }
-
-function handlePlaceOrder(e) {
+function openAdminWhatsApp(reference, total, items) {
+    var lines = items.map(function(item) { return '- ' + (item.title || item.name || 'Item') + ' × ' + (item.quantity || 1); });
+    var message = 'New PSE quotation request ' + reference + '\nEstimated cart total: $' + total.toFixed(2) + '\n' + lines.join('\n') + '\nPlease prepare a final quotation.';
+    window.open('https://wa.me/' + PSE_ADMIN_WHATSAPP + '?text=' + encodeURIComponent(message), '_blank', 'noopener');
+}
+async function handleQuoteRequest(e) {
     e.preventDefault();
-    localStorage.removeItem('pilot_cart');
-    window.syncCartCount();
-    window.location.href = '/order-success';
+    var items = cartItems();
+    if (!items.length) { window.location.href = '/cart'; return; }
+    if (!window.auth || !window.db || !window.auth.currentUser) {
+        window.pseToast('Please sign in before submitting a quotation request.', 'error');
+        window.location.href = '/login?redirect=' + encodeURIComponent('/checkout');
+        return;
+    }
+    var button = document.querySelector('#checkoutForm button[type="submit"]');
+    button.disabled = true;
+    var original = button.innerHTML;
+    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending request…';
+    try {
+        var user = window.auth.currentUser;
+        var total = quoteTotal(items);
+        var reference = 'PSE-Q-' + Date.now().toString(36).toUpperCase();
+        var customerName = document.getElementById('customerName').value.trim();
+        var rfq = {
+            reference: reference,
+            title: 'Checkout quotation ' + reference,
+            category: 'Checkout cart',
+            quantity: items.reduce(function(n, item) { return n + Number(item.quantity || 1); }, 0),
+            budget: total,
+            currency: 'USD',
+            description: items.map(function(item) { return (item.title || item.name || 'Item') + ' × ' + (item.quantity || 1); }).join('; '),
+            items: items.map(function(item) { return { title: String(item.title || item.name || 'Item'), quantity: Number(item.quantity || 1), unit_price: Number(item.price || 0) }; }),
+            customer: { name: customerName, phone: document.getElementById('phone').value.trim(), address: document.getElementById('streetAddress').value.trim(), city: document.getElementById('city').value.trim(), state_zip: document.getElementById('stateZip').value.trim() },
+            user_id: user.uid,
+            user_email: user.email || '',
+            status: 'pending',
+            source: 'checkout_quote_request',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        await window.db.collection('rfqs').add(rfq);
+        window.pseToast('Quotation request sent to PSE. WhatsApp will open with the reference.', 'success');
+        openAdminWhatsApp(reference, total, items);
+        setTimeout(function() { window.location.href = '/buyer-dashboard'; }, 400);
+    } catch (error) {
+        console.error('Unable to submit quotation request:', error);
+        window.pseToast('We could not send the request. Your cart was kept—please try again.', 'error');
+        button.disabled = false;
+        button.innerHTML = original;
+    }
 }
-
 document.addEventListener('DOMContentLoaded', loadCheckoutTotals);
 </script>
 </body>
