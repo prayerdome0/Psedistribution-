@@ -810,6 +810,39 @@
                         <label style="display:block; font-weight:600; color:var(--secondary); margin-bottom:0.3rem;">Contact Email for Buyers <span style="color:#c0392b;">*</span></label>
                         <input type="email" id="sellerContactEmail" placeholder="sales@yourbusiness.com" style="width:100%; padding:0.7rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;" />
                     </div>
+
+                    <!-- 🔒 Secure Escrow Bank & Payout Settings -->
+                    <div style="background:var(--bg-main); border: 1px solid var(--border-light); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; border-left: 5px solid var(--primary);">
+                        <p style="margin:0 0 0.5rem; font-size:0.9rem; color:var(--secondary); font-weight:700;"><i class="fa-solid fa-lock" style="color:var(--primary); margin-right:0.3rem;"></i> Payment & Payout Details (Secure Escrow)</p>
+                        <p style="margin:0 0 1rem; font-size:0.75rem; color:var(--text-light); line-height:1.4;">Input your bank payout details. These are securely saved and completely hidden from public users. They are ONLY revealed to verified buyers who have placed an order with your store and completed the communication confirmation step.</p>
+                        
+                        <div class="form-group" style="margin-bottom:0.8rem;">
+                            <label style="display:block; font-weight:600; font-size:0.8rem; color:var(--secondary); margin-bottom:0.2rem;">PayPal Payout Email</label>
+                            <input type="email" id="sellerPaypal" placeholder="paypal@yourbusiness.com" style="width:100%; padding:0.6rem 0.7rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.85rem;" />
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom:0.8rem;">
+                            <label style="display:block; font-weight:600; font-size:0.8rem; color:var(--secondary); margin-bottom:0.2rem;">Bank Name (for Wire Transfer)</label>
+                            <input type="text" id="sellerBankName" placeholder="e.g. JPMorgan Chase" style="width:100%; padding:0.6rem 0.7rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.85rem;" />
+                        </div>
+                        
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:0.8rem;">
+                            <div class="form-group">
+                                <label style="display:block; font-weight:600; font-size:0.8rem; color:var(--secondary); margin-bottom:0.2rem;">Routing Number</label>
+                                <input type="text" id="sellerBankRouting" placeholder="9-digit routing" style="width:100%; padding:0.6rem 0.7rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.85rem;" />
+                            </div>
+                            <div class="form-group">
+                                <label style="display:block; font-weight:600; font-size:0.8rem; color:var(--secondary); margin-bottom:0.2rem;">Account Number</label>
+                                <input type="text" id="sellerBankAccount" placeholder="Account number" style="width:100%; padding:0.6rem 0.7rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.85rem;" />
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="display:block; font-weight:600; font-size:0.8rem; color:var(--secondary); margin-bottom:0.2rem;">Other Payment Details (USDT, IBAN, Swift etc.)</label>
+                            <input type="text" id="sellerOtherPayment" placeholder="e.g. USDT ERC20: 0x..." style="width:100%; padding:0.6rem 0.7rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.85rem;" />
+                        </div>
+                    </div>
+
                     <button type="button" class="btn-add-product" onclick="saveSettings()">
                         <i class="fa-regular fa-floppy-disk"></i> Save Settings
                     </button>
@@ -1796,7 +1829,13 @@
             whatsapp: document.getElementById('sellerWa').value.trim(),
             phone: document.getElementById('sellerPhone').value.trim(),
             contactEmail: document.getElementById('sellerContactEmail').value.trim(),
-            contact_email: document.getElementById('sellerContactEmail').value.trim()
+            contact_email: document.getElementById('sellerContactEmail').value.trim(),
+            // Secure payment info
+            paypal: document.getElementById('sellerPaypal').value.trim(),
+            bank_name: document.getElementById('sellerBankName').value.trim(),
+            bank_routing: document.getElementById('sellerBankRouting').value.trim(),
+            bank_account: document.getElementById('sellerBankAccount').value.trim(),
+            other_info: document.getElementById('sellerOtherPayment').value.trim()
         };
         localStorage.setItem('pilot_seller_settings', JSON.stringify(settings));
         // Persist buyer-contact details to Firestore so buyers reach the right seller
@@ -1809,6 +1848,13 @@
                     contactEmail: settings.contactEmail,
                     contact_email: settings.contactEmail,
                     company: settings.storeName,
+                    payment_details: {
+                        paypal: settings.paypal || '',
+                        bank_name: settings.bank_name || '',
+                        bank_routing: settings.bank_routing || '',
+                        bank_account: settings.bank_account || '',
+                        other_info: settings.other_info || ''
+                    },
                     updated_at: new Date().toISOString()
                 });
                 // Sync to this seller's existing products so RFQ/chat route correctly
@@ -1837,6 +1883,14 @@
                     document.getElementById('sellerWa').value = d.whatsapp || '';
                     document.getElementById('sellerPhone').value = d.phone || '';
                     document.getElementById('sellerContactEmail').value = d.contactEmail || d.contact_email || d.email || '';
+                    
+                    // Payout details
+                    const p = d.payment_details || {};
+                    document.getElementById('sellerPaypal').value = p.paypal || '';
+                    document.getElementById('sellerBankName').value = p.bank_name || '';
+                    document.getElementById('sellerBankRouting').value = p.bank_routing || '';
+                    document.getElementById('sellerBankAccount').value = p.bank_account || '';
+                    document.getElementById('sellerOtherPayment').value = p.other_info || '';
                 }
             }
         } catch (e) {}
@@ -1849,6 +1903,13 @@
                 if (!document.getElementById('sellerContactEmail').value) document.getElementById('sellerContactEmail').value = settings.contactEmail || '';
                 document.getElementById('storeDescription').value = settings.storeDescription || '';
                 document.getElementById('storeCategory').value = settings.storeCategory || '';
+                
+                // Fallbacks from local cache if database fails
+                if (!document.getElementById('sellerPaypal').value) document.getElementById('sellerPaypal').value = settings.paypal || '';
+                if (!document.getElementById('sellerBankName').value) document.getElementById('sellerBankName').value = settings.bank_name || '';
+                if (!document.getElementById('sellerBankRouting').value) document.getElementById('sellerBankRouting').value = settings.bank_routing || '';
+                if (!document.getElementById('sellerBankAccount').value) document.getElementById('sellerBankAccount').value = settings.bank_account || '';
+                if (!document.getElementById('sellerOtherPayment').value) document.getElementById('sellerOtherPayment').value = settings.other_info || '';
             }
         } catch (e) {}
     }

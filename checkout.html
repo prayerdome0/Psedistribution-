@@ -212,6 +212,7 @@
 </div>
 
 <script src="/marketplace-app.js"></script>
+<script src="/email.js"></script>
 <script>
 /* A quote request is deliberately not a payment. Card details are never collected here. */
 var PSE_ADMIN_WHATSAPP = '19099384682';
@@ -258,6 +259,15 @@ async function handleQuoteRequest(e) {
         var total = quoteTotal(items);
         var reference = 'PSE-Q-' + Date.now().toString(36).toUpperCase();
         var customerName = document.getElementById('customerName').value.trim();
+        
+        // 📍 Track location to prevent scams
+        var locationInfo = {};
+        try {
+            locationInfo = await window.PSEMarketplace.trackLocation();
+        } catch (le) {
+            console.warn('Location track failed:', le);
+        }
+
         var rfq = {
             reference: reference,
             title: 'Checkout quotation ' + reference,
@@ -272,10 +282,21 @@ async function handleQuoteRequest(e) {
             user_email: user.email || '',
             status: 'pending',
             source: 'checkout_quote_request',
+            location_tracking: locationInfo, // 📍 SAVE TRACKED LOCATION
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         };
         await window.db.collection('rfqs').add(rfq);
+
+        // 📧 Send email confirmation to the buyer!
+        try {
+            if (window.sendRFQConfirmation) {
+                await window.sendRFQConfirmation(user.email, customerName, rfq.title, rfq.quantity);
+            }
+        } catch (ee) {
+            console.error('Email confirmation send error:', ee);
+        }
+
         window.pseToast('Quotation request sent to PSE. WhatsApp will open with the reference.', 'success');
         openAdminWhatsApp(reference, total, items);
         setTimeout(function() { window.location.href = '/buyer-dashboard'; }, 400);

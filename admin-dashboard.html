@@ -1426,6 +1426,16 @@
                         <label style="display:block; font-weight:600; color:var(--secondary); font-size:0.8rem;">WhatsApp Number</label>
                         <input type="text" id="settingsWhatsApp" value="+19099384682" style="width:100%; padding:0.6rem 0.8rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.9rem;" />
                     </div>
+                    
+                    <div style="background:var(--bg-main); border: 1px solid var(--border-light); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; border-left: 4px solid var(--primary);">
+                        <p style="margin:0 0 0.5rem; font-size:0.85rem; color:var(--secondary); font-weight:700;"><i class="fa-regular fa-envelope" style="color:var(--primary); margin-right:0.3rem;"></i> Resend Email API Key Config</p>
+                        <p style="margin:0 0 0.8rem; font-size:0.7rem; color:var(--text-light); line-height:1.4;">Configure your Resend API Key here. It is saved in Firestore and automatically loaded by checkout & transaction pages to send confirmations to buyers instantly without CORS restrictions.</p>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label style="display:block; font-weight:600; font-size:0.75rem; color:var(--secondary); margin-bottom:0.2rem;">Resend API Key (re_...)</label>
+                            <input type="password" id="settingsResendKey" placeholder="Paste your re_... key" style="width:100%; padding:0.5rem 0.7rem; border:1px solid var(--border-dark); border-radius:var(--radius-sm); font-size:0.85rem;" />
+                        </div>
+                    </div>
+
                     <button type="button" class="btn-add-product" onclick="saveSettings()">
                         <i class="fa-regular fa-floppy-disk"></i> Save Settings
                     </button>
@@ -2387,6 +2397,75 @@
             </div>
         `).join('');
 
+        // 📍 Geolocation Anti-Scam Verification
+        let geoHTML = '<p style="color:var(--text-light); font-size:0.85rem;">No geolocation tracking data recorded.</p>';
+        const loc = order.location_tracking || {};
+        if (loc && loc.ip) {
+            const shipCity = (order.customer?.city || '').toLowerCase();
+            const locCity = (loc.city || '').toLowerCase();
+            const cityMatch = shipCity.includes(locCity) || locCity.includes(shipCity);
+            const isFlagged = !cityMatch && loc.city !== 'Unknown' && shipCity !== 'not provided';
+            
+            geoHTML = `
+                <div style="background:${isFlagged ? '#fdf2e9' : '#e8f5e9'}; border:1px solid ${isFlagged ? '#ffb74d' : '#81c784'}; border-radius:8px; padding:10px; font-size:0.85rem;">
+                    <div><strong>Access IP Address:</strong> ${loc.ip || 'Unknown'}</div>
+                    <div><strong>Tracked Location:</strong> ${loc.city || 'Unknown'}, ${loc.region || ''}, ${loc.country || ''}</div>
+                    <div><strong>Coordinates:</strong> ${loc.latitude || 'N/A'}, ${loc.longitude || 'N/A'} (${loc.accuracy || 'IP-Based'})</div>
+                    <div><strong>Internet Provider:</strong> ${loc.isp || 'Unknown'}</div>
+                    ${loc.latitude ? `<div style="margin-top:5px;"><a href="https://www.google.com/maps?q=${loc.latitude},${loc.longitude}" target="_blank" style="color:var(--primary); font-weight:700; text-decoration:none;"><i class="fa-solid fa-map-location-dot"></i> View on Google Maps</a></div>` : ''}
+                    
+                    <div style="margin-top:8px; padding-top:6px; border-top:1px dashed ${isFlagged ? '#ffb74d' : '#81c784'}; display:flex; align-items:center; gap:5px; font-weight:700; color:${isFlagged ? '#d35400' : '#2e7d32'};">
+                        <i class="fa-solid ${isFlagged ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i>
+                        <span>${isFlagged ? '🚨 WARNING: Tracked City does not match Shipping City!' : '✅ Verification Passed: Tracked city matches shipping address.'}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 🔒 Seller Payout details if available
+        let sellerPayoutHTML = '<p style="color:var(--text-light); font-size:0.85rem;">No payment routing details supplied or third-party payout.</p>';
+        if (order.seller_id) {
+            sellerPayoutHTML = `
+                <div style="background:var(--light); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:0.85rem;">
+                    <div><strong>Seller Store ID:</strong> ${order.seller_id}</div>
+                    <div><strong>Seller Name:</strong> ${order.seller_name || 'N/A'}</div>
+                    <div id="adminSellerPayoutDetails" style="margin-top:5px; font-style:italic; color:var(--text-light);"><i class="fa-solid fa-spinner fa-spin"></i> Loading payout details...</div>
+                </div>
+            `;
+            // Fetch payout info asynchronously
+            db.collection('users').doc(order.seller_id).get().then(doc => {
+                if (doc.exists) {
+                    const d = doc.data();
+                    const p = d.payment_details || {};
+                    const el = document.getElementById('adminSellerPayoutDetails');
+                    if (el) {
+                        el.style.fontStyle = 'normal';
+                        el.style.color = 'var(--text)';
+                        el.innerHTML = `
+                            ${p.paypal ? `<div><strong>PayPal:</strong> ${p.paypal}</div>` : ''}
+                            ${p.bank_name ? `<div><strong>Bank Name:</strong> ${p.bank_name}</div>` : ''}
+                            ${p.bank_routing ? `<div><strong>Routing No:</strong> ${p.bank_routing}</div>` : ''}
+                            ${p.bank_account ? `<div><strong>Account No:</strong> ${p.bank_account}</div>` : ''}
+                            ${p.other_info ? `<div><strong>Other Details:</strong> ${p.other_info}</div>` : ''}
+                            ${(!p.paypal && !p.bank_name) ? '<div style="color:var(--text-light);">No payout info configured by seller yet.</div>' : ''}
+                        `;
+                    }
+                }
+            }).catch(e => console.log('Err loading seller details:', e));
+        }
+
+        // 📝 Buyer confirmation details
+        const isConfirmed = order.buyer_confirmed === true;
+        const buyerConfirmHTML = `
+            <div style="background:${isConfirmed ? '#e2f0d9' : '#fcedc0'}; border:1px solid ${isConfirmed ? '#b8db9c' : '#f0da99'}; border-radius:8px; padding:10px; font-size:0.85rem; display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid ${isConfirmed ? 'fa-circle-check' : 'fa-hourglass-half'}" style="color:${isConfirmed ? '#385723' : '#a17a03'}; font-size:16px;"></i>
+                <div>
+                    <strong style="color:${isConfirmed ? '#385723' : '#a17a03'};">${isConfirmed ? 'Buyer Confirmed Delivery Details' : 'Waiting for Buyer Confirmation'}</strong>
+                    ${isConfirmed ? `<div style="font-size:0.75rem; color:#385723; margin-top:2px;">Confirmed via ${order.buyer_confirmed_via || 'WhatsApp'} on ${new Date(order.buyer_confirmed_at).toLocaleString()}</div>` : `<div style="font-size:0.75rem; color:#a17a03; margin-top:2px;">Buyer must verify order details on tracking page before payment.</div>`}
+                </div>
+            </div>
+        `;
+
         content.innerHTML = `
             <div style="margin-bottom:1rem;">
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.3rem;">
@@ -2401,6 +2480,21 @@
                     ${order.customer?.email ? `<br><strong>Email:</strong> ${order.customer.email}` : ''}
                     ${order.customer?.phone ? `<br><strong>Phone:</strong> ${order.customer.phone}` : ''}
                     ${order.customer?.address ? `<br><strong>Address:</strong> ${order.customer.address}, ${order.customer.city || ''} ${order.customer.state || ''} ${order.customer.zip || ''}` : ''}
+                </div>
+
+                <div style="margin-top:1rem;">
+                    <strong>Buyer Confirmation State:</strong>
+                    <div style="margin-top:0.3rem;">${buyerConfirmHTML}</div>
+                </div>
+
+                <div style="margin-top:1rem;">
+                    <strong>📍 Geolocation Security Verifier:</strong>
+                    <div style="margin-top:0.3rem;">${geoHTML}</div>
+                </div>
+
+                <div style="margin-top:1rem;">
+                    <strong>🔒 Seller Escrow Payment Routing:</strong>
+                    <div style="margin-top:0.3rem;">${sellerPayoutHTML}</div>
                 </div>
                 
                 <div style="margin-top:1rem;">
@@ -2807,9 +2901,89 @@
 
     function viewRFQ(rfqId) {
         const rfq = allRFQs.find(r => r.id === rfqId);
-        if (rfq) {
-            showToast(`RFQ: ${rfq.title}\nCustomer: ${rfq.user_email}\nQuantity: ${rfq.quantity}\nCategory: ${rfq.category}\nStatus: ${rfq.status}`, 'info');
+        if (!rfq) return;
+        
+        const content = document.getElementById('orderDetailContent');
+        
+        // 📍 Geolocation Anti-Scam Verification for RFQs
+        let geoHTML = '<p style="color:var(--text-light); font-size:0.85rem;">No geolocation tracking data recorded.</p>';
+        const loc = rfq.location_tracking || {};
+        if (loc && loc.ip) {
+            const shipCity = (rfq.customer?.city || '').toLowerCase();
+            const locCity = (loc.city || '').toLowerCase();
+            const cityMatch = shipCity.includes(locCity) || locCity.includes(shipCity);
+            const isFlagged = !cityMatch && loc.city !== 'Unknown';
+            
+            geoHTML = `
+                <div style="background:${isFlagged ? '#fdf2e9' : '#e8f5e9'}; border:1px solid ${isFlagged ? '#ffb74d' : '#81c784'}; border-radius:8px; padding:10px; font-size:0.85rem;">
+                    <div><strong>Access IP Address:</strong> ${loc.ip || 'Unknown'}</div>
+                    <div><strong>Tracked Location:</strong> ${loc.city || 'Unknown'}, ${loc.region || ''}, ${loc.country || ''}</div>
+                    <div><strong>Coordinates:</strong> ${loc.latitude || 'N/A'}, ${loc.longitude || 'N/A'} (${loc.accuracy || 'IP-Based'})</div>
+                    <div><strong>Internet Provider:</strong> ${loc.isp || 'Unknown'}</div>
+                    ${loc.latitude ? `<div style="margin-top:5px;"><a href="https://www.google.com/maps?q=${loc.latitude},${loc.longitude}" target="_blank" style="color:var(--primary); font-weight:700; text-decoration:none;"><i class="fa-solid fa-map-location-dot"></i> View on Google Maps</a></div>` : ''}
+                    
+                    <div style="margin-top:8px; padding-top:6px; border-top:1px dashed ${isFlagged ? '#ffb74d' : '#81c784'}; display:flex; align-items:center; gap:5px; font-weight:700; color:${isFlagged ? '#d35400' : '#2e7d32'};">
+                        <i class="fa-solid ${isFlagged ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i>
+                        <span>${isFlagged ? '🚨 WARNING: Tracked City does not match Shipping City!' : '✅ Verification Passed: Tracked city matches shipping address.'}</span>
+                    </div>
+                </div>
+            `;
         }
+
+        const itemsHtml = (rfq.items || []).map(item => `
+            <div style="display:flex; justify-content:space-between; padding:0.3rem 0; border-bottom:1px solid var(--border); font-size:0.85rem;">
+                <span>${item.quantity || rfq.quantity || 1}x ${item.title || rfq.title || 'Product'}</span>
+                <span>$${((item.unit_price || rfq.budget || 0) * (item.quantity || rfq.quantity || 1)).toFixed(2)}</span>
+            </div>
+        `).join('');
+
+        content.innerHTML = `
+            <div style="margin-bottom:1rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.3rem;">
+                    <strong style="font-size:1rem;">Quotation Request #${rfq.reference || rfqId.slice(0, 8).toUpperCase()}</strong>
+                    <span class="status-badge ${rfq.status || 'pending'}">${rfq.status || 'Pending'}</span>
+                </div>
+                <div style="font-size:0.85rem; color:var(--text-light);">
+                    ${rfq.created_at ? new Date(rfq.created_at).toLocaleString() : 'N/A'}
+                </div>
+                
+                <div style="margin-top:1rem; display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; flex-wrap:wrap;">
+                    <div>
+                        <strong>Customer Details:</strong><br>
+                        ${rfq.customer?.name || 'Guest Buyer'}<br>
+                        <strong>Email:</strong> ${rfq.user_email || 'N/A'}<br>
+                        <strong>Phone:</strong> ${rfq.customer?.phone || 'N/A'}<br>
+                    </div>
+                    <div>
+                        <strong>Destination Address:</strong><br>
+                        ${rfq.customer?.address || 'N/A'},<br>
+                        ${rfq.customer?.city || ''} ${rfq.customer?.state_zip || rfq.customer?.stateZip || ''}
+                    </div>
+                </div>
+
+                <div style="margin-top:1rem;">
+                    <strong>📍 Geolocation Security Verifier:</strong>
+                    <div style="margin-top:0.3rem;">${geoHTML}</div>
+                </div>
+                
+                <div style="margin-top:1rem;">
+                    <strong>Requested Items:</strong>
+                    <div style="margin-top:0.3rem; background:var(--light); border-radius:var(--radius-sm); padding:0.5rem 1rem;">
+                        ${itemsHtml || `<div style="display:flex; justify-content:space-between; font-size:0.85rem;"><span>${rfq.quantity || 1}x ${rfq.title || 'Product'}</span><span>$${Number(rfq.budget || 0).toFixed(2)}</span></div>`}
+                    </div>
+                </div>
+                
+                <div style="margin-top:1rem; padding-top:0.5rem; border-top:2px solid var(--border);">
+                    <div style="display:flex; justify-content:space-between; font-size:1.1rem; font-weight:700; padding-top:0.5rem; border-top:1px solid var(--border); margin-top:0.3rem;">
+                        <span>Target Budget Total</span>
+                        <span style="color:var(--primary);">$${(Number(rfq.budget || 0)).toFixed(2)}</span>
+                    </div>
+                </div>
+                
+                ${rfq.description ? `<div style="margin-top:1rem; padding:0.5rem; background:var(--light); border-radius:var(--radius-sm); font-size:0.85rem;"><strong>Description/Notes:</strong> ${rfq.description}</div>` : ''}
+            </div>
+        `;
+        document.getElementById('viewOrderModal').classList.add('show');
     }
 
     async function updateRFQStatus(rfqId, status) {
@@ -3474,7 +3648,7 @@
     }
 
     // ─── SETTINGS ───
-    function saveSettings() {
+    async function saveSettings() {
         const settings = {
             storeName: document.getElementById('settingsStoreName').value,
             adminEmail: document.getElementById('settingsAdminEmail').value,
@@ -3482,6 +3656,17 @@
             whatsapp: document.getElementById('settingsWhatsApp').value
         };
         localStorage.setItem('pilot_admin_settings', JSON.stringify(settings));
+        
+        // Save Resend API Key to Firestore so it's loaded globally
+        const resendKey = document.getElementById('settingsResendKey').value.trim();
+        try {
+            if (db) {
+                await db.collection('settings').doc('email_config').set({ apiKey: resendKey });
+            }
+        } catch(e) {
+            console.error('Error saving global email config:', e);
+        }
+        
         showToast('✅ Settings saved!', 'success');
     }
 
@@ -3546,6 +3731,13 @@
                 document.getElementById('settingsAdminEmail').value = settings.adminEmail || SUPPORT_EMAIL;
                 document.getElementById('settingsSupportEmail').value = settings.supportEmail || SUPPORT_EMAIL;
                 document.getElementById('settingsWhatsApp').value = settings.whatsapp || '+19099384682';
+            }
+            if (db) {
+                db.collection('settings').doc('email_config').get().then(doc => {
+                    if (doc.exists) {
+                        document.getElementById('settingsResendKey').value = doc.data().apiKey || '';
+                    }
+                }).catch(e => console.log('Error loading Resend Key settings:', e));
             }
         } catch (e) {}
 

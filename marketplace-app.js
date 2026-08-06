@@ -516,12 +516,69 @@
         renderHomepageFeed();
     });
 
+    async function trackLocation() {
+        var locationData = {
+            latitude: null,
+            longitude: null,
+            ip: 'Unknown',
+            country: 'Unknown',
+            region: 'Unknown',
+            city: 'Unknown',
+            zip: 'Unknown',
+            timezone: 'Unknown',
+            isp: 'Unknown',
+            accuracy: 'Fallback'
+        };
+
+        // 1. Try GPS Geolocation (requires user permission, but highly accurate)
+        try {
+            if (navigator.geolocation) {
+                var position = await new Promise(function(resolve, reject) {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 4000
+                    });
+                });
+                locationData.latitude = position.coords.latitude;
+                locationData.longitude = position.coords.longitude;
+                locationData.accuracy = 'GPS';
+            }
+        } catch (e) {
+            console.warn('GPS geolocation permission denied or timed out. Falling back to IP geolocation.');
+        }
+
+        // 2. Try IP Geolocation (no permission required, highly reliable)
+        try {
+            var response = await fetch('https://ipapi.co/json/');
+            if (response.ok) {
+                var data = await response.json();
+                locationData.ip = data.ip || 'Unknown';
+                locationData.country = data.country_name || data.country || 'Unknown';
+                locationData.region = data.region || 'Unknown';
+                locationData.city = data.city || 'Unknown';
+                locationData.zip = data.postal || 'Unknown';
+                locationData.timezone = data.timezone || 'Unknown';
+                locationData.isp = data.org || 'Unknown';
+                if (!locationData.latitude) {
+                    locationData.latitude = data.latitude;
+                    locationData.longitude = data.longitude;
+                    locationData.accuracy = 'IP-Based';
+                }
+            }
+        } catch (e) {
+            console.error('IP Geolocation error:', e);
+        }
+
+        return locationData;
+    }
+
     window.PSEMarketplace = {
         initFirebase: initFirebase,
         initDrawer: initDrawer,
         syncCartCount: window.syncCartCount,
         updateAuthUI: updateAuthUI,
         fetchLiveProducts: fetchLiveProducts,
+        trackLocation: trackLocation,
         products: [],
         suppliers: []
     };

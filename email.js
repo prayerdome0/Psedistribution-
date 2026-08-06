@@ -922,17 +922,31 @@ async function sendEmailResend(templateType, data, toEmail) {
             throw new Error(`Template "${templateType}" not found`);
         }
 
+        // 🔍 Fetch key from Firestore (source of truth) so it's shared across all buyers
+        let databaseKey = '';
+        try {
+            if (window.db) {
+                const settingsDoc = await window.db.collection('settings').doc('email_config').get();
+                if (settingsDoc.exists) {
+                    databaseKey = settingsDoc.data().apiKey || '';
+                }
+            }
+        } catch (e) {
+            console.warn('Firestore email config fetch note:', e);
+        }
+
         // 🔒 Security: Only attempt Resend if a key is explicitly configured
-        // via localStorage (admin) or server env. Otherwise skip directly to
+        // via Firestore (shared), localStorage (admin), or server env. Otherwise skip directly to
         // free FormSubmit fallback — no hardcoded secret in repo.
         const configuredKey = (function(){
             try {
-                // Try multiple sources: localStorage, meta tag, global config
-                return localStorage.getItem('PSE_RESEND_KEY') ||
+                // Try multiple sources: database, localStorage, meta tag, global config
+                return databaseKey ||
+                       localStorage.getItem('PSE_RESEND_KEY') ||
                        (document.querySelector('meta[name="resend-key"]')?.content) ||
                        (window.PSE_CONFIG && window.PSE_CONFIG.resendKey) ||
                        EMAIL_CONFIG.apiKey || '';
-            } catch(e){ return EMAIL_CONFIG.apiKey || ''; }
+            } catch(e){ return databaseKey || EMAIL_CONFIG.apiKey || ''; }
         })();
 
         if (!configuredKey || configuredKey.length < 10) {
@@ -943,33 +957,32 @@ async function sendEmailResend(templateType, data, toEmail) {
         }
 
         const emailData = {
-            from: EMAIL_CONFIG.fromEmail,
             to: toEmail || data.email || EMAIL_CONFIG.fallbackEmail,
-            reply_to: EMAIL_CONFIG.replyTo,
             subject: template.subject,
-            html: template.html
+            html: template.html,
+            apiKey: configuredKey
         };
 
-        const response = await fetch(RESEND_API_URL, {
+        // Send via backend proxy to completely bypass browser CORS restrictions
+        const response = await fetch('/api/send-email', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${configuredKey}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(emailData)
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(()=>({message:'Resend failed'}));
-            throw new Error(errorData.message || 'Failed to send email via Resend');
+            const errorData = await response.json().catch(()=>({message:'Backend API email dispatch failed'}));
+            throw new Error(errorData.message || 'Failed to send email via backend API');
         }
 
         const result = await response.json();
-        console.log('✅ Email sent via Resend');
+        console.log('✅ Email sent via Resend backend API');
         return { success: true, transport: 'resend', result };
 
     } catch (error) {
-        console.warn('Resend not available, using fallback transport:', error.message);
+        console.warn('Resend backend API not available, using fallback transport:', error.message);
         // Fallback 1: FormSubmit (free, no API key)
         const formSubmitResult = await sendEmailFormSubmit(templateType, data, toEmail);
         if (formSubmitResult.success) {
@@ -978,6 +991,7 @@ async function sendEmailResend(templateType, data, toEmail) {
         // Fallback 2: mailto
         return sendEmailFallback(templateType, data, toEmail);
     }
+}
 }
 
 // ─── SEND EMAIL USING MAILTO FALLBACK ───
