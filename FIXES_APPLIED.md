@@ -38,7 +38,7 @@ This document summarizes the full audit and fixes applied to make the marketplac
   - "Verified Suppliers Worldwide — Trade Assurance"
   - "Escrow Protection & Inspection Available"
   - "Freight Quoted Per Product — No Surprises"
-- **Files fixed:** `404.html`, `about.html`, `account.html`, `become-seller.html`, `buyer-dashboard.html`, `cart.html`, `checkout.html`, `contact.html`, `help-center.html`, `login.html`, `order-success.html`, `privacy.html`, `product-detail.html`, `products.html`, `register.html`, `rfq.html`, `supplier-verification.html`, `terms.html`, `track-order.html`, `wishlist.html`, `Email Template/welcome.html`, `catalog-data.js`, `catalog-pdf.js`, `ai-assistant.js`, `email.js`
+- **Files fixed:** `404.html`, `about.html`, `account.html`, `become-seller.html`, `buyer-dashboard.html`, `cart.html`, `checkout.html`, `contact.html`, `help-center.html`, `login.html`, `order-success.html`, `privacy.html`, `product-detail.html`, `products.html`, `register.html`, `rfq.html`, `supplier-verification.html`, `terms.html`, `track-order.html`, `wishlist.html`, `email-template/welcome.html`, `catalog-data.js`, `catalog-pdf.js`, `ai-assistant.js`, `email.js`
 
 ### About Page
 - Top bar fake stats removed

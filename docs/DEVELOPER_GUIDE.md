@@ -182,7 +182,7 @@ postgres + valkey + firebase emulators).
 | A new inventory API endpoint | `services/pse-inventory/pse_inventory/api.py` + update `vendor/pse-inventory-packet/03_CONTRACTS/` |
 | A new Firestore collection | Update `firestore.rules` (deny-by-default) + add an index in `firestore.indexes.json` |
 | A new env var | `.env.example` (template only) + `tests/test_env_hygiene.py` (it'll catch you) |
-| A new email template | `Email Template/<name>.html` + register in `email.js` |
+| A new email template | `email-template/<name>.html` + register in `email.js` |
 
 ---
 
