@@ -1159,6 +1159,54 @@
         }
     }
 
+    // ─── 19b. COUNTER SYNC (cart & wishlist badges) ───────────────────────────
+    function syncCounters() {
+        var cartCount = 0;
+        try {
+            cartCount = JSON.parse(localStorage.getItem('pilot_cart') || '[]')
+                .reduce(function (sum, item) { return sum + (Number(item.quantity) || 1); }, 0);
+        } catch (e) {}
+        document.querySelectorAll('.cart-count, #cartCount').forEach(function (el) {
+            el.textContent = cartCount;
+        });
+
+        var wishCount = 0;
+        try {
+            wishCount = JSON.parse(localStorage.getItem('pilot_wishlist') || '[]').length;
+        } catch (e) {}
+        document.querySelectorAll('.wishlist-count').forEach(function (el) {
+            el.textContent = wishCount;
+            el.style.display = wishCount > 0 ? 'inline' : 'none';
+        });
+    }
+
+    // ─── 19c. PRICE ALERT MODAL (openPriceAlertModal) ─────────────────────────
+    function openPriceAlertModal(title, price) {
+        var modal = document.getElementById('mktPriceAlertModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'mktPriceAlertModal';
+            modal.className = 'mkt-modal-overlay';
+            modal.innerHTML = [
+                '<div class="mkt-modal-box" style="max-width:420px;text-align:center;">',
+                    '<button class="mkt-modal-close" onclick="document.getElementById(\'mktPriceAlertModal\').classList.remove(\'show\');document.body.style.overflow=\'\';">&times;</button>',
+                    '<div style="font-size:2.6rem;margin-bottom:0.6rem;">🔔</div>',
+                    '<h2 style="font-size:1.3rem;font-weight:900;color:#0f1111;margin:0 0 0.5rem;">Price Alert Set</h2>',
+                    '<p style="font-size:0.85rem;color:#565959;line-height:1.5;margin:0 0 1.2rem;" id="priceAlertText">We will notify you the moment this product drops in price.</p>',
+                    '<button class="buybox-btn-cart" style="padding:0.65rem 1.8rem;font-size:0.85rem;" onclick="document.getElementById(\'mktPriceAlertModal\').classList.remove(\'show\');document.body.style.overflow=\'\';">Got it</button>',
+                '</div>'
+            ].join('');
+            document.body.appendChild(modal);
+        }
+        var text = document.getElementById('priceAlertText');
+        if (text && title) {
+            text.textContent = 'We will email you the moment "' + String(title).substring(0, 40) + (String(title).length > 40 ? '…' : '') + '" drops below ' + formatPrice(Number(price) || 0) + '.';
+        }
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        pseToast('🔔 Price alert set for "' + String(title || 'this product').substring(0, 30) + '…"', 'success');
+    }
+
     // ─── 20. GLOBAL TOAST HELPER ──────────────────────────────────────────────
     window.pseToast = function (message, type) {
         if (typeof showToast === 'function') {
