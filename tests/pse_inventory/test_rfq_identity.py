@@ -1,72 +1,76 @@
-"""Website wiring contract: catalog/detail/RFQ consume only the public API and
-preserve Deal ID, source/snapshot version and quantity end-to-end."""
+"""Public-release and dormant inventory-module boundary checks.
+
+The verified opportunity-display release intentionally replaced the older
+live-catalog storefront. The reusable catalog module remains tested, while the
+deployed pages must stay request-based and must not imply live inventory.
+"""
 from __future__ import annotations
 
-import json
 import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_node_catalog_tests_pass():
+def test_dormant_catalog_module_tests_pass() -> None:
     completed = subprocess.run(
         ["node", "--test", "catalog.test.mjs"],
         cwd=ROOT / "apps" / "pse-inventory-catalog",
-        capture_output=True, text=True, check=False,
+        capture_output=True,
+        text=True,
+        check=False,
     )
     assert completed.returncode == 0, completed.stdout + completed.stderr
 
 
-def test_products_page_reads_public_api_not_private_master():
+def test_current_opportunity_page_is_request_based() -> None:
     html = (ROOT / "products.html").read_text(encoding="utf-8")
-    assert "/api/inventory" in html
-    assert "fetchInventoryFeed" in html
-    # Public product discovery is API-only. Firebase remains available for
-    # account/cart features, but no buyer-facing loader may read the private
-    # product collection or static fallback catalog.
-    load_block = html.split("async function loadProducts()")[1].split("allProducts = products;")[0]
-    assert "db.collection('products')" not in load_block
-    assert "PSE_CATALOG_DATA" not in load_block
-    assert "fetchInventoryFeed" in load_block
-    assert "mapInventoryItem" in load_block
+    assert "PUBLIC CATALOG STATUS" in html
+    assert "Request-based" in html
+    assert "Local draft only" in html
+    assert "/api/inventory" not in html
+    assert "fetchInventoryFeed" not in html
 
 
-def test_product_detail_page_prefers_public_api():
+def test_protected_product_detail_is_fail_closed() -> None:
     html = (ROOT / "product-detail.html").read_text(encoding="utf-8")
-    assert "/api/inventory/" in html
-    assert "mapInventoryDetail" in html
-    assert "rfqOnly" in html, "RFQ/login pricing must never render a fabricated price"
+    assert 'content="noindex,nofollow"' in html
+    assert "Current deal details are request-based" in html
+    assert "/api/inventory/" not in html
     assert "db.collection('products')" not in html
 
 
-def test_public_discovery_pages_have_no_private_or_static_product_fallbacks():
+def test_public_discovery_pages_have_no_private_or_static_product_fallbacks() -> None:
     for page in ("index.html", "products.html", "product-detail.html", "search-pro.js"):
         html = (ROOT / page).read_text(encoding="utf-8")
         assert "db.collection('products')" not in html
         assert "PSE_CATALOG_DATA" not in html
 
 
-def test_rfq_page_preserves_inventory_identity():
+def test_rfq_is_a_local_non_inventory_draft() -> None:
     html = (ROOT / "rfq.html").read_text(encoding="utf-8")
-    for field in ("rfqDealId", "rfqSlug", "rfqSourceVersion", "rfqSnapshotVersion"):
-        assert field in html
-    assert "deal_id: dealId || null" in html
-    assert "source_version: sourceVersion || null" in html
-    assert "snapshot_version: snapshotVersion || null" in html
-    assert "prefillFromInventoryLink" in html
+    script = (ROOT / "site.js").read_text(encoding="utf-8")
+    assert "does not transmit data" in html
+    assert "NOT SUBMITTED / NOT AN ORDER" in script
+    assert "fetch(" not in script
+    assert "XMLHttpRequest" not in script
+    assert "rfqDealId" not in html
 
 
-def test_unsupported_claims_removed_from_storefront():
+def test_unsupported_claims_are_absent_from_storefront() -> None:
+    unsupported = [
+        "12,000+ Products",
+        "580+ Verified Suppliers",
+        "99.7% Customer Satisfaction",
+        "Free Shipping on Orders Over $250",
+    ]
     for page in ("index.html", "products.html"):
         html = (ROOT / page).read_text(encoding="utf-8")
-        assert "12,000+ Products" not in html
-        assert "580+ Verified Suppliers" not in html
-        assert "99.7% Customer Satisfaction" not in html
-        assert "Free Shipping on Orders Over $250" not in html
+        for claim in unsupported:
+            assert claim not in html
 
 
-def test_product_level_terms_present_on_catalog():
+def test_request_page_states_current_verification_boundary() -> None:
     html = (ROOT / "products.html").read_text(encoding="utf-8")
-    assert "Freight quoted separately unless explicitly included" in html
-    assert "Availability subject to prior sale and final confirmation" in html
+    assert "request current deals" in html.lower()
+    assert "nothing is submitted, ordered, reserved, messaged, or paid" in html.lower()

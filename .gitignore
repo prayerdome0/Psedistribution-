@@ -13,6 +13,7 @@ node_modules/
 .vscode/
 *.log
 .arena/
+.vercel-public/
 
 .venv/
 __pycache__/

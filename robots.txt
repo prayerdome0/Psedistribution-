@@ -14,5 +14,6 @@ Disallow: /seller-dashboard.html
 Disallow: /supplier-pending.html
 Disallow: /track-order.html
 Disallow: /wishlist.html
+Disallow: /api/
 
 Sitemap: https://pilotsalesdistribution.com/sitemap.xml
