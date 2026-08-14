@@ -1,179 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>About Us — PSE Marketplace</title>
-    <meta name="description" content="Learn about Pilot Sales Distribution and our buyer-focused wholesale marketplace services." />
-    <link rel="canonical" href="https://pilotsalesdistribution.com/about" />
-    <meta property="og:title" content="About Pilot Sales Distribution | Pilot Sales Distribution" />
-    <meta property="og:description" content="Learn about Pilot Sales Distribution and our buyer-focused wholesale marketplace services." />
-    <meta property="og:url" content="https://pilotsalesdistribution.com/about" />
-    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://pilotsalesdistribution.com/"},{"@type":"ListItem","position":2,"name":"About Pilot Sales Distribution","item":"https://pilotsalesdistribution.com/about"}]}</script>
-    
-    <!-- Favicon & PWA -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0057FF">
-
-    <!-- Font Awesome & Google Fonts -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
-    <!-- Unified Master Stylesheet -->
-    <link rel="stylesheet" href="/marketplace-app.css" />
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="How Pilot Sales Distribution reviews wholesale and closeout opportunities.">
+  <title>How it works | Pilot Sales Distribution</title><link rel="stylesheet" href="site.css"><script src="site.js" defer></script>
 </head>
-
 <body>
-
-<div class="app-shell">
-
-    <!-- ═══════════ GLOBAL HEADER ═══════════ -->
-    <header class="app-header">
-        <div class="app-header-top">
-            <button type="button" class="app-menu-btn" id="appMenuBtn" aria-label="Open Navigation Menu">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-
-            <a href="/" class="app-logo" aria-label="PSE Marketplace Home">
-                <img src="/logo.webp" alt="PSE Marketplace Logo" />
-                <span class="app-logo-name">PSE <b>Marketplace</b></span>
-            </a>
-
-            <div class="app-header-actions">
-                <button type="button" class="app-icon-btn" id="appNotifBtn" aria-label="Notifications">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="app-badge" id="appNotifBadge">3</span>
-                </button>
-                <a href="/cart" class="app-icon-btn" aria-label="Cart">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <span class="app-badge app-badge--cart cart-count" id="cartCount">0</span>
-                </a>
-            </div>
-        </div>
-
-        <div class="app-search" id="searchBar">
-            <form class="app-search-form" role="search" onsubmit="event.preventDefault(); var q=document.getElementById('searchInput').value.trim(); if(q) window.location.href='/products?search='+encodeURIComponent(q);">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="search" id="searchInput" placeholder="Search Products, Brands, Suppliers..." autocomplete="off" aria-label="Search marketplace" />
-                <button type="submit" id="searchBtn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
-            </form>
-        </div>
-
-        <div class="app-locbar">
-            <button type="button" class="app-loc" id="appLocBtn" title="Tap to change delivery location">
-                <i class="fa-solid fa-location-dot"></i> Deliver to <strong id="appZip">Worldwide 🌐</strong>
-            </button>
-            <a class="app-greet" href="/account" id="appGreetLink"><i class="fa-regular fa-circle-user"></i> Hi, <span id="accountLabel">Guest</span></a>
-        </div>
-    </header>
-
-    <!-- ═══════════ GLOBAL MENU DRAWER ═══════════ -->
-    <div class="app-drawer-overlay" id="appDrawerOverlay"></div>
-    <aside class="app-drawer" id="appDrawer" aria-label="Navigation drawer" aria-hidden="true">
-        <div class="app-drawer-header">
-            <div class="app-drawer-user">
-                <div class="app-drawer-avatar"><i class="fa-solid fa-user"></i></div>
-                <div class="app-drawer-userinfo">
-                    <span class="app-drawer-greeting">Welcome to PSE</span>
-                    <strong class="app-drawer-username" id="drawerUserLabel">Hello, Guest</strong>
-                    <a href="/login" class="app-drawer-authlink" id="drawerAuthLink">Sign In / Register</a>
-                </div>
-            </div>
-            <button type="button" class="app-drawer-close" id="appDrawerClose" aria-label="Close menu">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <div class="app-drawer-body">
-            <div class="app-drawer-group-title">Navigation</div>
-            <ul class="app-drawer-menu">
-                <li><a href="/"><i class="fa-solid fa-house"></i><span>Home</span></a></li>
-                <li><a href="/products"><i class="fa-solid fa-layer-group"></i><span>Categories</span></a></li>
-                <li><a href="/products?category=electronics"><i class="fa-solid fa-tv"></i><span>Electronics</span></a></li>
-                <li><a href="/products?category=computers"><i class="fa-solid fa-laptop"></i><span>Computers</span></a></li>
-                <li><a href="/products?category=phones"><i class="fa-solid fa-mobile-screen-button"></i><span>Smartphones</span></a></li>
-                <li><a href="/products?category=fashion"><i class="fa-solid fa-shirt"></i><span>Fashion</span></a></li>
-                <li><a href="/products?category=automotive"><i class="fa-solid fa-car"></i><span>Automotive</span></a></li>
-                <li><a href="/products?category=home"><i class="fa-solid fa-couch"></i><span>Home &amp; Industrial</span></a></li>
-                <li><a href="/products?category=overstock"><i class="fa-solid fa-boxes-stacked"></i><span>Liquidation Lots</span></a></li>
-                <li><a href="/rfq"><i class="fa-solid fa-file-invoice-dollar"></i><span>RFQ Quotes</span><span class="app-drawer-pill">B2B</span></a></li>
-                <li><a href="/supplier-store"><i class="fa-solid fa-store"></i><span>Supplier Directory</span></a></li>
-                <li><a href="/account#orders"><i class="fa-solid fa-box"></i><span>Orders</span></a></li>
-                <li><a href="/wishlist"><i class="fa-regular fa-heart"></i><span>Wishlist</span></a></li>
-                <li><a href="/cart"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><span class="app-drawer-badge cart-count">0</span></a></li>
-                <li><a href="/account"><i class="fa-regular fa-user"></i><span>Account</span></a></li>
-                <li><a href="/account#settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a></li>
-                <li><a href="/contact"><i class="fa-regular fa-envelope"></i><span>Contact Us</span></a></li>
-            </ul>
-        </div>
-    </aside>
-
-    <!-- ═══════════ ABOUT CONTENT ═══════════ -->
-    <main class="app-main">
-
-        <div class="app-hero-banner" style="background:linear-gradient(135deg, #0057FF 0%, #0036A8 100%);">
-            <span class="app-hero-tag"><i class="fa-solid fa-earth-americas"></i> Global Marketplace</span>
-            <h1>About PSE Marketplace</h1>
-            <p>Pilot Sales Distribution is the leading verified B2B marketplace connecting certified wholesale distributors and buyers worldwide.</p>
-        </div>
-
-        <div style="display:flex; flex-direction:column; gap:12px;">
-            <div style="background:#fff; border:1px solid var(--app-border); border-radius:var(--app-radius-lg); padding:16px;">
-                <h3 style="font-size:14px; font-weight:800; color:var(--app-text); margin:0 0 6px;"><i class="fa-solid fa-shield-halved" style="color:var(--app-primary); margin-right:6px;"></i> Verified Wholesale</h3>
-                <p style="font-size:12.5px; color:var(--app-text-muted); margin:0;">Every inventory lot listed on PSE undergoes strict SKU availability verification, inspection standards, and authentication before going live.</p>
-            </div>
-
-            <div style="background:#fff; border:1px solid var(--app-border); border-radius:var(--app-radius-lg); padding:16px;">
-                <h3 style="font-size:14px; font-weight:800; color:var(--app-text); margin:0 0 6px;"><i class="fa-solid fa-comments" style="color:var(--app-accent-dark); margin-right:6px;"></i> Direct quotation support</h3>
-                <p style="font-size:12.5px; color:var(--app-text-muted); margin:0;">PSE issues final quotations and approved payment instructions directly. <a href="https://wa.me/19099384682" target="_blank" rel="noopener">Message us on WhatsApp</a> or <a href="/contact">send an email enquiry</a>.</p>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- ═══════════ COMPACT FOOTER ═══════════ -->
-    <footer class="app-footer">
-        <div class="app-footer-logo">
-            <img src="/logo.webp" alt="PSE Marketplace" />
-            <strong>PSE <b>Marketplace</b></strong>
-        </div>
-        <p>&copy; 2026 Pilot Sales Distribution, Inc. All rights reserved.</p>
-    </footer>
-
-    <!-- ═══════════ BOTTOM NAVIGATION ═══════════ -->
-    <nav class="app-bottom-nav" aria-label="Main navigation">
-        <a href="/" class="app-nav-item" data-nav="home">
-            <i class="fa-solid fa-house"></i>
-            <span>Home</span>
-        </a>
-        <a href="/products" class="app-nav-item" data-nav="categories">
-            <i class="fa-solid fa-shapes"></i>
-            <span>Categories</span>
-        </a>
-        <a href="/rfq" class="app-nav-item" data-nav="rfq">
-            <i class="fa-solid fa-file-invoice"></i>
-            <span>RFQ</span>
-        </a>
-        <a href="/cart" class="app-nav-item" data-nav="cart">
-            <div class="app-nav-icon-wrap">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span class="app-badge app-badge--cart cart-count">0</span>
-            </div>
-            <span>Cart</span>
-        </a>
-        <a href="/account" class="app-nav-item" data-nav="account">
-            <i class="fa-solid fa-user"></i>
-            <span>Account</span>
-        </a>
-    </nav>
-
-</div>
-
-<script src="/marketplace-app.js"></script>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><div class="shell header-row"><a class="brand" href="index.html"><img src="logo.jpg" width="44" height="44" alt=""><span><strong>Pilot Sales</strong><small>Distribution</small></span></a><button class="menu-button" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button><nav id="primary-nav" class="primary-nav" aria-label="Primary navigation"><a href="index.html">Home</a><a href="products.html">Opportunities</a><a class="active" aria-current="page" href="about.html">How it works</a><a href="contact.html">Contact</a></nav><a class="header-cta" href="rfq.html">Request current deals</a></div></header>
+  <main id="main">
+    <section class="page-hero shell"><p class="eyebrow">OPERATING MODEL</p><h1>Evidence first. Approval before action.</h1><p>Pilot Sales Distribution is a review desk for wholesale and closeout opportunities—not an open marketplace with automatic seller access or checkout.</p></section>
+    <section class="section shell">
+      <div class="section-heading"><div><p class="eyebrow">THE STANDARD</p><h2>What makes an opportunity reviewable</h2></div><p>Every match should make the known facts, missing facts, and next approval easy to see.</p></div>
+      <div class="principle-grid">
+        <article><span>KNOWN</span><h3>Source-backed facts</h3><p>Quantity, location, condition, ownership authority, commercial terms, and time sensitivity.</p></article>
+        <article><span>MISSING</span><h3>Open questions</h3><p>Anything unresolved stays visible instead of being converted into a promise or marketing claim.</p></article>
+        <article><span>GATED</span><h3>Consequential actions</h3><p>Contact, purchase, payment, publication, and record changes remain separate approvals.</p></article>
+      </div>
+    </section>
+    <section class="section process-section"><div class="shell"><div class="section-heading light"><div><p class="eyebrow">REVIEW SEQUENCE</p><h2>From criteria to a decision-ready packet</h2></div></div><ol class="timeline"><li><span>01</span><div><h3>Buyer criteria</h3><p>Define category, quantity, destination, timing, price basis, and hard requirements.</p></div></li><li><span>02</span><div><h3>Candidate screening</h3><p>Check the opportunity against the buyer need and flag missing evidence.</p></div></li><li><span>03</span><div><h3>Economics and logistics</h3><p>Separate product cost, freight, terms, location, timing, and practical risks.</p></div></li><li><span>04</span><div><h3>Owner review</h3><p>Present the exact next action for approval before anything consequential happens.</p></div></li></ol></div></section>
+    <section class="section shell note-grid"><h2>Why the public site stays narrow</h2><p>Protected supplier identity, company records, and buyer lists belong in controlled workspaces. The public surface should explain the service and collect only the minimum criteria needed to start a review.</p></section>
+  </main>
+  <footer class="site-footer"><div class="shell footer-grid"><div><strong>Pilot Sales Distribution</strong><p>Reviewed wholesale and closeout opportunity intake.</p></div><nav aria-label="Footer"><a href="products.html">Opportunities</a><a href="contact.html">Contact</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></nav></div><div class="shell footer-bottom"><span>© 2026 Pilot Sales Distribution</span><span>Public site · protected deal records remain separate</span></div></footer>
 </body>
 </html>

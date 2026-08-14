@@ -1,331 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Products &amp; Categories — PSE Marketplace</title>
-    <meta name="description" content="Browse buyer-safe published wholesale offers. Availability is subject to prior sale and final confirmation." />
-    <link rel="canonical" href="https://pilotsalesdistribution.com/products" />
-    <meta property="og:title" content="Verified Wholesale Inventory | Pilot Sales Distribution" />
-    <meta property="og:description" content="Browse buyer-safe published wholesale offers. Availability is subject to prior sale and final confirmation." />
-    <meta property="og:url" content="https://pilotsalesdistribution.com/products" />
-    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://pilotsalesdistribution.com/"},{"@type":"ListItem","position":2,"name":"Verified Wholesale Inventory","item":"https://pilotsalesdistribution.com/products"}]}</script>
-    
-    <!-- SEO Meta Tags -->
-    <link rel="canonical" href="https://pilotsalesdistribution.com/products" />
-    <meta name="robots" content="index, follow" />
-    <meta name="description" content="Browse verified wholesale products and liquidation lots from admin and sellers on PSE Marketplace." />
-
-    <!-- Favicon & PWA -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0057FF">
-
-    <!-- Font Awesome & Google Fonts -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-    <!-- Unified Master Stylesheet -->
-    <link rel="stylesheet" href="/marketplace-app.css" />
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Request current wholesale and closeout opportunities from Pilot Sales Distribution.">
+  <title>Current opportunities | Pilot Sales Distribution</title>
+  <link rel="stylesheet" href="site.css"><script src="site.js" defer></script>
 </head>
-
 <body>
-
-<div class="app-shell">
-
-    <!-- ═══════════ GLOBAL HEADER ═══════════ -->
-    <header class="app-header">
-        <div class="app-header-top">
-            <button type="button" class="app-menu-btn" id="appMenuBtn" aria-label="Open Navigation Menu">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-
-            <a href="/" class="app-logo" aria-label="PSE Marketplace Home">
-                <img src="/logo.webp" alt="PSE Marketplace Logo" />
-                <span class="app-logo-name">PSE <b>Marketplace</b></span>
-            </a>
-
-            <div class="app-header-actions">
-                <button type="button" class="app-icon-btn" id="appNotifBtn" aria-label="Notifications">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="app-badge" id="appNotifBadge">3</span>
-                </button>
-                <a href="/cart" class="app-icon-btn" aria-label="Cart">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <span class="app-badge app-badge--cart cart-count" id="cartCount">0</span>
-                </a>
-            </div>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><div class="shell header-row"><a class="brand" href="index.html"><img src="logo.jpg" width="44" height="44" alt=""><span><strong>Pilot Sales</strong><small>Distribution</small></span></a><button class="menu-button" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button><nav id="primary-nav" class="primary-nav" aria-label="Primary navigation"><a href="index.html">Home</a><a class="active" aria-current="page" href="products.html">Opportunities</a><a href="about.html">How it works</a><a href="contact.html">Contact</a></nav><a class="header-cta" href="rfq.html">Request current deals</a></div></header>
+  <main id="main" data-display-system data-selection-status="final-candidate" data-selected-modules="1-load-passport,2-manifest-visualizer,4-quote-builder,5-proof-stack,7-story-strip,8-ai-reality-toggle">
+    <section class="page-hero shell"><p class="eyebrow">CURRENT OPPORTUNITIES</p><h1>Request the list that fits your buying criteria.</h1><p>Inventory changes quickly. This page does not publish stale product cards, unverified prices, or availability counters.</p></section>
+    <section class="section shell">
+      <div class="current-state"><div><span class="state-label">PUBLIC CATALOG STATUS</span><strong>Request-based</strong></div><p>Share your category, quantity, destination, and timing. The deal desk can then review current matches and identify what still needs evidence.</p><a class="button primary" href="rfq.html">Build request draft</a></div>
+      <div class="section-heading opportunity-heading"><div><p class="eyebrow">REQUESTABLE LANES</p><h2>What buyers can ask us to review</h2></div><p>These are sourcing lanes, not claims that a specific product is currently in stock.</p></div>
+      <div class="opportunity-list">
+        <a href="rfq.html?lane=Home%20goods"><span>01</span><div><strong>Home goods</strong><small>Closeout, overstock, and general home categories</small></div><b>Start request</b></a>
+        <a href="rfq.html?lane=Consumer%20electronics"><span>02</span><div><strong>Consumer electronics</strong><small>Condition, pack, model, and paperwork reviewed before release</small></div><b>Start request</b></a>
+        <a href="rfq.html?lane=General%20merchandise"><span>03</span><div><strong>General merchandise</strong><small>Mixed or category-specific buying criteria</small></div><b>Start request</b></a>
+        <a href="rfq.html?lane=Other"><span>04</span><div><strong>Other buying need</strong><small>Describe the exact category and non-negotiable requirements</small></div><b>Start request</b></a>
+      </div>
+    </section>
+    <section class="section display-system-section" aria-labelledby="display-system-title">
+      <div class="shell">
+        <div class="display-system-heading">
+          <div><p class="eyebrow">FINAL OPPORTUNITY DISPLAY</p><h2 id="display-system-title">One buying packet. Evidence before price.</h2></div>
+          <p>When a current opportunity is approved for release, buyers receive the same ordered view of identity, manifest, proof, and request terms. Unknown facts stay visible instead of being filled with marketing.</p>
         </div>
-
-        <div class="app-search" id="searchBar">
-            <form class="app-search-form" role="search" onsubmit="event.preventDefault(); var q=document.getElementById('searchInput').value.trim(); if(q) window.location.href='/products?search='+encodeURIComponent(q);">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="search" id="searchInput" placeholder="Search Products, Brands, Suppliers..." autocomplete="off" aria-label="Search marketplace" />
-                <button type="submit" id="searchBtn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
-            </form>
+        <div class="display-boundary" data-display-boundary><span>DISPLAY STATUS</span><strong>Framework active</strong><p>Display framework — no current lot represented. Specific inventory remains request-based until its facts and release authority are verified.</p></div>
+        <ol class="display-flow" data-shopper-flow="1-load-passport,2-manifest-visualizer,5-proof-stack,4-quote-builder">
+          <li class="display-stage" data-module-id="1-load-passport"><span class="display-stage__number">01</span><div><p class="display-stage__label">IDENTITY</p><h3>Load Passport</h3><p>Lead with the approved lot identifier, category, quantity basis, pack structure, freight window, and release state. Missing fields remain marked as missing.</p></div></li>
+          <li class="display-stage" data-module-id="2-manifest-visualizer"><span class="display-stage__number">02</span><div><p class="display-stage__label">COMPOSITION</p><h3>Manifest Visualizer</h3><p>Turn the approved manifest into a readable category and quantity view while keeping exceptions, mixed units, and unverified rows explicit.</p></div></li>
+          <li class="display-stage" data-module-id="5-proof-stack"><span class="display-stage__number">03</span><div><p class="display-stage__label">EVIDENCE GATE</p><h3>Proof Stack</h3><p>Keep original product photos, condition notes, documents, and unresolved evidence together. Proof is reviewed before a price or availability statement is released.</p></div></li>
+          <li class="display-stage display-stage--action" data-module-id="4-quote-builder"><span class="display-stage__number">04</span><div><p class="display-stage__label">BUYER ACTION</p><h3>Smart Quote Builder</h3><p>Carry the buyer's quantity, destination, timing, price basis, freight preference, and non-negotiable requirements into a local review draft.</p><a class="button primary" data-quote-action href="rfq.html">Build request draft</a><small>Local draft only · nothing is submitted, ordered, reserved, messaged, or paid.</small></div></li>
+        </ol>
+      </div>
+    </section>
+    <section class="section creative-system-section" aria-labelledby="creative-system-title">
+      <div class="shell creative-system-layout">
+        <div class="creative-system-intro"><p class="eyebrow">AFTER EVIDENCE APPROVAL</p><h2 id="creative-system-title">Channel-ready, without rewriting reality.</h2><p>Social and banner creative begins only after an opportunity clears the proof gate. It can change the presentation—not the product facts.</p></div>
+        <div class="creative-flow" data-social-flow="7-story-strip,8-ai-reality-toggle">
+          <article class="creative-stage" data-module-id="7-story-strip"><span>05 / CHANNEL</span><h3>Load Story Kit</h3><p>Adapt approved facts and original product photography into website banners, story frames, and concise buyer-facing sequences.</p></article>
+          <article class="creative-stage" data-module-id="8-ai-reality-toggle"><span>06 / INTEGRITY</span><h3>AI / Reality Toggle</h3><p>The original photo remains available beside every styled variant. Background, crop, type, and motion may change; product identity, quantity, packaging, condition, and damage may not.</p></article>
+          <div class="creative-rule"><strong>Release rule</strong><p>Creative output cannot serve as inventory proof, and promotional source material cannot establish accuracy, performance, or buyer economics.</p></div>
         </div>
-
-        <div class="app-locbar">
-            <button type="button" class="app-loc" id="appLocBtn" title="Tap to change delivery location">
-                <i class="fa-solid fa-location-dot"></i> Deliver to <strong id="appZip">Worldwide 🌐</strong>
-            </button>
-            <a class="app-greet" href="/account" id="appGreetLink"><i class="fa-regular fa-circle-user"></i> Hi, <span id="accountLabel">Guest</span></a>
-        </div>
-    </header>
-
-    <!-- ═══════════ GLOBAL MENU DRAWER ═══════════ -->
-    <div class="app-drawer-overlay" id="appDrawerOverlay"></div>
-    <aside class="app-drawer" id="appDrawer" aria-label="Navigation drawer" aria-hidden="true">
-        <div class="app-drawer-header">
-            <div class="app-drawer-user">
-                <div class="app-drawer-avatar"><i class="fa-solid fa-user"></i></div>
-                <div class="app-drawer-userinfo">
-                    <span class="app-drawer-greeting">Welcome to PSE</span>
-                    <strong class="app-drawer-username" id="drawerUserLabel">Hello, Guest</strong>
-                    <a href="/login" class="app-drawer-authlink" id="drawerAuthLink">Sign In / Register</a>
-                </div>
-            </div>
-            <button type="button" class="app-drawer-close" id="appDrawerClose" aria-label="Close menu">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <div class="app-drawer-body">
-            <div class="app-drawer-group-title">Navigation</div>
-            <ul class="app-drawer-menu">
-                <li><a href="/"><i class="fa-solid fa-house"></i><span>Home</span></a></li>
-                <li><a href="/products"><i class="fa-solid fa-layer-group"></i><span>Categories</span></a></li>
-                <li><a href="/products?category=electronics"><i class="fa-solid fa-tv"></i><span>Electronics</span></a></li>
-                <li><a href="/products?category=computers"><i class="fa-solid fa-laptop"></i><span>Computers</span></a></li>
-                <li><a href="/products?category=phones"><i class="fa-solid fa-mobile-screen-button"></i><span>Smartphones</span></a></li>
-                <li><a href="/products?category=fashion"><i class="fa-solid fa-shirt"></i><span>Fashion</span></a></li>
-                <li><a href="/products?category=automotive"><i class="fa-solid fa-car"></i><span>Automotive</span></a></li>
-                <li><a href="/products?category=home"><i class="fa-solid fa-couch"></i><span>Home &amp; Industrial</span></a></li>
-                <li><a href="/products?category=overstock"><i class="fa-solid fa-boxes-stacked"></i><span>Liquidation Lots</span></a></li>
-                <li><a href="/rfq"><i class="fa-solid fa-file-invoice-dollar"></i><span>RFQ Quotes</span><span class="app-drawer-pill">B2B</span></a></li>
-                <li><a href="/supplier-store"><i class="fa-solid fa-store"></i><span>Supplier Directory</span></a></li>
-                <li><a href="/account#orders"><i class="fa-solid fa-box"></i><span>Orders</span></a></li>
-                <li><a href="/wishlist"><i class="fa-regular fa-heart"></i><span>Wishlist</span></a></li>
-                <li><a href="/cart"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><span class="app-drawer-badge cart-count">0</span></a></li>
-                <li><a href="/account"><i class="fa-regular fa-user"></i><span>Account</span></a></li>
-                <li><a href="/account#settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a></li>
-                <li><a href="/contact"><i class="fa-regular fa-envelope"></i><span>Contact Us</span></a></li>
-            </ul>
-        </div>
-    </aside>
-
-    <!-- ═══════════ CATALOG CONTENT ═══════════ -->
-    <main class="app-main">
-
-        <!-- Category Banner -->
-        <div class="app-category-banner">
-            <h1 id="catalogHeaderTitle">Wholesale Catalog</h1>
-            <p id="catalogHeaderDesc">Verified wholesale inventory lots with guaranteed availability and escrow protection.</p>
-        </div>
-
-        <!-- Filter Pills -->
-        <div class="app-filter-pills" id="categoryPills">
-            <a href="/products" class="app-pill active" data-cat="all">All Items</a>
-            <a href="/products?category=electronics" class="app-pill" data-cat="electronics">Electronics</a>
-            <a href="/products?category=computers" class="app-pill" data-cat="computers">Computers</a>
-            <a href="/products?category=phones" class="app-pill" data-cat="phones">Smartphones</a>
-            <a href="/products?category=fashion" class="app-pill" data-cat="fashion">Fashion</a>
-            <a href="/products?category=automotive" class="app-pill" data-cat="automotive">Automotive</a>
-            <a href="/products?category=home" class="app-pill" data-cat="home">Home &amp; Tools</a>
-            <a href="/products?category=overstock" class="app-pill" data-cat="overstock">Liquidation</a>
-        </div>
-
-        <!-- Sort & Count Bar -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:12px;">
-            <span id="resultsCountText" style="color:var(--app-text-muted); font-weight:700;">Showing verified lots</span>
-            <select id="sortSelect" onchange="applySort(this.value)" style="border:1px solid var(--app-border); border-radius:var(--app-radius-sm); padding:4px 8px; font-size:12px; background:#fff; font-family:inherit; color:var(--app-text);">
-                <option value="default">Sort: Best Match</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="rating">Top Rated</option>
-            </select>
-        </div>
-
-        <!-- Products Grid (grid-cols-2 / grid-cols-3) -->
-        <div class="grid-cols-2" id="catalogProductsGrid">
-            <!-- Rendered by JS from real admin and seller listings -->
-        </div>
-
-    </main>
-
-    <!-- ═══════════ COMPACT FOOTER ═══════════ -->
-    <footer class="app-footer">
-        <div class="app-footer-logo">
-            <img src="/logo.webp" alt="PSE Marketplace" />
-            <strong>PSE <b>Marketplace</b></strong>
-        </div>
-        <p>&copy; 2026 Pilot Sales Distribution, Inc. All rights reserved.</p>
-    </footer>
-
-    <!-- ═══════════ BOTTOM NAVIGATION ═══════════ -->
-    <nav class="app-bottom-nav" aria-label="Main navigation">
-        <a href="/" class="app-nav-item" data-nav="home">
-            <i class="fa-solid fa-house"></i>
-            <span>Home</span>
-        </a>
-        <a href="/products" class="app-nav-item active" data-nav="categories">
-            <i class="fa-solid fa-shapes"></i>
-            <span>Categories</span>
-        </a>
-        <a href="/rfq" class="app-nav-item" data-nav="rfq">
-            <i class="fa-solid fa-file-invoice"></i>
-            <span>RFQ</span>
-        </a>
-        <a href="/cart" class="app-nav-item" data-nav="cart">
-            <div class="app-nav-icon-wrap">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span class="app-badge app-badge--cart cart-count">0</span>
-            </div>
-            <span>Cart</span>
-        </a>
-        <a href="/account" class="app-nav-item" data-nav="account">
-            <i class="fa-solid fa-user"></i>
-            <span>Account</span>
-        </a>
-    </nav>
-
-</div>
-
-<script src="/inventory-client.js"></script>
-<script src="/marketplace-app.js"></script>
-<script>
-(function () {
-    var allItems = [];
-    var filteredItems = [];
-
-    // GET /api/inventory is the only public product-discovery source.
-    // The public API is the only source for buyer discovery.  It contains an
-    // allowlisted snapshot and never exposes the SalesMax/private master.
-    async function fetchInventoryFeed(options) {
-        var response = await window.PSEInventory.list(options || {});
-        return response.items;
-    }
-
-    function mapInventoryItem(item) {
-        return {
-            id: item.dealId, slug: item.slug, title: item.title, brand: item.brand,
-            category: item.category, description: item.shortDescription,
-            image: item.image_url, images: item.imageUrls, moq: item.moq,
-            stock: item.stock, price: item.price, pricingMode: item.pricingMode,
-            dealId: item.dealId, sourceVersion: item.sourceVersion,
-            snapshotVersion: item.snapshotVersion, freightTerms: item.freightTerms
-        };
-    }
-
-    async function loadProducts() {
-        var products = (await fetchInventoryFeed({ limit: 100 })).map(mapInventoryItem);
-        var allProducts = products;
-        return allProducts;
-    }
-
-    async function initCatalog() {
-        var params = new URLSearchParams(window.location.search);
-        var cat = params.get('category') || params.get('cat') || 'all';
-        var search = params.get('search') || '';
-
-        // Highlight active pill
-        document.querySelectorAll('#categoryPills .app-pill').forEach(function (pill) {
-            var pillCat = pill.getAttribute('data-cat');
-            pill.classList.toggle('active', pillCat === cat);
-        });
-
-        // Set banner title
-        var titleEl = document.getElementById('catalogHeaderTitle');
-        var descEl = document.getElementById('catalogHeaderDesc');
-        if (cat !== 'all') {
-            titleEl.textContent = cat.charAt(0).toUpperCase() + cat.slice(1) + ' Lots';
-            descEl.textContent = 'Explore verified wholesale lots in ' + cat + ' from verified sellers.';
-        } else if (search) {
-            titleEl.textContent = 'Search: "' + search + '"';
-            descEl.textContent = 'Results matching your search terms.';
-        }
-
-        allItems = await loadProducts();
-
-        filteredItems = allItems.filter(function (p) {
-            var matchCat = (cat === 'all' || p.category === cat);
-            var matchSearch = (!search || p.title.toLowerCase().indexOf(search.toLowerCase()) !== -1 || (p.brand && p.brand.toLowerCase().indexOf(search.toLowerCase()) !== -1));
-            return matchCat && matchSearch;
-        });
-
-        renderGrid(filteredItems);
-    }
-
-    function renderGrid(items) {
-        var grid = document.getElementById('catalogProductsGrid');
-        var countEl = document.getElementById('resultsCountText');
-        if (!grid) return;
-
-        if (countEl) countEl.textContent = 'Showing ' + items.length + ' verified wholesale lots';
-
-        if (!items.length) {
-            grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:36px 16px; background:#fff; border-radius:16px; border:1px solid var(--app-border);"><i class="fa-solid fa-box-open" style="font-size:32px; color:var(--app-text-light); margin-bottom:8px;"></i><h3 style="font-size:15px; margin:0 0 4px;">No products found</h3><p style="font-size:12px; color:var(--app-text-muted); margin:0;">No products have been listed under this category yet.</p></div>';
-            return;
-        }
-
-        grid.innerHTML = items.map(function (p) {
-            var wish = window.isWishlisted ? window.isWishlisted(p.id) : false;
-            var publicPrice = Number.isFinite(Number(p.price));
-            var price = publicPrice ? Number(p.price).toFixed(2) : 'RFQ';
-            var oldPrice = p.oldPrice ? '$' + Number(p.oldPrice).toFixed(2) : '';
-            var slug = p.slug || (p.title || 'product').toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            var detailUrl = '/product-detail?slug=' + encodeURIComponent(slug);
-
-            return '' +
-                '<div class="app-card">' +
-                    '<div class="app-card-img" onclick="window.location.href=\'' + detailUrl + '\'">' +
-                        '<span class="app-card-badge">VERIFIED</span>' +
-                        '<button type="button" class="app-card-wish ' + (wish ? 'active' : '') + '" onclick="event.stopPropagation(); window.toggleWishlist(\'' + p.id + '\', \'' + p.title + '\', ' + p.price + ', \'' + p.image + '\', \'' + slug + '\', this)" aria-label="Save">' +
-                            '<i class="' + (wish ? 'fa-solid' : 'fa-regular') + ' fa-heart"></i>' +
-                        '</button>' +
-                        '<img src="' + (p.image || '/product-placeholder.svg') + '" alt="' + p.title + '" loading="lazy" onerror="this.src=\'/product-placeholder.svg\'" />' +
-                    '</div>' +
-                    '<div class="app-card-body">' +
-                        '<div class="app-card-brand">' + (p.brand || p.supplier_name || 'Verified Supplier') + '</div>' +
-                        '<a href="' + detailUrl + '" class="app-card-title">' + p.title + '</a>' +
-                        '<div class="app-card-price-row">' +
-                            '<span class="app-card-price">' + (publicPrice ? '$' + price : 'Request a quote') + '</span>' +
-                            (oldPrice ? '<span class="app-card-oldprice">' + oldPrice + '</span>' : '') +
-                        '</div>' +
-                        '<div class="app-card-moq"><i class="fa-solid fa-box"></i> MOQ: ' + (p.moq || 1) + ' units · Freight quoted separately unless explicitly included. Availability subject to prior sale and final confirmation.</div>' +
-                        '<button type="button" class="app-card-btn" onclick="window.handleAddToCart(\'' + p.id + '\', \'' + p.title + '\', ' + p.price + ', \'' + p.image + '\')">' +
-                            '<i class="fa-solid fa-cart-shopping"></i> Add to Cart' +
-                        '</button>' +
-                    '</div>' +
-                '</div>';
-        }).join('');
-    }
-
-    window.applySort = function (val) {
-        if (val === 'price-low') {
-            filteredItems.sort(function (a, b) { return (a.price || 0) - (b.price || 0); });
-        } else if (val === 'price-high') {
-            filteredItems.sort(function (a, b) { return (b.price || 0) - (a.price || 0); });
-        } else if (val === 'rating') {
-            filteredItems.sort(function (a, b) { return (Number(b.rating) || 0) - (Number(a.rating) || 0); });
-        } else {
-            initCatalog();
-            return;
-        }
-        renderGrid(filteredItems);
-    };
-
-    document.addEventListener('DOMContentLoaded', initCatalog);
-})();
-</script>
+      </div>
+    </section>
+    <section class="section note-section"><div class="shell note-grid"><h2>Why there is no open cart</h2><p>A real wholesale purchase needs current inventory, an approved counterparty, exact freight and payment terms, and final buyer review. A public cart would imply certainty that this site cannot responsibly provide.</p></div></section>
+  </main>
+  <footer class="site-footer"><div class="shell footer-grid"><div><strong>Pilot Sales Distribution</strong><p>Reviewed wholesale and closeout opportunity intake.</p></div><nav aria-label="Footer"><a href="about.html">How it works</a><a href="contact.html">Contact</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></nav></div><div class="shell footer-bottom"><span>© 2026 Pilot Sales Distribution</span><span>Public site · protected deal records remain separate</span></div></footer>
 </body>
 </html>
