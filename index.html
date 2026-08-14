@@ -1,358 +1,153 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>PSE Marketplace — Buy &amp; Sell Worldwide | Wholesale &amp; Retail</title>
-    <meta name="description" content="Pilot Sales Distribution connects qualified businesses with verified wholesale opportunities and a controlled request-for-quote process." />
-    <link rel="canonical" href="https://pilotsalesdistribution.com/" />
-    <meta property="og:title" content="Wholesale Inventory & RFQ Marketplace | Pilot Sales Distribution" />
-    <meta property="og:description" content="Pilot Sales Distribution connects qualified businesses with verified wholesale opportunities and a controlled request-for-quote process." />
-    <meta property="og:url" content="https://pilotsalesdistribution.com/" />
-    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://pilotsalesdistribution.com/"},{"@type":"ListItem","position":2,"name":"Wholesale Inventory & RFQ Marketplace","item":"https://pilotsalesdistribution.com/"}]}</script>
-    
-    <!-- SEO Meta Tags -->
-    <link rel="canonical" href="https://pilotsalesdistribution.com/" />
-    <meta name="robots" content="index, follow" />
-    <meta name="description" content="PSE Marketplace — Buy and sell worldwide. Verified suppliers, flash deals, electronics, computers, smartphones, fashion, automotive, home &amp; liquidation lots." />
-    <meta name="keywords" content="marketplace, wholesale, b2b marketplace, electronics wholesale, liquidation lots, verified suppliers, rfq quotes" />
-
-    <!-- Open Graph & Social Cards -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="PSE Marketplace - Buy &amp; Sell Worldwide" />
-    <meta property="og:description" content="Request verified wholesale quotations for electronics, fashion &amp; liquidation lots. PSE confirms final pricing and payment instructions directly." />
-    <meta property="og:url" content="https://pilotsalesdistribution.com/" />
-    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.webp" />
-
-    <!-- Favicon & PWA -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0057FF">
-
-    <!-- Font Awesome & Google Fonts -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-    <!-- Unified Master Stylesheet -->
-    <link rel="stylesheet" href="/marketplace-app.css" />
-
-    <!-- Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "PSE Marketplace",
-      "url": "https://pilotsalesdistribution.com",
-      "logo": "https://pilotsalesdistribution.com/logo.webp"
-    }
-    </script>
-
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Pilot Sales Distribution","url":"https://pilotsalesdistribution.com"}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Pilot Sales Distribution","url":"https://pilotsalesdistribution.com"}</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Pilot Sales Distribution reviews wholesale and closeout opportunities before presenting current terms to buyers.">
+  <meta name="robots" content="index,follow">
+  <title>Pilot Sales Distribution | Reviewed wholesale opportunities</title>
+  <link rel="stylesheet" href="site.css">
+  <script src="site.js" defer></script>
 </head>
-
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="shell header-row">
+      <a class="brand" href="index.html">
+        <img src="logo.jpg" width="44" height="44" alt="">
+        <span><strong>Pilot Sales</strong><small>Distribution</small></span>
+      </a>
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
+        <a class="active" aria-current="page" href="index.html">Home</a>
+        <a href="products.html">Opportunities</a>
+        <a href="about.html">How it works</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <a class="header-cta" href="rfq.html">Request current deals</a>
+    </div>
+  </header>
 
-<div class="app-shell">
+  <main id="main">
+    <section class="cinematic-hero" data-cinematic-hero aria-labelledby="hero-title">
+      <div class="cinematic-hero__frame" data-inspection-surface>
+        <div class="shell hero-dossier">
+          <div class="hero-promise" data-mobile-promise>
+            <p class="eyebrow">PILOT INSPECTION / 001</p>
+            <h1 id="hero-title">The opportunity comes second. The facts come first.</h1>
+            <p class="lede">Inspect the scene. We review the essential deal details before a wholesale opportunity reaches your desk.</p>
+            <p class="microcopy">Concept-only editorial media. No inventory, price, order, or availability is represented here.</p>
+          </div>
 
-    <!-- ═══════════ GLOBAL HEADER (Same on Every Page) ═══════════ -->
-    <header class="app-header">
-        <div class="app-header-top">
-            <!-- ☰ Menu Icon (top left) -->
-            <button type="button" class="app-menu-btn" id="appMenuBtn" aria-label="Open Navigation Menu">
-                <i class="fa-solid fa-bars"></i>
-            </button>
+          <div class="hero-action">
+            <div class="hero-action__copy"><p class="eyebrow">REVIEW GATE</p><strong>Only reviewed opportunities move forward.</strong></div>
+            <a class="button primary" data-primary-action href="rfq.html">Request current deals</a>
+            <span>Start with category, quantity, destination, and timing.</span>
+          </div>
 
-            <!-- PSE Marketplace Logo -->
-            <a href="/" class="app-logo" aria-label="PSE Marketplace Home">
-                <img src="/logo.webp" alt="PSE Marketplace Logo" />
-                <span class="app-logo-name">PSE <b>Marketplace</b></span>
-            </a>
+          <figure class="cinematic-hero__media" data-mobile-media aria-label="Conceptual pallet inspection scene">
+            <video class="cinematic-hero__video" data-hero-video muted playsinline preload="none" poster="assets/hero-inspection-poster.jpg" aria-hidden="true">
+              <source src="assets/hero-inspection-web.mp4" type="video/mp4">
+            </video>
+            <img class="cinematic-hero__poster" src="assets/hero-inspection-poster.jpg" width="1920" height="1080" alt="A generic shrink-wrapped pallet in a dark warehouse inspection bay" fetchpriority="high">
+            <span class="cinematic-hero__scrim" aria-hidden="true"></span>
+          </figure>
 
-            <!-- Notification & Cart Icons -->
-            <div class="app-header-actions">
-                <button type="button" class="app-icon-btn" id="appNotifBtn" aria-label="Notifications">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="app-badge" id="appNotifBadge">3</span>
-                </button>
-                <a href="/cart" class="app-icon-btn" aria-label="Cart">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <span class="app-badge app-badge--cart cart-count" id="cartCount">0</span>
-                </a>
-            </div>
+          <ol class="dossier-stages" data-mobile-stages aria-label="Inspection sequence">
+            <li class="dossier-stage is-active" data-dossier-stage>
+              <span class="dossier-stage__number">01 / BUYER FIT</span>
+              <div class="dossier-stage__body" aria-current="step"><strong>Category fit</strong><small>Does the opportunity match the buying brief?</small></div>
+            </li>
+            <li class="dossier-stage" data-dossier-stage>
+              <span class="dossier-stage__number">02 / EVIDENCE</span>
+              <div class="dossier-stage__body"><strong>Condition reviewed</strong><small>Pack, location, quantity, and open questions are made visible.</small></div>
+            </li>
+            <li class="dossier-stage" data-dossier-stage>
+              <span class="dossier-stage__number">03 / RELEASE GATE</span>
+              <div class="dossier-stage__body"><strong>Terms confirmed before release</strong><small>Price basis, freight, timing, and authority are rechecked.</small></div>
+            </li>
+          </ol>
+
+          <div class="inspection-control" data-inspection-control>
+            <label for="inspection-position">Inspection position</label>
+            <p id="inspection-hint">Move to inspect · Arrow keys also work</p>
+            <input id="inspection-position" data-inspection-range type="range" min="0" max="100" step="1" value="0" aria-label="Inspection position" aria-describedby="inspection-hint" aria-valuetext="Buyer fit, 0 percent">
+            <div class="inspection-ticks" aria-hidden="true"><span>01 Buyer fit</span><span>02 Evidence</span><span>03 Release gate</span></div>
+          </div>
         </div>
+      </div>
+    </section>
 
-        <!-- Search Products, Brands, Suppliers... -->
-        <div class="app-search" id="searchBar">
-            <form class="app-search-form" role="search" onsubmit="event.preventDefault(); var q=document.getElementById('searchInput').value.trim(); if(q) window.location.href='/products?search='+encodeURIComponent(q);">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="search" id="searchInput" placeholder="Search Products, Brands, Suppliers..." autocomplete="off" aria-label="Search marketplace" />
-                <button type="submit" id="searchBtn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
-            </form>
+    <section class="section sourcing-ledger" aria-labelledby="lanes-title">
+      <div class="shell">
+        <div class="editorial-heading">
+          <p class="eyebrow">SOURCING LEDGER / BUYER BRIEF FIRST</p>
+          <h2 id="lanes-title">Tell us what belongs on your shelf.</h2>
+          <p>We discuss matching opportunities only when the current facts support your criteria.</p>
         </div>
-
-        <!-- Deliver To Location & User Greeting -->
-        <div class="app-locbar">
-            <button type="button" class="app-loc" id="appLocBtn" title="Tap to change delivery location">
-                <i class="fa-solid fa-location-dot"></i> Deliver to <strong id="appZip">Worldwide 🌐</strong>
-            </button>
-            <a class="app-greet" href="/account" id="appGreetLink"><i class="fa-regular fa-circle-user"></i> Hi, <span id="accountLabel">Guest</span></a>
+        <div class="lane-ledger">
+          <article class="lane-row">
+            <span class="lane-number">01</span>
+            <h3>Home goods</h3>
+            <p>Closeout, overstock, and general home categories considered against quantity and destination.</p>
+            <a href="rfq.html?lane=Home%20goods">Request this lane <span aria-hidden="true">→</span></a>
+          </article>
+          <article class="lane-row">
+            <span class="lane-number">02</span>
+            <h3>Consumer electronics</h3>
+            <p>Model details, condition, pack, location, and documentation reviewed before release.</p>
+            <a href="rfq.html?lane=Consumer%20electronics">Request this lane <span aria-hidden="true">→</span></a>
+          </article>
+          <article class="lane-row">
+            <span class="lane-number">03</span>
+            <h3>General merchandise</h3>
+            <p>Mixed and category-specific opportunities screened for buyer fit and unresolved deal risks.</p>
+            <a href="rfq.html?lane=General%20merchandise">Request this lane <span aria-hidden="true">→</span></a>
+          </article>
         </div>
+      </div>
+    </section>
 
-        <!-- Notification Dropdown Panel -->
-        <div class="app-notif-panel" id="appNotifPanel" hidden>
-            <div class="app-notif-head">
-                <strong><i class="fa-regular fa-bell" style="color:var(--app-primary);margin-right:6px;"></i>Notifications</strong>
-                <button type="button" onclick="document.getElementById('appNotifBadge').style.display='none'">Mark all read</button>
-            </div>
-            <div class="app-notif-item">
-                <div class="app-notif-ico app-notif-ico--blue"><i class="fa-brands fa-whatsapp"></i></div>
-                <div style="flex:1;min-width:0;">
-                    <h4>Need a quotation?</h4>
-                    <p><a href="https://wa.me/19099384682" target="_blank" rel="noopener">Message PSE on WhatsApp</a> or submit an RFQ for final pricing.</p>
-                </div>
-            </div>
-            <div class="app-notif-item">
-                <div class="app-notif-ico app-notif-ico--amber"><i class="fa-solid fa-bolt"></i></div>
-                <div style="flex:1;min-width:0;">
-                    <h4>Flash Deals Active</h4>
-                    <p>Electronics liquidation lots up to 60% off — ends tonight.</p>
-                    <time>1 hr ago</time>
-                </div>
-            </div>
-            <div class="app-notif-item">
-                <div class="app-notif-ico app-notif-ico--green"><i class="fa-solid fa-circle-check"></i></div>
-                <div style="flex:1;min-width:0;">
-                    <h4>Verified Suppliers Live</h4>
-                    <p>Sony, Apple &amp; Dell wholesale storefronts now updated.</p>
-                    <time>3 hrs ago</time>
-                </div>
-            </div>
+    <section class="section process-section" aria-labelledby="process-title">
+      <div class="shell process-layout">
+        <div class="process-intro">
+          <p class="eyebrow">BUYER FLOW / THREE CHECKPOINTS</p>
+          <h2 id="process-title">A clear request. A controlled review.</h2>
+          <p>The public site gathers your criteria. Evidence and approvals stay with the deal desk.</p>
         </div>
-    </header>
+        <ol class="process-path">
+          <li><span>01</span><div><h3>Define the request</h3><p>Category, quantity, destination, timing, and non-negotiable requirements.</p></div></li>
+          <li><span>02</span><div><h3>Review candidate facts</h3><p>Available evidence, open questions, freight assumptions, and commercial terms.</p></div></li>
+          <li><span>03</span><div><h3>Approve the next step</h3><p>Buyer review comes before contact, commitment, payment, or release.</p></div></li>
+        </ol>
+      </div>
+    </section>
 
-    <!-- ═══════════ GLOBAL MENU DRAWER (Sidebar) ═══════════ -->
-    <div class="app-drawer-overlay" id="appDrawerOverlay"></div>
-    <aside class="app-drawer" id="appDrawer" aria-label="Navigation drawer" aria-hidden="true">
-        <div class="app-drawer-header">
-            <div class="app-drawer-user">
-                <div class="app-drawer-avatar"><i class="fa-solid fa-user"></i></div>
-                <div class="app-drawer-userinfo">
-                    <span class="app-drawer-greeting">Welcome to PSE</span>
-                    <strong class="app-drawer-username" id="drawerUserLabel">Hello, Guest</strong>
-                    <a href="/login" class="app-drawer-authlink" id="drawerAuthLink">Sign In / Register</a>
-                </div>
-            </div>
-            <button type="button" class="app-drawer-close" id="appDrawerClose" aria-label="Close menu">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+    <section class="section boundary-section" aria-labelledby="boundary-title">
+      <div class="shell boundary-dossier">
+        <div class="boundary-statement">
+          <p class="eyebrow">PUBLIC / PRIVATE BOUNDARY</p>
+          <h2 id="boundary-title">Useful in public. Controlled behind the desk.</h2>
         </div>
-
-        <div class="app-drawer-body">
-            <div class="app-drawer-group-title">Navigation</div>
-            <ul class="app-drawer-menu">
-                <li><a href="/"><i class="fa-solid fa-house"></i><span>Home</span></a></li>
-                <li><a href="/products"><i class="fa-solid fa-layer-group"></i><span>Categories</span></a></li>
-                <li><a href="/products?category=electronics"><i class="fa-solid fa-tv"></i><span>Electronics</span></a></li>
-                <li><a href="/products?category=computers"><i class="fa-solid fa-laptop"></i><span>Computers</span></a></li>
-                <li><a href="/products?category=phones"><i class="fa-solid fa-mobile-screen-button"></i><span>Smartphones</span></a></li>
-                <li><a href="/products?category=fashion"><i class="fa-solid fa-shirt"></i><span>Fashion</span></a></li>
-                <li><a href="/products?category=automotive"><i class="fa-solid fa-car"></i><span>Automotive</span></a></li>
-                <li><a href="/products?category=home"><i class="fa-solid fa-couch"></i><span>Home &amp; Industrial</span></a></li>
-                <li><a href="/products?category=overstock"><i class="fa-solid fa-boxes-stacked"></i><span>Liquidation Lots</span></a></li>
-                <li><a href="/rfq"><i class="fa-solid fa-file-invoice-dollar"></i><span>RFQ Quotes</span><span class="app-drawer-pill">B2B</span></a></li>
-                <li><a href="/supplier-store"><i class="fa-solid fa-store"></i><span>Supplier Directory</span></a></li>
-                <li><a href="/account#orders"><i class="fa-solid fa-box"></i><span>Orders</span></a></li>
-                <li><a href="/wishlist"><i class="fa-regular fa-heart"></i><span>Wishlist</span></a></li>
-                <li><a href="/cart"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><span class="app-drawer-badge cart-count">0</span></a></li>
-                <li><a href="/account"><i class="fa-regular fa-user"></i><span>Account</span></a></li>
-                <li><a href="/account#settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a></li>
-                <li><a href="/contact"><i class="fa-regular fa-envelope"></i><span>Contact Us</span></a></li>
-            </ul>
+        <div class="boundary-column">
+          <span>PUBLIC SITE / CAN</span>
+          <ul><li>Explain the review process</li><li>Collect a local request draft</li><li>Show which facts are required</li></ul>
         </div>
-
-        <div class="app-drawer-footer">
-            <a href="/become-seller" class="app-drawer-seller-btn">
-                <i class="fa-solid fa-store"></i>
-                <div>
-                    <strong>Sell on PSE Marketplace</strong>
-                    <span>Reach 15,000+ verified buyers</span>
-                </div>
-                <i class="fa-solid fa-chevron-right"></i>
-            </a>
+        <div class="boundary-column boundary-column--held">
+          <span>DEAL DESK / HOLDS</span>
+          <ul><li>Protected supplier records</li><li>Current inventory and shipping terms</li><li>Orders, payments, and final approval</li></ul>
         </div>
-    </aside>
+      </div>
+    </section>
 
-    <!-- ═══════════ MAIN HOMEPAGE CONTENT ═══════════ -->
-    <main class="app-main">
+    <section class="cta-band">
+      <div class="shell cta-row"><div><p class="eyebrow">READY FOR REVIEW?</p><h2>Build the brief before you chase the deal.</h2></div><a class="button primary light-button" href="rfq.html">Create request draft</a></div>
+    </section>
+  </main>
 
-        <!-- 1. HERO BANNER -->
-        <section class="app-hero-banner" aria-label="Wholesale promotion">
-            <span class="app-hero-tag"><i class="fa-solid fa-file-invoice-dollar"></i> Verified Quote Support</span>
-            <h1>Global Wholesale &amp; Liquidation Deals</h1>
-            <p>Direct sourcing from verified enterprise suppliers worldwide with confirmed lot availability.</p>
-            <div class="app-hero-actions">
-                <a href="/products" class="app-btn-hero-primary"><i class="fa-solid fa-boxes-stacked"></i> Browse Lots</a>
-                <a href="/rfq" class="app-btn-hero-secondary"><i class="fa-solid fa-file-invoice"></i> Request Quote</a>
-            </div>
-        </section>
-
-        <!-- 2. CATEGORIES GRID (grid-cols-2 / grid-cols-3) -->
-        <section class="app-section" aria-labelledby="catTitle">
-            <div class="app-section-head">
-                <h2 id="catTitle"><i class="fa-solid fa-shapes" style="color:var(--app-primary);"></i> Categories</h2>
-                <a href="/products" class="app-link-btn">All Categories</a>
-            </div>
-            <div class="grid-cols-3">
-                <a href="/products?category=electronics" class="app-cat-card">
-                    <div class="app-cat-ico"><i class="fa-solid fa-tv"></i></div>
-                    <span>Electronics</span>
-                </a>
-                <a href="/products?category=computers" class="app-cat-card">
-                    <div class="app-cat-ico"><i class="fa-solid fa-laptop"></i></div>
-                    <span>Computers</span>
-                </a>
-                <a href="/products?category=phones" class="app-cat-card">
-                    <div class="app-cat-ico"><i class="fa-solid fa-mobile-screen-button"></i></div>
-                    <span>Smartphones</span>
-                </a>
-                <a href="/products?category=fashion" class="app-cat-card">
-                    <div class="app-cat-ico"><i class="fa-solid fa-shirt"></i></div>
-                    <span>Fashion</span>
-                </a>
-                <a href="/products?category=automotive" class="app-cat-card">
-                    <div class="app-cat-ico"><i class="fa-solid fa-car"></i></div>
-                    <span>Automotive</span>
-                </a>
-                <a href="/products?category=home" class="app-cat-card">
-                    <div class="app-cat-ico"><i class="fa-solid fa-couch"></i></div>
-                    <span>Home &amp; Industrial</span>
-                </a>
-            </div>
-        </section>
-
-        <!-- 3. FLASH DEALS (Vertical Grid) -->
-        <section class="app-section" aria-labelledby="flashTitle">
-            <div class="app-flash-wrapper">
-                <div class="app-flash-header">
-                    <div class="app-flash-title" id="flashTitle">
-                        <i class="fa-solid fa-bolt" style="color:var(--app-accent);"></i> Flash Deals
-                    </div>
-                    <div class="app-flash-timer">
-                        ENDS IN <span id="appTimer">08:45:12</span>
-                    </div>
-                </div>
-                <div class="app-flash-grid">
-                    <div class="grid-cols-2" id="flashGrid">
-                        <!-- Loaded dynamically via marketplace-app.js -->
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 4. FEATURED PRODUCTS (Vertical Grid) -->
-        <section class="app-section" aria-labelledby="featuredTitle">
-            <div class="app-section-head">
-                <h2 id="featuredTitle"><i class="fa-solid fa-fire" style="color:#EF4444;"></i> Featured Products</h2>
-                <a href="/products" class="app-link-btn">See All</a>
-            </div>
-            <div class="grid-cols-2" id="featuredGrid">
-                <!-- Loaded dynamically via marketplace-app.js -->
-            </div>
-        </section>
-
-        <!-- 5. VERIFIED SUPPLIERS (Clean Grid) -->
-        <section class="app-section" aria-labelledby="suppliersTitle">
-            <div class="app-section-head">
-                <h2 id="suppliersTitle"><i class="fa-solid fa-circle-check" style="color:var(--app-primary);"></i> Verified Suppliers</h2>
-                <a href="/supplier-store" class="app-link-btn">Directory</a>
-            </div>
-            <div class="grid-cols-2" id="suppliersGrid">
-                <!-- Loaded dynamically via marketplace-app.js -->
-            </div>
-        </section>
-
-        <!-- 6. RECOMMENDED PRODUCTS (Vertical Grid) -->
-        <section class="app-section" aria-labelledby="recTitle">
-            <div class="app-section-head">
-                <h2 id="recTitle"><i class="fa-solid fa-thumbs-up" style="color:var(--app-primary);"></i> Recommended Products</h2>
-                <a href="/products" class="app-link-btn">More</a>
-            </div>
-            <div class="grid-cols-2" id="recommendedGrid">
-                <!-- Loaded dynamically via marketplace-app.js -->
-            </div>
-        </section>
-
-        <!-- 7. RECENT PRODUCTS (Vertical Grid) -->
-        <section class="app-section" aria-labelledby="recentTitle">
-            <div class="app-section-head">
-                <h2 id="recentTitle"><i class="fa-solid fa-clock-rotate-left" style="color:var(--app-primary);"></i> Recent Products</h2>
-                <a href="/products" class="app-link-btn">Browse All</a>
-            </div>
-            <div class="grid-cols-2" id="recentGrid">
-                <!-- Loaded dynamically via marketplace-app.js -->
-            </div>
-        </section>
-
-    </main>
-
-    <!-- ═══════════ COMPACT MOBILE FOOTER ═══════════ -->
-    <footer class="app-footer">
-        <div class="app-footer-logo">
-            <img src="/logo.webp" alt="PSE Marketplace" />
-            <strong>PSE <b>Marketplace</b></strong>
-        </div>
-        <div class="app-footer-links">
-            <a href="/about">About</a>
-            <a href="/become-seller">Sell on PSE</a>
-            <a href="/supplier-store">Suppliers</a>
-            <a href="/track-order">Tracking</a>
-            <a href="/help-center">Help Center</a>
-            <a href="/terms">Terms</a>
-            <a href="/privacy">Privacy</a>
-        </div>
-        <p>&copy; 2026 Pilot Sales Distribution, Inc. All rights reserved.<br />Verified B2B wholesale distribution. Final quotations and payment instructions are provided by PSE via WhatsApp or email.</p>
-    </footer>
-
-    <!-- ═══════════ UNIFIED BOTTOM NAVIGATION (Fixed at bottom) ═══════════ -->
-    <nav class="app-bottom-nav" aria-label="Main navigation">
-        <a href="/" class="app-nav-item active" data-nav="home">
-            <i class="fa-solid fa-house"></i>
-            <span>Home</span>
-        </a>
-        <a href="/products" class="app-nav-item" data-nav="categories">
-            <i class="fa-solid fa-shapes"></i>
-            <span>Categories</span>
-        </a>
-        <a href="/rfq" class="app-nav-item" data-nav="rfq">
-            <i class="fa-solid fa-file-invoice"></i>
-            <span>RFQ</span>
-        </a>
-        <a href="/cart" class="app-nav-item" data-nav="cart">
-            <div class="app-nav-icon-wrap">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span class="app-badge app-badge--cart cart-count">0</span>
-            </div>
-            <span>Cart</span>
-        </a>
-        <a href="/account" class="app-nav-item" data-nav="account">
-            <i class="fa-solid fa-user"></i>
-            <span>Account</span>
-        </a>
-    </nav>
-
-</div>
-
-<!-- Master Application Script -->
-<script src="/marketplace-app.js"></script>
+  <footer class="site-footer">
+    <div class="shell footer-grid"><div><strong>Pilot Sales Distribution</strong><p>Reviewed wholesale and closeout opportunity intake.</p></div><nav aria-label="Footer"><a href="about.html">How it works</a><a href="contact.html">Contact</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></nav></div>
+    <div class="shell footer-bottom"><span>© 2026 Pilot Sales Distribution</span><span>Public site · protected deal records remain separate</span></div>
+  </footer>
 </body>
 </html>

@@ -1,317 +1,46 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Request for Quote (RFQ) — PSE Marketplace</title>
-    <meta name="description" content="Submit a wholesale request for quote with the deal identity and availability context preserved." />
-    <link rel="canonical" href="https://pilotsalesdistribution.com/rfq" />
-    <meta property="og:title" content="Request a Wholesale Quote | Pilot Sales Distribution" />
-    <meta property="og:description" content="Submit a wholesale request for quote with the deal identity and availability context preserved." />
-    <meta property="og:url" content="https://pilotsalesdistribution.com/rfq" />
-    <meta property="og:image" content="https://pilotsalesdistribution.com/logo.jpg" />
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://pilotsalesdistribution.com/"},{"@type":"ListItem","position":2,"name":"Request a Wholesale Quote","item":"https://pilotsalesdistribution.com/rfq"}]}</script>
-    
-    <!-- SEO Meta Tags -->
-    <link rel="canonical" href="https://pilotsalesdistribution.com/rfq" />
-    <meta name="robots" content="index, follow" />
-    <meta name="description" content="Submit wholesale RFQ requests to verified suppliers worldwide on PSE Marketplace with escrow protection." />
-
-    <!-- Favicon & PWA -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0057FF">
-
-    <!-- Font Awesome & Google Fonts -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
-    <!-- Firebase: RFQs are stored in the protected buyer/admin workflow. -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <!-- Unified Master Stylesheet -->
-    <link rel="stylesheet" href="/marketplace-app.css" />
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Create a local wholesale request draft for Pilot Sales Distribution.">
+  <meta name="robots" content="noindex,follow"><title>Request current deals | Pilot Sales Distribution</title>
+  <link rel="stylesheet" href="site.css"><script src="site.js" defer></script>
 </head>
-
 <body>
-
-<div class="app-shell">
-
-    <!-- ═══════════ GLOBAL HEADER ═══════════ -->
-    <header class="app-header">
-        <div class="app-header-top">
-            <button type="button" class="app-menu-btn" id="appMenuBtn" aria-label="Open Navigation Menu">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-
-            <a href="/" class="app-logo" aria-label="PSE Marketplace Home">
-                <img src="/logo.webp" alt="PSE Marketplace Logo" />
-                <span class="app-logo-name">PSE <b>Marketplace</b></span>
-            </a>
-
-            <div class="app-header-actions">
-                <button type="button" class="app-icon-btn" id="appNotifBtn" aria-label="Notifications">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="app-badge" id="appNotifBadge">3</span>
-                </button>
-                <a href="/cart" class="app-icon-btn" aria-label="Cart">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <span class="app-badge app-badge--cart cart-count" id="cartCount">0</span>
-                </a>
-            </div>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><div class="shell header-row"><a class="brand" href="index.html"><img src="logo.jpg" width="44" height="44" alt=""><span><strong>Pilot Sales</strong><small>Distribution</small></span></a><button class="menu-button" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button><nav id="primary-nav" class="primary-nav" aria-label="Primary navigation"><a href="index.html">Home</a><a href="products.html">Opportunities</a><a href="about.html">How it works</a><a href="contact.html">Contact</a></nav><span class="header-status">Local draft</span></div></header>
+  <main id="main" class="form-main">
+    <section class="page-hero shell compact"><p class="eyebrow">BUYER REQUEST</p><h1>Create a clear sourcing brief.</h1><p>This form builds a draft in your browser. It does not transmit data, contact anyone, reserve inventory, or create an order.</p></section>
+    <section class="shell form-layout">
+      <form id="rfq-form" class="rfq-form" novalidate>
+        <p class="required-note" id="required-note"><span aria-hidden="true">*</span> Required fields are marked.</p>
+        <div class="form-errors" id="form-errors" role="alert" tabindex="-1" hidden></div>
+        <div class="form-section-heading"><span>01</span><div><h2>Buying need</h2><p>Describe what a useful opportunity must include.</p></div></div>
+        <div class="field-grid two">
+          <label><span class="field-label">Category or product <span class="required-marker">Required</span></span><input id="category" name="category" maxlength="100" required aria-describedby="category-error" autocomplete="off" placeholder="Example: small kitchen appliances"><span class="field-error" id="category-error" hidden>Enter a category or product.</span></label>
+          <label><span class="field-label">Target quantity <span class="required-marker">Required</span></span><input id="quantity" name="quantity" maxlength="60" required aria-describedby="quantity-error" autocomplete="off" placeholder="Units, pallets, or truckloads"><span class="field-error" id="quantity-error" hidden>Enter a target quantity.</span></label>
+          <label><span class="field-label">Delivery destination <span class="required-marker">Required</span></span><input id="destination" name="destination" maxlength="100" required aria-describedby="destination-error" autocomplete="shipping address-level2" placeholder="City, state, or port"><span class="field-error" id="destination-error" hidden>Enter a city, state, or port.</span></label>
+          <label><span class="field-label">Needed by <span class="required-marker">Required</span></span><input id="timing" name="timing" maxlength="80" required aria-describedby="timing-error" autocomplete="off" placeholder="Date or timing window"><span class="field-error" id="timing-error" hidden>Enter a date or timing window.</span></label>
         </div>
+        <label>Condition and pack requirements<textarea id="condition" name="condition" maxlength="500" rows="4" placeholder="New, shelf pulls, case pack, model mix, documentation…"></textarea></label>
 
-        <div class="app-search" id="searchBar">
-            <form class="app-search-form" role="search" onsubmit="event.preventDefault(); var q=document.getElementById('searchInput').value.trim(); if(q) window.location.href='/products?search='+encodeURIComponent(q);">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="search" id="searchInput" placeholder="Search Products, Brands, Suppliers..." autocomplete="off" aria-label="Search marketplace" />
-                <button type="submit" id="searchBtn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
-            </form>
+        <div class="form-section-heading"><span>02</span><div><h2>Commercial guardrails</h2><p>Give the reviewer boundaries before a match is considered.</p></div></div>
+        <div class="field-grid two">
+          <label>Target price basis<input id="price" name="price" maxlength="100" autocomplete="off" placeholder="Per unit, lot, or delivered target"></label>
+          <label>Freight preference<select id="freight" name="freight"><option value="Needs review">Needs review</option><option value="Delivered">Delivered</option><option value="Buyer pickup">Buyer pickup</option><option value="Freight quoted separately">Freight quoted separately</option></select></label>
         </div>
-
-        <div class="app-locbar">
-            <button type="button" class="app-loc" id="appLocBtn" title="Tap to change delivery location">
-                <i class="fa-solid fa-location-dot"></i> Deliver to <strong id="appZip">Worldwide 🌐</strong>
-            </button>
-            <a class="app-greet" href="/account" id="appGreetLink"><i class="fa-regular fa-circle-user"></i> Hi, <span id="accountLabel">Guest</span></a>
-        </div>
-    </header>
-
-    <!-- ═══════════ GLOBAL MENU DRAWER ═══════════ -->
-    <div class="app-drawer-overlay" id="appDrawerOverlay"></div>
-    <aside class="app-drawer" id="appDrawer" aria-label="Navigation drawer" aria-hidden="true">
-        <div class="app-drawer-header">
-            <div class="app-drawer-user">
-                <div class="app-drawer-avatar"><i class="fa-solid fa-user"></i></div>
-                <div class="app-drawer-userinfo">
-                    <span class="app-drawer-greeting">Welcome to PSE</span>
-                    <strong class="app-drawer-username" id="drawerUserLabel">Hello, Guest</strong>
-                    <a href="/login" class="app-drawer-authlink" id="drawerAuthLink">Sign In / Register</a>
-                </div>
-            </div>
-            <button type="button" class="app-drawer-close" id="appDrawerClose" aria-label="Close menu">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <div class="app-drawer-body">
-            <div class="app-drawer-group-title">Navigation</div>
-            <ul class="app-drawer-menu">
-                <li><a href="/"><i class="fa-solid fa-house"></i><span>Home</span></a></li>
-                <li><a href="/products"><i class="fa-solid fa-layer-group"></i><span>Categories</span></a></li>
-                <li><a href="/products?category=electronics"><i class="fa-solid fa-tv"></i><span>Electronics</span></a></li>
-                <li><a href="/products?category=computers"><i class="fa-solid fa-laptop"></i><span>Computers</span></a></li>
-                <li><a href="/products?category=phones"><i class="fa-solid fa-mobile-screen-button"></i><span>Smartphones</span></a></li>
-                <li><a href="/products?category=fashion"><i class="fa-solid fa-shirt"></i><span>Fashion</span></a></li>
-                <li><a href="/products?category=automotive"><i class="fa-solid fa-car"></i><span>Automotive</span></a></li>
-                <li><a href="/products?category=home"><i class="fa-solid fa-couch"></i><span>Home &amp; Industrial</span></a></li>
-                <li><a href="/products?category=overstock"><i class="fa-solid fa-boxes-stacked"></i><span>Liquidation Lots</span></a></li>
-                <li><a href="/rfq"><i class="fa-solid fa-file-invoice-dollar"></i><span>RFQ Quotes</span><span class="app-drawer-pill">B2B</span></a></li>
-                <li><a href="/supplier-store"><i class="fa-solid fa-store"></i><span>Supplier Directory</span></a></li>
-                <li><a href="/account#orders"><i class="fa-solid fa-box"></i><span>Orders</span></a></li>
-                <li><a href="/wishlist"><i class="fa-regular fa-heart"></i><span>Wishlist</span></a></li>
-                <li><a href="/cart"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><span class="app-drawer-badge cart-count">0</span></a></li>
-                <li><a href="/account"><i class="fa-regular fa-user"></i><span>Account</span></a></li>
-                <li><a href="/account#settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a></li>
-                <li><a href="/contact"><i class="fa-regular fa-envelope"></i><span>Contact Us</span></a></li>
-            </ul>
-        </div>
-    </aside>
-
-    <!-- ═══════════ RFQ MAIN CONTENT ═══════════ -->
-    <main class="app-main">
-
-        <!-- RFQ Header Banner -->
-        <div class="app-hero-banner" style="background:linear-gradient(135deg, #1E293B 0%, #0F172A 100%);">
-            <span class="app-hero-tag" style="background:var(--app-accent);"><i class="fa-solid fa-file-invoice"></i> B2B Wholesale Sourcing</span>
-            <h1>Request a Custom Quote</h1>
-            <p>Get direct wholesale prices and freight estimates from verified global manufacturers and distributors.</p>
-        </div>
-
-        <!-- RFQ Form Card -->
-        <div style="background:#FFFFFF; border:1px solid var(--app-border); border-radius:var(--app-radius-lg); padding:16px; margin-bottom:16px;">
-            <form onsubmit="handleRFQSubmit(event)">
-                <div style="margin-bottom:12px;">
-                    <label style="display:block; font-size:12px; font-weight:700; color:var(--app-text); margin-bottom:4px;">Product Category</label>
-                    <select id="rfqCategory" style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;">
-                        <option value="electronics">Electronics &amp; Audio</option>
-                        <option value="computers">Computers &amp; Servers</option>
-                        <option value="phones">Smartphones &amp; Tablets</option>
-                        <option value="fashion">Apparel &amp; Footwear</option>
-                        <option value="automotive">Automotive &amp; Fleet</option>
-                        <option value="home">Home &amp; Industrial</option>
-                        <option value="overstock">Liquidation &amp; Overstock</option>
-                    </select>
-                </div>
-
-                <div style="margin-bottom:12px;">
-                    <label style="display:block; font-size:12px; font-weight:700; color:var(--app-text); margin-bottom:4px;">Product Name / SKU</label>
-                    <input type="hidden" id="rfqDealId" />
-                    <input type="hidden" id="rfqSlug" />
-                    <input type="hidden" id="rfqSourceVersion" />
-                    <input type="hidden" id="rfqSnapshotVersion" />
-                    <input type="text" id="rfqProduct" placeholder="e.g. Sony WH-1000XM5 Wholesale Pallet" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
-                </div>
-
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
-                    <div>
-                        <label style="display:block; font-size:12px; font-weight:700; color:var(--app-text); margin-bottom:4px;">Target Quantity</label>
-                        <input type="number" id="rfqQty" placeholder="e.g. 50" min="1" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:12px; font-weight:700; color:var(--app-text); margin-bottom:4px;">Target Price / Unit ($)</label>
-                        <input type="number" id="rfqTargetPrice" placeholder="e.g. 210.00" step="0.01" style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
-                    </div>
-                </div>
-
-                <div style="margin-bottom:12px;">
-                    <label style="display:block; font-size:12px; font-weight:700; color:var(--app-text); margin-bottom:4px;">Delivery Destination (City / Port / ZIP)</label>
-                    <input type="text" id="rfqDestination" placeholder="e.g. Los Angeles Port / 90210" required style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC;" />
-                </div>
-
-                <div style="margin-bottom:14px;">
-                    <label style="display:block; font-size:12px; font-weight:700; color:var(--app-text); margin-bottom:4px;">Special Requirements</label>
-                    <textarea id="rfqNotes" rows="3" placeholder="Condition requirements, inspection terms, pallet preferences..." style="width:100%; padding:10px 12px; border:1px solid var(--app-border); border-radius:var(--app-radius-md); font-size:13px; font-family:inherit; background:#FAFBFC; resize:vertical;"></textarea>
-                </div>
-
-                <button type="submit" class="app-checkout-btn">
-                    <i class="fa-solid fa-paper-plane"></i> Submit RFQ Quote Request
-                </button>
-            </form>
-        </div>
-
-        <!-- Submitted RFQs Section -->
-        <section class="app-section">
-            <div class="app-section-head">
-                <h2><i class="fa-solid fa-clock-rotate-left" style="color:var(--app-primary);"></i> My RFQ Quotes</h2>
-            </div>
-            <div id="rfqList" style="display:flex; flex-direction:column; gap:10px;">
-                <p style="font-size:12px;color:var(--app-text-muted);margin:0;">Sign in to view your submitted quotation requests.</p>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- ═══════════ COMPACT FOOTER ═══════════ -->
-    <footer class="app-footer">
-        <div class="app-footer-logo">
-            <img src="/logo.webp" alt="PSE Marketplace" />
-            <strong>PSE <b>Marketplace</b></strong>
-        </div>
-        <p>&copy; 2026 Pilot Sales Distribution, Inc. All rights reserved.</p>
-    </footer>
-
-    <!-- ═══════════ BOTTOM NAVIGATION ═══════════ -->
-    <nav class="app-bottom-nav" aria-label="Main navigation">
-        <a href="/" class="app-nav-item" data-nav="home">
-            <i class="fa-solid fa-house"></i>
-            <span>Home</span>
-        </a>
-        <a href="/products" class="app-nav-item" data-nav="categories">
-            <i class="fa-solid fa-shapes"></i>
-            <span>Categories</span>
-        </a>
-        <a href="/rfq" class="app-nav-item active" data-nav="rfq">
-            <i class="fa-solid fa-file-invoice"></i>
-            <span>RFQ</span>
-        </a>
-        <a href="/cart" class="app-nav-item" data-nav="cart">
-            <div class="app-nav-icon-wrap">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span class="app-badge app-badge--cart cart-count">0</span>
-            </div>
-            <span>Cart</span>
-        </a>
-        <a href="/account" class="app-nav-item" data-nav="account">
-            <i class="fa-solid fa-user"></i>
-            <span>Account</span>
-        </a>
-    </nav>
-
-</div>
-
-<script src="/inventory-client.js"></script>
-<script src="/marketplace-app.js"></script>
-<script>
-function rfqStatusLabel(status) { return String(status || 'pending').replace(/_/g, ' '); }
-function rfqText(value) { return String(value == null ? '' : value); }
-function renderRFQs(records) {
-    var list = document.getElementById('rfqList');
-    list.replaceChildren();
-    if (!records.length) {
-        var empty = document.createElement('p');
-        empty.style.cssText = 'font-size:12px;color:var(--app-text-muted);margin:0;';
-        empty.textContent = 'No quotation requests have been submitted yet.';
-        list.appendChild(empty); return;
-    }
-    records.forEach(function(rfq) {
-        var card = document.createElement('div');
-        card.style.cssText = 'background:#fff;border:1px solid var(--app-border);border-radius:var(--app-radius-md);padding:12px;';
-        var heading = document.createElement('div'); heading.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;';
-        var ref = document.createElement('strong'); ref.style.fontSize = '13px'; ref.textContent = rfq.reference || ('RFQ-' + rfq.id.slice(0, 8).toUpperCase());
-        var status = document.createElement('span'); status.style.cssText = 'background:var(--app-primary-soft);color:var(--app-primary);font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:10px;text-transform:capitalize;'; status.textContent = rfqStatusLabel(rfq.status);
-        heading.append(ref, status);
-        var details = document.createElement('div'); details.style.cssText = 'font-size:12px;color:var(--app-text-muted);margin-bottom:6px;'; details.textContent = rfqText(rfq.title) + ' (' + Number(rfq.quantity || 0) + ' units)';
-        var submitted = document.createElement('span'); submitted.style.cssText = 'font-size:10.5px;color:var(--app-text-light);'; submitted.textContent = 'Submitted ' + (rfq.created_at ? new Date(rfq.created_at).toLocaleString() : 'recently');
-        card.append(heading, details, submitted); list.appendChild(card);
-    });
-}
-async function loadRFQs() {
-    if (!window.auth || !window.db) return;
-    var user = window.auth.currentUser;
-    if (!user) { renderRFQs([]); return; }
-    try {
-        var snapshot = await window.db.collection('rfqs').where('user_id', '==', user.uid).get();
-        var records = snapshot.docs.map(function(doc) { return Object.assign({ id: doc.id }, doc.data()); });
-        records.sort(function(a, b) { return String(b.created_at || '').localeCompare(String(a.created_at || '')); });
-        renderRFQs(records);
-    } catch (error) { console.error('Unable to load RFQs:', error); window.pseToast('Unable to load your quote requests.', 'error'); }
-}
-async function handleRFQSubmit(e) {
-    e.preventDefault();
-    if (!window.auth || !window.db || !window.auth.currentUser) {
-        window.pseToast('Please sign in before submitting an RFQ.', 'error');
-        window.location.href = '/login?redirect=' + encodeURIComponent('/rfq'); return;
-    }
-    var button = e.currentTarget.querySelector('button[type="submit"]'); button.disabled = true;
-    try {
-        var user = window.auth.currentUser;
-        var quantity = Number(document.getElementById('rfqQty').value);
-        var unitTarget = Number(document.getElementById('rfqTargetPrice').value || 0);
-        var reference = 'PSE-RFQ-' + Date.now().toString(36).toUpperCase();
-        var dealId = document.getElementById('rfqDealId').value;
-        var sourceVersion = document.getElementById('rfqSourceVersion').value;
-        var snapshotVersion = document.getElementById('rfqSnapshotVersion').value;
-        await window.db.collection('rfqs').add({
-            deal_id: dealId || null, source_version: sourceVersion || null, snapshot_version: snapshotVersion || null, reference: reference, title: document.getElementById('rfqProduct').value.trim(),
-            category: document.getElementById('rfqCategory').value, quantity: quantity,
-            budget: unitTarget > 0 ? unitTarget * quantity : null, currency: 'USD',
-            destination: document.getElementById('rfqDestination').value.trim(),
-            description: document.getElementById('rfqNotes').value.trim(), user_id: user.uid,
-            user_email: user.email || '', status: 'pending', source: 'rfq_form',
-            created_at: new Date().toISOString(), updated_at: new Date().toISOString()
-        });
-        e.currentTarget.reset(); window.pseToast('RFQ submitted. PSE will prepare a quotation.', 'success'); await loadRFQs();
-    } catch (error) { console.error('Unable to submit RFQ:', error); window.pseToast('Unable to submit RFQ. Please try again.', 'error'); }
-    finally { button.disabled = false; }
-}
-function prefillFromInventoryLink() {
-    var q = new URLSearchParams(window.location.search);
-    var mapping = { dealId: 'rfqDealId', slug: 'rfqSlug', sourceVersion: 'rfqSourceVersion', snapshotVersion: 'rfqSnapshotVersion' };
-    Object.keys(mapping).forEach(function (key) { var el = document.getElementById(mapping[key]); if (el) el.value = q.get(key) || ''; });
-    if (q.get('product')) document.getElementById('rfqProduct').value = q.get('product');
-    if (q.get('quantity')) document.getElementById('rfqQty').value = q.get('quantity');
-}
-document.addEventListener('DOMContentLoaded', function() {
-    prefillFromInventoryLink();
-    var wait = setInterval(function() { if (window.auth && window.db) { clearInterval(wait); window.auth.onAuthStateChanged(loadRFQs); } }, 50);
-    setTimeout(function() { clearInterval(wait); }, 5000);
-});
-</script>
-</script>
+        <label>Non-negotiable requirements<textarea id="requirements" name="requirements" maxlength="700" rows="4" placeholder="Paperwork, inspection, brand restrictions, payment terms, or other must-haves"></textarea></label>
+        <div class="check-field"><label class="check-row"><input id="safe-input" type="checkbox" required aria-describedby="safe-input-error"><span>I did not include payment-card data, passwords, credentials, private supplier identity, or other sensitive records. <span class="required-marker">Required</span></span></label><span class="field-error" id="safe-input-error" hidden>Confirm that the brief contains no sensitive records.</span></div>
+        <button class="button primary submit-button" type="submit">Build review draft</button>
+      </form>
+      <section class="draft-panel" aria-labelledby="draft-state-title" aria-live="polite">
+        <span class="state-label">DRAFT STATUS</span><h2 id="draft-state-title">Not submitted</h2><p>Your request summary will appear here. You choose what to do with it next.</p>
+        <div id="draft-output" class="draft-output" tabindex="0" hidden></div>
+        <div id="draft-actions" class="draft-actions" hidden><button id="copy-draft" class="button secondary" type="button">Copy draft</button><button id="download-draft" class="text-button" type="button">Download .txt</button></div>
+        <p id="draft-feedback" class="feedback" role="status"></p>
+      </section>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="shell footer-bottom"><span>© 2026 Pilot Sales Distribution</span><a href="privacy.html">Privacy</a></div></footer>
 </body>
 </html>

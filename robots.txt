@@ -1,26 +1,18 @@
 User-agent: *
 Allow: /
 
-# Sitemaps
+# Protected and closed public routes
+Disallow: /account.html
+Disallow: /admin-dashboard.html
+Disallow: /cart.html
+Disallow: /checkout-success.html
+Disallow: /checkout.html
+Disallow: /login.html
+Disallow: /order-success.html
+Disallow: /product-detail.html
+Disallow: /seller-dashboard.html
+Disallow: /supplier-pending.html
+Disallow: /track-order.html
+Disallow: /wishlist.html
+
 Sitemap: https://pilotsalesdistribution.com/sitemap.xml
-
-# Private / app areas
-Disallow: /admin-dashboard
-Disallow: /admin
-Disallow: /seller-dashboard
-Disallow: /seller
-Disallow: /buyer-dashboard
-Disallow: /account
-Disallow: /chat
-Disallow: /checkout
-Disallow: /cart
-Disallow: /api/
-Disallow: /order-success
-Disallow: /forgot-password
-Disallow: /forgot
-Disallow: /reset-password
-Disallow: /500
-Disallow: /error
-
-# Crawl politely
-Crawl-delay: 1
