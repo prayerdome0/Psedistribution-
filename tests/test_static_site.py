@@ -1,267 +1,257 @@
-"""
-test_static_site.py
--------------------
-Lightweight structural tests for the static HTML storefront. These do
-not require a browser — they parse the HTML and assert the invariants
-the rest of the site depends on.
-
-Add new tests here when you add a new page or a new public-facing
-behaviour that has to keep working.
-"""
+"""Contract tests for the intentionally narrow Pilot Sales public release."""
 from __future__ import annotations
 
 import json
 import re
+import subprocess
+import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import unquote, urlparse
 
 import pytest
 
 REPO = Path(__file__).resolve().parents[1]
+DOMAIN = "https://pilotsalesdistribution.com"
 
 PUBLIC_PAGES = [
-    "index.html", "products.html", "product-detail.html", "rfq.html",
-    "about.html", "contact.html", "help-center.html",
-    "privacy.html", "terms.html",
+    "index.html",
+    "products.html",
+    "rfq.html",
+    "about.html",
+    "contact.html",
+    "privacy.html",
+    "terms.html",
 ]
-ALL_PAGES = [
-    "index.html", "products.html", "product-detail.html", "rfq.html",
-    "login.html", "register.html", "forgot-password.html",
-    "account.html", "buyer-dashboard.html", "seller-dashboard.html",
-    "admin-dashboard.html", "about.html", "contact.html", "help-center.html",
-    "privacy.html", "terms.html", "track-order.html", "cart.html",
-    "checkout.html", "wishlist.html", "order-success.html", "chat.html",
-    "offline.html", "404.html", "500.html",
+INDEXABLE_PAGES = [page for page in PUBLIC_PAGES if page != "rfq.html"]
+PROTECTED_PLACEHOLDER_PAGES = [
+    "account.html",
+    "admin-dashboard.html",
+    "cart.html",
+    "checkout-success.html",
+    "checkout.html",
+    "login.html",
+    "order-success.html",
+    "product-detail.html",
+    "register.html",
+    "returns.html",
+    "seller-dashboard.html",
+    "supplier-pending.html",
+    "track-order.html",
+    "wishlist.html",
 ]
+EXPECTED_RELEASE_FILES = {
+    *PUBLIC_PAGES,
+    *PROTECTED_PLACEHOLDER_PAGES,
+    "assets/hero-inspection-poster.jpg",
+    "assets/hero-inspection-web.mp4",
+    "favicon.ico",
+    "logo.jpg",
+    "robots.txt",
+    "site.css",
+    "site.js",
+    "sitemap.xml",
+}
 
 
-class _Counter(HTMLParser):
+class PageParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
         self.has_main = False
         self.has_h1 = False
-        self.has_form = False
         self.has_viewport = False
         self.lang: str | None = None
         self.charset: str | None = None
-        self.inline_event_handlers: list[str] = []
         self.links: list[str] = []
-        self.imgs: list[tuple[str, str | None]] = []
-        # Form / auth-sensitive markers
-        self.has_password_input = False
-        self.has_email_input = False
-        self.has_submit = False
+        self.assets: list[str] = []
+        self.images: list[tuple[str, str | None]] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        a = dict(attrs)
+        values = dict(attrs)
         if tag == "html":
-            self.lang = a.get("lang")
+            self.lang = values.get("lang")
         elif tag == "meta":
-            if a.get("name") == "viewport":
-                self.has_viewport = True
-            if a.get("charset"):
-                self.charset = a.get("charset")
+            self.charset = values.get("charset") or self.charset
+            self.has_viewport |= values.get("name") == "viewport"
         elif tag == "main":
             self.has_main = True
         elif tag == "h1":
             self.has_h1 = True
-        elif tag == "form":
-            self.has_form = True
-        elif tag == "a" and a.get("href"):
-            self.links.append(a["href"])
-        elif tag == "img":
-            self.imgs.append((a.get("src", ""), a.get("alt")))
-        elif tag == "input":
-            t = (a.get("type") or "").lower()
-            if t == "password":
-                self.has_password_input = True
-            elif t == "email":
-                self.has_email_input = True
-            elif t == "submit":
-                self.has_submit = True
-        elif tag == "button":
-            if (a.get("type") or "").lower() == "submit":
-                self.has_submit = True
-        # inline event handlers on interactive elements only
-        if tag in ("button", "a", "div", "span", "section", "form"):
-            for k in a:
-                if k.startswith("on"):
-                    self.inline_event_handlers.append(f"{tag}[{k}]")
+        elif tag == "a" and values.get("href"):
+            self.links.append(values["href"])
+        elif tag in {"script", "link", "source", "video", "img"}:
+            target = values.get("src") or values.get("href") or values.get("poster")
+            if target:
+                self.assets.append(target)
+            if tag == "img":
+                self.images.append((values.get("src", ""), values.get("alt")))
 
 
-@pytest.mark.parametrize("fname", ALL_PAGES)
-def test_page_exists(fname: str) -> None:
-    assert (REPO / fname).exists(), f"required page {fname} is missing"
+def page_text(page: str) -> str:
+    return (REPO / page).read_text(encoding="utf-8", errors="strict")
 
 
-@pytest.mark.parametrize("fname", ALL_PAGES)
-def test_page_has_doctype(fname: str) -> None:
-    text = (REPO / fname).read_text(encoding="utf-8", errors="replace").lstrip().lower()
-    assert text.startswith("<!doctype html>"), f"{fname} must start with <!DOCTYPE html>"
+def head_text(page: str) -> str:
+    text = page_text(page)
+    match = re.search(r"<head>(.*?)</head>", text, re.I | re.S)
+    assert match, f"{page} must have a head element"
+    return match.group(1)
 
 
-@pytest.mark.parametrize("fname", ALL_PAGES)
-def test_page_has_charset(fname: str) -> None:
-    c = _Counter()
-    c.feed((REPO / fname).read_text(encoding="utf-8", errors="replace"))
-    assert c.charset, f"{fname} must declare <meta charset>"
+def canonical_for(page: str) -> str:
+    return f"{DOMAIN}/" if page == "index.html" else f"{DOMAIN}/{page}"
 
 
-@pytest.mark.parametrize("fname", ALL_PAGES)
-def test_page_has_viewport(fname: str) -> None:
-    c = _Counter()
-    c.feed((REPO / fname).read_text(encoding="utf-8", errors="replace"))
-    assert c.has_viewport, f"{fname} must declare <meta name='viewport'>"
+@pytest.mark.parametrize("page", PUBLIC_PAGES)
+def test_public_page_has_document_basics(page: str) -> None:
+    text = page_text(page)
+    parser = PageParser()
+    parser.feed(text)
+    assert text.lstrip().lower().startswith("<!doctype html>")
+    assert parser.charset and parser.has_viewport and parser.lang == "en"
+    assert parser.has_main and parser.has_h1
+    for src, alt in parser.images:
+        assert alt is not None, f"{page}: img {src!r} is missing alt"
 
 
-@pytest.mark.parametrize("fname", ALL_PAGES)
-def test_page_has_lang(fname: str) -> None:
-    c = _Counter()
-    c.feed((REPO / fname).read_text(encoding="utf-8", errors="replace"))
-    assert c.lang, f"{fname} must declare lang on <html>"
-    assert c.lang.startswith("en"), f"{fname} should have lang='en' (got {c.lang!r})"
+@pytest.mark.parametrize("page", PUBLIC_PAGES)
+def test_public_page_metadata_contract(page: str) -> None:
+    head = head_text(page)
+    title = re.findall(r"<title>(.*?)</title>", head, re.I | re.S)
+    assert len(title) == 1 and 1 <= len(title[0].strip()) <= 70
+    description = re.search(r'<meta\s+name="description"\s+content="([^"]+)"', head, re.I)
+    assert description and 50 <= len(description.group(1)) <= 200
+    canonical = canonical_for(page)
+    assert f'<link rel="canonical" href="{canonical}">' in head
+    for property_name in ["og:title", "og:description", "og:url", "og:image"]:
+        assert re.search(
+            rf'<meta\s+property="{re.escape(property_name)}"\s+content="[^"]+"', head, re.I
+        ), f"{page} is missing {property_name}"
+    assert f'<meta property="og:url" content="{canonical}">' in head
+    for twitter_name in ["twitter:card", "twitter:title", "twitter:description", "twitter:image"]:
+        assert re.search(
+            rf'<meta\s+name="{re.escape(twitter_name)}"\s+content="[^"]+"', head, re.I
+        ), f"{page} is missing {twitter_name}"
 
 
-@pytest.mark.parametrize("fname", ALL_PAGES)
-def test_page_has_unique_title(fname: str) -> None:
-    text = (REPO / fname).read_text(encoding="utf-8", errors="replace")
-    # Only count <title> tags that are direct children of <head>. Other
-    # <title> tags may appear inside <svg> or inside JS template literals
-    # and should be ignored.
-    head_end = text.lower().find("</head>")
-    assert head_end != -1, f"{fname} has no </head>"
-    head = text[:head_end]
-    matches = re.findall(r"<title>(.*?)</title>", head, re.S)
-    assert matches, f"{fname} must have a <title> in <head>"
-    assert len(matches) == 1, f"{fname} must have exactly one <title> in <head> (found {len(matches)})"
-    title = matches[0].strip()
-    assert title, f"{fname}: <title> is empty"
-    assert len(title) <= 70, f"{fname}: <title> is {len(title)} chars (>70 hurts SEO)"
+def test_homepage_has_organization_and_website_jsonld() -> None:
+    text = page_text("index.html")
+    assert re.search(r'"@type"\s*:\s*"Organization"', text)
+    assert re.search(r'"@type"\s*:\s*"WebSite"', text)
 
 
-@pytest.mark.parametrize("fname", PUBLIC_PAGES)
-def test_public_page_has_meta_description(fname: str) -> None:
-    text = (REPO / fname).read_text(encoding="utf-8", errors="replace")
-    m = re.search(r'<meta\s+name="description"\s+content="([^"]+)"', text)
-    assert m, f"{fname} must have a meta description"
-    desc = m.group(1)
-    assert 50 <= len(desc) <= 200, f"{fname}: description is {len(desc)} chars (target 50-200)"
-
-
-@pytest.mark.parametrize("fname", PUBLIC_PAGES)
-def test_public_page_has_canonical(fname: str) -> None:
-    text = (REPO / fname).read_text(encoding="utf-8", errors="replace")
-    assert 'rel="canonical"' in text, f"{fname} must declare a canonical URL"
-
-
-@pytest.mark.parametrize("fname", PUBLIC_PAGES)
-def test_public_page_has_og_title_and_description(fname: str) -> None:
-    text = (REPO / fname).read_text(encoding="utf-8", errors="replace")
-    assert 'property="og:title"' in text, f"{fname} must declare og:title"
-    assert 'property="og:description"' in text, f"{fname} must declare og:description"
-    assert 'property="og:url"' in text, f"{fname} must declare og:url"
-    assert 'property="og:image"' in text, f"{fname} must declare og:image"
-
-
-@pytest.mark.parametrize("fname", PUBLIC_PAGES)
-def test_public_page_has_breadcrumb_jsonld(fname: str) -> None:
-    text = (REPO / fname).read_text(encoding="utf-8", errors="replace")
-    assert '"@type":"BreadcrumbList"' in text or '"@type": "BreadcrumbList"' in text, (
-        f"{fname} should have a BreadcrumbList JSON-LD block"
+@pytest.mark.parametrize("page", PUBLIC_PAGES)
+def test_jsonld_blocks_are_valid_json(page: str) -> None:
+    blocks = re.findall(
+        r'<script\s+type="application/ld\+json">(.*?)</script>',
+        page_text(page),
+        re.I | re.S,
     )
+    assert blocks, f"{page} must contain JSON-LD"
+    for block in blocks:
+        parsed = json.loads(block)
+        assert parsed.get("@context") == "https://schema.org"
 
 
-def test_index_has_organization_jsonld() -> None:
-    text = (REPO / "index.html").read_text(encoding="utf-8", errors="replace")
-    assert '"@type":"Organization"' in text, "index.html must have Organization JSON-LD"
-    assert '"@type":"WebSite"' in text, "index.html must have WebSite JSON-LD"
+@pytest.mark.parametrize("page", [p for p in PUBLIC_PAGES if p != "index.html"])
+def test_non_home_pages_have_breadcrumb_jsonld(page: str) -> None:
+    assert re.search(r'"@type"\s*:\s*"BreadcrumbList"', page_text(page))
 
 
-# ─── Auth page-specific checks ──────────────────────────────────────
-AUTH_PAGES = ["login.html", "register.html", "forgot-password.html"]
+def test_rfq_is_noindex_while_indexable_pages_are_indexable() -> None:
+    assert re.search(r'<meta\s+name="robots"\s+content="[^"]*noindex', head_text("rfq.html"), re.I)
+    for page in INDEXABLE_PAGES:
+        match = re.search(r'<meta\s+name="robots"\s+content="([^"]+)"', head_text(page), re.I)
+        if match:
+            assert "noindex" not in match.group(1).lower(), f"{page} must remain indexable"
 
 
-@pytest.mark.parametrize("fname", AUTH_PAGES)
-def test_auth_page_has_email_and_password(fname: str) -> None:
-    c = _Counter()
-    c.feed((REPO / fname).read_text(encoding="utf-8", errors="replace"))
-    if fname == "forgot-password.html":
-        assert c.has_email_input, f"{fname} must have an email input"
-    else:
-        assert c.has_email_input, f"{fname} must have an email input"
-        assert c.has_password_input, f"{fname} must have a password input"
-    assert c.has_submit, f"{fname} must have a submit button"
+@pytest.mark.parametrize("page", PROTECTED_PLACEHOLDER_PAGES)
+def test_protected_placeholder_is_fail_closed(page: str) -> None:
+    text = page_text(page)
+    assert re.search(r'<meta\s+name="robots"\s+content="[^"]*noindex', text, re.I)
+    assert "<form" not in text.lower(), f"{page} must not imply a working public account flow"
+    assert not re.search(r'type\s*=\s*["\'](?:email|password|submit)["\']', text, re.I)
 
 
-@pytest.mark.parametrize("fname", AUTH_PAGES)
-def test_auth_page_has_noindex(fname: str) -> None:
-    text = (REPO / fname).read_text(encoding="utf-8", errors="replace")
-    # auth pages must not be indexed
-    m = re.search(r'<meta\s+name="robots"\s+content="([^"]+)"', text)
-    assert m, f"{fname} must have a robots meta"
-    assert "noindex" in m.group(1).lower(), f"{fname} robots must be noindex (got {m.group(1)!r})"
+def test_release_manifest_is_exact_and_source_backed() -> None:
+    manifest = json.loads((REPO / "public-release.json").read_text())
+    assert manifest == sorted(EXPECTED_RELEASE_FILES)
+    for relative in manifest:
+        path = REPO / relative
+        assert path.is_file(), f"release input is missing or not a file: {relative}"
+        assert path.resolve().is_relative_to(REPO.resolve())
 
 
-# ─── Image alt text ──────────────────────────────────────────────────
-@pytest.mark.parametrize("fname", ALL_PAGES)
-def test_page_images_have_alt(fname: str) -> None:
-    c = _Counter()
-    c.feed((REPO / fname).read_text(encoding="utf-8", errors="replace"))
-    for src, alt in c.imgs:
-        # An empty alt="" is OK for purely decorative images (e.g. a 1x1
-        # spacer), but the attribute MUST be present.
-        assert alt is not None, f"{fname}: <img> missing alt (src={src[:60]})"
-
-
-# ─── vercel.json sanity ──────────────────────────────────────────────
-def test_vercel_json_required_headers() -> None:
-    with open(REPO / "vercel.json") as f:
-        data = json.load(f)
-    headers = {h["key"]: h["value"] for e in data.get("headers", []) for h in e.get("headers", [])}
-    for required in ["X-Content-Type-Options", "X-Frame-Options", "Referrer-Policy",
-                     "Content-Security-Policy", "Permissions-Policy"]:
-        assert required in headers, f"vercel.json missing required header {required}"
-    csp = headers.get("Content-Security-Policy", "")
-    assert "default-src" in csp, "CSP must include default-src"
-    assert "frame-ancestors" in csp, "CSP must include frame-ancestors"
-
-
-def test_vercel_json_rewrites_for_required_pages() -> None:
-    with open(REPO / "vercel.json") as f:
-        data = json.load(f)
-    rewrite_sources = {r.get("source", "").rstrip("/") for r in data.get("rewrites", [])}
-    # /404 and /offline are served automatically by Vercel/Firebase from the
-    # static /404.html and /offline.html files; no rewrite needed.
-    for required in ["/products", "/rfq", "/login", "/register", "/forgot-password",
-                     "/admin-dashboard", "/buyer-dashboard", "/500", "/offline"]:
-        assert required in rewrite_sources, f"vercel.json missing rewrite for {required}"
-
-
-# ─── robots.txt / sitemap coherence ─────────────────────────────────
-def test_robots_txt_disallows_admin() -> None:
-    text = (REPO / "robots.txt").read_text()
-    for must in ["/admin-dashboard", "/seller-dashboard", "/account", "/api/"]:
-        assert must in text, f"robots.txt must disallow {must}"
-
-
-def test_sitemap_xml_well_formed() -> None:
-    import xml.etree.ElementTree as ET
-    tree = ET.parse(REPO / "sitemap.xml")
-    root = tree.getroot()
-    urls = [u.text for u in root.iter() if u.tag.endswith("}loc") or u.tag == "loc"]
-    assert len(urls) >= 5, f"sitemap.xml only has {len(urls)} URLs (expected at least 5)"
-
-
-# ─── Service worker + manifest ─────────────────────────────────────
-def test_sw_caches_offline_page() -> None:
-    text = (REPO / "sw.js").read_text()
-    assert "/offline.html" in text, "sw.js must precache the offline page"
-
-
-def test_manifest_references_sw_scope() -> None:
-    data = json.loads((REPO / "manifest.json").read_text())
-    assert data.get("start_url"), "manifest.json must have a start_url"
-    assert data.get("name"), "manifest.json must have a name"
-    assert any(icon.get("sizes") == "192x192" for icon in data.get("icons", [])), (
-        "manifest.json must declare a 192x192 icon for PWA install"
+def test_public_builder_emits_only_the_manifest(tmp_path: Path) -> None:
+    output = tmp_path / "public-output"
+    subprocess.run(
+        ["node", "scripts/build-public-site.mjs", str(output)],
+        cwd=REPO,
+        check=True,
+        text=True,
+        capture_output=True,
     )
+    emitted = {
+        str(path.relative_to(output))
+        for path in output.rglob("*")
+        if path.is_file()
+    }
+    assert emitted == EXPECTED_RELEASE_FILES
+    forbidden = {
+        "buyer-dashboard.html",
+        "firebase.json",
+        "firestore.rules",
+        "docker-compose.yml",
+        "pytest.ini",
+        "sw.js",
+        "manifest.json",
+    }
+    assert emitted.isdisjoint(forbidden)
+    assert not any(path.suffix.lower() in {".zip", ".csv", ".md"} for path in output.rglob("*"))
+
+
+def test_public_documents_have_no_broken_local_references() -> None:
+    for page in PUBLIC_PAGES:
+        parser = PageParser()
+        parser.feed(page_text(page))
+        for raw_target in parser.links + parser.assets:
+            parsed = urlparse(raw_target)
+            if parsed.scheme or parsed.netloc or raw_target.startswith(("#", "mailto:", "tel:")):
+                continue
+            target = unquote(parsed.path)
+            if not target:
+                continue
+            relative = "index.html" if target == "/" else target.lstrip("/")
+            assert relative in EXPECTED_RELEASE_FILES, f"{page} references undeployed file {relative}"
+
+
+def test_vercel_serves_clean_build_with_security_headers() -> None:
+    config = json.loads((REPO / "vercel.json").read_text())
+    assert config.get("buildCommand") == "node scripts/build-public-site.mjs"
+    assert config.get("outputDirectory") == ".vercel-public"
+    headers = {
+        header["key"]: header["value"]
+        for rule in config.get("headers", [])
+        for header in rule.get("headers", [])
+    }
+    for required in [
+        "Content-Security-Policy",
+        "X-Content-Type-Options",
+        "X-Frame-Options",
+        "Referrer-Policy",
+        "Permissions-Policy",
+    ]:
+        assert required in headers
+    assert "frame-ancestors 'none'" in headers["Content-Security-Policy"]
+    assert headers["X-Frame-Options"] == "DENY"
+
+
+def test_robots_and_sitemap_match_the_indexable_contract() -> None:
+    robots = (REPO / "robots.txt").read_text()
+    for route in ["/admin-dashboard.html", "/seller-dashboard.html", "/account.html", "/api/"]:
+        assert f"Disallow: {route}" in robots
+    root = ET.parse(REPO / "sitemap.xml").getroot()
+    urls = {node.text for node in root.iter() if node.tag.endswith("}loc") or node.tag == "loc"}
+    assert urls == {canonical_for(page) for page in INDEXABLE_PAGES}
+    assert canonical_for("rfq.html") not in urls

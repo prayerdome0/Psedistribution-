@@ -50,8 +50,9 @@
     const markMediaFailure = () => {
       if (mediaFailed) return;
       mediaFailed = true;
-      cinematicHero.classList.remove('cinematic-hero--interactive');
-      cinematicHero.classList.add('cinematic-hero--media-failed');
+      cinematicHero.classList.remove('cinematic-hero--interactive', 'cinematic-hero--has-input');
+      cinematicHero.classList.add('cinematic-hero--media-failed', 'cinematic-hero--poster-only');
+      heroVideo.pause();
       heroVideo.preload = 'none';
       if (animationFrame) window.cancelAnimationFrame(animationFrame);
       animationFrame = 0;
@@ -74,12 +75,12 @@
     };
 
     const scheduleFrame = () => {
-      if (mediaFailed) return;
+      if (mediaFailed || !cinematicHero.classList.contains('cinematic-hero--interactive')) return;
       if (!animationFrame) animationFrame = window.requestAnimationFrame(renderFrame);
     };
 
     const setTarget = (value, recordInput = true) => {
-      if (mediaFailed) return;
+      if (mediaFailed || !cinematicHero.classList.contains('cinematic-hero--interactive')) return;
       targetProgress = clampProgress(value);
       updateInterface(targetProgress);
       if (recordInput) cinematicHero.classList.add('cinematic-hero--has-input');
@@ -88,46 +89,66 @@
 
     updateInterface(0);
 
-    if (reducedMotion.matches || compactViewport.matches || !finePointer.matches) {
+    const shouldUsePoster = () => reducedMotion.matches || compactViewport.matches || !finePointer.matches;
+
+    const readMetadata = () => {
+      if (mediaFailed) return false;
+      if (!Number.isFinite(heroVideo.duration) || heroVideo.duration <= 0) {
+        if (heroVideo.readyState >= 1) markMediaFailure();
+        return false;
+      }
+      videoDuration = heroVideo.duration;
+      return true;
+    };
+
+    const disableInspection = () => {
+      cinematicHero.classList.remove('cinematic-hero--interactive', 'cinematic-hero--has-input');
       cinematicHero.classList.add('cinematic-hero--poster-only');
-    } else {
-      const readMetadata = () => {
-        if (mediaFailed) return false;
-        if (!Number.isFinite(heroVideo.duration) || heroVideo.duration <= 0) {
-          markMediaFailure();
-          return false;
-        }
-        videoDuration = heroVideo.duration;
-        return true;
-      };
+      heroVideo.pause();
+      heroVideo.preload = 'none';
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+    };
 
-      const enableInspection = () => {
-        if (mediaFailed || heroVideo.readyState < 2 || !readMetadata()) return;
-        heroVideo.pause();
-        cinematicHero.classList.add('cinematic-hero--interactive');
-        setTarget(0, false);
-      };
+    const enableInspection = () => {
+      if (mediaFailed || shouldUsePoster() || heroVideo.readyState < 2 || !readMetadata()) return;
+      heroVideo.pause();
+      cinematicHero.classList.remove('cinematic-hero--poster-only');
+      cinematicHero.classList.add('cinematic-hero--interactive');
+      setTarget(targetProgress, false);
+    };
 
-      inspectionSurface.addEventListener('pointermove', (event) => {
-        if (event.target instanceof Element && event.target.closest('a, button, input, select, textarea')) return;
-        const bounds = inspectionSurface.getBoundingClientRect();
-        if (bounds.width <= 0) return;
-        setTarget((event.clientX - bounds.left) / bounds.width);
-      }, { passive: true });
-
-      inspectionRange.addEventListener('input', () => setTarget(Number(inspectionRange.value) / 100));
-      heroVideo.addEventListener('seeked', scheduleFrame);
-      heroVideo.addEventListener('error', markMediaFailure, { once: true });
-      heroVideo.querySelector('source')?.addEventListener('error', markMediaFailure, { once: true });
-      heroVideo.addEventListener('loadedmetadata', readMetadata, { once: true });
-      heroVideo.addEventListener('loadeddata', enableInspection, { once: true });
+    const syncPresentationMode = () => {
+      if (mediaFailed || shouldUsePoster()) {
+        disableInspection();
+        return;
+      }
+      cinematicHero.classList.remove('cinematic-hero--poster-only');
       heroVideo.preload = 'auto';
       if (heroVideo.readyState >= 1) readMetadata();
       if (!mediaFailed) {
         if (heroVideo.readyState >= 2) enableInspection();
         else heroVideo.load();
       }
+    };
+
+    inspectionSurface.addEventListener('pointermove', (event) => {
+      if (event.target instanceof Element && event.target.closest('a, button, input, select, textarea')) return;
+      const bounds = inspectionSurface.getBoundingClientRect();
+      if (bounds.width <= 0) return;
+      setTarget((event.clientX - bounds.left) / bounds.width);
+    }, { passive: true });
+
+    inspectionRange.addEventListener('input', () => setTarget(Number(inspectionRange.value) / 100));
+    heroVideo.addEventListener('seeked', scheduleFrame);
+    heroVideo.addEventListener('error', markMediaFailure, { once: true });
+    heroVideo.querySelector('source')?.addEventListener('error', markMediaFailure, { once: true });
+    heroVideo.addEventListener('loadedmetadata', readMetadata);
+    heroVideo.addEventListener('loadeddata', enableInspection);
+    for (const mediaQuery of [reducedMotion, finePointer, compactViewport]) {
+      mediaQuery.addEventListener('change', syncPresentationMode);
     }
+    syncPresentationMode();
   }
 
   const form = document.getElementById('rfq-form');

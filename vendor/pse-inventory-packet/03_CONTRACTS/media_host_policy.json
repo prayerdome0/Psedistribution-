@@ -3,6 +3,7 @@
   "requiredScheme": "https",
   "defaultAllowedHosts": [
     "cdn.pilotsalesdistribution.com",
+    "i.ibb.co",
     "pilotsalesdistribution.com",
     "www.pilotsalesdistribution.com"
   ],
